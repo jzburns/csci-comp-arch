@@ -1,3 +1,8 @@
+/*
+ * this code demonstrates the purpose of
+ * the literal pool for optimizing immediate 
+ * offset addressing
+ */
 global_start
 
 _start:
