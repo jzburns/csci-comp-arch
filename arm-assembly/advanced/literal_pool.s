@@ -1,11 +1,11 @@
 /*
  * this code demonstrates the purpose of
- * the literal pool for optimizing immediate 
+ * the literal pool for optimizing immediate
  * offset addressing
  */
-global_start
+.global main
 
-_start:
+main:
 	ldr r0, =array	// trigger literal pool creation
 	str r2, [r0, #4]
 	ldr r7, =0x00FFFFAA
