@@ -1,0 +1,6 @@
+\beamer@sectionintoc {1}{Introduction}{3}{0}{1}
+\beamer@sectionintoc {2}{Topic 1: Optimizing Deep Neural Network Training with OpenMP}{4}{0}{2}
+\beamer@sectionintoc {3}{Topic 2: Help! Advising OpenMP Parallelization}{6}{0}{3}
+\beamer@sectionintoc {4}{Topic 3: Parallel Graph Neural Networks with OpenMP}{8}{0}{4}
+\beamer@sectionintoc {5}{Topic 4: Energy-Efficient ML Model Training with OpenMP}{10}{0}{5}
+\beamer@sectionintoc {6}{Topic 5: OpenMP Enhancement of R Selected Contributed Packages}{12}{0}{6}

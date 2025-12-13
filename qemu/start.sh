@@ -35,6 +35,7 @@ if [ ! -e bullseye.img ]; then
 	echo "done"
 fi
 
+#	-drive "file=bullseye.img,format=raw,index=0,if=sd" \
 # start the emuator running - then use ssh -p 5555 localhost to connect
 qemu-system-aarch64 \
 	-machine raspi3b \
