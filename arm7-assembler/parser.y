@@ -17,30 +17,30 @@ void yyerror(const char *s);
 %token B BL BX
 %token LDR STR LDRB STRB 
 
-%%  /* ====== GRAMMAR RULES SECTION ====== */
-
-input:
-      expr                { printf("Result = %d\n", $1); }
+%%  
+program
+    : stmt_list
     ;
 
-expr:
-      expr PLUS term       { $$ = $1 + $3; }
-    | expr CMP term        { $$ = $1 + $3; }
-    | expr MINUS term      { $$ = $1 - $3; }
-    | term                 { $$ = $1; }
+stmt_list
+    : stmt_list stmt
+    | stmt
     ;
 
-term:
-      term MUL factor      { $$ = $1 * $3; }
-    | term DIV factor      { $$ = $1 / $3; }
-    | factor               { $$ = $1; }
+stmt
+    : CMP IDENT '=' expr ';'
+    | PRINT expr ';'
     ;
 
-factor:
-      NUMBER               { $$ = $1; }
-    | LPAREN expr RPAREN   { $$ = $2; }
+expr
+    : expr '+' term
+    | term
     ;
 
+term
+    : NUMBER
+    | IDENT
+    ;
 %%  /* ====== PLAIN C CODE SECTION ====== */
 
 int main(int argc, char **argv) {
