@@ -7,11 +7,10 @@ int yylex(void);
 void yyerror(const char *s);
 %}
 
-/* Tokens */
-%token NUMBER
-%token PLUS MINUS MUL DIV LPAREN RPAREN
 /* ARM7DTMI tokens */
-%token CMP ADD SUB MLA
+%token CMP 
+%token MOV
+%token ADD SUB MUL MLA
 %token ORR AND  
 %token LSL LSR ASR ROR
 %token B BL BX
