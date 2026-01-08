@@ -60,7 +60,24 @@ extern int yydebug;
     MUL = 261,                     /* MUL  */
     DIV = 262,                     /* DIV  */
     LPAREN = 263,                  /* LPAREN  */
-    RPAREN = 264                   /* RPAREN  */
+    RPAREN = 264,                  /* RPAREN  */
+    CMP = 265,                     /* CMP  */
+    ADD = 266,                     /* ADD  */
+    SUB = 267,                     /* SUB  */
+    MLA = 268,                     /* MLA  */
+    ORR = 269,                     /* ORR  */
+    AND = 270,                     /* AND  */
+    LSL = 271,                     /* LSL  */
+    LSR = 272,                     /* LSR  */
+    ASR = 273,                     /* ASR  */
+    ROR = 274,                     /* ROR  */
+    B = 275,                       /* B  */
+    BL = 276,                      /* BL  */
+    BX = 277,                      /* BX  */
+    LDR = 278,                     /* LDR  */
+    STR = 279,                     /* STR  */
+    LDRB = 280,                    /* LDRB  */
+    STRB = 281                     /* STRB  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

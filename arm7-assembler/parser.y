@@ -10,6 +10,12 @@ void yyerror(const char *s);
 /* Tokens */
 %token NUMBER
 %token PLUS MINUS MUL DIV LPAREN RPAREN
+/* ARM7DTMI tokens */
+%token CMP ADD SUB MLA
+%token ORR AND  
+%token LSL LSR ASR ROR
+%token B BL BX
+%token LDR STR LDRB STRB 
 
 %%  /* ====== GRAMMAR RULES SECTION ====== */
 
@@ -19,6 +25,7 @@ input:
 
 expr:
       expr PLUS term       { $$ = $1 + $3; }
+    | expr CMP term        { $$ = $1 + $3; }
     | expr MINUS term      { $$ = $1 - $3; }
     | term                 { $$ = $1; }
     ;

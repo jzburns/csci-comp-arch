@@ -15,6 +15,20 @@ ID      [a-zA-Z_][a-zA-Z0-9_]*
 "("             { return LPAREN; }
 ")"             { return RPAREN; }
 [ \t\n]+        ;   /* skip whitespace */
+"cmp"           { return CMP; }
+"add"           { return ADD; }
+"sub"           { return SUB; }
+"mla"           { return MLA; }
+"orr"           { return ORR; }
+"and"           { return AND; }
+"lsl"           { return LSL; }
+"lsr"           { return LSR; }
+"asr"           { return ASR; }
+"ror"           { return ROR; }
+"str"           { return STR; }
+"ldr"           { return LDR; }
+"strb"          { return STRB; }
+"ldrb"          { return LDRB; }
 .               { return yytext[0]; }
 %%
 
