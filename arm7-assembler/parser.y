@@ -7,11 +7,12 @@ int yylex(void);
 void yyerror(const char *s);
 %}
 
-/* ARM7DTMI tokens */
+/* ARM7DTMI uconditional execution tokens */
+%token REG
 %token CMP 
 %token MOV
 %token ADD SUB MUL MLA
-%token ORR AND  
+%token ORR AND
 %token LSL LSR ASR ROR
 %token B BL BX
 %token LDR STR LDRB STRB 
@@ -27,7 +28,7 @@ stmt_list
     ;
 
 stmt
-    : CMP IDENT '=' expr ';'
+    : CMP REG '=' expr ';'
     | PRINT expr ';'
     ;
 

@@ -7,13 +7,6 @@ DIGIT   [0-9]
 ID      [a-zA-Z_][a-zA-Z0-9_]*
 
 %%
-{DIGIT}+        { yylval = atoi(yytext); return NUMBER; }
-"+"             { return PLUS; }
-"-"             { return MINUS; }
-"*"             { return MUL; }
-"/"             { return DIV; }
-"("             { return LPAREN; }
-")"             { return RPAREN; }
 [ \t\n]+        ;   /* skip whitespace */
 "cmp"           { return CMP; }
 "add"           { return ADD; }
