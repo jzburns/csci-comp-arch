@@ -20,7 +20,9 @@ void yyerror(const char *s);
 %token LSL LSR ASR ROR
 %token B BL BX
 %token LDR STR LDRB STRB 
-%token COMMA 
+%token COMMA
+%token IMM
+
 
 %%  
 program
@@ -35,6 +37,7 @@ stmt_list
 stmt
     : CMP REG COMMA REG
     | ADD REG COMMA REG COMMA REG
+    | SUB REG COMMA REG COMMA REG
     ;
 
 %%  /* ====== PLAIN C CODE SECTION ====== */

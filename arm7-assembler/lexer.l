@@ -7,14 +7,16 @@
 /* Definitions */
 DIGIT   [0-9]
 ID      [a-zA-Z_][a-zA-Z0-9_]*
-IMMEDIATE #[0-9]*
+REGISTER "r"[0-9]+
+IMMEDIATE #[0-9]+
 
 %%
-"r"[0-9]+	{ return REG; }
+{REGISTER}	{ printf("Register (%s)\n", yytext); return REG; }
+{IMMEDIATE}	{ printf("Immediate (%s)\n", yytext); return IMM; }
 [ \t\n]+        ;   /* skip whitespace */
-"cmp"           { return CMP; }
-"add"           { return ADD; }
-"sub"           { return SUB; }
+"cmp"           { printf("Instr 'cmp'\n"); return CMP; }
+"add"           { printf("Instr 'add'\n"); return ADD; }
+"sub"           { printf("Instr 'sub'\n"); return SUB; }
 "mla"           { return MLA; }
 "orr"           { return ORR; }
 "and"           { return AND; }

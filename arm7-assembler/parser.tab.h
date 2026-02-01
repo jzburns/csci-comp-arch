@@ -74,7 +74,8 @@ extern int yydebug;
     STR = 275,                     /* STR  */
     LDRB = 276,                    /* LDRB  */
     STRB = 277,                    /* STRB  */
-    COMMA = 278                    /* COMMA  */
+    COMMA = 278,                   /* COMMA  */
+    IMM = 279                      /* IMM  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
