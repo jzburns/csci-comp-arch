@@ -39,7 +39,7 @@
 # define YY_YY_PARSER_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -54,30 +54,26 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    NUMBER = 258,                  /* NUMBER  */
-    PLUS = 259,                    /* PLUS  */
-    MINUS = 260,                   /* MINUS  */
-    MUL = 261,                     /* MUL  */
-    DIV = 262,                     /* DIV  */
-    LPAREN = 263,                  /* LPAREN  */
-    RPAREN = 264,                  /* RPAREN  */
-    CMP = 265,                     /* CMP  */
-    ADD = 266,                     /* ADD  */
-    SUB = 267,                     /* SUB  */
-    MLA = 268,                     /* MLA  */
-    ORR = 269,                     /* ORR  */
-    AND = 270,                     /* AND  */
-    LSL = 271,                     /* LSL  */
-    LSR = 272,                     /* LSR  */
-    ASR = 273,                     /* ASR  */
-    ROR = 274,                     /* ROR  */
-    B = 275,                       /* B  */
-    BL = 276,                      /* BL  */
-    BX = 277,                      /* BX  */
-    LDR = 278,                     /* LDR  */
-    STR = 279,                     /* STR  */
-    LDRB = 280,                    /* LDRB  */
-    STRB = 281                     /* STRB  */
+    REG = 258,                     /* REG  */
+    CMP = 259,                     /* CMP  */
+    MOV = 260,                     /* MOV  */
+    ADD = 261,                     /* ADD  */
+    SUB = 262,                     /* SUB  */
+    MUL = 263,                     /* MUL  */
+    MLA = 264,                     /* MLA  */
+    ORR = 265,                     /* ORR  */
+    AND = 266,                     /* AND  */
+    LSL = 267,                     /* LSL  */
+    LSR = 268,                     /* LSR  */
+    ASR = 269,                     /* ASR  */
+    ROR = 270,                     /* ROR  */
+    B = 271,                       /* B  */
+    BL = 272,                      /* BL  */
+    BX = 273,                      /* BX  */
+    LDR = 274,                     /* LDR  */
+    STR = 275,                     /* STR  */
+    LDRB = 276,                    /* LDRB  */
+    STRB = 277                     /* STRB  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

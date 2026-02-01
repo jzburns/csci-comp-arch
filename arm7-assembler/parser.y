@@ -7,6 +7,10 @@ int yylex(void);
 void yyerror(const char *s);
 %}
 
+%define parse.error verbose
+%define parse.trace
+%debug
+
 /* ARM7DTMI uconditional execution tokens */
 %token REG
 %token CMP 
@@ -28,22 +32,17 @@ stmt_list
     ;
 
 stmt
-    : CMP REG '=' expr ';'
-    | PRINT expr ';'
+    : CMP REG ',' REG 
     ;
 
-expr
-    : expr '+' term
-    | term
-    ;
-
-term
-    : NUMBER
-    | IDENT
-    ;
 %%  /* ====== PLAIN C CODE SECTION ====== */
 
+int yylineno; 
+extern char *yytext;
+
 int main(int argc, char **argv) {
+	int yydebug = 1;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <inputfile>\n", argv[0]);
         return 1;
@@ -60,7 +59,8 @@ int main(int argc, char **argv) {
     return rc;
 }
 
+
 void yyerror(const char *s) {
-    fprintf(stderr, "Error: %s\n", s);
+    fprintf(stderr, "Error: %s at line %d near '%s'\n", s, yylineno, yytext);
 }
 
