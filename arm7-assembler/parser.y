@@ -23,6 +23,10 @@ void yyerror(const char *s);
 %token COMMA
 %token IMM
 
+/* labels */
+%token LABELCOLON
+
+%token COMMENT
 
 %%  
 program
@@ -33,12 +37,18 @@ stmt_list
     : stmt_list stmt
     | stmt
     ;
-
+    
 stmt
     : CMP REG COMMA REG
+    | CMP REG COMMA REG COMMENT
     | ADD REG COMMA REG COMMA REG
+    | ADD REG COMMA REG COMMA REG COMMENT
     | SUB REG COMMA REG COMMA REG
+    | SUB REG COMMA REG COMMA REG COMMENT
+    | LABELCOLON
+    | LABELCOLON COMMENT
     ;
+    
 
 %%  /* ====== PLAIN C CODE SECTION ====== */
 

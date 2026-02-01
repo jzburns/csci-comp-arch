@@ -9,11 +9,15 @@ DIGIT   [0-9]
 ID      [a-zA-Z_][a-zA-Z0-9_]*
 REGISTER "r"[0-9]+
 IMMEDIATE #[0-9]+
+COLON 	":"
+COMMENTSTART  "//"
 
 %%
 {REGISTER}	{ printf("Register (%s)\n", yytext); return REG; }
 {IMMEDIATE}	{ printf("Immediate (%s)\n", yytext); return IMM; }
 [ \t\n]+        ;   /* skip whitespace */
+{ID}{COLON}	{ printf("Label (%s)\n", yytext); return LABELCOLON; }
+{COMMENTSTART}  { printf("Comment '//'\n"); return COMMENT; }
 "cmp"           { printf("Instr 'cmp'\n"); return CMP; }
 "add"           { printf("Instr 'add'\n"); return ADD; }
 "sub"           { printf("Instr 'sub'\n"); return SUB; }
