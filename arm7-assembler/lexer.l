@@ -7,10 +7,10 @@
 /* Definitions */
 DIGIT   [0-9]
 ID      [a-zA-Z_][a-zA-Z0-9_]*
-REG 		r[0-9]
 IMMEDIATE #[0-9]*
 
 %%
+"r"[0-9]+	{ return REG; }
 [ \t\n]+        ;   /* skip whitespace */
 "cmp"           { return CMP; }
 "add"           { return ADD; }
@@ -26,6 +26,7 @@ IMMEDIATE #[0-9]*
 "ldr"           { return LDR; }
 "strb"          { return STRB; }
 "ldrb"          { return LDRB; }
+","          	{ return COMMA; }
 .               { return yytext[0]; }
 %%
 

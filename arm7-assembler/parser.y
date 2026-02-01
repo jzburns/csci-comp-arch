@@ -20,6 +20,7 @@ void yyerror(const char *s);
 %token LSL LSR ASR ROR
 %token B BL BX
 %token LDR STR LDRB STRB 
+%token COMMA 
 
 %%  
 program
@@ -32,12 +33,13 @@ stmt_list
     ;
 
 stmt
-    : CMP REG ',' REG 
+    : CMP REG COMMA REG
+    | ADD REG COMMA REG COMMA REG
     ;
 
 %%  /* ====== PLAIN C CODE SECTION ====== */
 
-int yylineno; 
+extern int yylineno; 
 extern char *yytext;
 
 int main(int argc, char **argv) {
