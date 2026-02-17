@@ -18,26 +18,25 @@ COMMENTSTART  "//"
 [ \t\n]+        ;   /* skip whitespace */
 {ID}{COLON}	{ printf("Label (%s)\n", yytext); return LABELCOLON; }
 {COMMENTSTART}  { printf("Comment '//'\n"); return COMMENT; }
-"cmp"           { printf("Instr 'cmp'\n"); return CMP; }
-"add"           { printf("Instr 'add'\n"); return ADD; }
-"sub"           { printf("Instr 'sub'\n"); return SUB; }
-"mla"           { return MLA; }
-"orr"           { return ORR; }
-"and"           { return AND; }
-"lsl"           { return LSL; }
-"lsr"           { return LSR; }
-"asr"           { return ASR; }
-"ror"           { return ROR; }
-"str"           { return STR; }
-"ldr"           { return LDR; }
-"strb"          { return STRB; }
-"ldrb"          { return LDRB; }
-","          	{ return COMMA; }
-.               { return yytext[0]; }
+(?i:cmp)           { printf("Instr 'cmp'\n"); return CMP; }
+(?i:add)           { printf("Instr 'add'\n"); return ADD; }
+(?i:sub)           { printf("Instr 'sub'\n"); return SUB; }
+(?i:mla)           { printf("Instr 'mla'\n"); return MLA; }
+(?i:orr)           { printf("Instr 'orr'\n");  return ORR; }
+(?i:ldrb)          { printf("Instr 'ldrb'\n"); return LDRB; }
+(?i:and)           { printf("Instr 'and'\n"); return AND; }
+(?i:lsl)           { printf("Instr 'lsl'\n"); return LSL; }
+(?i:lsr)           { printf("Instr 'lsr'\n"); return LSR; }
+(?i:asr)           { printf("Instr 'asr'\n"); return ASR; }
+(?i:ror)           { printf("Instr 'rorldrb'\n"); return ROR; }
+(?i:str)           { printf("Instr 'str`'\n"); return STR; }
+(?i:ldr)           { printf("Instr 'ldr'\n"); return LDR; }
+(?i:strb)          { printf("Instr 'strb'\n"); return STRB; }
+","          	     { printf("Instr 'comma'\n"); return COMMA; }
+.                  { return yytext[0]; }
 %%
 
 
 int yywrap(void) {
     return 1;
 }
-

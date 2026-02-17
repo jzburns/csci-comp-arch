@@ -35,18 +35,20 @@ program
 
 stmt_list
     : stmt_list stmt
+    | stmt comment
     | stmt
+    ;
+
+comment
+    : COMMENT
     ;
     
 stmt
     : CMP REG COMMA REG
-    | CMP REG COMMA REG COMMENT
     | ADD REG COMMA REG COMMA REG
-    | ADD REG COMMA REG COMMA REG COMMENT
     | SUB REG COMMA REG COMMA REG
-    | SUB REG COMMA REG COMMA REG COMMENT
+    | LDRB REG COMMA REG COMMA REG
     | LABELCOLON
-    | LABELCOLON COMMENT
     ;
     
 
