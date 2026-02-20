@@ -34,7 +34,7 @@ program
 
 stmt_list
     : stmt_list stmt
-    | stmt comment
+    | stmt
     | comment
     ;
 
@@ -44,11 +44,17 @@ comment
     
 stmt
     : CMP REG COMMA REG
+    | CMP REG COMMA REG COMMENT
     | ADD REG COMMA REG COMMA REG
+    | ADD REG COMMA REG COMMA REG COMMENT
     | SUB REG COMMA REG COMMA REG
+    | SUB REG COMMA REG COMMA REG COMMENT
     | LDRB REG COMMA REG COMMA REG
+    | LDRB REG COMMA REG COMMA REG COMMENT
     | MOV REG COMMA REG 
+    | MOV REG COMMA REG COMMENT
     | MOV REG COMMA IMM 
+    | MOV REG COMMA IMM  COMMENT
     | LABELCOLON
     ;
     
