@@ -34,7 +34,6 @@ COMMENTSTART 	"//"
 (?i:str)    { printf("Instr 'str`'\n"); return STR; }
 (?i:ldr)    { printf("Instr 'ldr'\n"); return LDR; }
 (?i:strb)   { printf("Instr 'strb'\n"); return STRB; }
-","         { printf("Instr 'comma'\n"); return COMMA; }
 .           { return yytext[0]; }
 %%
 
