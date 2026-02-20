@@ -7,33 +7,35 @@
 /* Definitions */
 DIGIT   [0-9]
 ID      [a-zA-Z_][a-zA-Z0-9_]*
+FREETEXT      [a-zA-Z_ ][a-zA-Z0-9_ ]*
 REGISTER "r"[0-9]+
 IMMEDIATE #[0-9]+
 COLON 	":"
-COMMENTSTART  "//"
+COMMENTSTART 	"//"
 
 %%
 {REGISTER}	{ printf("Register (%s)\n", yytext); return REG; }
 {IMMEDIATE}	{ printf("Immediate (%s)\n", yytext); return IMM; }
-[ \t\n]+        ;   /* skip whitespace */
+{COMMENTSTART}{FREETEXT} { printf("comment (%s)\n", yytext); return COMMENT; }
 {ID}{COLON}	{ printf("Label (%s)\n", yytext); return LABELCOLON; }
-{COMMENTSTART}  { printf("Comment '//'\n"); return COMMENT; }
-(?i:cmp)           { printf("Instr 'cmp'\n"); return CMP; }
-(?i:add)           { printf("Instr 'add'\n"); return ADD; }
-(?i:sub)           { printf("Instr 'sub'\n"); return SUB; }
-(?i:mla)           { printf("Instr 'mla'\n"); return MLA; }
-(?i:orr)           { printf("Instr 'orr'\n");  return ORR; }
-(?i:ldrb)          { printf("Instr 'ldrb'\n"); return LDRB; }
-(?i:and)           { printf("Instr 'and'\n"); return AND; }
-(?i:lsl)           { printf("Instr 'lsl'\n"); return LSL; }
-(?i:lsr)           { printf("Instr 'lsr'\n"); return LSR; }
-(?i:asr)           { printf("Instr 'asr'\n"); return ASR; }
-(?i:ror)           { printf("Instr 'rorldrb'\n"); return ROR; }
-(?i:str)           { printf("Instr 'str`'\n"); return STR; }
-(?i:ldr)           { printf("Instr 'ldr'\n"); return LDR; }
-(?i:strb)          { printf("Instr 'strb'\n"); return STRB; }
-","          	     { printf("Instr 'comma'\n"); return COMMA; }
-.                  { return yytext[0]; }
+[ \t\n]+        ;   /* skip whitespace */
+(?i:cmp)    { printf("Instr 'cmp'\n"); return CMP; }
+(?i:add)    { printf("Instr 'add'\n"); return ADD; }
+(?i:sub)    { printf("Instr 'sub'\n"); return SUB; }
+(?i:mov)    { printf("Instr 'mov'\n"); return MOV; }
+(?i:mla)    { printf("Instr 'mla'\n"); return MLA; }
+(?i:orr)    { printf("Instr 'orr'\n");  return ORR; }
+(?i:ldrb)   { printf("Instr 'ldrb'\n"); return LDRB; }
+(?i:and)    { printf("Instr 'and'\n"); return AND; }
+(?i:lsl)    { printf("Instr 'lsl'\n"); return LSL; }
+(?i:lsr)    { printf("Instr 'lsr'\n"); return LSR; }
+(?i:asr)    { printf("Instr 'asr'\n"); return ASR; }
+(?i:ror)    { printf("Instr 'rorldrb'\n"); return ROR; }
+(?i:str)    { printf("Instr 'str`'\n"); return STR; }
+(?i:ldr)    { printf("Instr 'ldr'\n"); return LDR; }
+(?i:strb)   { printf("Instr 'strb'\n"); return STRB; }
+","         { printf("Instr 'comma'\n"); return COMMA; }
+.           { return yytext[0]; }
 %%
 
 

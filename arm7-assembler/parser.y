@@ -22,11 +22,10 @@ void yyerror(const char *s);
 %token LDR STR LDRB STRB 
 %token COMMA
 %token IMM
+%token COMMENT
 
 /* labels */
 %token LABELCOLON
-
-%token COMMENT
 
 %%  
 program
@@ -36,11 +35,11 @@ program
 stmt_list
     : stmt_list stmt
     | stmt comment
-    | stmt
+    | comment
     ;
 
 comment
-    : COMMENT
+    : COMMENT 
     ;
     
 stmt
@@ -48,6 +47,8 @@ stmt
     | ADD REG COMMA REG COMMA REG
     | SUB REG COMMA REG COMMA REG
     | LDRB REG COMMA REG COMMA REG
+    | MOV REG COMMA REG 
+    | MOV REG COMMA IMM 
     | LABELCOLON
     ;
     
