@@ -11,7 +11,7 @@ DIGIT   [0-9]
 ID      [a-zA-Z_][a-zA-Z0-9_]*
 FREETEXT      [a-zA-Z_ ][a-zA-Z0-9_ ]*
 REGISTER "r"[0-9]+
-IMMEDIATE #[0-9]+
+IMMEDIATE "#"[0-9]+
 COLON 	":"
 COMMENTSTART 	"//"
 

@@ -43,14 +43,32 @@ comment
     ;
     
 stmt
+		// compare
     : CMP REG ',' REG
     | CMP REG ',' REG COMMENT
+
+		// add
     | ADD REG ',' REG ',' REG
     | ADD REG ',' REG ',' REG COMMENT
+
+		// subtract
     | SUB REG ',' REG ',' REG
     | SUB REG ',' REG ',' REG COMMENT
-    | LDRB REG ',' REG ',' REG
-    | LDRB REG ',' REG ',' REG COMMENT
+		
+		// load register
+		// offset addressing
+    | LDR REG ',' '[' REG ']'
+    | LDR REG ',' '[' REG ']' COMMENT
+
+		// offset with immediate
+    | LDR REG ',' '[' REG ',' IMM ']'
+    | LDR REG ',' '[' REG ',' IMM ']' COMMENT
+
+		// offset with register
+    | LDR REG ',' '[' REG ',' REG ']'
+    | LDR REG ',' '[' REG ',' REG ']' COMMENT
+
+		// move
     | MOV REG ',' REG 
     | MOV REG ',' REG COMMENT
     | MOV REG ',' IMM 
@@ -60,6 +78,8 @@ stmt
     
 
 %%  /* ====== PLAIN C CODE SECTION ====== */
+
+//ldr r1, [ r4 ]
 
 extern int yylineno; 
 extern char *yytext;
