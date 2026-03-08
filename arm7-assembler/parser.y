@@ -23,6 +23,7 @@ void yyerror(const char *s);
 %token COMMA
 %token IMM
 %token COMMENT
+%token MEMORYVAR
 
 /* labels */
 %token LABELCOLON
@@ -59,6 +60,10 @@ stmt
 		// offset 
 		// post-index 
 		// pre-index
+
+		// offset addressing register initialization:
+    | LDR REG ',' MEMORYVAR
+    | LDR REG ',' MEMORYVAR COMMENT
 
 		// offset addressing:
     | LDR REG ',' '[' REG ']'
