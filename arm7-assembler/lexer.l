@@ -5,16 +5,15 @@
 
 %option yylineno
 
-
 /* Definitions */
-DIGIT   [0-9]
-ID      [a-zA-Z_][a-zA-Z0-9_]*
-FREETEXT  [a-zA-Z_ ][a-zA-Z0-9_ ]*
-REGISTER "r"[0-9]+
-IMMEDIATE "#"[0-9]+
-COLON 	":"
-ADDRESSOF 	"="
-COMMENTSTART 	"//"
+DIGIT 				[0-9]
+ID 						[a-zA-Z_][a-zA-Z0-9_]*
+FREETEXT			[a-zA-Z_ ][a-zA-Z0-9_ ]*
+REGISTER			"r"[0-9]+
+IMMEDIATE 		"#"[0-9]+
+COLON 				":"
+ADDRESSOF			"="
+COMMENTSTART	"//"
 
 %%
 {REGISTER}	{ print_instr("Reg: "); return REG; }

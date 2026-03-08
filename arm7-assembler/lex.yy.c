@@ -746,7 +746,7 @@ YY_DECL
 		}
 
 	{
-#line 19 "lexer.l"
+#line 18 "lexer.l"
 
 #line 751 "lex.yy.c"
 
@@ -817,118 +817,118 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 20 "lexer.l"
+#line 19 "lexer.l"
 { print_instr("Reg: "); return REG; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 21 "lexer.l"
+#line 20 "lexer.l"
 { print_instr("Imm: "); return IMM; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 22 "lexer.l"
+#line 21 "lexer.l"
 { print_instr("Var: "); return MEMORYVAR; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 23 "lexer.l"
+#line 22 "lexer.l"
 { print_instr("Comment: "); return COMMENT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 24 "lexer.l"
+#line 23 "lexer.l"
 { print_instr(""); return LABELCOLON; }
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 25 "lexer.l"
+#line 24 "lexer.l"
 ;   /* skip whitespace */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 26 "lexer.l"
+#line 25 "lexer.l"
 { print_instr("CMP Instruction: "); return CMP; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 27 "lexer.l"
+#line 26 "lexer.l"
 { print_instr("ADD Instruction: "); return ADD; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 28 "lexer.l"
+#line 27 "lexer.l"
 { print_instr("SUB Instruction: "); return SUB; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 29 "lexer.l"
+#line 28 "lexer.l"
 { print_instr("MOV Instruction: "); return MOV; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 30 "lexer.l"
+#line 29 "lexer.l"
 { print_instr("MLA Instruction: "); return MLA; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 31 "lexer.l"
+#line 30 "lexer.l"
 { print_instr("ORR Instruction: "); return ORR; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 32 "lexer.l"
+#line 31 "lexer.l"
 { print_instr("LDRB Instruction: "); return LDRB; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 33 "lexer.l"
+#line 32 "lexer.l"
 { print_instr("AND Instruction: "); return AND; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 34 "lexer.l"
+#line 33 "lexer.l"
 { print_instr("LSL Instruction: "); return LSL; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 35 "lexer.l"
+#line 34 "lexer.l"
 { print_instr("LSR Instruction: "); return LSR; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 36 "lexer.l"
+#line 35 "lexer.l"
 { print_instr("ASR Instruction: "); return ASR; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 37 "lexer.l"
+#line 36 "lexer.l"
 { print_instr("ROR Instruction: "); return ROR; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 38 "lexer.l"
+#line 37 "lexer.l"
 { print_instr("STR Instruction: "); return STR; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 39 "lexer.l"
+#line 38 "lexer.l"
 { print_instr("LDR Instruction: "); return LDR; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 40 "lexer.l"
+#line 39 "lexer.l"
 { print_instr("STRB Instruction: "); return STRB; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 41 "lexer.l"
+#line 40 "lexer.l"
 { return yytext[0]; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 42 "lexer.l"
+#line 41 "lexer.l"
 ECHO;
 	YY_BREAK
 #line 934 "lex.yy.c"
@@ -1948,7 +1948,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 42 "lexer.l"
+#line 41 "lexer.l"
 
 
 

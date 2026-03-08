@@ -61,7 +61,7 @@ stmt
 		// post-index 
 		// pre-index
 
-		// offset addressing register initialization:
+		// addressing register initialization:
     | LDR REG ',' MEMORYVAR
     | LDR REG ',' MEMORYVAR COMMENT
 
