@@ -23,7 +23,7 @@ COMMENTSTART	"//"
 {ADDRESSOF}{ID}	{ print_instr("Var: "); return MEMORYVAR; }
 {COMMENTSTART}{FREETEXT} { print_instr("Comment: "); return COMMENT; }
 {ID}{COLON}	{ print_instr("Label: "); return LABELCOLON; }
-[ \t\n]+        ;   /* skip whitespace */
+[ \t\n]+     ;   /* skip whitespace */
 (?i:cmp)    { print_instr("CMP Instruction: "); return CMP; }
 (?i:add)    { print_instr("ADD Instruction: "); return ADD; }
 (?i:sub)    { print_instr("SUB Instruction: "); return SUB; }

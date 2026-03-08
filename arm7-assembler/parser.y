@@ -57,6 +57,7 @@ stmt
     | SUB REG ',' REG ',' REG COMMENT
 		
 		// load register instructions: 
+		// initialization 
 		// offset 
 		// post-index 
 		// pre-index
@@ -107,8 +108,6 @@ stmt
     
 
 %%  /* ====== PLAIN C CODE SECTION ====== */
-
-//ldr r1, [ r4 ]
 
 extern int yylineno; 
 extern char *yytext;
