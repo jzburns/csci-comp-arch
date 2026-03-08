@@ -9,7 +9,9 @@
 DIGIT 				[0-9]
 ID 						[a-zA-Z_][a-zA-Z0-9_]*
 FREETEXT			[a-zA-Z_ ][a-zA-Z0-9_ ]*
-REGISTER			"r"[0-9]+
+
+/* there may be another way to do this */
+REGISTER			"r"[0-9]|"r10"|"r11"|"r12"|"r13"|"r14"|"r15","R"[0-9]|"R10"|"R11"|"R12"|"R13"|"R14"|"R15"
 IMMEDIATE 		"#"[0-9]+
 COLON 				":"
 ADDRESSOF			"="
@@ -20,7 +22,7 @@ COMMENTSTART	"//"
 {IMMEDIATE}	{ print_instr("Imm: "); return IMM; }
 {ADDRESSOF}{ID}	{ print_instr("Var: "); return MEMORYVAR; }
 {COMMENTSTART}{FREETEXT} { print_instr("Comment: "); return COMMENT; }
-{ID}{COLON}	{ print_instr(""); return LABELCOLON; }
+{ID}{COLON}	{ print_instr("Label: "); return LABELCOLON; }
 [ \t\n]+        ;   /* skip whitespace */
 (?i:cmp)    { print_instr("CMP Instruction: "); return CMP; }
 (?i:add)    { print_instr("ADD Instruction: "); return ADD; }
@@ -39,7 +41,6 @@ COMMENTSTART	"//"
 (?i:strb)   { print_instr("STRB Instruction: "); return STRB; }
 .           { return yytext[0]; }
 %%
-
 
 void print_instr(char* info) {
 	printf("%s %s\n", info, yytext);
