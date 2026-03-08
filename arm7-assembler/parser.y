@@ -55,8 +55,12 @@ stmt
     | SUB REG ',' REG ',' REG
     | SUB REG ',' REG ',' REG COMMENT
 		
-		// load register
-		// offset addressing
+		// load register instructions: 
+		// offset 
+		// post-index 
+		// pre-index
+
+		// offset addressing:
     | LDR REG ',' '[' REG ']'
     | LDR REG ',' '[' REG ']' COMMENT
 
@@ -67,6 +71,26 @@ stmt
 		// offset with register
     | LDR REG ',' '[' REG ',' REG ']'
     | LDR REG ',' '[' REG ',' REG ']' COMMENT
+
+		// post-index addressing:
+
+		// post-index with immediate
+    | LDR REG ',' '[' REG ']' ',' IMM
+    | LDR REG ',' '[' REG ']' ',' IMM COMMENT
+
+		// post-index with register
+    | LDR REG ',' '[' REG ']' ',' REG
+    | LDR REG ',' '[' REG ']' ',' REG COMMENT
+
+		// pre-index addressing:
+
+		// pre-index with immediate
+    | LDR REG ',' '[' REG ',' IMM ']' '!'
+    | LDR REG ',' '[' REG ',' IMM ']' '!' COMMENT
+
+		// pre-index with register
+    | LDR REG ',' '[' REG ',' REG ']' '!'
+    | LDR REG ',' '[' REG ',' REG ']' '!' COMMENT
 
 		// move
     | MOV REG ',' REG 
