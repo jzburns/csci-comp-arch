@@ -10,6 +10,7 @@ ldr r0, [ r1 ], #6 // another long comment
 ldr r0, [ r1 ], r6 // another long comment
 ldr r0, [ r1, #32 ]! // another long comment
 ldr r0, [ r1, R12 ]! // another long comment
+ldr r0, [ sp ] // another long comment
 ldr r0, =var // load the address of the first element of var into r0
 here:
 	mov r0, #6 

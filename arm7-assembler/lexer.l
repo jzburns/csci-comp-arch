@@ -10,11 +10,11 @@ DIGIT 				[0-9]
 ID 						[a-zA-Z_][a-zA-Z0-9_]*
 FREETEXT			[a-zA-Z_ ][a-zA-Z0-9_ ]*
 
-/* there may be another way to do this */
-REGISTER			"r"[0-9]|"r10"|"r11"|"r12"|"r13"|"r14"|"r15","R"[0-9]|"R10"|"R11"|"R12"|"R13"|"R14"|"R15"
-IMMEDIATE 		"#"[0-9]+
-COLON 				":"
-ADDRESSOF			"="
+/* Register Definitions */
+REGISTER			([rR]([0-9]|1[0-5]))|(sp|lr|pc)
+IMMEDIATE 		#[0-9]+
+COLON 				:
+ADDRESSOF			=
 COMMENTSTART	"//"
 
 %%

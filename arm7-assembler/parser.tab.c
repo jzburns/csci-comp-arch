@@ -530,9 +530,9 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int8 yyrline[] =
 {
        0,    33,    33,    37,    38,    39,    43,    48,    49,    52,
-      53,    56,    57,    65,    66,    69,    70,    73,    74,    77,
-      78,    83,    84,    87,    88,    93,    94,    97,    98,   101,
-     102,   103,   104,   105
+      53,    56,    57,    66,    67,    70,    71,    74,    75,    78,
+      79,    84,    85,    88,    89,    94,    95,    98,    99,   102,
+     103,   104,   105,   106
 };
 #endif
 
@@ -1619,10 +1619,8 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 109 "parser.y"
+#line 110 "parser.y"
   /* ====== PLAIN C CODE SECTION ====== */
-
-//ldr r1, [ r4 ]
 
 extern int yylineno; 
 extern char *yytext;
