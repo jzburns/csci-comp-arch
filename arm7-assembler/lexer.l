@@ -13,7 +13,10 @@ FREETEXT			[a-zA-Z_ ][a-zA-Z0-9_ ]*
 
 /* Register Definitions */
 REGISTER			([rR]([0-9]|1[0-5]))|(sp|lr|pc)
-IMMEDIATE 		#[0-9]+
+
+/* Immediate  Definitions */
+IMMEDIATE 		(#|#-)[0-9]+
+
 COLON 				:
 ADDRESSOF			=
 COMMENTSTART	"//"
