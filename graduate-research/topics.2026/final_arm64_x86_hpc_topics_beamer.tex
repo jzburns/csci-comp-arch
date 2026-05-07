@@ -1,0 +1,259 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+\definecolor{primary}{RGB}{64,60,104}
+\definecolor{secondary}{RGB}{91,110,128}
+\setbeamercolor{title}{fg=white,bg=primary}
+\setbeamercolor{frametitle}{fg=white,bg=primary}
+\setbeamercolor{structure}{fg=secondary}
+\setbeamercolor{author in head/foot}{bg=secondary,fg=white}
+\setbeamercolor{title in head/foot}{bg=primary,fg=white}
+\setbeamercolor{date in head/foot}{bg=secondary,fg=white}
+\title{ARM64 vs x86-64 HPC Research Topics}
+\subtitle{MSc Thesis Ideas in High Performance Computing and Computer Architecture}
+\author{Dr. John Burns}
+\date{\today}
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{1. Performance-per-Watt in HPC}
+\small
+\textbf{Research Question}\\
+How does ARM64 compare to x86-64 in performance-per-watt for scientific HPC workloads?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This research evaluates whether modern ARM64 processors can provide superior energy efficiency compared to x86-64 systems for scientific HPC applications. The study benchmarks numerical and parallel workloads to analyze tradeoffs between execution performance, power consumption, and scalability.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+LINPACK, HPCG, Linux perf, RAPL, ARM Streamline
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item Simakov et al., Are We Ready for Broader Adoption of ARM in the HPC Community?, ACM HPC Asia Workshops, 2023.
+\item Elwasif et al., Application Experiences on a GPU-Accelerated Arm-Based HPC Testbed, ACM HPC Asia Workshops, 2023.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{2. ARM CPU-GPU HPC Systems}
+\small
+\textbf{Research Question}\\
+Can ARM-based CPU-GPU systems provide competitive performance for heterogeneous HPC applications?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This thesis investigates the performance characteristics of ARM-based CPU-GPU systems for heterogeneous HPC workloads. The research focuses on CPU-GPU coordination overheads, memory behavior, and application scalability compared to traditional x86-64-based platforms.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+CUDA, NVIDIA Nsight Systems, Slurm
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item Elwasif et al., Application Experiences on a GPU-Accelerated Arm-Based HPC Testbed, ACM HPC Asia Workshops, 2023.
+\item Simakov et al., First Impressions of the NVIDIA Grace CPU Superchip and NVIDIA Grace Hopper Superchip, ACM HPC Asia Workshops, 2024.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{3. ARM SVE vs AVX-512}
+\small
+\textbf{Research Question}\\
+How does vectorization performance differ between ARM SVE and x86 AVX-512 architectures?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This research compares the effectiveness of ARM Scalable Vector Extension (SVE) and x86 AVX-512 vector instruction sets for scientific computing workloads. The study evaluates vectorization efficiency, compiler optimization behavior, and application throughput across architectures.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+LLVM/Clang, GCC, ARM SVE toolchains, Intel VTune
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item Evaluation of Vectorization Methods on Arm SVE Using the Exo Language, IEEE Cluster Workshops, 2024.
+\item Simakov et al., Are We Ready for Broader Adoption of ARM in the HPC Community?, ACM HPC Asia Workshops, 2023.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{4. Memory-Centric Profiling}
+\small
+\textbf{Research Question}\\
+Can memory-centric profiling improve optimization of ARM-based HPC systems?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This thesis investigates whether memory-centric profiling techniques can identify bottlenecks and improve optimization strategies for ARM-based HPC systems. The research focuses on cache utilization, memory locality, and bandwidth behavior in scientific applications.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+perf, ARM SPE, PAPI, STREAM benchmark
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item Multi-level Memory-Centric Profiling on ARM Processors with ARM SPE, IEEE/ACM SC Workshops, 2024.
+\item Simakov et al., First Impressions of the NVIDIA Grace CPU Superchip and NVIDIA Grace Hopper Superchip, ACM HPC Asia Workshops, 2024.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{5. Transformer Inference on ARM}
+\small
+\textbf{Research Question}\\
+How effective are ARM many-core CPUs for transformer inference workloads?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This research evaluates the suitability of ARM many-core processors for transformer inference and AI-HPC hybrid applications. The study examines optimization strategies, scalability, and throughput compared to traditional x86-64 systems.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+PyTorch, ONNX Runtime, Linux perf, Hugging Face Transformers
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item Jiang et al., Full-Stack Optimizing Transformer Inference on ARM Many-Core CPU, IEEE TPDS, 2023.
+\item Simakov et al., First Impressions of the NVIDIA Grace CPU Superchip and NVIDIA Grace Hopper Superchip, ACM HPC Asia Workshops, 2024.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{6. AI-Assisted Architecture Tuning}
+\small
+\textbf{Research Question}\\
+Can AI-assisted architecture tuning improve performance optimization on ARM HPC systems?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This thesis investigates whether AI-assisted optimization techniques can improve architecture tuning and workload configuration for ARM-based HPC systems. The research evaluates automated tuning methods for performance and energy efficiency improvements.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+Python ML libraries, Bayesian optimization frameworks, autotuning tools
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item AI-Assisted Design-Space Analysis of High-Performance Arm, IEEE/ACM SC Workshops, 2024.
+\item Simakov et al., Are We Ready for Broader Adoption of ARM in the HPC Community?, ACM HPC Asia Workshops, 2023.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{7. Memory-Bound Parallel Applications}
+\small
+\textbf{Research Question}\\
+How do ARM64 and x86-64 architectures compare for memory-bound parallel applications?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This study compares ARM64 and x86-64 systems under memory-intensive parallel workloads commonly found in scientific computing. The research focuses on memory bandwidth utilization, cache behavior, and parallel scalability.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+STREAM benchmark, OpenMP, HPCToolkit
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item Multi-level Memory-Centric Profiling on ARM Processors with ARM SPE, IEEE/ACM SC Workshops, 2024.
+\item Elwasif et al., Application Experiences on a GPU-Accelerated Arm-Based HPC Testbed, ACM HPC Asia Workshops, 2023.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{8. Energy-Efficient ARM Datacenters}
+\small
+\textbf{Research Question}\\
+Can ARM-based HPC systems reduce datacenter energy consumption without significant performance loss?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This thesis evaluates whether ARM-based HPC systems can improve energy efficiency at the datacenter level while maintaining acceptable computational performance. The study benchmarks scientific workloads under sustained utilization scenarios.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+Prometheus, Grafana, RAPL, Slurm accounting
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item Simakov et al., Are We Ready for Broader Adoption of ARM in the HPC Community?, ACM HPC Asia Workshops, 2023.
+\item Simakov et al., First Impressions of the NVIDIA Grace CPU Superchip and NVIDIA Grace Hopper Superchip, ACM HPC Asia Workshops, 2024.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{9. Distributed HPC on ARM}
+\small
+\textbf{Research Question}\\
+How effective are ARM-based systems for GPU-accelerated distributed HPC applications?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This research investigates the scalability and communication efficiency of distributed HPC workloads running on ARM-based GPU-accelerated systems. The study evaluates MPI communication overheads and application scaling characteristics.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+Open MPI, NCCL, Score-P, OSU benchmarks
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item Elwasif et al., Application Experiences on a GPU-Accelerated Arm-Based HPC Testbed, ACM HPC Asia Workshops, 2023.
+\item Simakov et al., First Impressions of the NVIDIA Grace CPU Superchip and NVIDIA Grace Hopper Superchip, ACM HPC Asia Workshops, 2024.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{10. Portability of HPC Optimizations}
+\small
+\textbf{Research Question}\\
+How portable are HPC optimization techniques between ARM64 and x86-64 architectures?
+
+\vspace{0.35em}
+
+\textbf{Abstract}\\
+This thesis studies whether HPC optimization strategies developed for x86-64 systems can be effectively transferred to ARM64 architectures. The research analyzes portability challenges involving vectorization, memory optimization, and compiler tuning.
+
+\vspace{0.35em}
+
+\textbf{Tooling}\\
+LLVM/Clang, GCC, OpenMP, SPEC CPU
+
+\vspace{0.35em}
+
+\textbf{References}
+\begin{itemize}
+\item Evaluation of Vectorization Methods on Arm SVE Using the Exo Language, IEEE Cluster Workshops, 2024.
+\item Jiang et al., Full-Stack Optimizing Transformer Inference on ARM Many-Core CPU, IEEE TPDS, 2023.
+\end{itemize}
+\end{frame}
+\end{document}
