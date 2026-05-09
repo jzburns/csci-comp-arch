@@ -1,13 +1,23 @@
 \documentclass[aspectratio=169]{beamer}
+
+\usepackage{xcolor}
+
+% Dark background
+\setbeamercolor{background canvas}{bg=black}
+
 \usetheme{Madrid}
 \definecolor{primary}{RGB}{64,60,104}
 \definecolor{secondary}{RGB}{91,110,128}
-\setbeamercolor{title}{fg=white,bg=primary}
-\setbeamercolor{frametitle}{fg=white,bg=primary}
-\setbeamercolor{structure}{fg=secondary}
-\setbeamercolor{author in head/foot}{bg=secondary,fg=white}
-\setbeamercolor{title in head/foot}{bg=primary,fg=white}
-\setbeamercolor{date in head/foot}{bg=secondary,fg=white}
+
+\definecolor{bgcolor}{RGB}{30,32,36}
+%%\definecolor{textcolor}{RGB}{230,225,215}
+\definecolor{textcolor}{RGB}{220,215,205}
+\definecolor{accent}{RGB}{135,155,175}
+
+\setbeamercolor{background canvas}{bg=bgcolor}
+\setbeamercolor{normal text}{fg=textcolor,bg=bgcolor}
+\setbeamercolor{structure}{fg=accent}
+
 \title{ARM64 vs x86-64 HPC Research Topics}
 \subtitle{MSc Thesis Ideas in High Performance Computing and Computer Architecture}
 \author{Dr. John Burns}
