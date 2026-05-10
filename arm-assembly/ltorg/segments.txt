@@ -1,0 +1,30 @@
+
+ltorg.o:     file format elf32-littlearm
+
+Contents of section .text:
+ 0000 0c009fe5 0a20a0e3 042080e5 04709fe5  ..... ... ...p..
+ 0010 075086e0 00000000 aaffff00 075086e0  .P...........P..
+ 0020 00109fe5 075086e0 00000000           .....P......    
+Contents of section .data:
+ 0000 01000000 02000000 03000000 04000000  ................
+ 0010 05000000 06000000                    ........        
+Contents of section .ARM.attributes:
+ 0000 411b0000 00616561 62690001 11000000  A....aeabi......
+ 0010 060a0741 08010902 0a032201           ...A......".    
+
+Disassembly of section .text:
+
+00000000 <main>:
+   0:	e59f000c 	ldr	r0, [pc, #12]	@ 14 <main+0x14>
+   4:	e3a0200a 	mov	r2, #10
+   8:	e5802004 	str	r2, [r0, #4]
+   c:	e59f7004 	ldr	r7, [pc, #4]	@ 18 <main+0x18>
+  10:	e0865007 	add	r5, r6, r7
+  14:	00000000 	.word	0x00000000
+  18:	00ffffaa 	.word	0x00ffffaa
+  1c:	e0865007 	add	r5, r6, r7
+  20:	e59f1000 	ldr	r1, [pc]	@ 28 <labelx+0x4>
+
+00000024 <labelx>:
+  24:	e0865007 	add	r5, r6, r7
+  28:	00000000 	.word	0x00000000
