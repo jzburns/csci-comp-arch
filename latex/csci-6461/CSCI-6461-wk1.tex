@@ -222,8 +222,8 @@ Abstractions simplify software development, but architecture explains why they l
 ]
 
 \node[box] (c) {High-level code: \texttt{c = a + b;}};
-\node[box, below=of c] (asm) {Assembly: \texttt{ADD X0, X1, X2} (AArch64 ISA)};
-\node[box, below=of asm] (mc) {Machine code: \hex{8B020000} (32-bit binary encoding)};
+\node[box, below=of c] (asm) {Assembly: \texttt{add x0, x1, x2} (AArch64 ISA)};
+\node[box, below=of asm] (mc) {Machine code: \hex{8b020000} (32-bit binary encoding)};
 \node[box, below=of mc] (uarch) {Microarchitecture: Datapath, ALU, control logic, pipeline};
 \node[box, below=of uarch] (logic) {Digital logic \& circuits: Transistors, logic gates, flip-flops};
 
@@ -251,17 +251,17 @@ Abstractions simplify software development, but architecture explains why they l
 \key{AArch64 Assembly (RISC Style):}
 \begin{itemize}
   \item Operands loaded into 64-bit registers:
-  $$\bits{ADD X0, X1, X2}$$
+  $$\bits{add x0, x1, x2}$$
   \item \key{Load-Store Model:} ALU instructions operate \emph{only} on registers, never directly on memory.
-  \item \key{Three-Operand Format:} Preserves source registers ($X_1, X_2$) non-destructively.
+  \item \key{Three-Operand Format:} Preserves source registers ($x_1, x_2$) non-destructively.
 \end{itemize}
 
 \column{0.48\textwidth}
 \key{Machine Encoding \& Execution:}
 \begin{itemize}
   \item Encoded as a fixed 32-bit word: \\
-        \hex{8B020000}
-  \item Regular bit fields decode into opcode, destination register ($X_0$), and source registers ($X_1, X_2$).
+        \hex{8b020000}
+  \item Regular bit fields decode into opcode, destination register ($x_0$), and source registers ($x_1, x_2$).
   \item ALU computes sum; result is latched to register file in 1 clock cycle.
 \end{itemize}
 
@@ -291,7 +291,7 @@ Abstractions simplify software development, but architecture explains why they l
 \begin{block}{Why AArch64?}
 \begin{itemize}
   \item ARMv8-A (AArch64) is a clean-slate 64-bit RISC design.
-  \item 31 general-purpose 64-bit registers (\bits{X0}--\bits{X30}) plus zero/stack registers.
+  \item 31 general-purpose 64-bit registers (\bits{x0}--\bits{x30}) plus zero/stack registers.
   \item Standardized across mobile, client (Apple Silicon), cloud (AWS Graviton, Ampere), and supercomputers.
 \end{itemize}
 \end{block}
@@ -313,7 +313,7 @@ Abstractions simplify software development, but architecture explains why they l
 \begin{itemize}
   \item What the software writer / compiler sees.
   \item Instruction set and encodings.
-  \item Register set (\bits{X0}--\bits{X30}, \bits{SP}, \bits{PC}).
+  \item Register set (\bits{x0}--\bits{x30}, \bits{sp}, \bits{pc}).
   \item Memory addressing semantics.
   \item Exception and privilege models.
 \end{itemize}
@@ -333,7 +333,7 @@ Abstractions simplify software development, but architecture explains why they l
 \end{columns}
 
 \vspace{0.6em}
-\key{Key Insight:} An Apple M-series core and an AWS Graviton core execute identical AArch64 instructions, but use vastly different microarchitectures to optimize for different power/performance budgets.
+\key{Architectural Observation:} An Apple M-series core and an AWS Graviton core execute identical AArch64 instructions, but use vastly different microarchitectures to optimize for different power/performance budgets.
 
 \end{frame}
 
@@ -345,10 +345,10 @@ Abstractions simplify software development, but architecture explains why they l
 
 \begin{itemize}
   \item Instructions and program data share the same memory space as bit patterns.
-  \item A \key{Program Counter (PC)} tracks the memory address of the next instruction.
+  \item A \key{Program Counter (pc)} tracks the memory address of the next instruction.
   \item The processor continuously executes the fundamental hardware loop:
         $$\text{\key{Fetch}} \longrightarrow \text{\key{Decode}} \longrightarrow \text{\key{Execute}} \longrightarrow \text{\key{Memory/Writeback}}$$
-  \item Control flow (branches, procedure calls, exceptions) modifies the PC sequence.
+  \item Control flow (branches, procedure calls, exceptions) modifies the \bits{pc} sequence.
 \end{itemize}
 
 \begin{block}{Architectural Consequence}
@@ -397,9 +397,9 @@ CPU compute cycles are fast ($\sim 0.3\text{--}0.5\text{ ns}$); DRAM accesses ar
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-\textbf{Interpretation} & \textbf{Meaning of} \hex{8B020000} \\
+\textbf{Interpretation} & \textbf{Meaning of} \hex{8b020000} \\
 \midrule
-AArch64 Instruction & \bits{ADD X0, X1, X2} \\
+AArch64 Instruction & \bits{add x0, x1, x2} \\
 32-bit Signed Integer & $-1,962,803,200$ \\
 32-bit Unsigned Integer & $2,332,164,096$ \\
 IEEE 754 Single-Precision Float & $-1.084 \times 10^{-32}$ \\
@@ -551,7 +551,7 @@ $$\bits{110101}_2 = 53_{10}$$
 \end{center}
 
 \begin{block}{Example: 32-bit AArch64 Instruction Encoding}
-$$\underbrace{\bits{1000}}_{\hex{8}}\; \underbrace{\bits{1011}}_{\hex{B}}\; \underbrace{\bits{0000}}_{\hex{0}}\; \underbrace{\bits{0010}}_{\hex{2}}\; \underbrace{\bits{0000}}_{\hex{0}}\; \underbrace{\bits{0000}}_{\hex{0}}\; \underbrace{\bits{0000}}_{\hex{0}}\; \underbrace{\bits{0000}}_{\hex{0}} \implies \hex{8B020000}$$
+$$\underbrace{\bits{1000}}_{\hex{8}}\; \underbrace{\bits{1011}}_{\hex{b}}\; \underbrace{\bits{0000}}_{\hex{0}}\; \underbrace{\bits{0010}}_{\hex{2}}\; \underbrace{\bits{0000}}_{\hex{0}}\; \underbrace{\bits{0000}}_{\hex{0}}\; \underbrace{\bits{0000}}_{\hex{0}}\; \underbrace{\bits{0000}}_{\hex{0}} \implies \hex{8b020000}$$
 \end{block}
 
 \end{frame}
@@ -604,7 +604,7 @@ $$\underbrace{\bits{1000}}_{\hex{8}}\; \underbrace{\bits{1011}}_{\hex{B}}\; \und
 \end{columns}
 
 \vspace{0.6em}
-\key{Solution:} Two's complement eliminates duplicate zero and lets a standard adder perform subtraction directly.
+\key{Hardware Result:} Two's complement eliminates duplicate zero and lets a standard adder perform subtraction directly.
 
 \end{frame}
 
@@ -688,17 +688,17 @@ $$\text{Value} = -128 + 64 + 32 + 16 + 0 + 4 + 2 + 0 = \mathbf{-10}$$
 \textbf{8-Bit Hex / Binary} & \textbf{Unsigned Interpretation} & \textbf{Two's Complement} \\
 \midrule
 \hex{00} \; (\bits{0000 0000}) & $0$ & $0$ \\
-\hex{7F} \; (\bits{0111 1111}) & $127$ & $+127$ \\
+\hex{7f} \; (\bits{0111 1111}) & $127$ & $+127$ \\
 \hex{80} \; (\bits{1000 0000}) & $128$ & $-128$ \\
-\hex{FE} \; (\bits{1111 1110}) & $254$ & $-2$ \\
-\hex{FF} \; (\bits{1111 1111}) & $255$ & $-1$ \\
+\hex{fe} \; (\bits{1111 1110}) & $254$ & $-2$ \\
+\hex{ff} \; (\bits{1111 1111}) & $255$ & $-1$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \begin{itemize}
   \item The hardware adder executes bit operations identically.
-  \item Conditional branch instructions (e.g., \texttt{B.LT} signed vs. \texttt{B.LO} unsigned in AArch64) determine how status flags are interpreted.
+  \item Conditional branch instructions (e.g., \texttt{b.lt} signed vs. \texttt{b.lo} unsigned in AArch64) determine how status flags are interpreted.
 \end{itemize}
 
 \end{frame}
@@ -872,7 +872,7 @@ $$\bits{0000 0000 1111 1011}_2 \; (251_{10})$$
 \end{columns}
 
 \vspace{0.6em}
-\key{Takeaway:} Pipelining and multicore architectures increase throughput, often while leaving individual instruction latency unchanged or slightly higher.
+\key{Architectural Consequence:} Pipelining and multicore architectures increase throughput, often while leaving individual instruction latency unchanged or slightly higher.
 
 \end{frame}
 
@@ -1007,14 +1007,14 @@ $$\text{Speedup} = \frac{T_{\text{old}}}{T_{\text{new}}} = \frac{\text{Performan
 % Slide 35
 % ============================================================
 
-\begin{frame}{Week 1 Synthesis and Next Steps}
+\begin{frame}{Week 1 Summary and Next Steps}
 
 \begin{itemize}
   \item \key{ISAs} define the boundary between machine code and hardware execution.
   \item \key{RISC Philosophy} prioritizes simple, uniform instructions and register-to-register operations to enable streamlined microarchitecture.
   \item \key{Representations} (binary, two's complement, hex) determine the range, precision, and simplicity of underlying ALU circuits.
   \item \key{The Iron Law} provides the quantitative foundation to reason about execution time trade-offs.
-  \item \key{Next Week:} The AArch64 Programmer's Model, General-Purpose Registers (\bits{X0}--\bits{X30}), and Core Instructions (\bits{ADD}, \bits{SUB}, \bits{LDR}, \bits{STR}).
+  \item \key{Next Module:} The AArch64 Programmer's Model, General-Purpose Registers (\bits{x0}--\bits{x30}), and Core Instructions (\bits{add}, \bits{sub}, \bits{ldr}, \bits{str}).
 \end{itemize}
 
 \end{frame}
