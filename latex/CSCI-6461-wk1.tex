@@ -1,493 +1,1498 @@
-\documentclass[10pt, aspectratio=169]{beamer}
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% ============================================================
+% Theme and typography
+% ============================================================
+
 \usetheme{Madrid}
-
-% Professional Color Palette (Navy / Slate Gray / Muted Gold)
-\definecolor{NavyBlueCustom}{RGB}{20, 35, 60}
-\definecolor{SlateGrayCustom}{RGB}{80, 95, 110}
-\definecolor{GoldCustom}{RGB}{190, 140, 40}
-\definecolor{LightBgCustom}{RGB}{248, 249, 250}
-
-\setbeamercolor{palette primary}{bg=NavyBlueCustom,fg=white}
-\setbeamercolor{palette secondary}{bg=SlateGrayCustom,fg=white}
-\setbeamercolor{palette tertiary}{bg=NavyBlueCustom,fg=white}
-\setbeamercolor{titlelike}{bg=NavyBlueCustom,fg=white}
-\setbeamercolor{frametitle}{bg=NavyBlueCustom,fg=white}
-\setbeamercolor{structure}{fg=NavyBlueCustom}
-\setbeamercolor{block title}{bg=NavyBlueCustom,fg=white}
-\setbeamercolor{block body}{bg=LightBgCustom,fg=black}
-
-% Bullet style: circles instead of arrows
-\setbeamertemplate{itemize item}[circle]
-\setbeamertemplate{itemize subitem}[circle]
-\setbeamertemplate{itemize subsubitem}[circle]
-\setbeamercolor{itemize item}{fg=GoldCustom}
-\setbeamercolor{itemize subitem}{fg=SlateGrayCustom}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
 
 \setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
 
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{listings}
-\usepackage{tikz}
-\usetikzlibrary{positioning, arrows.meta, shapes}
-
-\lstset{
-  basicstyle=\ttfamily\small,
-  breaklines=true,
-  frame=single,
-  backgroundcolor=\color{gray!10}
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}
+    [wd=.84\paperwidth,ht=2.7ex,dp=1.1ex,leftskip=.8em]
+    {author in head/foot}
+    CSCI 6461 --- Computer Systems Architecture
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}
+    [wd=.16\paperwidth,ht=2.7ex,dp=1.1ex,rightskip=.8em]
+    {date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
 }
 
-\title{Week 1: Introduction to Computing Systems \& Binary Foundations}
-\subtitle{Abstraction Layers, Binary, Two's Complement, Hex, and the Iron Law}
-\author{J. Burns}
-\institute{CSCI 6461 --- Computer Systems Architecture}
-\date{\today}
+\setbeamersize{
+  text margin left=0.65cm,
+  text margin right=0.65cm
+}
+
+\setbeamerfont{frametitle}{
+  size=\Large,
+  series=\bfseries
+}
+
+\setbeamerfont{block title}{
+  series=\bfseries
+}
+
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% ============================================================
+% Packages
+% ============================================================
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+
+\usetikzlibrary{
+  arrows.meta,
+  positioning,
+  shapes.geometric
+}
+
+% ============================================================
+% Colors
+% ============================================================
+
+\definecolor{navy}{RGB}{24,43,68}
+\definecolor{deepblue}{RGB}{45,88,130}
+\definecolor{lightblue}{RGB}{229,238,248}
+\definecolor{softgray}{RGB}{245,247,250}
+\definecolor{darkgray}{RGB}{38,43,50}
+\definecolor{gold}{RGB}{190,140,40}
+
+\setbeamercolor{palette primary}{
+  bg=navy,
+  fg=white
+}
+
+\setbeamercolor{palette secondary}{
+  bg=deepblue,
+  fg=white
+}
+
+\setbeamercolor{frametitle}{
+  bg=navy,
+  fg=white
+}
+
+\setbeamercolor{title}{
+  fg=white
+}
+
+\setbeamercolor{subtitle}{
+  fg=white
+}
+
+\setbeamercolor{author}{
+  fg=white
+}
+
+\setbeamercolor{date}{
+  fg=white
+}
+
+\setbeamercolor{titlelike}{
+  fg=white
+}
+
+\setbeamercolor{block title}{
+  bg=deepblue,
+  fg=white
+}
+
+\setbeamercolor{block body}{
+  bg=lightblue,
+  fg=darkgray
+}
+
+\setbeamercolor{normal text}{
+  fg=darkgray,
+  bg=white
+}
+
+% ============================================================
+% General formatting
+% ============================================================
+
+\setlength{\parskip}{0.35em}
+
+\newcommand{\key}[1]{\textbf{#1}}
+\newcommand{\bits}[1]{\texttt{#1}}
+\newcommand{\hex}[1]{\texttt{0x#1}}
+
+% ============================================================
+% Metadata
+% ============================================================
+
+\title[Week 1]{
+  Introduction to Computing Systems \\
+  \& Binary Foundations
+}
+
+\subtitle{
+  Abstraction layers, binary, two's complement,
+  hexadecimal, and the Iron Law
+}
+
+\author{
+  Computer Systems Architecture -- ARM AArch64
+}
+
+\date{}
+
+% ============================================================
+% Document
+% ============================================================
 
 \begin{document}
 
 % ============================================================
-\begin{frame}
-\titlepage
-\end{frame}
-
+% Slide 1
 % ============================================================
-\section{Framing \& Motivation}
 
-\begin{frame}{Why Study Computer Architecture?}
-\begin{itemize}
-    \item Every line of software eventually becomes voltages on wires
-    \item Performance, energy efficiency, and correctness are all bounded by hardware
-    \item Understanding the stack lets you reason about \emph{why} code is slow, not just \emph{that} it is slow
-    \item Architecture knowledge is essential for: compiler writers, OS designers, systems programmers, ML/HPC engineers
-    \item This week builds the vocabulary, number systems, and performance model used for the rest of the course
-\end{itemize}
-\end{frame}
+\begin{frame}[plain]
 
-\begin{frame}{The Great Abstraction Stack}
-\begin{center}
-\begin{tikzpicture}[node distance=0.4cm, every node/.style={rectangle, draw, minimum width=8cm, minimum height=0.7cm}]
-\node (app) {Application (C, Python, Java)};
-\node (lang) [below=of app] {Programming Language / Compiler};
-\node (os) [below=of lang] {Operating System};
-\node (isa) [below=of os] {Instruction Set Architecture (ISA)};
-\node (uarch) [below=of isa] {Microarchitecture};
-\node (circ) [below=of uarch] {Digital Logic / Circuits};
-\node (dev) [below=of circ] {Devices \& Physics (Transistors)};
-\draw[-Stealth, thick, NavyBlueCustom] (app) -- (lang);
-\draw[-Stealth, thick, NavyBlueCustom] (lang) -- (os);
-\draw[-Stealth, thick, NavyBlueCustom] (os) -- (isa);
-\draw[-Stealth, thick, NavyBlueCustom] (isa) -- (uarch);
-\draw[-Stealth, thick, NavyBlueCustom] (uarch) -- (circ);
-\draw[-Stealth, thick, NavyBlueCustom] (circ) -- (dev);
+\begin{tikzpicture}[remember picture,overlay]
+
+\fill[navy]
+  (current page.south west)
+  rectangle
+  (current page.north east);
+
+\fill[gold]
+  (current page.south west)
+  rectangle
+  ([yshift=.12cm]current page.south east);
+
 \end{tikzpicture}
-\end{center}
-\end{frame}
 
-\begin{frame}{Learning Objectives}
-By the end of Week 1, students should be able to:
-\begin{itemize}
-    \item Trace a program's journey from C source to gate-level control signals
-    \item Convert fluently between binary, decimal, and hexadecimal
-    \item Represent and manipulate signed integers using two's complement
-    \item Detect overflow and correctly perform sign extension
-    \item Apply the Iron Law of performance to compare machine designs
-\end{itemize}
+\vspace{1.0cm}
+
+\begin{minipage}{0.74\textwidth}
+
+{\color{gold}
+ \large
+ CSCI 6461 \;|\; WEEK 1
+ \par}
+
+\vspace{0.28cm}
+
+{\color{white}
+ \fontsize{25}{30}\selectfont
+ \bfseries
+ Introduction to Computing Systems \\
+ \& Binary Foundations
+ \par}
+
+\vspace{0.35cm}
+
+{\color{white!78}
+ \large
+ Abstraction, representation,
+ and quantitative performance
+ \par}
+
+\end{minipage}
+
+\vfill
+
+{\color{white}
+ \normalsize
+ Dr. J. Burns
+ \par}
+
+{\color{white!65}
+ \small
+ Computer Systems Architecture
+ \par}
+
+\vspace{0.45cm}
+
 \end{frame}
 
 % ============================================================
-\section{Abstraction Layers in Practice}
+% Slide 2
+% ============================================================
 
-\begin{frame}{From C to Machine: The Compilation Pipeline}
-\begin{center}
-\texttt{source.c} $\rightarrow$ \textbf{Preprocessor} $\rightarrow$ \textbf{Compiler} $\rightarrow$
-\texttt{.s} (assembly) $\rightarrow$ \textbf{Assembler} $\rightarrow$ \texttt{.o} (object) $\rightarrow$
-\textbf{Linker} $\rightarrow$ \texttt{a.out} $\rightarrow$ \textbf{Loader} $\rightarrow$ execution
-\end{center}
-\vspace{0.3cm}
+\begin{frame}{What Computer Architecture Studies}
+
 \begin{itemize}
-    \item Preprocessor: macro expansion, \texttt{\#include} resolution
-    \item Compiler: translates high-level constructs to assembly, performs optimization
-    \item Assembler: translates mnemonics to machine encodings
-    \item Linker: resolves symbols across object files and libraries
-    \item Loader: places the executable image into memory and starts execution
+
+\item Computer architecture is not just ``parts of a computer.''
+It studies the \key{interface between software behavior and
+hardware implementation}.
+
+\item The central question is:
+\key{what must the machine promise to software, and how can
+hardware deliver that promise efficiently?}
+
+\item Architecture includes instruction sets, processor organization,
+memory systems, and performance trade-offs.
+
+\item A correct machine is not automatically a good machine;
+architecture also asks whether it is fast, efficient, scalable,
+and practical.
+
 \end{itemize}
+
+\begin{block}{Course Focus}
+We will use ARM AArch64 as the concrete RISC architecture,
+but Week 1 builds the representation and performance
+foundations first.
+\end{block}
+
 \end{frame}
 
-\begin{frame}[fragile]{A Simple C Function}
-We will trace this function through every layer of the stack:
-\begin{lstlisting}
-int add(int a, int b) {
-    return a + b;
+% ============================================================
+% Slide 3
+% ============================================================
+
+\begin{frame}{The Core Abstraction Problem}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.52\textwidth}
+
+\begin{itemize}
+
+\item Programmers want to write algorithms,
+not manipulate voltage levels.
+
+\item Hardware only stores and transforms bit patterns.
+
+\item Abstraction layers make this gap manageable.
+
+\item Each layer hides detail, but hidden detail
+can still affect performance.
+
+\end{itemize}
+
+\column{0.42\textwidth}
+
+\begin{block}{Important tension}
+
+Abstraction makes systems usable.
+
+Architecture explains when abstraction leaks:
+performance, memory layout, integer overflow,
+and instruction costs.
+
+\end{block}
+
+\end{columns}
+
+\end{frame}
+
+% ============================================================
+% Slide 4
+% ============================================================
+
+\begin{frame}{System Layers: From Program to Gates}
+
+\centering
+
+\begin{tikzpicture}[
+  node distance=0.52cm,
+  every node/.style={
+    rounded corners,
+    draw=navy,
+    fill=lightblue,
+    align=center,
+    minimum width=7.8cm,
+    minimum height=0.6cm
+  }
+]
+
+\node (c)
+  {High-level code: variables, loops, functions};
+
+\node[below=of c] (asm)
+  {Assembly: ISA instructions and registers};
+
+\node[below=of asm] (mc)
+  {Machine code: binary instruction encodings};
+
+\node[below=of mc] (uarch)
+  {Microarchitecture: datapath, control, pipeline};
+
+\node[below=of uarch] (logic)
+  {Digital logic: gates, registers, memory cells};
+
+% Explicit arrows avoid whitespace/node-name parsing problems
+\draw[-{Latex[length=2mm]}, thick, navy]
+  (c) -- (asm);
+
+\draw[-{Latex[length=2mm]}, thick, navy]
+  (asm) -- (mc);
+
+\draw[-{Latex[length=2mm]}, thick, navy]
+  (mc) -- (uarch);
+
+\draw[-{Latex[length=2mm]}, thick, navy]
+  (uarch) -- (logic);
+
+\end{tikzpicture}
+
+\vspace{0.5em}
+
+\begin{itemize}
+\item Architecture connects these layers rather than
+treating them as unrelated topics.
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 5
+% ============================================================
+
+\begin{frame}{A Small Example Across the Layers}
+
+\begin{block}{High-level intent}
+\texttt{c = a + b;}
+\end{block}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{itemize}
+
+\item If \texttt{a} and \texttt{b} are already in registers,
+a compiler may choose an addition instruction.
+
+\item In AArch64, this could be conceptually written as
+
+\[
+\bits{ADD X0, X1, X2}
+\]
+
+\item The instruction means:
+\key{X0 gets X1 + X2}.
+
+\end{itemize}
+
+\column{0.48\textwidth}
+
+\begin{itemize}
+
+\item The assembler encodes the instruction into 32 bits.
+
+\item Hardware decodes fields for operation
+and register numbers.
+
+\item The ALU performs the addition
+and writes the result.
+
+\end{itemize}
+
+\end{columns}
+
+\end{frame}
+
+% ============================================================
+% Slide 6
+% ============================================================
+
+\begin{frame}{ISA vs. Microarchitecture}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{ISA: what software sees}
+
+\begin{itemize}
+\item Instructions
+\item Registers
+\item Addressing behavior
+\item Architectural state
+\item Defined results
+\end{itemize}
+
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Microarchitecture: how hardware does it}
+
+\begin{itemize}
+\item Datapath
+\item Control logic
+\item Pipeline stages
+\item Caches
+\item Execution units
+\end{itemize}
+
+\end{block}
+
+\end{columns}
+
+\vspace{0.5em}
+
+\key{Key idea:}
+Two processors may run the same AArch64 program correctly
+but have very different performance.
+
+\end{frame}
+
+% ============================================================
+% Slide 7
+% ============================================================
+
+\begin{frame}{The Stored-Program Model}
+
+\begin{itemize}
+
+\item Instructions and data are both stored
+in memory as bit patterns.
+
+\item A program counter identifies the next
+instruction to fetch.
+
+\item The processor repeatedly performs
+fetch, decode, execute, and state update.
+
+\item Branches and calls modify the normal
+next-instruction sequence.
+
+\item This model is simple, but it is the conceptual
+base for pipelines and caches.
+
+\end{itemize}
+
+\begin{block}{Why this matters later}
+
+If instructions live in memory, then memory speed affects
+not only data access but also instruction delivery.
+
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 8
+% ============================================================
+
+\begin{frame}{Core Hardware Components}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.55\textwidth}
+
+\begin{itemize}
+
+\item \key{CPU:} executes instructions.
+
+\item \key{Registers:} hold nearby operands and results.
+
+\item \key{Main memory:} holds active programs and data.
+
+\item \key{Storage:} keeps persistent data.
+
+\item \key{I/O:} connects the machine
+to the outside world.
+
+\end{itemize}
+
+\column{0.40\textwidth}
+
+\begin{block}{Architectural consequence}
+
+The processor is fast, memory is slower,
+and storage is much slower.
+
+Performance depends heavily on movement
+across this hierarchy.
+
+\end{block}
+
+\end{columns}
+
+\end{frame}
+
+% ============================================================
+% Slide 9
+% ============================================================
+
+\begin{frame}{Why Binary Is Enough}
+
+\begin{itemize}
+
+\item Digital circuits reliably distinguish two voltage ranges,
+represented as 0 and 1.
+
+\item A single bit carries little information;
+groups of bits carry many possibilities.
+
+\item With \(n\) bits, there are \(2^n\) distinct patterns.
+
+\item Those patterns can represent numbers, characters,
+instructions, addresses, or control fields.
+
+\item The hardware does not know the ``meaning''
+of a pattern by itself.
+
+\end{itemize}
+
+\begin{block}{Core warning}
+Bits are representation. Meaning comes from interpretation.
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 10
+% ============================================================
+
+\begin{frame}{Unsigned Binary: Place Value}
+
+\begin{center}
+
+\begin{tabular}{c|cccccc}
+Bit position & 5 & 4 & 3 & 2 & 1 & 0 \\
+\midrule
+Weight & 32 & 16 & 8 & 4 & 2 & 1 \\
+Bits & 1 & 0 & 1 & 1 & 0 & 1
+\end{tabular}
+
+\end{center}
+
+\vspace{0.6em}
+
+\begin{itemize}
+
+\item Binary is positional just like decimal,
+but the weights are powers of two.
+
+\item A 1 contributes its weight;
+a 0 contributes nothing.
+
+\item \bits{101101} therefore represents
+
+\[
+32+8+4+1=45
+\]
+
+\item With fixed-width hardware,
+the number of available positions is limited.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 11
+% ============================================================
+
+\begin{frame}{Unsigned Range and Fixed Width}
+
+\begin{itemize}
+
+\item An \(n\)-bit unsigned value has
+\(2^n\) possible patterns.
+
+\item The smallest value is 0.
+
+\item The largest value is
+
+\[
+2^n-1
+\]
+
+\item Four unsigned bits represent 0 through 15.
+
+\item Eight unsigned bits represent 0 through 255.
+
+\item Fixed width is not a formatting detail;
+it determines what values are representable.
+
+\end{itemize}
+
+\begin{block}{Architecture connection}
+
+Register widths, immediate fields, and address fields
+all impose representational limits.
+
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 12
+% ============================================================
+
+\begin{frame}{Converting Decimal to Binary}
+
+\begin{block}{Example: convert 45 to binary}
+
+\[
+45 = 32 + 8 + 4 + 1
+\]
+
+\end{block}
+
+\begin{center}
+
+\begin{tabular}{c|cccccc}
+Weight & 32 & 16 & 8 & 4 & 2 & 1 \\
+\midrule
+Use it? & 1 & 0 & 1 & 1 & 0 & 1
+\end{tabular}
+
+\end{center}
+
+\vspace{0.5em}
+
+\begin{itemize}
+
+\item Select the powers of two that sum
+to the decimal value.
+
+\item Write 1 where a weight is used
+and 0 where it is not.
+
+\item Therefore
+
+\[
+45_{10}=101101_2
+\]
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 13
+% ============================================================
+
+\begin{frame}{Converting Binary to Decimal}
+
+\begin{block}{Example: convert \bits{110101}}
+
+\[
+110101_2
+\]
+
+\end{block}
+
+\begin{center}
+
+\begin{tabular}{c|cccccc}
+Weight & 32 & 16 & 8 & 4 & 2 & 1 \\
+\midrule
+Bits & 1 & 1 & 0 & 1 & 0 & 1
+\end{tabular}
+
+\end{center}
+
+\[
+32+16+4+1=53
+\]
+
+\begin{block}{Result}
+\[
+110101_2 = 53_{10}
+\]
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 14
+% ============================================================
+
+\begin{frame}{Why Hexadecimal Exists}
+
+\begin{itemize}
+
+\item Long binary strings are difficult for humans to read.
+
+\item Hexadecimal uses 16 symbols:
+
+\[
+0,1,\ldots,9,A,B,C,D,E,F
+\]
+
+\item One hexadecimal digit represents exactly four bits.
+
+\item Two hexadecimal digits represent one byte.
+
+\item Hexadecimal therefore compresses binary
+without hiding the underlying bit boundaries.
+
+\item Addresses and instruction encodings
+are commonly written in hexadecimal.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 15
+% ============================================================
+
+\begin{frame}{Binary and Hexadecimal}
+
+\begin{center}
+
+\begin{tabular}{cc@{\qquad}cc}
+\toprule
+Binary & Hex & Binary & Hex \\
+\midrule
+0000 & 0 & 1000 & 8 \\
+0001 & 1 & 1001 & 9 \\
+0010 & 2 & 1010 & A \\
+0011 & 3 & 1011 & B \\
+0100 & 4 & 1100 & C \\
+0101 & 5 & 1101 & D \\
+0110 & 6 & 1110 & E \\
+0111 & 7 & 1111 & F \\
+\bottomrule
+\end{tabular}
+
+\end{center}
+
+\vspace{0.4em}
+
+\begin{block}{Example}
+
+\[
+0011\;1101_2 = \hex{3D}
+\]
+
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 16
+% ============================================================
+
+\begin{frame}{The Signed-Integer Problem}
+
+\begin{itemize}
+
+\item Unsigned binary uses all available patterns
+for zero and positive values.
+
+\item Real programs also require negative integers.
+
+\item We therefore need a convention that assigns
+some bit patterns to negative values.
+
+\item A good representation should make
+arithmetic hardware simple.
+
+\item It should also provide predictable
+fixed-width behavior.
+
+\item Modern processors overwhelmingly use
+\key{two's-complement representation}.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 17
+% ============================================================
+
+\begin{frame}{Why Not Sign-Magnitude?}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{itemize}
+
+\item A simple idea is to reserve one bit for the sign.
+
+\item The remaining bits store the magnitude.
+
+\item This is easy for humans to understand.
+
+\item But it creates both \(+0\) and \(-0\).
+
+\end{itemize}
+
+\column{0.48\textwidth}
+
+\begin{block}{Hardware problem}
+
+Addition becomes conditional:
+the arithmetic hardware must consider signs
+and magnitudes separately.
+
+\end{block}
+
+\begin{itemize}
+
+\item This complicates datapath design.
+
+\item Two's complement avoids much of this complexity.
+
+\end{itemize}
+
+\end{columns}
+
+\end{frame}
+
+% ============================================================
+% Slide 18
+% ============================================================
+
+\begin{frame}{Two's-Complement Range}
+
+\begin{itemize}
+
+\item In \(n\) bits, two's complement still has
+\(2^n\) total patterns.
+
+\item The lower half of the number line is negative.
+
+\item The upper half includes zero and positive values.
+
+\item The range is
+
+\[
+-2^{n-1}
+\quad \text{through} \quad
+2^{n-1}-1
+\]
+
+\item Eight bits represent
+
+\[
+-128 \quad \text{through} \quad +127
+\]
+
+\item The range is asymmetric because zero
+uses one nonnegative pattern.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 19
+% ============================================================
+
+\begin{frame}{Creating a Negative Value}
+
+\begin{block}{Rule for forming \(-x\) in two's complement}
+
+Write \(+x\) in the required width,
+invert all bits, then add 1.
+
+\end{block}
+
+\begin{center}
+
+\begin{tabular}{rl}
+\(+5\) in 8 bits: & \bits{00000101} \\[0.25em]
+Invert bits: & \bits{11111010} \\[0.25em]
+Add 1: & \bits{11111011}
+\end{tabular}
+
+\end{center}
+
+\begin{itemize}
+
+\item Therefore \bits{11111011} represents
+\(-5\) in 8-bit two's complement.
+
+\item The width is part of the representation;
+do not drop leading bits casually.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 20
+% ============================================================
+
+\begin{frame}{Interpreting a Negative Pattern}
+
+\begin{block}{
+Example: interpret \bits{11110110}
+as an 8-bit signed integer
 }
-\end{lstlisting}
-\begin{itemize}
-    \item Simple enough to see every transformation clearly
-    \item Involves register usage, arithmetic, and function return conventions
-    \item We'll revisit this same example at each layer
-\end{itemize}
-\end{frame}
 
-\begin{frame}{RISC Design Philosophy}
-ARM64 (and RISC-V) embody the classic RISC principles:
-\begin{itemize}
-    \item \textbf{Fixed-width instructions} (32 bits, always) -- simplifies fetch and decode, enables easy pipelining
-    \item \textbf{Load/store architecture} -- only \texttt{LDR}/\texttt{STR} touch memory; arithmetic instructions operate strictly on registers
-    \item \textbf{Large, uniform register file} -- 31 general-purpose 64-bit registers (\texttt{x0--x30}) reduce memory traffic
-    \item \textbf{Simple addressing modes} -- fewer, more regular formats compared to CISC (e.g., x86)
-    \item Consequence: instructions are individually simpler $\Rightarrow$ CPI (Cycles Per Instruction -- covered in detail later in the Iron Law section) tends toward 1, but instruction \emph{count} for a given task can be higher than a CISC ISA
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{C $\rightarrow$ Assembly (Compiler's Job)}
-\begin{lstlisting}
-add:
-    add  w0, w0, w1    ; w0 = a + b  (args in w0, w1)
-    ret                ; return value in w0, return addr in x30
-\end{lstlisting}
-\begin{itemize}
-    \item AArch64 (ARM64) calling convention: first arguments in \texttt{w0/x0}, \texttt{w1/x1}, \dots; return value in \texttt{w0/x0}
-    \item No explicit \texttt{mov} needed -- RISC compilers lean on a large uniform register file rather than shuffling values
-    \item \texttt{ret} implicitly branches to the link register \texttt{x30} -- no explicit operand required in the common case
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Assembly $\rightarrow$ Machine Code (Assembler's Job)}
 \begin{center}
-\begin{tabular}{l l}
-\textbf{Assembly} & \textbf{Machine Code (hex)} \\
-\hline
-\texttt{add w0, w0, w1} & \texttt{0x0B010000} \\
-\texttt{ret} & \texttt{0xD65F03C0} \\
+
+\begin{tabular}{rl}
+Original: & \bits{11110110} \\[0.25em]
+Invert: & \bits{00001001} \\[0.25em]
+Add 1: & \bits{00001010} = 10 \\[0.25em]
+Result: & \(-10\)
 \end{tabular}
+
 \end{center}
-\begin{itemize}
-    \item Every ARM64 instruction is exactly 32 bits -- opcode, registers, and immediates sit in fixed bit fields
-    \item Fixed width means the decoder never has to first figure out ``how long is this instruction?'' (unlike variable-length CISC encodings)
-    \item Assembler resolves labels into PC-relative offsets encoded directly in the instruction word
-\end{itemize}
-\end{frame}
 
-\begin{frame}{Machine Code $\rightarrow$ Gates (Hardware's Job)}
-\begin{itemize}
-    \item CPU fetches a fixed 32-bit instruction word from memory every cycle
-    \item Control unit decodes fixed bit fields (opcode, \texttt{Rn}, \texttt{Rm}, \texttt{Rd}, immediate) into control signals
-    \item Control signals drive muxes, ALU operation select lines, register file read/write enables
-    \item Fixed-width, regular encoding is precisely what makes single-cycle decode -- and later, pipelined decode -- tractable
-    \item This is the boundary where software becomes physics
-\end{itemize}
-\end{frame}
+\end{block}
 
-\begin{frame}{Why Abstraction Works: Isolation of Concerns}
 \begin{itemize}
-    \item Each layer exposes an interface and hides implementation details from the layer above
-    \item A compiler writer doesn't need to know transistor physics
-    \item A circuit designer doesn't need to know C syntax
-    \item Enables independent innovation at each layer (e.g., new microarchitectures behind the same ISA)
-    \item Cost: some inefficiency and information loss at each boundary
-\end{itemize}
-\end{frame}
 
-\begin{frame}{Where Abstraction Leaks}
-\begin{itemize}
-    \item \textbf{Cache effects}: identical algorithms, wildly different runtimes depending on memory access pattern
-    \item \textbf{Undefined behavior}: C's abstraction assumes well-defined semantics that hardware doesn't always guarantee
-    \item \textbf{Timing side-channels}: Spectre/Meltdown show microarchitectural state leaking through the ISA boundary
-    \item \textbf{Numerical representation}: floating-point rounding is invisible until it isn't
-    \item Architecture knowledge lets you reason \emph{across} layers when abstraction breaks down
+\item A leading 1 signals a negative value
+in two's complement.
+
+\item The invert-and-add-one procedure
+finds the magnitude.
+
 \end{itemize}
+
 \end{frame}
 
 % ============================================================
-\section{Unsigned Binary}
+% Slide 21
+% ============================================================
 
-\begin{frame}{Why Binary? Physical \& Engineering Motivation}
-\begin{itemize}
-    \item Transistors are most reliably operated as two-state switches (on/off)
-    \item Two voltage levels give large noise margins compared to multi-level encoding
-    \item Binary logic maps directly onto Boolean algebra $\Rightarrow$ clean mathematical foundation
-    \item Alternative bases (e.g., ternary computing) exist but lack the same manufacturing maturity
-\end{itemize}
-\end{frame}
+\begin{frame}{Same Bits, Different Interpretation}
 
-\begin{frame}{Positional Number Systems Review}
-\begin{itemize}
-    \item A number in base $b$ with digits $d_{n-1} \ldots d_1 d_0$ represents:
-    \[
-    \sum_{i=0}^{n-1} d_i \cdot b^i
-    \]
-    \item Decimal (base 10): digits $0$--$9$
-    \item Binary (base 2): digits $0$--$1$
-    \item Example: $(503)_{10} = 5\times10^2 + 0\times10^1 + 3\times10^0$
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Unsigned Binary Representation}
-\begin{itemize}
-    \item $n$-bit unsigned number: $\sum_{i=0}^{n-1} b_i \cdot 2^i$, where $b_i \in \{0,1\}$
-    \item Range: $0$ to $2^n - 1$
-    \item Example (8 bits): $0000\,0000$ to $1111\,1111$ = $0$ to $255$
-    \item Most significant bit (MSB) carries weight $2^{n-1}$
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Binary $\leftrightarrow$ Decimal Conversion}
-\textbf{Binary to Decimal:} sum the weights of set bits
-\[
-1011_2 = 1\times8 + 0\times4 + 1\times2 + 1\times1 = 11_{10}
-\]
-\textbf{Decimal to Binary:} repeated division by 2 (record remainders)
-\[
-13 \div 2 = 6\ r1,\ 6 \div 2 = 3\ r0,\ 3 \div 2 = 1\ r1,\ 1 \div 2 = 0\ r1 \Rightarrow 1101_2
-\]
-\end{frame}
-
-\begin{frame}{Binary Addition}
-\begin{itemize}
-    \item Same rules as decimal addition, base 2 carry rules:
-    \item $0+0=0$, \quad $0+1=1$, \quad $1+1=10$ (write 0, carry 1), \quad $1+1+1=11$
-\end{itemize}
-\[
-\begin{array}{r}
- 0111 \\
-+0101 \\
-\hline
- 1100
-\end{array}
-\]
-\begin{itemize}
-    \item Carry chain ripples left-to-right -- this is exactly how a ripple-carry adder circuit works
-    \item Overflow (for unsigned) occurs when there's a carry out of the MSB
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Bit Widths and Range Limits}
 \begin{center}
-\begin{tabular}{l l l}
-\textbf{Width} & \textbf{Unsigned Range} & \textbf{Common Use} \\
-\hline
-8-bit  & 0 -- 255 & byte, char \\
-16-bit & 0 -- 65{,}535 & short \\
-32-bit & 0 -- $\sim$4.29 billion & int, \texttt{w}-registers (ARM64) \\
-64-bit & 0 -- $\sim$1.8$\times10^{19}$ & long, \texttt{x}-registers, pointers \\
+
+\begin{tabular}{ccc}
+\toprule
+Bit pattern & Interpretation & Value \\
+\midrule
+\bits{11111111} & Unsigned 8-bit & 255 \\
+\bits{11111111} & Signed 8-bit two's complement & -1 \\
+\bits{11111111} & Byte of raw data & Depends on format \\
+\bottomrule
 \end{tabular}
+
 \end{center}
+
 \begin{itemize}
-    \item Choice of width is a real design/cost tradeoff: storage, bus width, register size
-    \item Overflow silently wraps around in unsigned arithmetic -- a common bug source
+
+\item The bits did not change;
+only the interpretation changed.
+
+\item Low-level bugs often come from
+using the wrong interpretation.
+
+\item Architecture forces us to track
+width and signedness explicitly.
+
 \end{itemize}
+
 \end{frame}
 
 % ============================================================
-\section{Two's Complement}
+% Slide 22
+% ============================================================
 
-\begin{frame}{The Problem with Naive Signed Representations}
-\textbf{Sign-magnitude:} reserve MSB as sign bit, remaining bits as magnitude
-\begin{itemize}
-    \item Example (4-bit): $0101 = +5$, $1101 = -5$
-    \item \textbf{Problem:} two representations of zero ($0000$ and $1000$); addition needs separate sign-handling logic
-    \item \textbf{One's complement} (brief note): negative = bitwise NOT of positive; still has dual-zero problem ($0000$/$1111$) and needs ``end-around carry'' correction
-    \item Used historically (CDC, some UNIVAC systems); both abandoned in favor of two's complement
-    \item Motivates a representation where addition ``just works'' with a single circuit
-\end{itemize}
-\end{frame}
+\begin{frame}{Binary Addition and Subtraction}
 
-\begin{frame}{Two's Complement Definition}
-\begin{itemize}
-    \item Standard signed integer representation in virtually all modern architectures, including ARM64 and RISC-V
-    \item For $n$ bits, value is:
-    \[
-    -b_{n-1}\cdot 2^{n-1} + \sum_{i=0}^{n-2} b_i \cdot 2^i
-    \]
-    \item Intuition: the MSB has \emph{negative} weight
-    \item Range for $n$ bits: $-2^{n-1}$ to $2^{n-1}-1$ (asymmetric!)
-    \item Exactly one representation of zero
-\end{itemize}
-\end{frame}
+\begin{columns}[T,onlytextwidth]
 
-\begin{frame}{Two's Complement: Computing the Negative}
-\textbf{Algorithm:} invert all bits, then add 1
+\column{0.46\textwidth}
+
+\begin{block}{Addition}
+
 \[
-+5 = 0101 \xrightarrow{\text{invert}} 1010 \xrightarrow{+1} 1011 = -5
+0101_2 + 0011_2 = 1000_2
 \]
-\begin{itemize}
-    \item Equivalent shortcut: copy bits up to and including the first 1 (from the right), invert the rest
-    \item Negating twice returns the original value (except for the most-negative edge case)
-    \item Circuit implication: negation reuses the same adder as addition (add inverted operand + 1) -- no separate ``negate'' circuit needed
-\end{itemize}
-\end{frame}
 
-\begin{frame}{Two's Complement Addition/Subtraction}
+\end{block}
+
 \begin{itemize}
-    \item Addition: identical bit-level procedure as unsigned addition -- \emph{same hardware}
-    \item Subtraction: $A - B = A + (\text{two's complement of } B)$
-    \item This uniformity is precisely \emph{why} two's complement won out over sign-magnitude / one's complement
+
+\item Binary addition uses carries
+just like decimal addition.
+
 \end{itemize}
+
+\column{0.50\textwidth}
+
+\begin{block}{Subtraction}
+
 \[
-\begin{array}{r}
- 0011\ (+3) \\
-+1110\ (-2) \\
-\hline
- 0001\ (+1)\ \text{(carry out discarded)}
-\end{array}
+A-B = A+(-B)
 \]
-\end{frame}
 
-\begin{frame}{Overflow Detection in Two's Complement}
-\begin{itemize}
-    \item Unsigned overflow $\ne$ signed overflow -- must check separately
-    \item \textbf{Rule:} signed overflow occurs when two operands of the \emph{same sign} produce a result of the \emph{opposite sign}
-    \item \textbf{Circuit rule:} overflow = XOR of carry-into-MSB and carry-out-of-MSB
-    \item Example: $0111\ (+7) + 0001\ (+1) = 1000\ (-8)$ -- overflow! (positive + positive = negative)
-    \item ARM64 makes this explicit in hardware: the \texttt{NZCV} condition flags register sets \texttt{N} (negative), \texttt{Z} (zero), \texttt{C} (carry/unsigned overflow), \texttt{V} (signed overflow) after flag-setting instructions like \texttt{ADDS}/\texttt{SUBS} or \texttt{CMP}
-\end{itemize}
-\end{frame}
+\end{block}
 
-\begin{frame}{Sign Extension}
 \begin{itemize}
-    \item Widening a signed value to more bits must preserve its numeric value
-    \item \textbf{Rule:} replicate the sign bit (MSB) into all new upper bits
-    \item Example: 4-bit $-5 = 1011 \rightarrow$ 8-bit $= 1111\,1011$ (still $-5$)
-    \item Contrast with unsigned \emph{zero extension}: pad with 0s instead
-    \item ARM64 provides dedicated instructions: \texttt{SXTW}, \texttt{SXTB}/\texttt{SXTH} for sign extension; \texttt{UXTW} etc. for zero extension. RISC-V analog: \texttt{sext.w}
+
+\item Two's complement lets the same adder
+support subtraction.
+
+\item This is a representation choice
+with hardware consequences.
+
 \end{itemize}
+
+\end{columns}
+
 \end{frame}
 
 % ============================================================
-\section{Hexadecimal \& Bit Manipulation}
+% Slide 23
+% ============================================================
 
-\begin{frame}{Hexadecimal Representation}
+\begin{frame}{Carry vs. Signed Overflow}
+
 \begin{itemize}
-    \item Base 16, digits $0$--$9$ then $A$--$F$ (10--15)
-    \item Compact, human-friendly shorthand for binary
-    \item One hex digit = exactly 4 bits (one ``nibble'')
-    \item Written with prefix \texttt{0x} in most programming languages and in ARM64/RISC-V assembly
-\end{itemize}
-\end{frame}
 
-\begin{frame}{Binary $\leftrightarrow$ Hex Conversion}
-\textbf{Technique:} group binary into nibbles (groups of 4) from the right
+\item Carry-out matters for unsigned arithmetic.
+
+\item Signed overflow is different:
+it means the signed result is outside
+the representable range.
+
+\item In 4-bit signed arithmetic,
+the maximum positive value is \(+7\).
+
+\item \bits{0111} represents \(+7\)
+and \bits{0011} represents \(+3\).
+
+\item
+
 \[
-1011\,1100\,0110_2 \;\rightarrow\; \underbrace{1011}_{B}\ \underbrace{1100}_{C}\ \underbrace{0110}_{6} \;=\; \texttt{0xBC6}
+\bits{0111}+\bits{0011}=\bits{1010}
 \]
-\begin{itemize}
-    \item Reverse direction: expand each hex digit into its 4-bit binary equivalent
-    \item Much faster than converting through decimal
-\end{itemize}
-\end{frame}
 
-\begin{frame}{Hex in Practice}
-\begin{itemize}
-    \item Memory addresses: \texttt{0x0000\,FFFF\,7FFE\,A3C0}
-    \item Register/debugger dumps -- compact display of 32-bit (\texttt{w}) / 64-bit (\texttt{x}) register values
-    \item Color codes as a familiar analogy: \texttt{\#FF5733} is really 3 bytes in hex
-    \item Instruction encodings, hash digests, and binary file inspection (\texttt{hexdump}, \texttt{xxd})
-\end{itemize}
-\end{frame}
+but \(+10\) cannot fit in four signed bits.
 
-\begin{frame}{Bitwise Operations}
-\begin{center}
-\begin{tabular}{l l l}
-\textbf{Op} & \textbf{C Symbol} & \textbf{ARM64 Mnemonic} \\
-\hline
-AND & \texttt{\&} & \texttt{AND} \\
-OR  & \texttt{|} & \texttt{ORR} \\
-XOR & \texttt{\^{}} & \texttt{EOR} \\
-NOT & \texttt{\~{}} & \texttt{MVN} \\
-Shift left/right & \texttt{<<}\ \texttt{>>} & \texttt{LSL} / \texttt{LSR} (logical), \texttt{ASR} (arithmetic) \\
-\end{tabular}
-\end{center}
-\begin{itemize}
-    \item Each maps to a dedicated, single-cycle ALU function unit in hardware
-    \item RISC ISAs expose logical vs.\ arithmetic shift as \emph{distinct} instructions -- the difference matters for signed two's complement values
-\end{itemize}
-\end{frame}
+\item The negative-looking result signals
+signed overflow, not a valid answer of \(-6\).
 
-\begin{frame}{Practical Encoding Example}
-\begin{itemize}
-    \item Character \texttt{'A'} $\rightarrow$ ASCII decimal $65$ $\rightarrow$ binary $0100\,0001$ $\rightarrow$ hex \texttt{0x41}
-    \item String \texttt{"Hi"} stored as consecutive bytes: \texttt{0x48 0x69}
-    \item Demonstrates all three representations (binary/decimal/hex) describing the \emph{same} underlying bit pattern
-    \item Reinforces: representation is a lens, not a property of the data itself
 \end{itemize}
+
 \end{frame}
 
 % ============================================================
-\section{Basic CPU Performance Metrics: The Iron Law}
+% Slide 24
+% ============================================================
 
-\begin{frame}{What Do We Mean by ``Performance''?}
+\begin{frame}{Sign Extension and Truncation}
+
 \begin{itemize}
-    \item \textbf{Latency}: time to complete a single task (seconds)
-    \item \textbf{Throughput}: tasks completed per unit time (tasks/second)
-    \item Optimizing one does not always optimize the other (e.g., pipelining improves throughput, may not reduce single-instruction latency)
-    \item Architecture decisions are always latency/throughput/energy tradeoffs
-\end{itemize}
-\end{frame}
 
-\begin{frame}{The Iron Law of Performance}
+\item Sign extension widens a signed value
+without changing its mathematical value.
+
+\item It repeats the original most significant bit
+into the new high-order bits.
+
+\item Eight-bit \(-5\) is
+
 \[
-\text{CPU Time} = \text{Instruction Count} \times \text{CPI} \times \text{Clock Cycle Time}
+\bits{11111011}
 \]
-\begin{itemize}
-    \item \textbf{Instruction Count (IC):} dynamic instructions executed -- depends on the program, compiler, and ISA (RISC vs.\ CISC)
-    \item \textbf{CPI:} cycles per instruction -- depends on microarchitecture
-    \item \textbf{Clock Cycle Time:} $1/\text{clock rate}$ -- depends on circuit design \& fabrication technology
-    \item Called the \emph{Iron Law} because every architectural decision you make moves exactly one of these three knobs -- and often trades off against another
-\end{itemize}
-\end{frame}
 
-\begin{frame}{Clock Rate, Cycle Time, and Frequency}
-\begin{itemize}
-    \item Clock rate $f$ measured in Hz; cycle time $T = 1/f$
-    \item Example: $3\ \text{GHz} \Rightarrow T \approx 0.33\ \text{ns}$
-    \item Historical trend: clock rates scaled aggressively through the early 2000s (Dennard scaling), then plateaued due to power/heat limits
-    \item Since then, performance gains increasingly come from parallelism (multicore, wider pipelines, SIMD) rather than raw frequency -- the third term of the Iron Law has stagnated, so architects push harder on IC and CPI
-\end{itemize}
-\end{frame}
+\item Sixteen-bit \(-5\) is
 
-\begin{frame}{CPI and Instruction Mix}
-\begin{itemize}
-    \item Different instruction classes have different costs (e.g., loads vs.\ ALU ops vs.\ branches)
-    \item Overall CPI is a weighted average:
-    \[
-    \text{CPI} = \sum_{i} \left( \text{Freq}_i \times \text{CPI}_i \right)
-    \]
-    \item In a load/store RISC ISA, ALU ops are register-only and cheap; only \texttt{LDR}/\texttt{STR} touch memory and carry the largest cost
-    \item Example (ARM64-like mix): 50\% ALU (CPI=1), 30\% load/store (CPI=4), 20\% branch (CPI=2)
-    \item $\text{CPI} = 0.5(1) + 0.3(4) + 0.2(2) = 2.1$
-    \item RISC bet: simple instructions push CPI toward 1, even if IC is somewhat higher than a CISC ISA doing the same task
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Worked Iron Law Problem}
-Two machines run the same program (100M instructions):
-\begin{itemize}
-    \item \textbf{Machine A:} 2 GHz clock, CPI = 1.5
-    \item \textbf{Machine B:} 3 GHz clock, CPI = 2.5
-\end{itemize}
 \[
-T_A = \frac{100\times10^6 \times 1.5}{2\times10^9} = 75\ \text{ms}
+\bits{11111111 11111011}
+\]
+
+\item Truncation does the opposite:
+it discards high-order bits.
+
+\item Truncation can destroy information
+and change the value completely.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 25
+% ============================================================
+
+\begin{frame}{Representation Mistakes That Matter}
+
+\begin{itemize}
+
+\item Treating signed data as unsigned
+can turn \(-1\) into a large positive value.
+
+\item Forgetting width can make a conversion
+appear correct but mean the wrong thing.
+
+\item Ignoring overflow can produce
+plausible-looking but incorrect results.
+
+\item Misreading hexadecimal can hide
+the bit fields inside an instruction or address.
+
+\item Confusing mathematical integers
+with fixed-width machine integers causes subtle bugs.
+
+\item These are not just programming mistakes;
+they are architecture-level interpretation mistakes.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 26
+% ============================================================
+
+\begin{frame}{What Does CPU Performance Mean?}
+
+\begin{itemize}
+
+\item For the same workload,
+less execution time means higher performance.
+
+\item Elapsed time may include I/O,
+operating-system activity, and waiting.
+
+\item CPU time focuses on processor time
+spent executing the program.
+
+\item Clock rate is visible and marketable,
+but incomplete.
+
+\item A faster clock can be offset by more instructions
+or more cycles per instruction.
+
+\item Architecture uses equations so performance
+comparisons do not rely on slogans.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 27
+% ============================================================
+
+\begin{frame}{Latency vs. Throughput}
+
+\begin{itemize}
+
+\item \key{Latency} is the time for one task to complete.
+
+\item \key{Throughput} is the amount of work completed
+per unit time.
+
+\item A processor improvement may reduce latency,
+increase throughput, or both.
+
+\item Pipelining often improves throughput more directly
+than the latency of one instruction.
+
+\item Users often care about latency;
+servers often care heavily about throughput.
+
+\item Distinguishing these terms prevents confusion
+when evaluating architectural techniques.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 28
+% ============================================================
+
+\begin{frame}{Clock Rate and Cycle Time}
+
+\begin{itemize}
+
+\item Clock rate is the number of cycles per second.
+
+\item Cycle time is the duration of one cycle.
+
+\item They are reciprocals:
+
+\[
+\text{Cycle Time}
+=
+\frac{1}{\text{Clock Rate}}
+\]
+
+\item A 2 GHz processor has a 0.5 ns cycle time.
+
+\item A 3 GHz processor has a shorter cycle time,
+but may not finish a program sooner.
+
+\item Program time also depends on
+instruction count and CPI.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 29
+% ============================================================
+
+\begin{frame}{Instruction Count}
+
+\begin{itemize}
+
+\item Instruction count is the number of
+\key{dynamic machine instructions} executed.
+
+\item It is not just the number of lines in a program.
+
+\item Loops can execute the same instruction many times.
+
+\item Instruction count depends on the algorithm,
+compiler, ISA, and input data.
+
+\item A program compiled for two different ISAs
+may execute different numbers of instructions.
+
+\item Reducing instruction count helps only if CPI
+and clock rate do not worsen enough to cancel the gain.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 30
+% ============================================================
+
+\begin{frame}{Cycles Per Instruction (CPI)}
+
+\begin{itemize}
+
+\item CPI is the average number of clock cycles
+per executed instruction.
+
+\item A CPI of 1 does not mean every instruction
+takes exactly one cycle.
+
+\item It is an average across the dynamic
+instruction stream.
+
+\item Memory stalls, pipeline hazards,
+and branch behavior can increase CPI.
+
+\item Better microarchitecture often tries
+to reduce CPI without changing the ISA.
+
+\item CPI is where implementation details often
+reappear despite software abstraction.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 31
+% ============================================================
+
+\begin{frame}{The Iron Law of Processor Performance}
+
+\begin{block}{The Iron Law}
+
+\[
+\boxed{
+\text{CPU Time}
+=
+\text{Instruction Count}
+\times
+\text{CPI}
+\times
+\text{Clock Cycle Time}
+}
+\]
+
+\[
+\boxed{
+\text{CPU Time}
+=
+\frac{
+\text{Instruction Count}
+\times
+\text{CPI}
+}{
+\text{Clock Rate}
+}
+}
+\]
+
+\end{block}
+
+\begin{itemize}
+
+\item Instruction count connects to software,
+compiler, and ISA.
+
+\item CPI connects to microarchitecture
+and memory behavior.
+
+\item Clock cycle time connects to circuit timing
+and design complexity.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 32
+% ============================================================
+
+\begin{frame}{Iron Law Worked Example}
+
+\begin{block}{Processor A}
+
+\[
+IC=1.0\times10^9,
 \qquad
-T_B = \frac{100\times10^6 \times 2.5}{3\times10^9} \approx 83.3\ \text{ms}
+CPI=2.0,
+\qquad
+Clock=2.0\;GHz
 \]
-\begin{itemize}
-    \item Machine A is faster despite the lower clock rate -- higher frequency alone doesn't guarantee better performance
-    \item This is the Iron Law in action: all three terms must be considered together, never just one in isolation
-\end{itemize}
+
+\[
+Time
+=
+\frac{
+1.0\times10^9 \times 2.0
+}{
+2.0\times10^9
+}
+=
+1.0\;s
+\]
+
+\end{block}
+
+\begin{block}{Processor B}
+
+\[
+IC=1.2\times10^9,
+\qquad
+CPI=1.2,
+\qquad
+Clock=2.4\;GHz
+\]
+
+\[
+Time
+=
+\frac{
+1.2\times10^9 \times 1.2
+}{
+2.4\times10^9
+}
+=
+0.6\;s
+\]
+
+\end{block}
+
 \end{frame}
 
 % ============================================================
-\section{Synthesis}
+% Slide 33
+% ============================================================
 
-\begin{frame}{Recap \& Bridge to Week 2}
+\begin{frame}{Why GHz Comparisons Fail}
+
 \begin{itemize}
-    \item The abstraction stack lets software and hardware evolve independently -- but leaks matter at the architecture level
-    \item Two's complement unifies signed/unsigned addition into one circuit -- a recurring design theme: \emph{reuse hardware across cases}
-    \item Hex is binary's human-readable shorthand; bitwise ops map directly to ARM64 ALU instructions
-    \item The Iron Law (IC $\times$ CPI $\times$ Cycle Time) is the lens for every optimization we'll study this term
-    \item \textbf{Week 2:} Instruction Set Architecture design -- how instructions are chosen, encoded, and how ISA choices shape IC and CPI
+
+\item Processor B in the example executes
+more instructions than Processor A.
+
+\item It still wins because its CPI and clock rate
+more than compensate.
+
+\item A higher clock can be defeated by poor CPI.
+
+\item A lower instruction count can be defeated
+by slower cycles.
+
+\item A design that improves one term
+may worsen another term.
+
+\item The Iron Law forces the full trade-off
+to be made explicit.
+
 \end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 34
+% ============================================================
+
+\begin{frame}{Speedup}
+
+\begin{block}{Definition}
+
+\[
+\boxed{
+\text{Speedup}
+=
+\frac{
+\text{Old Execution Time}
+}{
+\text{New Execution Time}
+}
+}
+\]
+
+\end{block}
+
+\begin{itemize}
+
+\item If time falls from 10 seconds to 5 seconds,
+speedup is \(2\times\).
+
+\item If time falls from 10 seconds to 8 seconds,
+speedup is \(1.25\times\).
+
+\item Speedup greater than 1 means improvement.
+
+\item Speedup below 1 means slowdown.
+
+\item Always specify the workload
+and the baseline system.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 35
+% ============================================================
+
+\begin{frame}{Week 1 Synthesis and Transition}
+
+\begin{itemize}
+
+\item Abstraction explains how high-level programs
+can execute on physical hardware.
+
+\item The ISA is the key boundary between
+machine-level software and hardware implementation.
+
+\item Binary and hexadecimal let us read
+the representations used for data and instructions.
+
+\item Two's complement shows how representation
+choices simplify arithmetic hardware.
+
+\item The Iron Law gives a disciplined way
+to reason about processor performance.
+
+\item Next, we apply these foundations to the
+AArch64 programmer's model and basic assembly instructions.
+
+\end{itemize}
+
 \end{frame}
 
 \end{document}
