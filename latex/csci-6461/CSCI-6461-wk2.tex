@@ -677,7 +677,8 @@ that does not imply less internal processor work.
 
 \begin{itemize}
 \item CPI measures average clock cycles consumed per executed instruction.
-\item Simple instructions may be easier to execute with predictable latency.
+\item Simple instructions typically require fewer distinct execution resources and exhibit 
+more regular latency behavior
 \item Complex instructions may require several internal operations.
 \item Modern superscalar processors can execute multiple simple operations
       concurrently.
@@ -710,7 +711,7 @@ that does not imply less internal processor work.
 % Slide 25
 % ============================================================
 
-\begin{frame}{The Iron Law Applied to ISA Design}
+\begin{frame}{The CPU Performance Equation (“Iron Law”)}
 
 \[
 \boxed{
@@ -750,7 +751,7 @@ Assume two implementations execute the same workload.
  & IC & CPI & Clock Rate \\
 \midrule
 RISC & $1.4\times10^9$ & 1.1 & 3.0 GHz \\
-CISC & $1.0\times10^9$ & 1.6 & 2.8 GHz \\
+CISC & $1.0\times10^9$ & 1.6 & 3.0 GHz \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -765,8 +766,8 @@ T_{\text{RISC}}
 \[
 T_{\text{CISC}}
 =
-\frac{1.0\times10^9 \times 1.6}{2.8\times10^9}
-\approx 0.571\text{ s}
+\frac{1.0\times10^9 \times 1.6}{3.0\times10^9}
+\approx 0.533\text{ s}
 \]
 
 The RISC machine executes more instructions yet completes the workload sooner.
