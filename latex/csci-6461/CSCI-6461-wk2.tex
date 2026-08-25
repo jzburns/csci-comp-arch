@@ -71,55 +71,17 @@
 \definecolor{darkgray}{RGB}{38,43,50}
 \definecolor{gold}{RGB}{190,140,40}
 
-\setbeamercolor{palette primary}{
-  bg=navy,
-  fg=white
-}
-
-\setbeamercolor{palette secondary}{
-  bg=deepblue,
-  fg=white
-}
-
-\setbeamercolor{frametitle}{
-  bg=navy,
-  fg=white
-}
-
-\setbeamercolor{title}{
-  fg=white
-}
-
-\setbeamercolor{subtitle}{
-  fg=white
-}
-
-\setbeamercolor{author}{
-  fg=white
-}
-
-\setbeamercolor{date}{
-  fg=white
-}
-
-\setbeamercolor{titlelike}{
-  fg=white
-}
-
-\setbeamercolor{block title}{
-  bg=deepblue,
-  fg=white
-}
-
-\setbeamercolor{block body}{
-  bg=lightblue,
-  fg=darkgray
-}
-
-\setbeamercolor{normal text}{
-  fg=darkgray,
-  bg=white
-}
+\setbeamercolor{palette primary}{bg=navy,fg=white}
+\setbeamercolor{palette secondary}{bg=deepblue,fg=white}
+\setbeamercolor{frametitle}{bg=navy,fg=white}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=white}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{date}{fg=white}
+\setbeamercolor{titlelike}{fg=white}
+\setbeamercolor{block title}{bg=deepblue,fg=white}
+\setbeamercolor{block body}{bg=lightblue,fg=darkgray}
+\setbeamercolor{normal text}{fg=darkgray,bg=white}
 
 % ============================================================
 % General formatting
@@ -224,23 +186,35 @@
 
 \end{frame}
 
+% ============================================================
+% Slide 2
+% ============================================================
 
-% 2
 \begin{frame}{What Is an Instruction Set Architecture?}
+
 \begin{itemize}
 \item An ISA is the programmer-visible specification of a processor.
-\item It defines instructions, registers, data types, addressing modes, and architectural state.
+\item It defines instructions, registers, data types, addressing modes,
+      and architectural state.
 \item Compilers generate code for the ISA; processors implement the ISA.
 \item ISA design therefore sits directly at the hardware/software boundary.
-\item A good ISA must remain useful for decades while implementations evolve underneath it.
-\item RISC and CISC are different historical answers to the question: \key{what should the ISA expose?}
+\item A good ISA must remain useful for decades while implementations
+      evolve underneath it.
+\item RISC and CISC are different historical answers to the question:
+      \key{what should the ISA expose?}
 \end{itemize}
+
 \end{frame}
 
-% 3
+% ============================================================
+% Slide 3
+% ============================================================
+
 \begin{frame}{Why ISA Design Matters}
+
 \begin{columns}[T,onlytextwidth]
-\column{0.49\textwidth}
+
+\begin{column}{0.46\textwidth}
 \begin{block}{Software consequences}
 \begin{itemize}
 \item Instruction count
@@ -250,7 +224,11 @@
 \item Binary compatibility
 \end{itemize}
 \end{block}
-\column{0.49\textwidth}
+\end{column}
+
+\hfill
+
+\begin{column}{0.46\textwidth}
 \begin{block}{Hardware consequences}
 \begin{itemize}
 \item Decode complexity
@@ -260,455 +238,729 @@
 \item Energy per instruction
 \end{itemize}
 \end{block}
+\end{column}
+
 \end{columns}
+
 \vspace{0.4em}
-\begin{flushleft}\key{ISA design redistributes complexity between software and hardware rather than eliminating it.}\end{flushleft}
+
+\begin{flushleft}
+\key{ISA design redistributes complexity between software and hardware
+rather than eliminating it.}
+\end{flushleft}
+
 \end{frame}
 
-% 4
+% ============================================================
+% Slide 4
+% ============================================================
+
 \begin{frame}{The Instruction-Set Design Problem}
+
 \begin{itemize}
-\item Should one instruction perform a small primitive operation or a larger sequence of work?
-\item Should arithmetic instructions access memory directly or operate only on registers?
+\item Should one instruction perform a small primitive operation or a
+      larger sequence of work?
+\item Should arithmetic instructions access memory directly or operate
+      only on registers?
 \item Should instructions have one fixed length or many lengths?
 \item How many addressing modes should hardware understand?
-\item Should frequently used operations receive special instructions even if they complicate decode?
-\item RISC and CISC emerged from different answers shaped by the technology of their eras.
+\item Should frequently used operations receive special instructions
+      even if they complicate decode?
+\item RISC and CISC emerged from different answers shaped by the
+      technology of their eras.
 \end{itemize}
+
 \end{frame}
 
-% 5
+% ============================================================
+% Slide 5
+% ============================================================
+
 \begin{frame}{Historical Constraints Shaped Early ISAs}
+
 \begin{itemize}
 \item Early main memory was expensive, slow, and physically limited.
 \item Compilers were less sophisticated than modern optimizing compilers.
-\item Hardware designers wanted programs to occupy fewer bytes and make fewer memory accesses.
+\item Hardware designers wanted programs to occupy fewer bytes and make
+      fewer memory accesses.
 \item Rich instructions could express substantial work in a compact encoding.
-\item Microcode made it practical to implement complex instruction behavior using simpler internal steps.
-\item These pressures strongly encouraged what later became known as the CISC style.
+\item Microprogrammed control allowed complex instructions to be implemented
+      as sequences of simpler internal operations.
+\item These pressures strongly encouraged what later became known as the
+      CISC style.
 \end{itemize}
+
 \end{frame}
 
-% 6
+% ============================================================
+% Slide 6
+% ============================================================
+
 \begin{frame}{The Origins of CISC}
+
 \begin{itemize}
 \item CISC stands for \key{Complex Instruction Set Computer}.
-\item The philosophy favored rich instruction sets with many operations and addressing modes.
-\item Individual instructions could perform multi-step tasks such as memory access plus arithmetic.
-\item Variable-length encodings allowed common instructions to be compact while retaining expressive instructions.
-\item The goal was often to reduce program size and narrow the semantic gap between languages and machine code.
+\item The philosophy favored rich instruction sets with many operations
+      and addressing modes.
+\item Individual instructions could perform multi-step tasks such as
+      memory access plus arithmetic.
+\item Variable-length encodings allowed common instructions to be compact
+      while retaining expressive instructions.
+\item The goal was often to reduce program size and narrow the semantic
+      gap between languages and machine code.
 \item The x86 ISA is the most prominent surviving example of a CISC lineage.
 \end{itemize}
+
 \end{frame}
 
-% 7
+% ============================================================
+% Slide 7
+% ============================================================
+
 \begin{frame}{The CISC Design Philosophy}
+
 \begin{itemize}
-\item Provide many instructions so software can request specialized operations directly.
+\item Provide many instructions so software can request specialized
+      operations directly.
 \item Permit operands to reside in registers or memory in many instruction forms.
-\item Support multiple addressing modes to make data structures convenient to access.
-\item Use variable instruction lengths to encode simple cases compactly and complex cases when needed.
-\item Allow one architectural instruction to correspond to several internal hardware actions.
-\item Accept more complicated decoding and control in exchange for expressive machine instructions.
+\item Support multiple addressing modes to make data structures convenient
+      to access.
+\item Use variable instruction lengths to encode simple cases compactly
+      and complex cases when needed.
+\item Allow one architectural instruction to correspond to several
+      internal hardware actions.
+\item Accept more complicated decoding and control in exchange for
+      expressive machine instructions.
 \end{itemize}
+
 \end{frame}
 
-% 8
+% ============================================================
+% Slide 8
+% ============================================================
+
 \begin{frame}{CISC Example: More Work per Instruction}
+
 \begin{block}{Conceptual example}
-Imagine an ISA instruction that computes \code{A = A + memory[B + 8]}.
+Imagine an ISA instruction that computes
+\code{a = a + memory[b + 8]}.
 \end{block}
+
 \begin{itemize}
-\item One architectural instruction identifies an address, reads memory, performs arithmetic, and writes a result.
-\item The instruction may encode an operation, base register, displacement, and destination.
+\item One architectural instruction identifies an address, reads memory,
+      performs arithmetic, and writes a result.
+\item The instruction may encode an operation, base register,
+      displacement, and destination.
 \item Fewer instructions are visible in the program.
-\item Internally, however, hardware may still perform address generation, memory access, addition, and write-back separately.
-\item The architectural instruction is compact semantically even if its implementation is multi-step.
-\item This distinction between \key{architectural instruction} and \key{internal work} matters throughout the lecture.
+\item Internally, hardware may still perform address generation,
+      memory access, addition, and write-back separately.
+\item The architectural instruction is compact semantically even if its
+      implementation is multi-step.
+\item This distinction between \key{architectural instruction} and
+      \key{internal work} is important.
 \end{itemize}
+
 \end{frame}
 
-% 9
+% ============================================================
+% Slide 9
+% ============================================================
+
 \begin{frame}{Why Complex Instructions Can Be Attractive}
+
 \begin{itemize}
 \item Fewer instructions can reduce instruction-fetch traffic.
 \item Rich addressing modes can express common data-access patterns directly.
-\item Compact encodings improve code density, which can benefit instruction-cache behavior.
+\item Compact encodings improve code density, which can benefit
+      instruction-cache behavior.
 \item Some specialized operations map naturally to common software idioms.
-\item Backward compatibility can preserve huge software ecosystems over many processor generations.
-\item The central attraction is not ``complexity for its own sake'' but doing useful work with fewer architectural instructions or bytes.
+\item Backward compatibility can preserve huge software ecosystems over
+      many processor generations.
+\item The attraction is not complexity for its own sake, but accomplishing
+      useful work with fewer architectural instructions or bytes.
 \end{itemize}
+
 \end{frame}
 
-% 10
+% ============================================================
+% Slide 10
+% ============================================================
+
 \begin{frame}{The Cost of Instruction Complexity}
+
 \begin{itemize}
-\item Variable instruction length makes instruction boundaries harder to find quickly.
+\item Variable instruction length makes instruction boundaries harder
+      to find quickly.
 \item Many addressing modes increase decoder and control complexity.
-\item Instructions may require very different execution times and hardware resources.
+\item Instructions may require very different execution times and
+      hardware resources.
 \item Irregular operand rules complicate pipelines and dependency handling.
-\item Complex decode consumes area and energy before useful arithmetic even begins.
-\item As transistor budgets and compiler quality improved, architects questioned whether this complexity still paid for itself.
+\item Complex decode consumes area and energy before useful execution begins.
+\item These costs became increasingly important as processors became
+      deeply pipelined.
 \end{itemize}
+
 \end{frame}
 
-% 11
+% ============================================================
+% Slide 11
+% ============================================================
+
 \begin{frame}{The Emergence of RISC}
+
 \begin{itemize}
-\item RISC stands for \key{Reduced Instruction Set Computer}.
-\item Researchers observed that compiled programs used some instructions far more often than others.
-\item Many complex instructions were rarely generated by compilers or were not faster than simple sequences.
-\item Faster semiconductor technology made simpler hardwired control increasingly attractive.
-\item The idea was to optimize the common case rather than provide hardware for every conceivable operation.
-\item Berkeley RISC and Stanford MIPS helped establish this approach in the early 1980s.
+\item Researchers observed that compilers used only a subset of many
+      complex instruction sets frequently.
+\item Simple operations often dominated real compiled workloads.
+\item Semiconductor integration made larger register files increasingly practical.
+\item Faster pipelines rewarded instructions with predictable execution behavior.
+\item Compiler technology improved enough to manage more of the scheduling
+      and instruction-selection burden.
+\item These observations motivated Reduced Instruction Set Computer designs.
 \end{itemize}
+
 \end{frame}
 
-% 12
+% ============================================================
+% Slide 12
+% ============================================================
+
 \begin{frame}{The RISC Design Philosophy}
+
 \begin{itemize}
-\item Keep instructions relatively simple and regular.
-\item Emphasize register-to-register arithmetic.
+\item Favor regular instructions that are straightforward to fetch,
+      decode, and execute.
+\item Perform arithmetic primarily on registers.
 \item Access memory explicitly through load and store instructions.
-\item Use relatively regular instruction encodings to simplify fetch and decode.
-\item Provide enough registers that temporary values can remain close to the execution units.
-\item Rely more heavily on compilers to combine simple instructions into efficient programs.
+\item Use relatively regular instruction encodings.
+\item Provide enough registers to keep active values close to the execution units.
+\item Let compilers combine simple operations into efficient instruction sequences.
 \end{itemize}
+
 \end{frame}
 
-% 13
+% ============================================================
+% Slide 13
+% ============================================================
+
 \begin{frame}{Berkeley RISC and Stanford MIPS}
-\begin{columns}[T,onlytextwidth]
-\column{0.49\textwidth}
-\begin{block}{Berkeley RISC}
+
 \begin{itemize}
-\item Regular instructions
-\item Large register emphasis
-\item Pipeline-friendly design
-\item Influenced SPARC
+\item RISC research accelerated during the late 1970s and early 1980s.
+\item Berkeley RISC demonstrated the value of simple instructions and
+      large register sets.
+\item Stanford MIPS emphasized pipeline-friendly instruction behavior.
+\item Both projects challenged the assumption that increasingly complex
+      ISAs were necessary for performance.
+\item Their ideas strongly influenced later commercial processor families.
+\item ARM emerged in the same broader movement toward simpler,
+      regular instruction-set design.
 \end{itemize}
-\end{block}
-\column{0.49\textwidth}
-\begin{block}{Stanford MIPS}
-\begin{itemize}
-\item Simple load/store ISA
-\item Compiler-oriented design
-\item Pipeline simplicity
-\item Influential teaching model
-\end{itemize}
-\end{block}
-\end{columns}
-\vspace{0.4em}
-The lasting contribution was a methodology: \key{measure real workloads, simplify the common path, and let compilers schedule simple primitives.}
+
 \end{frame}
 
-% 14
-\begin{frame}{RISC Principle 1: Simple, Regular Operations}
+% ============================================================
+% Slide 14
+% ============================================================
+
+\begin{frame}{RISC Principle: Simple and Regular Instructions}
+
 \begin{itemize}
-\item Regular operations reduce the number of special cases hardware must handle.
-\item Similar instruction formats allow common decode circuitry to be reused.
-\item Predictable operand placement simplifies datapath control.
-\item Shorter critical control paths can support higher clock rates or lower energy.
-\item Simplicity also makes pipelining easier because stages perform more uniform work.
-\item ``Simple'' does not mean weak: complex programs are built by composing many simple instructions.
+\item Regularity makes instruction behavior easier for hardware to predict.
+\item Similar instruction formats simplify field extraction during decode.
+\item Operations tend to have clearly defined sources and destinations.
+\item Simpler instruction semantics reduce special-case control paths.
+\item Regularity becomes particularly valuable when many instructions
+      overlap in a pipeline.
+\item The goal is not necessarily fewer instruction types, but predictable structure.
 \end{itemize}
+
 \end{frame}
 
-% 15
-\begin{frame}{RISC Principle 2: Load/Store Architecture}
-\begin{block}{Key rule}
-Arithmetic operates on registers; separate instructions move data between registers and memory.
-\end{block}
+% ============================================================
+% Slide 15
+% ============================================================
+
+\begin{frame}{RISC Principle: Load/Store Architecture}
+
 \begin{itemize}
-\item A load computes an address and brings a value into a register.
-\item Arithmetic then consumes register operands.
-\item A store writes a register value back to memory when needed.
-\item This separates memory access from ALU computation in the ISA.
-\item The separation maps naturally onto pipeline stages such as EX and MEM.
-\item AArch64 follows this load/store model closely.
+\item Arithmetic and logical instructions operate primarily on registers.
+\item Loads transfer data from memory into registers.
+\item Stores transfer data from registers back to memory.
+\item Arithmetic instructions therefore do not normally need to wait
+      directly for arbitrary memory operands.
+\item Memory behavior becomes concentrated in explicit instruction classes.
+\item AArch64 follows this load/store organization.
 \end{itemize}
+
 \end{frame}
 
-% 16
-\begin{frame}{RISC Principle 3: Register-Based Computation}
+% ============================================================
+% Slide 16
+% ============================================================
+
+\begin{frame}{RISC Principle: Register-Based Computation}
+
 \begin{itemize}
 \item Registers are much faster to access than main memory.
-\item Keeping active values in registers reduces expensive memory traffic.
-\item Register operands are easy to name with compact fields in an instruction.
-\item Multiple read and write ports can feed execution units efficiently.
-\item Compiler register allocation becomes important because software decides which values stay resident.
-\item This is a deliberate transfer of responsibility: simpler hardware requires smarter code generation.
+\item A large register set allows temporary values to remain near execution hardware.
+\item Compilers attempt to assign frequently used program values to registers.
+\item Register-to-register operations have regular operand access behavior.
+\item Reduced memory traffic can improve both performance and energy efficiency.
+\item Register allocation therefore becomes an important compiler responsibility.
 \end{itemize}
+
 \end{frame}
 
-% 17
-\begin{frame}{RISC Principle 4: Regular Instruction Encoding}
+% ============================================================
+% Slide 17
+% ============================================================
+
+\begin{frame}{RISC Principle: Regular Instruction Encoding}
+
 \begin{itemize}
-\item Fixed or highly regular instruction lengths make boundaries easy to locate.
-\item Decoders can examine predictable bit positions for opcode and register fields.
-\item Instruction fetch can retrieve aligned groups without first discovering varying lengths.
-\item Regularity reduces front-end control complexity.
-\item The trade-off is that some operations may require more instruction bits or multiple instructions.
-\item AArch64 uses fixed 32-bit instruction encodings, a classic RISC-friendly property.
+\item Fixed-width instructions make instruction boundaries immediately known.
+\item Fetch hardware can retrieve several aligned instructions predictably.
+\item Decoder logic knows where common fields are likely to appear.
+\item Parallel decoding becomes easier when instruction boundaries are regular.
+\item AArch64 uses fixed 32-bit instruction encodings.
+\item Encoding regularity is one reason RISC designs map naturally onto pipelines.
 \end{itemize}
+
 \end{frame}
 
-% 18
-\begin{frame}{RISC Principle 5: Compiler-Friendly Design}
+% ============================================================
+% Slide 18
+% ============================================================
+
+\begin{frame}{RISC Principle: Compiler-Friendly ISA Design}
+
 \begin{itemize}
-\item RISC assumes compilers can select and schedule simple operations effectively.
-\item The compiler exposes instruction-level opportunities rather than hiding work inside large instructions.
-\item Register allocation is essential because the ISA expects frequent register use.
-\item Regular instructions simplify cost modeling during optimization.
-\item Compiler improvements can therefore yield performance gains without changing hardware.
-\item The risk is that poor code generation can produce more instructions and more memory traffic.
+\item RISC deliberately exposes relatively primitive operations to software.
+\item Compilers decide how those operations should be combined.
+\item Register allocation determines which values remain in fast registers.
+\item Instruction scheduling can rearrange independent operations to reduce stalls.
+\item A regular ISA gives the compiler predictable building blocks.
+\item Some complexity therefore moves from instruction semantics into
+      compiler optimization.
 \end{itemize}
+
 \end{frame}
 
-% 19
-\begin{frame}{Worked Example: Evaluate \texorpdfstring{$z=(a+b)\times c$}{z=(a+b)*c}}
-\begin{block}{Load/store-style sequence}
-\code{ldr x1, [a]}\\
-\code{ldr x2, [b]}\\
-\code{add x3, x1, x2}\\
-\code{ldr x4, [c]}\\
-\code{mul x5, x3, x4}\\
-\code{str x5, [z]}
+% ============================================================
+% Slide 19
+% ============================================================
+
+\begin{frame}[fragile]{Worked Example: Evaluating an Expression in RISC}
+
+Suppose:
+
+\[
+c = a + b
+\]
+
+and the values are stored in memory.
+
+\begin{block}{Conceptual AArch64-style sequence}
+\begin{verbatim}
+ldr x1, [x0]
+ldr x2, [x0, #8]
+add x3, x1, x2
+str x3, [x0, #16]
+\end{verbatim}
 \end{block}
+
 \begin{itemize}
-\item The sequence is longer than a hypothetical memory-to-memory expression instruction.
-\item But each instruction performs a regular, easily identified job.
-\item This regularity is valuable for decoding, pipelining, dependency tracking, and compiler scheduling.
+\item Memory access and arithmetic are separate operations.
+\item The actual addition occurs between register operands.
+\item Four architectural instructions are visible.
 \end{itemize}
+
 \end{frame}
 
-% 20
-\begin{frame}{Hypothetical CISC Equivalent: Same Expression}
-\begin{block}{One richer architectural instruction}
-\centering
-\Large\code{muladd\_mem [z], [a], [b], [c]}
+% ============================================================
+% Slide 20
+% ============================================================
+
+\begin{frame}[fragile]{Hypothetical CISC Equivalent}
+
+The same conceptual operation might be exposed as:
+
+\begin{block}{Hypothetical CISC instruction}
+\begin{verbatim}
+add_mem [c], [a], [b]
+\end{verbatim}
 \end{block}
-\begin{itemize}
-\item This \key{hypothetical} instruction represents the same expression $z=(a+b)\times c$ in one architectural instruction.
-\item The instruction must obtain three source values from memory and ultimately write one result back to memory.
-\item Internally, the processor still needs address generation, multiple memory accesses, addition, multiplication, and a store.
-\item Architectural instruction count falls from six visible RISC-style instructions to one visible CISC-style instruction.
-\item The trade-off is a richer encoding and more complicated decode, sequencing, exception handling, and dependency behavior.
-\item The example illustrates CISC philosophy; it is \key{not} intended to claim that a real x86 instruction has exactly this form.
-\end{itemize}
+
+Conceptually, this one instruction performs:
+
+\begin{enumerate}
+\item Read operand \code{a} from memory.
+\item Read operand \code{b} from memory.
+\item Add the two values.
+\item Write the result to memory location \code{c}.
+\end{enumerate}
+
+\begin{block}{Important distinction}
+This is a deliberately hypothetical instruction used to illustrate
+CISC philosophy; it is not being presented as an actual x86 instruction.
+\end{block}
+
 \end{frame}
 
-% 21
-\begin{frame}{RISC vs. CISC: Same Computation, Different Exposure}
+% ============================================================
+% Slide 21
+% ============================================================
+
+\begin{frame}{RISC vs. CISC: Same Computation, Different Interface}
+
 \begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{RISC-style exposure}
+
+\begin{column}{0.46\textwidth}
+\begin{block}{RISC view}
+Several explicit operations:
 \begin{itemize}
-\item Load operands
-\item Compute in registers
-\item Store result
-\item More visible instructions
-\item More regular operations
+\item load
+\item load
+\item add
+\item store
 \end{itemize}
 \end{block}
-\column{0.48\textwidth}
-\begin{block}{CISC-style exposure}
+\end{column}
+
+\hfill
+
+\begin{column}{0.46\textwidth}
+\begin{block}{CISC view}
+One richer architectural operation may:
 \begin{itemize}
-\item Memory may be an operand
-\item Richer single instructions
-\item Fewer visible instructions
-\item Variable work per instruction
-\item More decode/control complexity
+\item identify memory operands
+\item perform address generation
+\item perform arithmetic
+\item update memory
 \end{itemize}
 \end{block}
+\end{column}
+
 \end{columns}
-\vspace{0.5em}
-\key{Neither description alone predicts performance.} We need the Iron Law.
+
+\vspace{0.3cm}
+
+The CISC sequence may contain fewer architectural instructions, but
+that does not imply less internal processor work.
+
 \end{frame}
 
-% 21
+% ============================================================
+% Slide 22
+% ============================================================
+
 \begin{frame}{Instruction Count: Is Fewer Always Better?}
+
 \begin{itemize}
-\item A CISC program may require fewer architectural instructions for the same task.
-\item But instruction count says nothing about the time required by each instruction.
-\item A rich instruction may decode into several internal operations.
-\item A RISC program may use more instructions but execute them with high pipeline regularity.
-\item Code size depends on instruction width as well as instruction count.
-\item Therefore \key{fewer instructions is useful only when the other performance factors remain favorable.}
+\item A complex instruction can replace several simpler instructions.
+\item This may reduce dynamic instruction count.
+\item Fewer instructions can also reduce instruction-fetch bandwidth.
+\item But instruction count is only one term in processor performance.
+\item A complex instruction may require more cycles or more decoding work.
+\item Therefore lower instruction count does not automatically imply
+      lower execution time.
 \end{itemize}
+
 \end{frame}
 
-% 22
-\begin{frame}{CPI: The Other Side of the Trade-off}
+% ============================================================
+% Slide 23
+% ============================================================
+
+\begin{frame}{Cycles per Instruction: The Other Side}
+
 \begin{itemize}
-\item CPI is the average number of clock cycles per executed architectural instruction.
-\item A complex instruction may require more internal work and potentially more cycles.
-\item Regular instructions can make average execution behavior easier to pipeline.
-\item However, modern superscalar processors can complete multiple instructions per cycle, giving CPI below 1.
-\item CPI therefore reflects implementation, workload, cache behavior, and instruction mix.
-\item RISC versus CISC cannot be evaluated by instruction count without considering CPI.
+\item CPI measures average clock cycles consumed per executed instruction.
+\item Simple instructions may be easier to execute with predictable latency.
+\item Complex instructions may require several internal operations.
+\item Modern superscalar processors can execute multiple simple operations
+      concurrently.
+\item Memory delays can dominate the CPI of either ISA style.
+\item Instruction count and CPI must therefore be considered together.
 \end{itemize}
+
 \end{frame}
 
-% 23
+% ============================================================
+% Slide 24
+% ============================================================
+
 \begin{frame}{Clock Cycle Time and Instruction Complexity}
+
 \begin{itemize}
-\item The clock period must accommodate the critical timing requirements of the implementation.
-\item More complicated decode and control can lengthen front-end paths or require additional pipeline stages.
-\item Simpler instruction structure can reduce work required before execution begins.
-\item But modern processors often pipeline decode aggressively, so ISA complexity does not directly equal a slow clock.
-\item Extra pipeline stages can raise branch-misprediction penalties even when frequency increases.
-\item Again, one design variable cannot be considered in isolation.
+\item Processor clock period is constrained by critical hardware paths.
+\item More complicated decode and control can increase front-end delay.
+\item Simpler instruction formats can make high-speed decoding easier.
+\item Modern processors use pipelining to divide complex work across stages.
+\item A longer pipeline can support higher clock frequency but introduces
+      other penalties.
+\item ISA complexity can therefore influence clock design indirectly
+      through implementation choices.
 \end{itemize}
+
 \end{frame}
 
-% 24
+% ============================================================
+% Slide 25
+% ============================================================
+
 \begin{frame}{The Iron Law Applied to ISA Design}
-\begin{center}
-{\Large \iron}
-\end{center}
+
+\[
+\boxed{
+T_{CPU}
+=
+IC
+\times
+CPI
+\times
+T_{cycle}
+}
+\]
+
 \begin{itemize}
-\item \key{Instruction count (IC):} often favors richer instructions or denser encodings.
-\item \key{CPI:} often benefits from regular instructions and efficient execution pipelines.
-\item \key{Cycle time:} may benefit from simpler decode/control paths.
-\item ISA design can improve one term while harming another.
-\item Compiler quality and microarchitecture determine where the real balance lands.
-\item The Iron Law is the correct framework for performance arguments about RISC and CISC.
+\item CISC may reduce \key{instruction count}.
+\item RISC regularity may help reduce \key{CPI}.
+\item Simpler decode and pipeline structures may help reduce
+      \key{clock cycle time}.
+\item These effects can oppose one another.
+\item No single term determines performance by itself.
+\item ISA design must therefore be evaluated using complete workload execution.
 \end{itemize}
+
 \end{frame}
 
-% 25
+% ============================================================
+% Slide 26
+% ============================================================
+
 \begin{frame}{Worked Performance Comparison}
-\begin{block}{Machine R}
-RISC-style program: 1.30 billion instructions, CPI 1.0, 3.0 GHz
-\end{block}
-\begin{block}{Machine C}
-CISC-style program: 0.90 billion instructions, CPI 1.4, 2.8 GHz
-\end{block}
-\begin{align*}
-T_R &= \frac{1.30\times 10^9\times 1.0}{3.0\times 10^9}=0.433\text{ s}\\
-T_C &= \frac{0.90\times 10^9\times 1.4}{2.8\times 10^9}=0.450\text{ s}
-\end{align*}
-\centering \key{Lower instruction count did not guarantee lower execution time.}
+
+Assume two implementations execute the same workload.
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & IC & CPI & Clock Rate \\
+\midrule
+RISC & $1.4\times10^9$ & 1.1 & 3.0 GHz \\
+CISC & $1.0\times10^9$ & 1.6 & 2.8 GHz \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\[
+T_{\text{RISC}}
+=
+\frac{1.4\times10^9 \times 1.1}{3.0\times10^9}
+\approx 0.513\text{ s}
+\]
+
+\[
+T_{\text{CISC}}
+=
+\frac{1.0\times10^9 \times 1.6}{2.8\times10^9}
+\approx 0.571\text{ s}
+\]
+
+The RISC machine executes more instructions yet completes the workload sooner.
+
 \end{frame}
 
-% 26
+% ============================================================
+% Slide 27
+% ============================================================
+
 \begin{frame}{Code Density and Memory Footprint}
+
 \begin{itemize}
-\item Code density measures how much useful program behavior fits into a given number of instruction bytes.
-\item Variable-length CISC encodings can represent common operations very compactly.
-\item Fixed-width RISC instructions may consume more bytes for some instruction sequences.
-\item Larger code can increase instruction-cache pressure and memory bandwidth demand.
-\item ARM historically addressed code density partly through Thumb and Thumb-2 encodings; AArch64 uses fixed 32-bit instructions.
-\item Code density shows that regular hardware-friendly encoding has a real system-level trade-off.
+\item Program size depends on both instruction count and bytes per instruction.
+\item Variable-length CISC encodings can represent common operations compactly.
+\item Fixed-width RISC instructions may require more bytes for some sequences.
+\item Higher code density can improve instruction-cache utilization.
+\item Better instruction-cache behavior can reduce memory traffic and energy.
+\item Code density therefore remains a genuine architectural advantage,
+      especially when memory capacity or bandwidth is constrained.
 \end{itemize}
+
 \end{frame}
 
-% 27
+% ============================================================
+% Slide 28
+% ============================================================
+
 \begin{frame}{Instruction Fetch and Decode Complexity}
+
 \begin{columns}[T,onlytextwidth]
-\column{0.49\textwidth}
-\begin{block}{Regular fixed-width ISA}
+
+\begin{column}{0.46\textwidth}
+\begin{block}{Regular fixed-width encoding}
 \begin{itemize}
-\item Boundaries known immediately
-\item Predictable field locations
-\item Easier parallel decode
-\item Simpler alignment logic
+\item boundaries known immediately
+\item easier parallel fetch
+\item regular field extraction
+\item simpler alignment
 \end{itemize}
 \end{block}
-\column{0.49\textwidth}
-\begin{block}{Variable-length rich ISA}
+\end{column}
+
+\hfill
+
+\begin{column}{0.46\textwidth}
+\begin{block}{Variable-length encoding}
 \begin{itemize}
-\item Boundaries must be discovered
-\item Prefixes may alter meaning
-\item Fields vary by instruction
-\item More front-end logic required
+\item boundaries must be discovered
+\item instructions may cross fetch boundaries
+\item decode may require more stages
+\item more front-end hardware may be required
 \end{itemize}
 \end{block}
+\end{column}
+
 \end{columns}
-\vspace{0.4em}
-Modern x86 processors invest substantial hardware in the front end precisely because compatibility with variable-length x86 instructions is valuable.
+
+\vspace{0.3cm}
+
+Modern CISC processors invest substantial hardware in making this
+front end fast enough to feed wide execution engines.
+
 \end{frame}
 
-% 28
+% ============================================================
+% Slide 29
+% ============================================================
+
 \begin{frame}{ISA Design and Pipelining}
+
 \begin{itemize}
-\item Pipelines work best when instruction processing can be divided into repeatable stages.
-\item RISC regularity historically made five-stage pipelines comparatively straightforward to build.
-\item Separate load/store operations map naturally onto a dedicated memory-access stage.
-\item Fixed instruction length simplifies fetch and decode timing.
-\item Complex instructions can still be pipelined, but often require decomposition or specialized paths.
-\item Modern high-performance processors go far beyond classic pipelines, yet front-end regularity still matters.
+\item Pipelines work best when instruction behavior can be divided into
+      regular stages.
+\item RISC load/store organization separates memory operations from
+      arithmetic operations.
+\item Fixed instruction width simplifies fetch and decode stage boundaries.
+\item Similar operand structures make hazard detection easier to organize.
+\item Irregular instructions can still be pipelined, but may require
+      additional translation or control.
+\item RISC historically aligned well with the needs of deeply pipelined processors.
 \end{itemize}
+
 \end{frame}
 
-% 29
+% ============================================================
+% Slide 30
+% ============================================================
+
 \begin{frame}{ISA Design and Compiler Optimization}
+
 \begin{itemize}
-\item Compilers transform high-level code into instruction sequences that exploit the ISA efficiently.
-\item RISC designs expose simple operations that compilers can reorder and combine.
-\item A large register set gives compilers more places to keep temporary values.
-\item CISC instructions may encode useful compound operations that reduce code size or instruction count.
-\item Modern compilers use detailed processor cost models rather than assuming one ISA philosophy is always superior.
-\item ISA quality therefore includes how well its features can be exploited by real compiler toolchains.
+\item Compilers translate high-level program behavior into ISA operations.
+\item A regular instruction set provides predictable optimization targets.
+\item Register allocation determines which program values remain in registers.
+\item Instruction scheduling attempts to expose independent operations.
+\item Rich CISC instructions can sometimes express useful operations directly.
+\item ISA quality therefore includes how effectively real compiler
+      toolchains can exploit its features.
 \end{itemize}
+
 \end{frame}
 
-% 30
+% ============================================================
+% Slide 31
+% ============================================================
+
 \begin{frame}{RISC vs. CISC: Energy and Thermal Trade-offs}
+
 \begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
+
+\begin{column}{0.46\textwidth}
 \begin{block}{RISC tendency}
 \begin{itemize}
 \item Regular encodings can simplify fetch, alignment, and decode.
 \item Simpler architectural operations can reduce front-end work per instruction.
-\item Explicit load/store behavior can make data movement more visible and predictable.
+\item Explicit load/store behavior can make data movement more predictable.
 \end{itemize}
 \end{block}
-\column{0.48\textwidth}
+\end{column}
+
+\hfill
+
+\begin{column}{0.46\textwidth}
 \begin{block}{CISC tendency}
 \begin{itemize}
-\item Variable-length or richer instructions can require more complex decode machinery.
-\item One architectural instruction may perform several operations or memory accesses.
-\item Better code density can reduce instruction-fetch traffic and cache pressure.
+\item Variable-length or richer instructions can require more complex decode.
+\item One instruction may perform several operations or memory accesses.
+\item Better code density can reduce instruction-fetch traffic.
 \end{itemize}
 \end{block}
+\end{column}
+
 \end{columns}
-\vspace{0.15cm}
+
+\vspace{0.2cm}
+
 \begin{block}{Architectural implication}
-ISA style influences energy, but implementation and workload determine total efficiency.
+ISA style influences energy, but implementation and workload determine
+total efficiency.
 \end{block}
+
 \end{frame}
 
-% 31
+% ============================================================
+% Slide 32
+% ============================================================
+
 \begin{frame}{Energy per Instruction Is Not Energy per Program}
+
 \begin{block}{A useful first-order model}
 \[
-E_{\text{program}} \approx IC \times E_{\text{instruction}}
+E_{\text{program}}
+\approx
+IC \times E_{\text{instruction}}
 \]
 \end{block}
+
 \begin{itemize}
-\item A simpler instruction may consume less energy each time it is fetched, decoded, and executed.
-\item But a RISC sequence may require more architectural instructions to complete the same task.
-\item A denser CISC sequence may reduce instruction-cache accesses and front-end traffic.
-\item Memory behavior can dominate energy when instructions cause cache misses or DRAM accesses.
-\item The relevant metric is therefore total energy for the workload, not energy for one instruction.
-\item This mirrors the Iron Law: optimizing one factor in isolation can produce the wrong conclusion.
+\item A simpler instruction may consume less energy when fetched,
+      decoded, and executed.
+\item But a RISC sequence may require more architectural instructions
+      to complete the same task.
+\item A denser CISC sequence may reduce instruction-cache accesses.
+\item Memory behavior can dominate energy when cache misses reach DRAM.
+\item The relevant metric is total energy for the workload.
+\item This mirrors the Iron Law: optimizing one factor alone can produce
+      the wrong conclusion.
 \end{itemize}
+
 \end{frame}
 
-% 32
+% ============================================================
+% Slide 33
+% ============================================================
+
 \begin{frame}{Power Becomes Heat --- and Heat Requires Cooling}
-\small
+
 \begin{columns}[T,onlytextwidth]
-\column{0.46\textwidth}
+
+\begin{column}{0.44\textwidth}
 \begin{block}{Energy and power}
 \[
 P = \frac{E}{t}
 \]
-Higher switching activity, voltage, frequency, and active hardware structures increase power demand.
+
+Higher switching activity, voltage, frequency, and active hardware
+structures increase power demand.
 \end{block}
-\column{0.50\textwidth}
+\end{column}
+
+\hfill
+
+\begin{column}{0.47\textwidth}
 \begin{block}{System consequence}
 \centering
 architectural complexity\\
@@ -721,86 +973,141 @@ heat generation\\
 $\downarrow$\\
 cooling requirement
 \end{block}
+\end{column}
+
 \end{columns}
-\vspace{0.12cm}
+
+\vspace{0.15cm}
+
 \begin{itemize}
-\item Cooling may range from passive heat spreaders to fans, liquid cooling, and data-center HVAC.
-\item Thermal limits can force frequency reduction, so power can ultimately constrain performance.
+\item Cooling ranges from passive heat spreaders to fans, liquid cooling,
+      and data-center HVAC.
+\item Thermal limits can force frequency reduction, so power can ultimately
+      constrain performance.
 \end{itemize}
+
 \end{frame}
 
-% 33
+% ============================================================
+% Slide 34
+% ============================================================
+
 \begin{frame}{Performance per Watt: The More Useful Question}
-\small
+
 \begin{itemize}
-\item Processor design increasingly optimizes useful work per unit of energy, not performance alone.
-\item Simpler decode and regular execution can help efficiency, especially in constrained systems.
-\item Code density, cache behavior, speculation, vector units, and memory traffic can reverse simple ISA-level expectations.
-\item Process technology, voltage, frequency, and microarchitecture often matter more than the RISC/CISC label.
-\item ARM's success now spans phones, laptops, and cloud servers, reflecting sustained attention to efficient implementations and system design.
-\item Therefore, ``ARM is efficient because RISC is simpler'' is an incomplete architectural explanation.
+\item Processor design increasingly optimizes useful work per unit of energy.
+\item Simpler decode and regular execution can contribute to efficiency.
+\item Code density, caches, speculation, vector units, and memory traffic
+      can reverse simple ISA-level expectations.
+\item Process technology, voltage, frequency, and microarchitecture often
+      matter more than the RISC/CISC label.
+\item ARM's success now spans phones, laptops, and cloud servers.
+\item Therefore, ``ARM is efficient because RISC is simpler'' is an
+      incomplete architectural explanation.
 \end{itemize}
+
 \begin{block}{Architectural implication}
-Compare \key{energy per workload}, \key{performance per watt}, and \key{thermal constraints}; ISA labels are only part of the evidence.
+Compare \key{energy per workload}, \key{performance per watt}, and
+\key{thermal constraints}; ISA labels are only part of the evidence.
 \end{block}
+
 \end{frame}
 
-% 31
+% ============================================================
+% Slide 35
+% ============================================================
+
 \begin{frame}{Why Modern x86 Looks RISC-Like Inside}
+
 \begin{itemize}
 \item Modern x86 cores preserve the complex x86 ISA for software compatibility.
-\item The front end decodes many x86 instructions into simpler internal micro-operations (\(\mu\)ops).
-\item Those \(\mu\)ops are scheduled onto regular execution resources inside the core.
-\item This separates a complex architectural interface from a more regular internal execution model.
-\item Some x86 instructions decode into one \(\mu\)op; others require several or specialized handling.
-\item The lesson: \key{ISA style and microarchitecture style are not the same thing.}
+\item The front end decodes many x86 instructions into simpler internal
+      micro-operations (\(\mu\)ops).
+\item Those \(\mu\)ops are scheduled onto regular execution resources.
+\item This separates a complex architectural interface from a more regular
+      internal execution model.
+\item Some x86 instructions decode into one \(\mu\)op; others require several.
+\item ISA style and microarchitecture style are therefore not the same thing.
 \end{itemize}
+
 \end{frame}
 
-% 32
+% ============================================================
+% Slide 36
+% ============================================================
+
 \begin{frame}{Why Modern RISC ISAs Are Not Necessarily ``Simple''}
+
 \begin{itemize}
-\item Modern RISC ISAs include SIMD, cryptography, virtualization, atomics, and system-control instructions.
-\item AArch64 has many instruction classes and sophisticated addressing features.
-\item High-performance ARM cores use branch prediction, out-of-order execution, speculation, and large caches.
-\item None of that violates the central RISC ideas of regular encoding and load/store organization.
-\item ``Reduced'' should be understood historically as architectural regularity, not a tiny instruction count.
-\item Calling a modern ARM core ``simple'' would confuse ISA philosophy with implementation sophistication.
+\item Modern RISC ISAs include SIMD, cryptography, virtualization,
+      atomics, and system-control instructions.
+\item AArch64 contains many instruction classes and sophisticated
+      addressing features.
+\item High-performance ARM cores use branch prediction, out-of-order
+      execution, speculation, and large caches.
+\item None of this violates the central RISC ideas of regular encoding
+      and load/store organization.
+\item ``Reduced'' should be understood historically as architectural
+      regularity, not a tiny instruction count.
+\item Calling a modern ARM core ``simple'' confuses ISA philosophy with
+      implementation sophistication.
 \end{itemize}
+
 \end{frame}
 
-% 33
+% ============================================================
+% Slide 37
+% ============================================================
+
 \begin{frame}{RISC Beyond Phones: Laptops}
+
 \begin{itemize}
-\item Modern RISC is no longer confined to embedded controllers or mobile phones.
-\item Apple Silicon brought Arm-based processors into mainstream laptop and desktop computing.
-\item Current MacBook Pro systems use Apple M5-family chips for high-performance portable computing.
-\item Apple emphasizes both performance and battery life; its MacBook Pro overview lists up to 24 hours of battery life.
-\item This makes laptops a useful example of the performance-per-watt argument, not just the low-power argument.
-\item The architectural lesson is that RISC principles can scale from constrained devices to high-performance personal computers.
+\item Modern RISC is no longer confined to embedded controllers or phones.
+\item Apple Silicon brought Arm-based processors into mainstream laptop
+      and desktop computing.
+\item Current MacBook Pro systems use Apple M5-family processors.
+\item These systems target high performance while retaining strong
+      energy efficiency and battery life.
+\item Laptops therefore demonstrate the importance of performance per watt,
+      not merely low power.
+\item RISC principles can scale from constrained devices to high-performance
+      personal computers.
 \end{itemize}
-\vspace{0.15cm}
-{\scriptsize Source: Apple MacBook Pro overview and technical specifications.}
+
 \end{frame}
 
-% 34
+% ============================================================
+% Slide 38
+% ============================================================
+
 \begin{frame}{RISC in the Data Center: Google Axion}
+
 \begin{itemize}
-\item Cloud providers now deploy Arm-based processors for general-purpose server workloads.
-\item Google Axion is a custom Arm-based CPU designed for Google Cloud data-center workloads.
-\item Google identifies web and app servers, databases, analytics, media processing, and CPU-based AI as Axion target workloads.
-\item Google reports production deployment for services such as Bigtable, Spanner, BigQuery, Blobstore, Pub/Sub, Google Earth Engine, and YouTube Ads.
-\item These are not small embedded workloads; they are latency-sensitive and throughput-oriented cloud services.
-\item The architectural question becomes performance per watt, fleet-level cost, cooling, and software ecosystem support.
+\item Cloud providers now deploy Arm-based processors for general-purpose
+      server workloads.
+\item Google Axion is a custom Arm-based CPU designed for Google Cloud
+      data-center workloads.
+\item Target workloads include web servers, databases, analytics,
+      media processing, and CPU-based AI.
+\item Google has described deployment for Bigtable, Spanner, BigQuery,
+      Blobstore, Pub/Sub, Earth Engine, and YouTube Ads.
+\item These are latency-sensitive and throughput-oriented production workloads.
+\item At data-center scale, performance per watt affects server density,
+      electricity cost, heat generation, and cooling infrastructure.
 \end{itemize}
-\vspace{0.15cm}
-{\scriptsize Source: Google Cloud Axion announcement and C4A deployment notes.}
+
 \end{frame}
 
-% 35
+% ============================================================
+% Slide 39
+% ============================================================
+
 \begin{frame}{Data-Center Workloads: What Runs on Arm?}
+
 \begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
+
+\begin{column}{0.46\textwidth}
+
 \begin{block}{Storage and databases}
 \begin{itemize}
 \item Spanner
@@ -808,71 +1115,121 @@ Compare \key{energy per workload}, \key{performance per watt}, and \key{thermal 
 \item Cloud SQL / AlloyDB-class workloads
 \end{itemize}
 \end{block}
+
+\vspace{0.2cm}
+
 \begin{block}{Analytics and pipelines}
 \begin{itemize}
 \item BigQuery
 \item Dataflow-style pipelines
-\item batch and containerized jobs
+\item Batch and containerized jobs
 \end{itemize}
 \end{block}
-\column{0.48\textwidth}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.46\textwidth}
+
 \begin{block}{Serving and platforms}
 \begin{itemize}
-\item YouTube Ads platform
-\item web and application servers
-\item containerized microservices
+\item YouTube Ads
+\item Web and application servers
+\item Containerized microservices
 \end{itemize}
 \end{block}
+
+\vspace{0.2cm}
+
 \begin{block}{AI and inference}
 \begin{itemize}
 \item CPU-based inference
-\item preprocessing and data movement
-\item services where accelerator use is not dominant
+\item Preprocessing and data movement
+\item Non-accelerator-dominated services
 \end{itemize}
 \end{block}
+
+\end{column}
+
 \end{columns}
+
 \end{frame}
 
-% 36
+% ============================================================
+% Slide 40
+% ============================================================
+
 \begin{frame}{ARM AArch64 as a Modern RISC ISA}
+
 \begin{itemize}
 \item AArch64 uses fixed 32-bit instruction encodings.
 \item Most arithmetic and logical operations use register operands.
 \item Memory is accessed primarily through explicit load and store instructions.
-\item Thirty-one general-purpose integer registers support register-oriented computation.
-\item Instruction formats are structured to make common fields relatively regular.
-\item These properties make AArch64 an excellent architecture for studying the connection between ISA and datapath design.
+\item Thirty-one general-purpose integer registers support
+      register-oriented computation.
+\item Instruction formats are structured so common fields remain
+      relatively regular.
+\item These properties make AArch64 useful for studying the connection
+      between ISA and datapath design.
 \end{itemize}
-\begin{block}{Preview}
-Next we move from philosophy to the actual AArch64 programmer's model and assembly syntax.
+
+\begin{block}{Next topic}
+The course now moves from ISA design philosophy to the actual AArch64
+programmer's model and assembly language.
 \end{block}
+
 \end{frame}
 
-% 34
+% ============================================================
+% Slide 41
+% ============================================================
+
 \begin{frame}{RISC vs. CISC: What Actually Matters Today?}
+
 \begin{itemize}
-\item The binary labels are less predictive than they were in the 1980s.
-\item Modern CISC processors use sophisticated internal decomposition and execution engines.
-\item Modern RISC processors contain highly complex microarchitectures and rich ISA extensions.
-\item Compatibility, code density, compiler ecosystem, implementation quality, and workload matter enormously.
-\item The enduring RISC contribution is emphasis on regularity, load/store organization, and compiler-visible simple operations.
-\item The enduring lesson is to evaluate architectural choices quantitatively rather than by slogans.
+\item The RISC/CISC labels are less predictive than they were in the 1980s.
+\item Modern CISC processors use sophisticated internal decomposition
+      and execution engines.
+\item Modern RISC processors contain complex microarchitectures and rich
+      ISA extensions.
+\item Compatibility, code density, compiler ecosystem, implementation
+      quality, and workload matter enormously.
+\item The enduring RISC contribution is emphasis on regularity,
+      load/store organization, and compiler-visible simple operations.
+\item Architectural choices should be evaluated quantitatively rather
+      than through slogans.
 \end{itemize}
+
 \end{frame}
 
-% 35
+% ============================================================
+% Slide 42
+% ============================================================
+
 \begin{frame}{Synthesis: ISA Choices Are Trade-offs}
+
 \begin{itemize}
-\item CISC tends to expose richer operations and often achieves strong code density.
-\item RISC tends to expose more regular operations that are easier to decode and pipeline.
-\item Neither lower instruction count nor higher clock rate guarantees better performance.
-\item The Iron Law forces us to consider instruction count, CPI, and cycle time together.
-\item Modern processors blur the historical boundary while preserving very different architectural interfaces.
-\item AArch64 gives us a modern RISC case study for the rest of the course.
+\item CISC tends to expose richer operations and often achieves strong
+      code density.
+\item RISC tends to expose more regular operations that are easier to
+      decode and pipeline.
+\item Neither lower instruction count nor higher clock rate guarantees
+      better performance.
+\item The Iron Law requires instruction count, CPI, and cycle time to be
+      considered together.
+\item Energy, heat, cooling, and performance per watt extend the analysis
+      beyond execution time alone.
+\item AArch64 provides a modern RISC case study for the remainder of the course.
 \end{itemize}
+
 \begin{block}{Design question}
-Do not ask ``Which philosophy is faster?'' Ask: \key{what trade-off does this ISA choice create, and what does the measured workload say?}
+Do not ask ``Which philosophy is faster?''
+
+Ask: \key{What trade-off does this ISA choice create, and what does the
+measured workload tell us?}
 \end{block}
+
 \end{frame}
 
 \end{document}
