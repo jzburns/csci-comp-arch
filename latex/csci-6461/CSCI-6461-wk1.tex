@@ -30,6 +30,10 @@
 \setbeamerfont{block title}{series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
+% Base list item separation
+\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
+\setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
+
 % ============================================================
 % Packages
 % ============================================================
@@ -80,6 +84,22 @@
 \newcommand{\bits}[1]{\texttt{#1}}
 \newcommand{\hex}[1]{\texttt{0x#1}}
 
+% Section divider macro
+\newcommand{\sectiondivider}[2]{%
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries #1\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+\end{minipage}
+\end{frame}
+}
+
 % ============================================================
 % Metadata
 % ============================================================
@@ -107,7 +127,7 @@
 \begin{document}
 
 % ============================================================
-% Slide 1
+% Slide 1: Title Slide
 % ============================================================
 
 \begin{frame}[plain]
@@ -149,7 +169,46 @@
 \end{frame}
 
 % ============================================================
-% Slide 2
+% Slide 2: Topics Overview
+% ============================================================
+
+\begin{frame}{Week 1: Module Topics}
+
+\begin{enumerate}\setlength{\itemsep}{10pt}
+  \item \key{Architecture Foundations \& Abstraction Layers}
+  \begin{itemize}
+    \item What architecture studies, interface contracts, and leaking abstractions.
+    \item System hierarchy: from high-level source code to digital gates.
+  \end{itemize}
+
+  \item \key{The Stored-Program Model \& Hardware Organization}
+  \begin{itemize}
+    \item ISA vs.\ microarchitecture, von Neumann fetch-execute loop, memory hierarchy.
+  \end{itemize}
+
+  \item \key{Data Representation \& Fixed-Width Arithmetic}
+  \begin{itemize}
+    \item Unsigned binary, place values, hexadecimal compression.
+    \item Two's-complement signed integer arithmetic, hardware negation, carry vs.\ overflow.
+  \end{itemize}
+
+  \item \key{Quantitative Processor Performance}
+  \begin{itemize}
+    \item Latency vs.\ throughput, clock metrics, dynamic instruction count, and CPI.
+    \item The Iron Law of processor performance and evaluating architectural speedup.
+  \end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Section 1 Divider
+% ============================================================
+
+\sectiondivider{PART 1}{Abstraction Layers \& System Hierarchy}
+
+% ============================================================
+% Slide 3
 % ============================================================
 
 \begin{frame}{What Computer Architecture Studies}
@@ -171,7 +230,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 3
+% Slide 4
 % ============================================================
 
 \begin{frame}{The Core Abstraction Problem}
@@ -201,7 +260,7 @@ Abstractions simplify software development, but architecture explains why they l
 \end{frame}
 
 % ============================================================
-% Slide 4
+% Slide 5
 % ============================================================
 
 \begin{frame}{System Layers: From Program to Gates}
@@ -237,7 +296,7 @@ Abstractions simplify software development, but architecture explains why they l
 \end{frame}
 
 % ============================================================
-% Slide 5
+% Slide 6
 % ============================================================
 
 \begin{frame}{A Concrete Example Across the Layers}
@@ -270,7 +329,13 @@ Abstractions simplify software development, but architecture explains why they l
 \end{frame}
 
 % ============================================================
-% Slide 6
+% Section 2 Divider
+% ============================================================
+
+\sectiondivider{PART 2}{Processor Models \& Hardware Hierarchy}
+
+% ============================================================
+% Slide 7
 % ============================================================
 
 \begin{frame}{The RISC Philosophy}
@@ -301,7 +366,7 @@ Abstractions simplify software development, but architecture explains why they l
 \end{frame}
 
 % ============================================================
-% Slide 7
+% Slide 8
 % ============================================================
 
 \begin{frame}{ISA vs. Microarchitecture}
@@ -338,7 +403,7 @@ Abstractions simplify software development, but architecture explains why they l
 \end{frame}
 
 % ============================================================
-% Slide 8
+% Slide 9
 % ============================================================
 
 \begin{frame}{The Stored-Program Model (von Neumann)}
@@ -358,7 +423,7 @@ Because instructions reside in memory, memory bandwidth and latency dictate inst
 \end{frame}
 
 % ============================================================
-% Slide 9
+% Slide 10
 % ============================================================
 
 \begin{frame}{Core Hardware Components \& Memory Hierarchy}
@@ -383,7 +448,13 @@ CPU compute cycles are fast ($\sim 0.3\text{--}0.5\text{ ns}$); DRAM accesses ar
 \end{frame}
 
 % ============================================================
-% Slide 10
+% Section 3 Divider
+% ============================================================
+
+\sectiondivider{PART 3}{Binary Representations \& Fixed-Width Arithmetic}
+
+% ============================================================
+% Slide 11
 % ============================================================
 
 \begin{frame}{Why Binary Is Sufficient}
@@ -414,7 +485,7 @@ Hardware stores bit patterns; the executing instruction determines interpretatio
 \end{frame}
 
 % ============================================================
-% Slide 11
+% Slide 12
 % ============================================================
 
 \begin{frame}{Unsigned Binary Representation}
@@ -442,14 +513,14 @@ Hardware stores bit patterns; the executing instruction determines interpretatio
 \end{frame}
 
 % ============================================================
-% Slide 12
+% Slide 13
 % ============================================================
 
 \begin{frame}{Fixed-Width Unsigned Ranges}
 
 \begin{itemize}
   \item For an $n$-bit unsigned number, the range is:
-  $$\left[0,\; 2^n - 1\right]$$
+  $$\left[0,\; 2^n - 1\right] = [0,\; 2^n-1]$$
   \item \key{8-bit byte:} $0 \text{ to } 255$ ($2^8 - 1$)
   \item \key{16-bit halfword:} $0 \text{ to } 65{,}535$ ($2^{16} - 1$)
   \item \key{32-bit word:} $0 \text{ to } 4{,}294{,}967{,}295$ ($2^{32} - 1 \approx 4.29 \times 10^9$)
@@ -463,7 +534,7 @@ Fixed register widths and immediate bit fields determine the maximum memory addr
 \end{frame}
 
 % ============================================================
-% Slide 13
+% Slide 14
 % ============================================================
 
 \begin{frame}{Converting Decimal to Binary}
@@ -488,7 +559,7 @@ $$45_{10} = \bits{101101}_2 = \bits{00101101}_2 \text{ (in 8 bits)}$$
 \end{frame}
 
 % ============================================================
-% Slide 14
+% Slide 15
 % ============================================================
 
 \begin{frame}{Converting Binary to Decimal}
@@ -514,7 +585,7 @@ $$\bits{110101}_2 = 53_{10}$$
 \end{frame}
 
 % ============================================================
-% Slide 15
+% Slide 16
 % ============================================================
 
 \begin{frame}{Hexadecimal Representation}
@@ -531,7 +602,7 @@ $$\bits{110101}_2 = 53_{10}$$
 \end{frame}
 
 % ============================================================
-% Slide 16
+% Slide 17
 % ============================================================
 
 \begin{frame}{Binary $\leftrightarrow$ Hex Conversion}
@@ -557,7 +628,7 @@ $$\underbrace{\bits{1000}}_{\hex{8}}\; \underbrace{\bits{1011}}_{\hex{b}}\; \und
 \end{frame}
 
 % ============================================================
-% Slide 17
+% Slide 18
 % ============================================================
 
 \begin{frame}{The Signed-Integer Problem}
@@ -576,7 +647,7 @@ $$\underbrace{\bits{1000}}_{\hex{8}}\; \underbrace{\bits{1011}}_{\hex{b}}\; \und
 \end{frame}
 
 % ============================================================
-% Slide 18
+% Slide 19
 % ============================================================
 
 \begin{frame}{Why Not Sign-Magnitude or Ones' Complement?}
@@ -609,7 +680,7 @@ $$\underbrace{\bits{1000}}_{\hex{8}}\; \underbrace{\bits{1011}}_{\hex{b}}\; \und
 \end{frame}
 
 % ============================================================
-% Slide 19
+% Slide 20
 % ============================================================
 
 \begin{frame}{Two's-Complement Formulation \& Range}
@@ -627,7 +698,7 @@ $$\underbrace{\bits{1000}}_{\hex{8}}\; \underbrace{\bits{1011}}_{\hex{b}}\; \und
 \end{frame}
 
 % ============================================================
-% Slide 20
+% Slide 21
 % ============================================================
 
 \begin{frame}{Negating a Two's Complement Number}
@@ -654,7 +725,7 @@ Add 1 ($+1$): & \bits{1111 1011} & (represents $-5$) \\
 \end{frame}
 
 % ============================================================
-% Slide 21
+% Slide 22
 % ============================================================
 
 \begin{frame}{Decoding Negative Bit Patterns}
@@ -677,7 +748,7 @@ $$\text{Value} = -128 + 64 + 32 + 16 + 0 + 4 + 2 + 0 = \mathbf{-10}$$
 \end{frame}
 
 % ============================================================
-% Slide 22
+% Slide 23
 % ============================================================
 
 \begin{frame}{Same Bits, Different Interpretation}
@@ -704,7 +775,7 @@ $$\text{Value} = -128 + 64 + 32 + 16 + 0 + 4 + 2 + 0 = \mathbf{-10}$$
 \end{frame}
 
 % ============================================================
-% Slide 23
+% Slide 24
 % ============================================================
 
 \begin{frame}{Hardware Subtraction via Addition}
@@ -743,7 +814,7 @@ Carry-out bit is discarded for signed arithmetic.
 \end{frame}
 
 % ============================================================
-% Slide 24
+% Slide 25
 % ============================================================
 
 \begin{frame}{Carry vs. Signed Overflow}
@@ -778,7 +849,7 @@ Because the range is $[-8, +7]$, $+10$ overflows into the sign bit. Hardware ass
 \end{frame}
 
 % ============================================================
-% Slide 25
+% Slide 26
 % ============================================================
 
 \begin{frame}{Sign Extension vs. Zero Extension}
@@ -812,7 +883,7 @@ $$\bits{0000 0000 1111 1011}_2 \; (251_{10})$$
 \end{frame}
 
 % ============================================================
-% Slide 26
+% Slide 27
 % ============================================================
 
 \begin{frame}{Common Representation Bugs in Systems}
@@ -827,7 +898,13 @@ $$\bits{0000 0000 1111 1011}_2 \; (251_{10})$$
 \end{frame}
 
 % ============================================================
-% Slide 27
+% Section 4 Divider
+% ============================================================
+
+\sectiondivider{PART 4}{Quantitative Processor Performance}
+
+% ============================================================
+% Slide 28
 % ============================================================
 
 \begin{frame}{Defining CPU Performance}
@@ -844,7 +921,7 @@ $$\bits{0000 0000 1111 1011}_2 \; (251_{10})$$
 \end{frame}
 
 % ============================================================
-% Slide 28
+% Slide 29
 % ============================================================
 
 \begin{frame}{Latency vs. Throughput}
@@ -877,7 +954,7 @@ $$\bits{0000 0000 1111 1011}_2 \; (251_{10})$$
 \end{frame}
 
 % ============================================================
-% Slide 29
+% Slide 30
 % ============================================================
 
 \begin{frame}{Clock Cycles and Dynamic Execution}
@@ -892,7 +969,7 @@ $$\bits{0000 0000 1111 1011}_2 \; (251_{10})$$
 \end{frame}
 
 % ============================================================
-% Slide 30
+% Slide 31
 % ============================================================
 
 \begin{frame}{Cycles Per Instruction (CPI)}
@@ -909,7 +986,7 @@ $$\bits{0000 0000 1111 1011}_2 \; (251_{10})$$
 \end{frame}
 
 % ============================================================
-% Slide 31
+% Slide 32
 % ============================================================
 
 \begin{frame}{The Iron Law of Processor Performance}
@@ -933,7 +1010,7 @@ $T_{\text{clk}}$ & $\frac{\text{Seconds}}{\text{Cycle}}$ & Circuit Design, Semic
 \end{frame}
 
 % ============================================================
-% Slide 32
+% Slide 33
 % ============================================================
 
 \begin{frame}{Iron Law: Worked Example}
@@ -968,7 +1045,7 @@ Machine B completes the workload \key{$1.67\times$ faster} despite executing $20
 \end{frame}
 
 % ============================================================
-% Slide 33
+% Slide 34
 % ============================================================
 
 \begin{frame}{Why Clock Frequency Alone Is Misleading}
@@ -984,7 +1061,7 @@ Machine B completes the workload \key{$1.67\times$ faster} despite executing $20
 \end{frame}
 
 % ============================================================
-% Slide 34
+% Slide 35
 % ============================================================
 
 \begin{frame}{Quantifying Speedup}
@@ -1004,18 +1081,68 @@ $$\text{Speedup} = \frac{T_{\text{old}}}{T_{\text{new}}} = \frac{\text{Performan
 \end{frame}
 
 % ============================================================
-% Slide 35
+% Section 5 Divider
 % ============================================================
 
-\begin{frame}{Week 1 Summary and Next Steps}
+\sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
-\begin{itemize}
-  \item \key{ISAs} define the boundary between machine code and hardware execution.
-  \item \key{RISC Philosophy} prioritizes simple, uniform instructions and register-to-register operations to enable streamlined microarchitecture.
-  \item \key{Representations} (binary, two's complement, hex) determine the range, precision, and simplicity of underlying ALU circuits.
-  \item \key{The Iron Law} provides the quantitative foundation to reason about execution time trade-offs.
-  \item \key{Next Module:} The AArch64 Programmer's Model, General-Purpose Registers (\bits{x0}--\bits{x30}), and Core Instructions (\bits{add}, \bits{sub}, \bits{ldr}, \bits{str}).
+% ============================================================
+% Slide 36: Comprehensive Summary
+% ============================================================
+
+\begin{frame}{Week 1: Comprehensive Summary}
+
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item \key{Architecture as an Interface:} The ISA serves as the contract between software behavior and hardware execution; abstraction hides details until hardware limits leak.
+  \item \key{The RISC Tenets:} Load-store architecture, fixed-width 32-bit instructions, and large register files streamline hardware datapaths and pipeline regularity.
+  \item \key{Representations Govern Circuits:} Bit patterns have no intrinsic meaning; two's complement enables standard binary adders to compute subtraction ($A - B = A + \sim B + 1$) and guarantees a single zero.
+  \item \key{Quantitative Performance (Iron Law):} Performance depends on the product of $\mathit{IC}$, $\mathit{CPI}$, and $T_{\text{clk}}$; clock frequency alone is insufficient to evaluate speed.
+  \item \key{Forward Transition:} Week 2 explores the AArch64 programmer's model, register conventions (\bits{x0}--\bits{x30}), and core arithmetic/memory instructions.
 \end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 37: Self-Test Questions (Part 1)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: Foundations \& Representation}
+
+\begin{enumerate}\setlength{\itemsep}{8pt}
+  \item \key{Abstraction Leaks:} Why does an algorithm's Big-$O$ time complexity fail to predict cache misses and integer overflow bugs?
+  
+  \item \key{Two's-Complement Properties:} 
+  \begin{itemize}
+    \item Evaluate the 8-bit pattern \hex{a5} as (a) an unsigned integer and (b) a signed two's-complement integer.
+    \item What is the 8-bit two's-complement negation of \hex{a5}?
+  \end{itemize}
+
+  \item \key{Carry vs.\ Overflow:} In a 4-bit adder computing $\bits{1001}_2 + \bits{1100}_2$:
+  \begin{itemize}
+    \item What is the 4-bit sum and carry-out bit ($C$)?
+    \item Does signed overflow ($V$) occur? Explain why or why not using input/output signs.
+  \end{itemize}
+
+  \item \key{Width Extension:} Why must an 8-bit negative value be \emph{sign-extended} rather than \emph{zero-extended} when loaded into a 64-bit register?
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Slide 38: Self-Test Questions (Part 2)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: The Iron Law \& Performance}
+
+\begin{enumerate}\setlength{\itemsep}{8pt}
+  \item \key{Iron Law Trade-offs:} Compiler optimization $X$ decreases dynamic instruction count by $20\%$, but increases average CPI by $15\%$ on a 2.5\,GHz processor. Does the optimization improve execution time? Quantify the speedup.
+
+  \item \key{Throughput vs.\ Latency:} A pipelined processor increases instruction throughput by $4\times$, but increases individual instruction latency from 1\,ns to 1.2\,ns. In what scenarios is this design preferable, and when does it degrade responsiveness?
+
+  \item \key{Megahertz Myth:} Explain why a 3.2\,GHz processor with $\mathit{CPI} = 1.4$ executes a given program faster than a 4.0\,GHz processor with $\mathit{CPI} = 2.0$, assuming both execute the exact same instruction count.
+
+  \item \key{Stored-Program Consequences:} How does the von Neumann bottleneck (shared memory space for instructions and data) impact instruction fetch bandwidth?
+\end{enumerate}
 
 \end{frame}
 
