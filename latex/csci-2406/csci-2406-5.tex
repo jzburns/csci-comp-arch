@@ -113,12 +113,12 @@
 % ============================================================
 
 \title[Topic 5]{
-  ARM Arithmetic and Logical Instructions
+  AArch64 Arithmetic and Logical Instructions
 }
 
 \subtitle{
-  Arithmetic instructions, logical and bitwise operations,\\
-  shift instructions, and constant generation in AArch64
+  Arithmetic instructions, logical and bitwise instructions,\\
+  shift instructions, and immediate values and constants
 }
 
 \author{
@@ -143,9 +143,9 @@
 \begin{minipage}{0.9\textwidth}
 {\color{gold}\large\bfseries CSCI 2406: Topic 05\par}
 \vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries ARM Arithmetic and Logical Instructions\par}
+{\color{white}\fontsize{20}{24}\selectfont\bfseries AArch64 Arithmetic and Logical Instructions\par}
 \vspace{0.3cm}
-{\color{lightblue}\normalsize Arithmetic operations, bitwise logic, barrel shifter scaling, and immediate constant generation in AArch64\par}
+{\color{lightblue}\normalsize Arithmetic instructions, logical and bitwise instructions, shift instructions, and immediate values and constants\par}
 \vspace{0.6cm}
 {\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad Topic 5\par}
 \end{minipage}
@@ -154,14 +154,15 @@
 % --- Slide 2: Topic Outline ---
 \begin{frame}{Topic 5 Outline}
     \begin{block}{Topic Objective}
-        Analysis of AArch64 Instruction Set Architecture specifications for arithmetic computation, bitwise logic manipulation, barrel-shifter operations, and immediate constant handling.
+        Analysis of AArch64 Instruction Set Architecture specifications for arithmetic computation, bitwise logic manipulation, shift operations, and immediate constant handling.
     \end{block}
     \vspace{0.4em}
     \begin{itemize}
-        \item \key{Section 1}: AArch64 Arithmetic Instructions and Operand Sizing
-        \item \key{Section 2}: Logical, Bitwise, and Shift Operations
-        \item \key{Section 3}: Immediate Values, Constants, and Advanced Synthesis
-        \item \key{Section 4}: Summary and Worked Self-Test Exercises
+        \item \key{Section 1}: Arithmetic Instructions and Operand Sizing
+        \item \key{Section 2}: Logical and Bitwise Instructions
+        \item \key{Section 3}: Shift Instructions and Barrel Shifting
+        \item \key{Section 4}: Immediate Values and Constants
+        \item \key{Section 5}: Summary and Worked Self-Test Exercises
     \end{itemize}
 \end{frame}
 
@@ -181,7 +182,7 @@
 % ============================================================
 % SECTION 1
 % ============================================================
-\sectiondivider{Section 01}{AArch64 Arithmetic Instructions\\and Operand Sizing}
+\sectiondivider{Section 01}{Arithmetic Instructions}
 
 % --- Slide 5: Overview of AArch64 Arithmetic ---
 \begin{frame}{Arithmetic Instructions in AArch64}
@@ -264,7 +265,7 @@
 % ============================================================
 % SECTION 2
 % ============================================================
-\sectiondivider{Section 02}{Logical, Bitwise, and\\Shift Operations}
+\sectiondivider{Section 02}{Logical and Bitwise Instructions}
 
 % --- Slide 10: Logical and Bitwise Operations ---
 \begin{frame}{Logical and Bitwise Instructions}
@@ -334,7 +335,12 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 14: Shift Instructions ---
+% ============================================================
+% SECTION 3
+% ============================================================
+\sectiondivider{Section 03}{Shift Instructions}
+
+% --- Slide 15: Shift Instructions ---
 \begin{frame}{Shift Instructions in AArch64}
     AArch64 includes dedicated shift instructions for positional bit movement:
     \vspace{0.2em}
@@ -346,7 +352,7 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 15: The Built-in Barrel Shifter ---
+% --- Slide 16: The Built-in Barrel Shifter ---
 \begin{frame}{The AArch64 Barrel Shifter}
     \begin{block}{Hardware Integration}
         AArch64 incorporates a hardware \key{barrel shifter} attached to the second operand input of data-processing instructions, allowing a shift operation to occur within the same clock cycle as computation.
@@ -359,7 +365,7 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 16: Barrel Shifter Variations ---
+% --- Slide 17: Barrel Shifter Variations ---
 \begin{frame}{Barrel Shifter Scale Variations}
     The barrel shifter supports multiple modifier types on the final register operand:
     \vspace{0.3em}
@@ -375,7 +381,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 17: Shift Amounts and Width Limits ---
+% --- Slide 18: Shift Amounts and Width Limits ---
 \begin{frame}{Shift Amount Constraints}
     Shift operations in AArch64 adhere to strict architectural limits:
     \vspace{0.3em}
@@ -391,11 +397,11 @@
 \end{frame}
 
 % ============================================================
-% SECTION 3
+% SECTION 4
 % ============================================================
-\sectiondivider{Section 03}{Immediate Values, Constants,\\and Advanced Synthesis}
+\sectiondivider{Section 04}{Immediate Values and Constants}
 
-% --- Slide 19: Handling Constants in Instructions ---
+% --- Slide 20: Handling Constants in Instructions ---
 \begin{frame}{Handling Constants (Immediates)}
     Arithmetic and logical instructions frequently combine registers with constant values:
     \vspace{0.2em}
@@ -406,7 +412,7 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 20: Immediate Arithmetic Constraints ---
+% --- Slide 21: Immediate Arithmetic Constraints ---
 \begin{frame}{Immediate Limits in Arithmetic Instructions}
     \begin{block}{Arithmetic Immediates (\code{add}, \code{sub})}
         Standard add and subtract immediate values are restricted to:
@@ -422,7 +428,7 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 21: Logical Immediate Bitmask Generation ---
+% --- Slide 22: Logical Immediate Bitmask Generation ---
 \begin{frame}{Logical Immediates and Bitmask Encoding}
     Logical instructions (\code{and}, \code{orr}, \code{eor}) handle constants via a bitmask encoding system:
     \vspace{0.2em}
@@ -433,7 +439,7 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 22: Loading Large Constants: MOVZ and MOVK ---
+% --- Slide 23: Loading Large Constants: MOVZ and MOVK ---
 \begin{frame}{Loading Large Constants: \code{movz} and \code{movk}}
     When constants exceed immediate limits, AArch64 utilizes explicit move instructions:
     \vspace{0.3em}
@@ -457,7 +463,7 @@
     \end{columns}
 \end{frame}
 
-% --- Slide 23: Combining Arithmetic, Logic, and Shifts ---
+% --- Slide 24: Combining Arithmetic, Logic, and Shifts ---
 \begin{frame}{Synthesizing Complex Expressions}
     Compilers combine arithmetic, logical instructions, and barrel shifts to evaluate expressions:
     \vspace{0.3em}
@@ -474,7 +480,7 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 24: Condition Flag Integration ---
+% --- Slide 25: Condition Flag Integration ---
 \begin{frame}{Connecting Instructions to Condition Flags}
     Arithmetic and logical operations can update or test condition flags for control flow:
     \vspace{0.3em}
@@ -485,7 +491,7 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 25: Performance Implications ---
+% --- Slide 26: Performance Implications ---
 \begin{frame}{Performance Implications in Datapaths}
     Instruction complexity directly impacts CPI (Cycles Per Instruction):
     \vspace{0.3em}
@@ -497,11 +503,11 @@
 \end{frame}
 
 % ============================================================
-% SECTION 4
+% SECTION 5
 % ============================================================
-\sectiondivider{Section 04}{Summary \& Self-Test}
+\sectiondivider{Section 05}{Summary \& Self-Test}
 
-% --- Slide 27: Topic Summary ---
+% --- Slide 28: Topic Summary ---
 \begin{frame}{Topic 5 Comprehensive Summary}
     \begin{itemize}
         \item \key{Arithmetic Instructions}: Execute addition, subtraction, and negation across 32-bit (\code{W}) and 64-bit (\code{X}) registers.
@@ -511,7 +517,7 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 28: Self-Test: Questions 1 & 2 ---
+% --- Slide 29: Self-Test: Questions 1 & 2 ---
 \begin{frame}{Self-Test: Questions 1 \& 2}
     \begin{block}{Question 1: Operand Sizing}
         What is the structural difference between operating on 32-bit \code{W} registers versus 64-bit \code{X} registers in AArch64, and what happens to the upper bits of a register when a 32-bit instruction executes?
@@ -522,7 +528,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 29: Self-Test: Solutions 1 & 2 ---
+% --- Slide 30: Self-Test: Solutions 1 & 2 ---
 \begin{frame}{Self-Test: Solutions 1 \& 2}
     \begin{block}{Solution 1}
         \code{W} registers access the lower 32 bits of the 64-bit \code{X} registers. When a 32-bit instruction executes, AArch64 automatically zero-extends the result by clearing the upper 32 bits of the parent register to zero.
@@ -533,7 +539,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 30: Self-Test: Questions 3 & 4 ---
+% --- Slide 31: Self-Test: Questions 3 & 4 ---
 \begin{frame}{Self-Test: Questions 3 \& 4}
     \begin{block}{Question 3: The Barrel Shifter}
         What is the architectural advantage of the AArch64 built-in barrel shifter during data-processing instructions?
@@ -544,7 +550,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 31: Self-Test: Solutions 3 & 4 ---
+% --- Slide 32: Self-Test: Solutions 3 & 4 ---
 \begin{frame}{Self-Test: Solutions 3 \& 4}
     \begin{block}{Solution 3}
         The barrel shifter allows a source operand to be shifted or scaled as part of the arithmetic or logical instruction in a single clock cycle, avoiding extra standalone shift instructions.
@@ -555,7 +561,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 32: Review & Concept Verification ---
+% --- Slide 33: Review & Concept Verification ---
 \begin{frame}{Review: Instruction Summary Table}
     \begin{table}[]
         \centering
@@ -573,7 +579,7 @@
     \end{table}
 \end{frame}
 
-% --- Slide 33: Additional Review & Practice ---
+% --- Slide 34: Additional Review & Practice ---
 \begin{frame}{Review Exercises \& Practice Problems}
     \begin{block}{Self-Directed Practice}
         Lab exercises for Topic 5 concept reinforcement:
@@ -581,17 +587,6 @@
             \item Write an AArch64 assembly snippet to extract bits 12 through 15 from register \code{x1} into \code{x0}.
             \item Apply a barrel-shifted add instruction to compute $\code{x5} = \code{x6} + (\code{x7} \times 32)$ in a single cycle.
             \item Explain why \code{eor x1, x1, x1} is preferred by compilers over \code{mov x1, \#0}.
-        \end{itemize}
-    \end{block}
-\end{frame}
-
-% --- Slide 34: Advanced Lab Prep ---
-\begin{frame}{Advanced Laboratory Preparation}
-    \begin{block}{Next Lab Preview}
-        Upcoming laboratory session transition from register-level arithmetic to memory load and store mechanics:
-        \begin{itemize}
-            \item Inspecting register dumps in QEMU during arithmetic transformations.
-            \item Profiling execution time differences between barrel-shifted operands and standalone shift instructions.
         \end{itemize}
     \end{block}
 \end{frame}
