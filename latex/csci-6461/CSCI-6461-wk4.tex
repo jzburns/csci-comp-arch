@@ -1,0 +1,703 @@
+\documentclass[aspectratio=169,11pt,t]{beamer}
+
+% ============================================================
+% Theme and typography
+% ============================================================
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
+    CSCI 6461 --- Computer Systems Architecture (AArch64 Reference / RISC Philosophy)
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+
+\setbeamersize{
+  text margin left=0.65cm,
+  text margin right=0.65cm
+}
+
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% Block vertical padding adjustments
+\addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
+\addtobeamertemplate{block end}{}{\vspace{0.2em}}
+
+% Base list item separation
+\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
+\setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
+
+% ============================================================
+% Packages
+% ============================================================
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+
+\usetikzlibrary{
+  arrows.meta,
+  positioning,
+  shapes.geometric,
+  calc
+}
+
+% ============================================================
+% Colors
+% ============================================================
+
+\definecolor{navy}{RGB}{24,43,68}
+\definecolor{deepblue}{RGB}{45,88,130}
+\definecolor{lightblue}{RGB}{235,242,250}
+\definecolor{softgray}{RGB}{245,247,250}
+\definecolor{darkgray}{RGB}{25,28,32}
+\definecolor{gold}{RGB}{200,145,35}
+
+\setbeamercolor{palette primary}{bg=navy,fg=white}
+\setbeamercolor{palette secondary}{bg=deepblue,fg=white}
+\setbeamercolor{frametitle}{bg=navy,fg=white}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=white}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{date}{fg=white}
+\setbeamercolor{titlelike}{fg=white}
+\setbeamercolor{block title}{bg=deepblue,fg=white}
+\setbeamercolor{block body}{bg=lightblue,fg=darkgray}
+\setbeamercolor{normal text}{fg=darkgray,bg=white}
+
+% ============================================================
+% Formatting shortcuts
+% ============================================================
+
+\setlength{\parskip}{0pt}
+
+\newcommand{\key}[1]{\textbf{#1}}
+\newcommand{\bits}[1]{\texttt{#1}}
+\newcommand{\hex}[1]{\texttt{0x#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Section divider macro
+\newcommand{\sectiondivider}[2]{%
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries #1\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+\end{minipage}
+\end{frame}
+}
+
+% ============================================================
+% Metadata
+% ============================================================
+
+\title[Topic 4]{
+  AArch64 Assembly Programming:\\
+  Arithmetic, Logic, \& Control Flow
+}
+
+\subtitle{
+  ALU mechanics, barrel shifting, bitwise operations,\\
+  condition flags, structured branches, and conditional selection
+}
+
+\author{
+  Computer Systems Architecture
+}
+
+\date{}
+
+% ============================================================
+% Document
+% ============================================================
+
+\begin{document}
+
+% ============================================================
+% Slide 1: Title Slide
+% ============================================================
+
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+
+\vspace{0.8cm}
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 4\par}
+\vspace{0.25cm}
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+ AArch64 Assembly Programming:\\[0.08cm]
+ Arithmetic, Logic, \& Control Flow
+\par}
+\vspace{0.35cm}
+{\color{white!80}\large
+ ALU mechanics, barrel shifting, bitwise operations,\\
+ condition flags, structured branches, and conditional selection
+\par}
+\end{minipage}
+
+\vfill
+{\color{white}\normalsize Dr. J. Burns\par}
+{\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
+\vspace{0.35cm}
+\end{frame}
+
+% ============================================================
+% Slide 2: Module Topics Overview
+% ============================================================
+
+\begin{frame}{Topic 4: Core Lecture Outline}
+
+\begin{enumerate}\setlength{\itemsep}{12pt}
+  \item \key{ALU Operations: Arithmetic, Shifting, \& Bitwise Logic}
+  \begin{itemize}
+    \item Addition, subtraction, multiplication, division, and barrel shifter integration.
+    \item Bitwise logic (\code{and}, \code{orr}, \code{eor}, \code{bic}) and bitfield extraction (\code{ubfx}).
+  \end{itemize}
+
+  \item \key{Condition Flags \& Comparison Mechanics}
+  \begin{itemize}
+    \item NZCV flag generation, comparison instructions (\code{cmp}, \code{tst}), and signed vs.\ unsigned branches.
+  \end{itemize}
+
+  \item \key{Control Flow: Branches \& Branchless Selection}
+  \begin{itemize}
+    \item Translating loops and \code{if-else} structures; branch-and-test (\code{cbz}/\code{cbnz}).
+    \item Branch penalties and branchless conditional selection (\code{csel}, \code{cset}).
+  \end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Section 1 Divider (Consolidated ALU: Arithmetic + Logic)
+% ============================================================
+
+\sectiondivider{PART 1}{ALU Operations: Arithmetic, Shifting, \& Bitwise Logic}
+
+% ============================================================
+% Slide 3
+% ============================================================
+
+\begin{frame}{Arithmetic Primitives: Addition \& Subtraction}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Standard AArch64 ALU instructions use a \key{3-operand non-destructive format}:
+  $$\code{op\quad destination,\; source1,\; source2}$$
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Instruction} & \textbf{Operation} & \textbf{Flags Updated?} \\
+\midrule
+\code{add  x0, x1, x2}  & $x_0 \leftarrow x_1 + x_2$ & No \\
+\code{adds x0, x1, x2}  & $x_0 \leftarrow x_1 + x_2$ & \key{Yes (Updates NZCV)} \\
+\code{sub  x0, x1, x2}  & $x_0 \leftarrow x_1 - x_2$ & No \\
+\code{subs x0, x1, x2}  & $x_0 \leftarrow x_1 - x_2$ & \key{Yes (Updates NZCV)} \\
+\code{neg  x0, x1}      & $x_0 \leftarrow 0 - x_1$   & No (Alias for \code{sub x0, xzr, x1}) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+\normalsize
+\begin{block}{Immediate Constant Arithmetic}
+\code{add x0, x1, \#42} adds a 12-bit immediate ($0\text{ to } 4095$). 32-bit registers (\bits{w0}--\bits{w30}) follow identical syntax.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 4
+% ============================================================
+
+\begin{frame}{The Barrel Shifter: Free Second-Operand Shifts}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item The ALU datapath passes the second source operand through a hardware \key{barrel shifter} before computation at \key{zero extra cycle penalty}.
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Shift Type} & \textbf{Mnemonic} & \textbf{Operation Meaning} \\
+\midrule
+Logical Shift Left  & \code{lsl \#k} & $x \ll k$ \quad (Multiplication by $2^k$, zero-fill) \\
+Logical Shift Right & \code{lsr \#k} & $x \gg k$ \quad (Unsigned division by $2^k$, zero-fill) \\
+Arithmetic Shift Right & \code{asr \#k} & $x \gg k$ \quad (Signed division by $2^k$, sign-fill) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+\begin{block}{Integrated Shift-Add Examples}
+\small
+\begin{tabular}{lll}
+\code{add x0, x1, x2, lsl \#3} & $\implies x_0 \leftarrow x_1 + (x_2 \times 8)$ & (Array indexing by 8-byte doubleword) \\
+\code{sub x0, x1, x2, lsr \#1} & $\implies x_0 \leftarrow x_1 - (x_2 / 2)$     & (Subtract half of unsigned value) \\
+\end{tabular}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 5
+% ============================================================
+
+\begin{frame}{Integer Multiplication \& Division}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Dedicated hardware units compute 64-bit and 32-bit products and quotients.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Instruction} & \textbf{RTL Semantic Action} & \textbf{Description} \\
+\midrule
+\code{mul  x0, x1, x2}        & $x_0 \leftarrow x_1 \times x_2$         & 64-bit integer product (lower 64 bits) \\
+\code{madd x0, x1, x2, x3}    & $x_0 \leftarrow x3 + (x_1 \times x_2)$ & Fused Multiply-Accumulate \\
+\code{msub x0, x1, x2, x3}    & $x_0 \leftarrow x_3 - (x_1 \times x_2)$ & Fused Multiply-Subtract \\
+\code{sdiv x0, x1, x2}        & $x_0 \leftarrow x_1 / x_2$             & Signed division \\
+\code{udiv x0, x1, x2}        & $x_0 \leftarrow x_1 / x_2$             & Unsigned division \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+\normalsize
+\begin{block}{Division by Zero}
+AArch64 division by zero does \textbf{not} raise an exception; it returns \bits{0} in the destination register.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 6
+% ============================================================
+
+\begin{frame}{Bitwise Logic Primitives}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Standard bitwise operations act bit-by-bit across all 64 (or 32) bits in parallel.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Instruction} & \textbf{Operation} & \textbf{Bitwise RTL Formula} \\
+\midrule
+\code{and x0, x1, x2} & Bitwise AND & $x_0 \leftarrow x_1 \land x_2$ \\
+\code{orr x0, x1, x2} & Bitwise OR  & $x_0 \leftarrow x_1 \lor x_2$ \\
+\code{eor x0, x1, x2} & Bitwise XOR & $x_0 \leftarrow x_1 \oplus x_2$ \\
+\code{bic x0, x1, x2} & Bit Clear (AND NOT) & $x_0 \leftarrow x_1 \land (\sim x_2)$ \\
+\code{mvn x0, x1}     & Bitwise NOT & $x_0 \leftarrow \sim x_1$ \quad (Alias: \code{orn x0, xzr, x1}) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+\normalsize
+\begin{block}{Bit Clear (\texttt{bic}) Idiom}
+\code{bic x0, x1, x2} sets bits to \bits{0} in $x_1$ wherever the mask in $x_2$ has \bits{1}s.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 7
+% ============================================================
+
+\begin{frame}{Bitfield Extraction: \texttt{ubfx}}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Hardware can extract packed fields without explicit manual mask-and-shift steps.
+  \item \code{ubfx xd, xn, \#lsb, \#width}: Unsigned bitfield extract.
+\end{itemize}
+
+\vspace{0.2cm}
+\centering
+\begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
+  \draw[fill=softgray, draw=navy] (0,0) rectangle (9.0,0.55);
+  \draw[fill=gold!40, draw=navy, thick] (4.0,0) rectangle (6.5,0.55);
+  \node at (5.25, 0.275) {\small\textbf{Extracted Field (\bits{width} bits)}};
+  \node[anchor=south, font=\tiny\bfseries] at (4.0, 0.55) {Bit $(\text{lsb}+\text{width}-1)$};
+  \node[anchor=south, font=\tiny\bfseries] at (6.5, 0.55) {Bit $\text{lsb}$};
+  \node[anchor=south, font=\tiny\bfseries] at (0.2, 0.55) {Bit 63};
+  \node[anchor=south, font=\tiny\bfseries] at (8.8, 0.55) {Bit 0};
+\end{tikzpicture}
+
+\vspace{0.3cm}
+\begin{block}{Example: Extract 8-bit Field Starting at Bit 16}
+\small
+\begin{tabular}{lll}
+\textbf{Standard Approach:} & \code{lsr x0, x1, \#16} \quad $\to$ \quad \code{and x0, x0, \#0xff} & (2 instructions) \\
+\textbf{Bitfield Extract:}  & \code{ubfx x0, x1, \#16, \#8}                                       & \key{1 instruction!} \\
+\end{tabular}
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Section 2 Divider
+% ============================================================
+
+\sectiondivider{PART 2}{Condition Flags \& Comparison Mechanics}
+
+% ============================================================
+% Slide 8
+% ============================================================
+
+\begin{frame}{The NZCV Condition Flags}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Flag bits reside in \bits{pstate} and record status of the most recent flag-setting ALU operation.
+  \item Standard instructions (\code{add}, \code{sub}) leave flags unchanged; ``\code{s}'' variants update flags.
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{cll}
+\toprule
+\textbf{Flag} & \textbf{Name} & \textbf{Condition Set to 1} \\
+\midrule
+\key{N} & \textbf{Negative} & Result bit 63 is 1 (negative in signed interpretation) \\
+\key{Z} & \textbf{Zero}     & Result is exactly zero \\
+\key{C} & \textbf{Carry}    & Unsigned carry-out (addition) or \key{no borrow} (subtraction) \\
+\key{V} & \textbf{Overflow} & Signed arithmetic overflow (result sign is mathematically invalid) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+\begin{block}{Carry Flag in Subtraction}
+In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow required). $\text{C} = 0$ indicates $A < B$ (unsigned borrow occurred).
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 9
+% ============================================================
+
+\begin{frame}{Comparison Instructions: \texttt{cmp} and \texttt{tst}}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Comparisons evaluate values, set NZCV flags, and discard the computed output.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Instruction} & \textbf{Equivalent Machine Operation} & \textbf{Flags Set} \\
+\midrule
+\code{cmp x0, x1} & \code{subs xzr, x0, x1} & Sets NZCV based on $x_0 - x_1$ \\
+\code{cmn x0, x1} & \code{adds xzr, x0, x1} & Sets NZCV based on $x_0 + x_1$ (Compare Negative) \\
+\code{tst x0, x1} & \code{ands xzr, x0, x1} & Sets N, Z based on $x_0 \land x_1$ (Bit Test) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+\normalsize
+\begin{block}{Checking Flags After \texttt{cmp x0, x1}}
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item If $x_0 == x_1$: \key{Z flag is set to 1}.
+  \item If $x_0 < x_1$ (signed): \key{$\text{N} \neq \text{V}$}.
+  \item If $x_0 < x_1$ (unsigned): \key{$\text{C} = 0$}.
+\end{itemize}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 10
+% ============================================================
+
+\begin{frame}{Condition Codes: Signed vs.\ Unsigned Branches}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{llll}
+\toprule
+\textbf{Branch} & \textbf{Meaning} & \textbf{Flag Condition} & \textbf{Comparison Context} \\
+\midrule
+\code{b.eq} & Equal                     & $\text{Z} == 1$           & Signed / Unsigned \\
+\code{b.ne} & Not Equal                 & $\text{Z} == 0$           & Signed / Unsigned \\
+\midrule
+\code{b.lt} & Signed Less Than ($<$)    & $\text{N} \neq \text{V}$  & \key{Signed} \\
+\code{b.le} & Signed Less or Equal ($\le$) & $(\text{Z} == 1) \lor (\text{N} \neq \text{V})$ & \key{Signed} \\
+\code{b.gt} & Signed Greater Than ($>$) & $(\text{Z} == 0) \land (\text{N} == \text{V})$ & \key{Signed} \\
+\code{b.ge} & Signed Greater or Equal ($\ge$) & $\text{N} == \text{V}$ & \key{Signed} \\
+\midrule
+\code{b.lo} & Unsigned Lower ($<$)      & $\text{C} == 0$           & \key{Unsigned (Pointers)} \\
+\code{b.hi} & Unsigned Higher ($>$)     & $(\text{C} == 1) \land (\text{Z} == 0)$ & \key{Unsigned (Pointers)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+\normalsize
+\key{Takeaway:} Always use \code{b.lo}/\code{b.hi} for pointer bounds and memory addresses.
+\end{frame}
+
+% ============================================================
+% Section 3 Divider
+% ============================================================
+
+\sectiondivider{PART 3}{Control Flow: Branches \& Selection}
+
+% ============================================================
+% Slide 11
+% ============================================================
+
+\begin{frame}{Fused Branch-and-Test: \texttt{cbz} and \texttt{cbnz}}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{Compare and Branch on Zero (\code{cbz}) / Non-Zero (\code{cbnz}):}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item Tests register contents directly; does \textbf{not} alter NZCV flags.
+    \item Saves 1 instruction compared to an explicit \code{cmp} $+$ \code{b.eq}.
+  \end{itemize}
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\begin{block}{Null Pointer Validation}
+\small
+\begin{tabular}{ll}
+\code{cbz x0, .Lhandle\_null} & \text{\scriptsize // If ptr == NULL, jump} \\
+\code{ldr x1, [x0]}           & \text{\scriptsize // Safe memory access} \\
+\end{tabular}
+\end{block}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{block}{Loop Counter Decrement}
+\small
+\begin{tabular}{ll}
+\code{.Lloop:} & \\
+\code{subs x1, x1, \#1} & \text{\scriptsize // count--} \\
+\code{cbnz x1, .Lloop}  & \text{\scriptsize // Loop until count == 0} \\
+\end{tabular}
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.25cm}
+\normalsize
+\key{Single Bit Check:} \code{tbz x0, \#0, label} branches if bit 0 is zero (even number test).
+\end{frame}
+
+% ============================================================
+% Slide 12
+% ============================================================
+
+\begin{frame}[fragile]{Translating \texttt{if-then-else} Blocks}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.44\textwidth}
+\begin{block}{High-Level C Code}
+\small
+\begin{verbatim}
+if (x > y) {
+    result = x - y;
+} else {
+    result = y - x;
+}
+\end{verbatim}
+\end{block}
+\end{column}
+
+\begin{column}{0.52\textwidth}
+\begin{block}{AArch64 Assembly Mapping}
+\small
+\begin{tabular}{ll}
+\multicolumn{2}{l}{\textit{// Assume: x0=x, x1=y, x2=result}} \\
+\code{cmp  x0, x1}        & \text{\scriptsize // Compare x and y} \\
+\code{b.le .Lelse}        & \text{\scriptsize // Invert test: jump if x <= y} \\
+\code{sub  x2, x0, x1}    & \text{\scriptsize // Then-body: result = x - y} \\
+\code{b    .Lend}         & \text{\scriptsize // Skip else block} \\
+\code{.Lelse:}            & \\
+\code{sub  x2, x1, x0}    & \text{\scriptsize // Else-body: result = y - x} \\
+\code{.Lend:}             & \\
+\end{tabular}
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.3cm}
+\normalsize
+\key{Assembly Pattern:} Invert the high-level condition to fall through into the ``then'' path.
+\end{frame}
+
+% ============================================================
+% Slide 13
+% ============================================================
+
+\begin{frame}[fragile]{Loop Translation: Inverted Loop Pattern}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.44\textwidth}
+\begin{block}{High-Level C Loop}
+\small
+\begin{verbatim}
+// Compute array sum
+int64_t i = 0;
+while (i < n) {
+    sum += arr[i];
+    i++;
+}
+\end{verbatim}
+\end{block}
+\end{column}
+
+\begin{column}{0.52\textwidth}
+\begin{block}{Optimized AArch64 Loop}
+\small
+\begin{tabular}{ll}
+\multicolumn{2}{l}{\textit{// x0=arr, x1=n, x2=i, x3=sum}} \\
+\code{mov  x2, xzr}       & \text{\scriptsize // i = 0} \\
+\code{mov  x3, xzr}       & \text{\scriptsize // sum = 0} \\
+\code{b    .Ltest}        & \text{\scriptsize // Jump to test first} \\
+\code{.Lbody:}            & \\
+\code{ldr  x4, [x0, x2, lsl \#3]} & \text{\scriptsize // Load arr[i]} \\
+\code{add  x3, x3, x4}    & \text{\scriptsize // sum += arr[i]} \\
+\code{add  x2, x2, \#1}   & \text{\scriptsize // i++} \\
+\code{.Ltest:}            & \\
+\code{cmp  x2, x1}        & \text{\scriptsize // i < n?} \\
+\code{b.lt .Lbody}        & \text{\scriptsize // Loop if true} \\
+\end{tabular}
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.25cm}
+\normalsize
+\key{Efficiency Rule:} Placing the branch at the bottom requires only \key{1 branch per iteration}.
+\end{frame}
+
+% ============================================================
+% Slide 14
+% ============================================================
+
+\begin{frame}{Branch Penalties \& Branchless Selection (\texttt{csel})}
+
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Pipelined processors speculatively execute instructions ahead of branches.
+  \item An unpredictable branch misprediction wastes $12\text{--}20$ clock cycles flushing the pipeline.
+  \item \key{Conditional Select (\code{csel}):} Evaluates condition flags and moves data in $1\text{ cycle}$ with \textbf{0 branch misprediction risk}.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{block}{Branchless Maximum: $\code{result} = (x_1 > x_2) \mathbin{?} x_1 : x_2$}
+\small
+\begin{tabular}{lll}
+\code{cmp  x1, x2}          & \text{\scriptsize // Set NZCV flags based on x1 - x2} \\
+\code{csel x0, x1, x2, gt}  & \text{\scriptsize // If x1 > x2, x0 = x1; else x0 = x2 (No jumps!)} \\
+\end{tabular}
+\end{block}
+
+\vspace{0.15cm}
+\begin{block}{Related Branchless Helpers}
+\small
+\begin{tabular}{lll}
+\code{cset w0, eq}          & $w_0 \leftarrow (\text{cond} \mathbin{?} 1 : 0)$ & (Convert condition to boolean 1 or 0) \\
+\code{cinc x0, x1, eq}      & $x_0 \leftarrow x_1 + (\text{cond} \mathbin{?} 1 : 0)$ & (Conditional increment) \\
+\end{tabular}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Section 4 Divider
+% ============================================================
+
+\sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
+
+% ============================================================
+% Slide 15: Comprehensive Summary
+% ============================================================
+
+\begin{frame}{Topic 4: Comprehensive Summary}
+
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{ALU Integration:} AArch64 embeds a barrel shifter into the second source operand path, giving single-cycle shift-adds (\code{add x0, x1, x2, lsl \#3}).
+  \item \key{Bitwise Primitives:} Native support for \code{and}, \code{orr}, \code{eor}, and bit clearing via \code{bic}; field extraction via \code{ubfx}.
+  \item \key{Selective Flag Updates:} Only ``\code{s}'' variants (\code{adds}, \code{subs}) and comparisons (\code{cmp}, \code{tst}) update NZCV; carry flag is active ($C=1$) when subtraction does not borrow.
+  \item \key{Control Flow Idioms:} Conditional jumps invert high-level conditions; loop inversion cuts branch overhead to 1 branch per iteration.
+  \item \key{Branch Elimination:} Conditional select instructions (\code{csel}, \code{cset}) avoid pipeline misprediction penalties for simple decision paths.
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 16: Self-Test Questions (Part 1)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: Arithmetic \& Logic}
+
+\begin{enumerate}\setlength{\itemsep}{7pt}
+  \item \key{Shifted Addition:} What is the exact mathematical operation and resulting decimal value stored in \bits{x0} after executing:
+  $$\code{mov x1, \#12} \quad \code{mov x2, \#5} \quad \code{add x0, x1, x2, lsl \#2}$$
+
+  \item \key{Bit Clear Operation:} If register \bits{x1} contains \hex{ff} and \bits{x2} contains \hex{0f}, what value resides in \bits{x0} after executing \code{bic x0, x1, x2}?
+
+  \item \key{Signed vs.\ Unsigned Comparisons:} If \bits{x0} contains $-1$ (\hex{ffffffff\_ffffffff}) and \bits{x1} contains $1$, which branch will be taken after \code{cmp x0, x1}: \code{b.lt} or \code{b.lo}? Why?
+
+  \item \key{Flag Updating:} Explain why \code{add x0, x1, x2} does not update the Zero ($Z$) flag even if the resulting sum is exactly zero.
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Slide 17: Self-Test Questions (Part 2)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: Control Flow \& Selection}
+
+\begin{enumerate}\setlength{\itemsep}{7pt}
+  \item \key{Loop Inversion Benefit:} Why do optimizing compilers place the conditional loop branch at the bottom of the loop body rather than at the top?
+
+  \item \key{Branchless Translation:} Write an equivalent 2-instruction branchless AArch64 snippet using \code{cmp} and \code{csel} to implement:
+  $$\code{int64\_t abs\_val = (val < 0) ? -val : val;}$$
+
+  \item \key{Fused Branch Instructions:} When should an assembly programmer use \code{cbz x0, label} instead of \code{cmp x0, \#0} followed by \code{b.eq label}?
+
+  \item \key{Branch Misprediction Trade-off:} Under what conditions will \code{csel} dramatically outperform a standard branching \code{if-else} sequence?
+\end{enumerate}
+
+\end{frame}
+
+\end{document}
