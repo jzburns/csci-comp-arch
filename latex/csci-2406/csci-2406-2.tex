@@ -122,7 +122,7 @@
 }
 
 \author{
-  Computer Architecture \& Organization
+  Computer Organization \& Architecture
 }
 
 \date{Topic 2}
@@ -147,23 +147,23 @@
 \vspace{0.3cm}
 {\color{lightblue}\normalsize RISC Design Philosophy, Modern Load/Store Model, AArch64 Programmer-Visible State, and Core Instruction Classes\par}
 \vspace{0.6cm}
-{\color{softgray}\small Computer Architecture \& Organization \quad\textbar\quad Topic 2\par}
+{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad Topic 2\par}
 \end{minipage}
 \end{frame}
 
-% --- Slide 2: Topic Roadmap ---
-\begin{frame}{Topic 2 Technical Roadmap}
+% --- Slide 2: Topic Outline ---
+\begin{frame}{Topic 2 Outline}
     \begin{block}{Topic Objective}
-        Analyze the architectural philosophy of Reduced Instruction Set Computers (RISC) and examine how modern ARM64 / AArch64 realizes this model via orthogonal 64-bit registers, condition flags, and clean instruction classes.
+        Analysis of the architectural philosophy of Reduced Instruction Set Computers (RISC) and examination of how modern ARM64 / AArch64 realizes this model via orthogonal 64-bit registers, condition flags, and instruction classes.
     \end{block}
     \vspace{0.4em}
     \begin{itemize}
         \item \key{Section 1}: RISC Design Principles and the Load/Store Paradigm
-        \item \key{Section 2}: CISC vs.\ RISC Architectural Trade-Offs
+        \item \key{Section 2}: CISC versus RISC Architectural Trade-Offs
         \item \key{Section 3}: AArch64 Architectural Overview and Encoding Model
         \item \key{Section 4}: Registers and 64-Bit Programmer-Visible State (\code{x0}--\code{x30}, \code{xzr}, \code{sp}, \code{pc}, \code{pstate})
         \item \key{Section 5}: Core AArch64 Instruction Classes: Data Processing, Memory, and Control Flow
-        \item \key{Section 6}: Topic Summary and Worked Self-Test Exercises
+        \item \key{Section 6}: Summary and Worked Self-Test Exercises
     \end{itemize}
 \end{frame}
 
@@ -796,7 +796,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 32: Self-Test: Solutions 1 \& 2 ---
+% --- Slide 32: Self-Test: Solutions 1 & 2 ---
 \begin{frame}{Self-Test: Solutions 1 \& 2}
     \begin{block}{Solution 1}
         RISC uses fixed 32-bit instructions, a load/store model, and regular operand fields. CISC uses variable-length encodings and direct memory arithmetic. Simpler decoding reduces silicon gate count and dynamic switching activity ($P \propto C \cdot V^2 \cdot f$), lowering power draw.
