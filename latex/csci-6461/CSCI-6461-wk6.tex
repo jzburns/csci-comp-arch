@@ -1,0 +1,2067 @@
+\documentclass[aspectratio=169,11pt,t]{beamer}
+
+% ============================================================
+% Theme and typography
+% ============================================================
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
+    CSCI 6461 --- Computer Systems Architecture (AArch64 Reference / RISC Philosophy)
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+
+\setbeamersize{
+  text margin left=0.65cm,
+  text margin right=0.65cm
+}
+
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% Block vertical padding adjustments
+\addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
+\addtobeamertemplate{block end}{}{\vspace{0.2em}}
+
+% Base list item separation
+\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
+\setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
+
+% ============================================================
+% Packages
+% ============================================================
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+
+\usetikzlibrary{
+  arrows.meta,
+  positioning,
+  shapes.geometric,
+  calc,
+  decorations.pathreplacing
+}
+
+% ============================================================
+% Colors
+% ============================================================
+
+\definecolor{navy}{RGB}{24,43,68}
+\definecolor{deepblue}{RGB}{45,88,130}
+\definecolor{lightblue}{RGB}{235,242,250}
+\definecolor{softgray}{RGB}{245,247,250}
+\definecolor{darkgray}{RGB}{25,28,32}
+\definecolor{gold}{RGB}{200,145,35}
+
+\setbeamercolor{palette primary}{bg=navy,fg=white}
+\setbeamercolor{palette secondary}{bg=deepblue,fg=white}
+\setbeamercolor{frametitle}{bg=navy,fg=white}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=white}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{date}{fg=white}
+\setbeamercolor{titlelike}{fg=white}
+\setbeamercolor{block title}{bg=deepblue,fg=white}
+\setbeamercolor{block body}{bg=lightblue,fg=darkgray}
+\setbeamercolor{normal text}{fg=darkgray,bg=white}
+
+% ============================================================
+% Formatting shortcuts
+% ============================================================
+
+\setlength{\parskip}{0pt}
+
+\newcommand{\key}[1]{\textbf{#1}}
+\newcommand{\bits}[1]{\texttt{#1}}
+\newcommand{\hex}[1]{\texttt{0x#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Section divider macro
+\newcommand{\sectiondivider}[2]{%
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries #1\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+\end{minipage}
+\end{frame}
+}
+
+% ============================================================
+% Metadata
+% ============================================================
+
+\title[Topic 6]{
+  Subroutines, Calling Conventions, \& the Stack
+}
+
+\subtitle{
+  Function linkage, register preservation rules, stack frame management,\\
+  and AAPCS64 architectural compliance
+}
+
+\author{
+  Computer Systems Architecture
+}
+
+\date{}
+
+% ============================================================
+% Document
+% ============================================================
+
+\begin{document}
+
+% ============================================================
+% Slide 1: Title Slide
+% ============================================================
+
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+
+\vspace{0.8cm}
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 6\par}
+\vspace{0.25cm}
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+ Subroutines, Calling Conventions,\\[0.08cm]
+ \& the Stack
+\par}
+\vspace{0.35cm}
+{\color{white!80}\large
+ Function linkage, register preservation rules, stack frame management,\\
+ and AAPCS64 architectural compliance
+\par}
+\end{minipage}
+
+\vfill
+{\color{white}\normalsize Dr. J. Burns\par}
+{\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
+\vspace{0.35cm}
+\end{frame}
+
+% ============================================================
+% Slide 2: Module Overview
+% ============================================================
+
+\begin{frame}{Topic 6: High-Level Module Roadmap}
+
+\begin{enumerate}\setlength{\itemsep}{10pt}
+  \item \key{Subroutine Linkage \& Control Flow}
+  \begin{itemize}
+    \item Function calls with \code{bl}, returns with \code{ret}, and the Link Register (\code{x30}).
+    \item Leaf vs.\ non-leaf subroutine execution mechanics.
+  \end{itemize}
+
+  \item \key{Procedure Call Standard (AAPCS64) \& Register Roles}
+  \begin{itemize}
+    \item Argument passing, return values, caller-saved vs.\ callee-saved contracts.
+    \item Interoperability between compiled C code and hand-written assembly.
+  \end{itemize}
+
+  \item \key{The Runtime Stack \& Activation Frames}
+  \begin{itemize}
+    \item Frame Pointer (\code{x29}) linkages, stack growth, and 16-byte alignment rules.
+    \item Constructing function prologues and epilogues.
+  \end{itemize}
+
+  \item \key{Assembly Implementation Patterns \& Worked Examples}
+  \begin{itemize}
+    \item Leaf functions, nested calls, recursive algorithms, and stack-passed parameters.
+  \end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Section 1 Divider
+% ============================================================
+
+\sectiondivider{PART 1}{Subroutine Linkage \& Control Flow}
+
+% ============================================================
+% Slide 3
+% ============================================================
+
+\begin{frame}{High-Level Function Execution Model}
+\large
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item \key{Subroutines} provide modular abstraction, reusability, and clean software architecture.
+  \item To execute a function call, the CPU must satisfy five core requirements:
+  \begin{enumerate}\setlength{\itemsep}{3pt}
+    \item \key{Pass Arguments:} Transfer input parameters to the function.
+    \item \key{Transfer Control:} Jump to the function's entry point address.
+    \item \key{Isolate Local State:} Provide memory space for function local variables.
+    \item \key{Return Value:} Pass computed results back to the caller.
+    \item \key{Resume Execution:} Return seamlessly to the instruction following the call.
+  \end{enumerate}
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 4
+% ============================================================
+
+\begin{frame}{The Link Register (\texttt{x30}) and Branch-with-Link (\texttt{bl})}
+
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Invoking a function requires remembering where to return when it completes.
+  \item \key{Branch with Link (\code{bl label}):} Atomically performs two operations:
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item Saves return address ($\text{PC} + 4$) into the \key{Link Register (\bits{x30} / \bits{lr})}.
+    \item Branches to target function: $\text{PC} \leftarrow \text{label}$.
+  \end{enumerate}
+\end{itemize}
+
+\vspace{0.2cm}
+\centering
+\begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
+  \node[draw=navy, fill=lightblue, rounded corners=2pt, minimum width=3.8cm, minimum height=0.6cm, font=\small\bfseries] (save) {1. $x_{30} \leftarrow \text{PC} + 4$};
+  \node[draw=gold!80!black, fill=gold!20, line width=1pt, rounded corners=2pt, right=1.2cm of save, minimum width=3.2cm, minimum height=0.6cm, font=\small\bfseries] (jump) {2. $\text{PC} \leftarrow \text{Target Address}$};
+  \draw[-{Latex}, thick, navy] (save) -- (jump);
+\end{tikzpicture}
+
+\vspace{0.3cm}
+\begin{block}{PC-Relative Calling Range}
+The \code{bl} instruction encodes a signed 26-bit immediate offset, allowing direct function calls within a $\pm 128\text{ MB}$ window of the current instruction.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 5
+% ============================================================
+
+\begin{frame}{Subroutine Return Mechanics (\texttt{ret})}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{Return from Subroutine (\code{ret}):} Redirects execution back to the caller by loading the target address from the Link Register into the Program Counter:
+  $$\text{PC} \leftarrow x_{30}$$
+  \item Execution resumes at the exact instruction immediately following the original \code{bl}.
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{block}{Example: Minimal Leaf Return Sequence}
+\small
+\begin{tabular}{ll}
+\code{caller\_func:} & \\
+    \quad \code{bl  helper\_func}  & \text{\scriptsize // x30 = address of next instruction; PC = helper\_func} \\
+    \quad \code{mov x1, x0}       & \text{\scriptsize // Execution resumes here after ret!} \\
+\code{helper\_func:} & \\
+    \quad \code{add x0, x0, \#1}  & \text{\scriptsize // Compute result} \\
+    \quad \code{ret}              & \text{\scriptsize // PC = x30} \\
+\end{tabular}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 6
+% ============================================================
+
+\begin{frame}{Leaf vs.\ Non-Leaf Functions}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\begin{block}{Leaf Functions}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item Calls \key{no other functions}.
+  \item Link Register (\bits{x30}) is never overwritten.
+  \item Can execute and return directly without saving \bits{x30} to the stack.
+  \item \key{Zero stack overhead!}
+\end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{block}{Non-Leaf Functions}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item Calls one or more \key{nested subroutines}.
+  \item Executing a nested \code{bl} \key{overwrites \bits{x30}} with the nested return address.
+  \item Must save \bits{x30} to the stack in its prologue before making any nested calls.
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.3cm}
+\normalsize
+\begin{block}{The Non-Leaf Rule}
+If a function calls another function, its own return address in \bits{x30} will be destroyed unless saved to memory upon entry.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 7
+% ============================================================
+
+\begin{frame}{Indirect Subroutine Calls (\texttt{blr})}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item When the target function address is determined dynamically at runtime, use \key{Branch with Link to Register (\code{blr xn})}.
+  \item Saves return address ($\text{PC} + 4$) into \bits{x30} and jumps to address held in register \bits{xn}.
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{block}{Primary Applications}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item \key{C Function Pointers:} \code{void (*func\_ptr)(int) = my\_callback;}
+  \item \key{Virtual Method Tables (vtables):} C++ polymorphism and object dispatch.
+  \item \key{Shared Library Veneers:} Dynamic linking and Symbol Jump Tables.
+\end{itemize}
+\end{block}
+
+\vspace{0.2cm}
+\small
+\code{ldr x2, [x0, \#8]} \quad \text{\scriptsize // Load function pointer from vtable} \\
+\code{blr x2}             \quad \text{\scriptsize // Call function indirectly via register x2}
+\end{frame}
+
+% ============================================================
+% Slide 8
+% ============================================================
+
+\begin{frame}{Subroutine Call Execution Trace}
+
+\centering
+\vspace{0.1cm}
+\begin{tikzpicture}[scale=0.82, every node/.style={transform shape}]
+  % Caller Timeline
+  \draw[navy, line width=1.5pt] (0,0) -- (0,4.5);
+  \node[anchor=south, font=\small\bfseries, navy] at (0,4.5) {Caller Code};
+  
+  % Callee Timeline
+  \draw[deepblue, line width=1.5pt] (5,0) -- (5,4.5);
+  \node[anchor=south, font=\small\bfseries, deepblue] at (5,4.5) {Callee Code};
+
+  % Call arrow
+  \draw[-{Latex}, gold!80!black, line width=1.2pt] (0,3.5) -- (5,2.8) node[midway, above, font=\tiny\bfseries] {1. \code{bl callee} ($x_{30} \leftarrow \text{PC}+4$)};
+  
+  % Callee execution
+  \node[anchor=west, font=\tiny] at (5.2,2.3) {Compute result...};
+  
+  % Return arrow
+  \draw[-{Latex}, navy, line width=1.2pt] (5,1.5) -- (0,0.8) node[midway, above, font=\tiny\bfseries] {2. \code{ret} ($\text{PC} \leftarrow x_{30}$)};
+
+  % Resume execution
+  \node[anchor=east, font=\tiny] at (-0.2,0.5) {Resume next instruction};
+\end{tikzpicture}
+
+\vspace{0.2cm}
+\normalsize
+Control flows smoothly from caller to callee and back using \bits{x30} as the hardware breadcrumb.
+\end{frame}
+
+% ============================================================
+% Section 2 Divider
+% ============================================================
+
+\sectiondivider{PART 2}{Procedure Call Standard \& Register Roles}
+
+% ============================================================
+% Slide 9
+% ============================================================
+
+\begin{frame}{Purpose of Procedure Call Standards (AAPCS64)}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{AAPCS64:} Procedure Call Standard for the ARM 64-bit Architecture.
+  \item Defines a strict software contract between caller and callee functions.
+  \item \key{Why Is an ABI Contract Mandatory?}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item Allows assembly code to seamlessly call C library functions (\code{printf}, \code{malloc}).
+    \item Enables C compilers (GCC, Clang) to interoperate with assembly routines.
+    \item Dictates parameter passing, return values, and register preservation rules.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 10
+% ============================================================
+
+\begin{frame}{Parameter Passing Registers (\texttt{x0}--\texttt{x7})}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Up to \key{8 integer or pointer parameters} are passed directly in registers \bits{x0} through \bits{x7}.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{cll}
+\toprule
+\textbf{Parameter Index} & \textbf{Register} & \textbf{C Language Example} \\
+\midrule
+1st Argument & \bits{x0} (\bits{w0}) & \code{int64\_t a} \\
+2nd Argument & \bits{x1} (\bits{w1}) & \code{char *str} \\
+3rd Argument & \bits{x2} (\bits{w2}) & \code{size\_t length} \\
+4th--8th Arguments & \bits{x3}--\bits{x7} & Additional scalar arguments \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+\normalsize
+\begin{block}{Overflow Arguments ($> 8$ Parameters)}
+Parameters beyond the 8th argument are passed on the runtime stack in reverse order.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 11
+% ============================================================
+
+\begin{frame}{Return Value Registers (\texttt{x0}--\texttt{x7})}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Functions return scalar results in registers without accessing memory:
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Return Data Type} & \textbf{Register Used} & \textbf{Description} \\
+\midrule
+32-bit Integer / Boolean & \bits{w0} & Lower 32 bits of register 0 \\
+64-bit Integer / Pointer & \bits{x0} & Full 64-bit register 0 \\
+128-bit Composite / Struct & \bits{x0} (lower), \bits{x1} (upper) & Split across two registers \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+\normalsize
+\begin{block}{Large Struct Returns ($> 16$ Bytes)}
+The caller allocates stack memory for the struct and passes an implicit pointer in register \key{\bits{x8}} (Indirect Result Location).
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 12
+% ============================================================
+
+\begin{frame}{Caller-Saved Registers (\texttt{x0}--\texttt{x17})}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Also known as \key{Scratch} or \key{Volatile} registers.
+  \item The callee function is free to overwrite these registers \key{without restoring them}.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Register Range} & \textbf{AAPCS64 Role} & \textbf{Callee Behavior} \\
+\midrule
+\bits{x0}--\bits{x7}   & Parameter passing / Return values & May overwrite freely \\
+\bits{x8}              & Indirect result location pointer  & May overwrite freely \\
+\bits{x9}--\bits{x15}  & Temporary caller scratch registers & May overwrite freely \\
+\bits{x16}--\bits{x17} & Intra-procedure linker scratch (IP0, IP1) & May overwrite freely \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+\begin{block}{Rule for Caller Functions}
+If a caller needs to preserve values in \bits{x0}--\bits{x17} across a subroutine call (\code{bl}), it \key{must save them to the stack before calling}.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 13
+% ============================================================
+
+\begin{frame}{Callee-Saved Registers (\texttt{x19}--\texttt{x28})}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Also known as \key{Preserved} or \key{Non-Volatile} registers.
+  \item Registers \bits{x19} through \bits{x28} hold long-lived variables across subroutine invocations.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{block}{The Callee Contract}
+If a subroutine modifies any register in \bits{x19}--\bits{x28}, it \key{must save the original value to the stack on entry} and \key{restore it before returning}.
+\end{block}
+
+\vspace{0.25cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\begin{block}{Callee Entry (Prologue)}
+\code{str x19, [sp, \#-16]!} \\
+\text{\scriptsize Preserves caller's x19 before modifying it.}
+\end{block}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{block}{Callee Exit (Epilogue)}
+\code{ldr x19, [sp], \#16} \\
+\text{\scriptsize Restores original x19 before ret.}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% Slide 14
+% ============================================================
+
+\begin{frame}{Special-Purpose ABI Registers}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Register} & \textbf{ABI Name} & \textbf{Architectural Role} \\
+\midrule
+\bits{x8}       & XR & Indirect result location pointer for struct returns \\
+\bits{x16}, \bits{x17} & IP0, IP1 & Intra-procedure call temporaries (used by dynamic linker) \\
+\bits{x18}      & PR & Platform register (reserved for OS kernel / thread pointer) \\
+\bits{x29}      & FP & Frame Pointer (base anchor for current activation frame) \\
+\bits{x30}      & LR & Link Register (holds function return address) \\
+\bits{sp}       & SP & Stack Pointer (holds current stack top; 16-byte aligned) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+\normalsize
+\key{Takeaway:} Never use \bits{x18}, \bits{x29}, \bits{x30}, or \bits{sp} as general scratchpad registers!
+\end{frame}
+
+% ============================================================
+% Slide 15
+% ============================================================
+
+\begin{frame}{Register Responsibility Summary}
+\begin{center}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{4.5cm}}
+\toprule
+\textbf{Registers} & \textbf{Role / Usage} & \textbf{Preservation Contract} \\
+\midrule
+\bits{x0}--\bits{x7}   & Parameters \& Return Values & \key{Caller-saved} (Callee can overwrite) \\[0.2em]
+\bits{x8}--\bits{x17}  & Scratch / Temporaries      & \key{Caller-saved} (Callee can overwrite) \\[0.2em]
+\bits{x19}--\bits{x28} & Preserved Local Variables  & \key{Callee-saved} (Callee must restore) \\[0.2em]
+\bits{x29} (\bits{fp}) & Frame Pointer              & \key{Callee-saved} (Callee must restore) \\[0.2em]
+\bits{x30} (\bits{lr}) & Link Register              & \key{Callee-saved} (if non-leaf) \\[0.2em]
+\bits{sp}              & Stack Pointer              & \key{Preserved} (Must balance exactly) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{frame}
+
+% ============================================================
+% Section 3 Divider
+% ============================================================
+
+\sectiondivider{PART 3}{The Runtime Stack \& Activation Frames}
+
+% ============================================================
+% Slide 16
+% ============================================================
+
+\begin{frame}{The Stack Memory Model}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item The runtime stack is a dynamic memory region allocated in process address space.
+  \item \key{Key Characteristics:}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item Grows \textbf{downward} from high memory addresses toward low memory addresses.
+    \item Stack Pointer (\bits{sp}) points to the current \key{lowest active address} (top of stack).
+    \item Operates on a Last-In, First-Out (LIFO) order.
+  \end{itemize}
+\end{itemize}
+
+\vspace{0.25cm}
+\begin{block}{Allocation vs.\ Deallocation}
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item \key{Push / Allocate:} Subtract from \bits{sp} (\code{sub sp, sp, \#32}).
+  \item \key{Pop / Deallocate:} Add to \bits{sp} (\code{add sp, sp, \#32}).
+\end{itemize}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 17
+% ============================================================
+
+\begin{frame}{Frame Pointer (\texttt{x29}) and Frame Chains}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item The \key{Frame Pointer (\bits{x29} / \bits{fp})} provides a fixed reference point within the activation frame for accessing arguments and local variables.
+  \item \key{The Frame Pointer Chain:}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item Each function saves the previous caller's \bits{x29} on the stack.
+    \item \bits{x29} is updated to point to this saved location.
+    \item Forms a linked list of stack frames back to \code{main()}.
+  \end{itemize}
+\end{itemize}
+
+\vspace{0.2cm}
+\centering
+\begin{tikzpicture}[scale=0.85, every node/.style={transform shape}]
+  \draw[fill=lightblue, draw=navy] (0,1.6) rectangle (4.5,2.3) node[midway, font=\small\bfseries] {Caller Frame (\bits{x29} anchor)};
+  \draw[fill=softgray, draw=navy] (0,0.5) rectangle (4.5,1.2) node[midway, font=\small\bfseries] {Callee Frame (\bits{x29} anchor)};
+  \draw[-{Latex}, line width=1.2pt, gold!80!black] (2.25,0.85) -- (2.25,1.95) node[midway, right, font=\tiny\bfseries] {Points to previous frame};
+\end{tikzpicture}
+
+\vspace{0.2cm}
+\normalsize
+Essential for runtime debuggers (e.g., GDB) to generate call stack backtraces.
+\end{frame}
+
+% ============================================================
+% Slide 18
+% ============================================================
+
+\begin{frame}{Standard Activation Frame Structure}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item An \key{Activation Frame} stores all data necessary for a single function execution instance.
+  \item Saved in a standardized order:
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item Saved Link Register (\bits{x30}).
+    \item Saved Frame Pointer (\bits{x29}).
+    \item Saved Callee Registers (\bits{x19}--\bits{x28}).
+    \item Local Variables \& Buffers.
+  \end{enumerate}
+\end{itemize}
+\end{column}
+
+\begin{column}{0.44\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.75, every node/.style={transform shape}]
+  \draw[fill=lightblue, draw=navy] (0,3.6) rectangle (4.5,4.4) node[midway, font=\small\bfseries] {Saved LR (\bits{x30})};
+  \draw[fill=lightblue, draw=navy] (0,2.8) rectangle (4.5,3.6) node[midway, font=\small\bfseries] {Saved FP (\bits{x29} $\leftarrow$ \bits{fp})};
+  \draw[fill=softgray, draw=navy] (0,2.0) rectangle (4.5,2.8) node[midway, font=\small\bfseries] {Saved Callee (\bits{x19})};
+  \draw[fill=softgray, draw=navy, dashed] (0,1.2) rectangle (4.5,2.0) node[midway, font=\small] {Local Variables (16B pad)};
+  \node[anchor=east, font=\scriptsize\bfseries] at (0,4.4) {High Addr};
+  \node[anchor=east, font=\scriptsize\bfseries] at (0,1.2) {Stack Top (\bits{sp})};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% Slide 19
+% ============================================================
+
+\begin{frame}[fragile]{Function Prologue Mechanics}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item The \key{Prologue} is the setup code executed at the very beginning of a non-leaf function.
+  \item Performs three standard actions:
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{block}{Standard Prologue Template}
+\small
+\begin{verbatim}
+my_func:
+    // 1. Push FP and LR; allocate stack frame (32 bytes)
+    stp   x29, x30, [sp, #-32]!
+
+    // 2. Set Frame Pointer to bottom of frame link
+    mov   x29, sp
+
+    // 3. Save any callee-saved registers used in body
+    str   x19, [sp, #16]
+\end{verbatim}
+\end{block}
+
+\vspace{0.2cm}
+\normalsize
+Pre-indexed \code{stp} combines stack allocation and saving \bits{x29}/\bits{x30} into a single instruction.
+\end{frame}
+
+% ============================================================
+% Slide 20
+% ============================================================
+
+\begin{frame}[fragile]{Function Epilogue Mechanics}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item The \key{Epilogue} tears down the frame and restores state before returning.
+  \item Reverses the exact sequence performed by the prologue:
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{block}{Standard Epilogue Template}
+\small
+\begin{verbatim}
+    // 1. Restore saved callee registers
+    ldr   x19, [sp, #16]
+
+    // 2. Restore original FP and LR; release stack frame
+    ldp   x29, x30, [sp], #32
+
+    // 3. Return to caller
+    ret
+\end{verbatim}
+\end{block}
+
+\vspace{0.2cm}
+\normalsize
+Post-indexed \code{ldp} restores \bits{x29}/\bits{x30} and deallocates 32 stack bytes atomically.
+\end{frame}
+
+% ============================================================
+% Slide 21
+% ============================================================
+
+\begin{frame}[fragile]{Local Variable Allocation on the Stack}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.46\textwidth}
+\begin{block}{C Function with Local Array}
+\small
+\begin{verbatim}
+void process(void) {
+    uint64_t buffer[2];
+    buffer[0] = 10;
+    buffer[1] = 20;
+}
+\end{verbatim}
+\end{block}
+\end{column}
+
+\begin{column}{0.50\textwidth}
+\begin{block}{AArch64 Stack Allocation}
+\small
+\begin{verbatim}
+process:
+    // 16B (FP/LR) + 16B (buffer) = 32B
+    stp  x29, x30, [sp, #-32]!
+    mov  x29, sp
+
+    mov  x0, #10
+    str  x0, [sp, #16] // buffer[0]
+    mov  x0, #20
+    str  x0, [sp, #24] // buffer[1]
+
+    ldp  x29, x30, [sp], #32
+    ret
+\end{verbatim}
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.25cm}
+\normalsize
+Local stack variables are referenced using positive offsets from \bits{sp} or \bits{x29}.
+\end{frame}
+
+% ============================================================
+% Slide 22
+% ============================================================
+
+\begin{frame}{Stack Alignment and Padding Rules}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item AAPCS64 mandates that \key{\bits{sp} must be a multiple of 16 at all times}.
+  \item If local variables require 20 bytes, allocation must be padded up to 32 bytes ($16 + 16$).
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{block}{Calculating Frame Size}
+$$\text{Total Frame Size} = \text{align16}(\text{Header (16B)} + \text{Callee Regs} + \text{Local Variables})$$
+\end{block}
+
+\vspace{0.2cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Requested Space} & \textbf{Padded Frame Allocation} & \textbf{Instruction} \\
+\midrule
+16 bytes & 16 bytes & \code{sub sp, sp, \#16} \\
+24 bytes & 32 bytes & \code{sub sp, sp, \#32} \\
+40 bytes & 48 bytes & \code{sub sp, sp, \#48} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{frame}
+
+% ============================================================
+% Section 4 Divider
+% ============================================================
+
+\sectiondivider{PART 4}{Worked Assembly Examples \& Patterns}
+
+% ============================================================
+% Slide 23
+% ============================================================
+
+\begin{frame}[fragile]{Worked Example 1: Minimal Leaf Function}
+\begin{block}{C Code: \texttt{int64\_t add\_three(int64\_t a, int64\_t b, int64\_t c)}}
+\end{block}
+
+\vspace{0.1cm}
+\begin{block}{AArch64 Assembly Implementation}
+\small
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\textit{// Inputs: x0 = a, x1 = b, x2 = c}} \\
+\code{add\_three:} & & \\
+    & \code{add x0, x0, x1}             & \text{\scriptsize // x0 = a + b} \\
+    & \code{add x0, x0, x2}             & \text{\scriptsize // x0 = (a + b) + c} \\
+    & \code{ret}                        & \text{\scriptsize // Return result in x0} \\
+\end{tabular}
+\end{block}
+
+\vspace{0.25cm}
+\normalsize
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item \key{Analysis:} Calls no subroutines; uses scratch registers \bits{x0}--\bits{x2}.
+  \item No stack allocation required; executes in 3 instructions.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 24
+% ============================================================
+
+\begin{frame}[fragile]{Worked Example 2: Non-Leaf Nested Function}
+\begin{block}{C Code: \texttt{int64\_t compute(int64\_t x)}}
+\small
+\begin{verbatim}
+int64_t compute(int64_t x) {
+    return add_three(x, 10, 20);
+}
+\end{verbatim}
+\end{block}
+
+\vspace{0.1cm}
+\begin{block}{AArch64 Assembly Implementation}
+\small
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\textit{// Input: x0 = x}} \\
+\code{compute:} & & \\
+    & \code{stp x29, x30, [sp, \#-16]!} & \text{\scriptsize // Save FP and LR (x30)} \\
+    & \code{mov x29, sp}                & \text{\scriptsize // Set up frame pointer} \\
+    & \code{mov x1, \#10}               & \text{\scriptsize // 2nd arg = 10} \\
+    & \code{mov x2, \#20}               & \text{\scriptsize // 3rd arg = 20} \\
+    & \code{bl  add\_three}             & \text{\scriptsize // Call add\_three (overwrites x30)} \\
+    & \code{ldp x29, x30, [sp], \#16}   & \text{\scriptsize // Restore FP and original LR} \\
+    & \code{ret}                        & \text{\scriptsize // Return to caller} \\
+\end{tabular}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 25
+% ============================================================
+
+\begin{frame}[fragile]{Worked Example 3: Recursive Factorial}
+\begin{block}{C Code: \texttt{uint64\_t factorial(uint64\_t n)}}
+\end{block}
+
+\vspace{0.1cm}
+\begin{block}{AArch64 Assembly Implementation}
+\small
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\textit{// Input: x0 = n}} \\
+\code{factorial:} & & \\
+    & \code{cmp  x0, \#1}               & \text{\scriptsize // Check n <= 1} \\
+    & \code{b.ls .Lbase\_case}          & \text{\scriptsize // Base case jump} \\
+    & \code{stp  x29, x30, [sp, \#-16]!} & \text{\scriptsize // Save FP and LR} \\
+    & \code{stp  x19, xzr, [sp, \#-16]!} & \text{\scriptsize // Save callee reg x19} \\
+    & \code{mov  x19, x0}               & \text{\scriptsize // Preserve n in x19 across call} \\
+    & \code{sub  x0, x0, \#1}           & \text{\scriptsize // Pass (n - 1) in x0} \\
+    & \code{bl   factorial}            & \text{\scriptsize // Recursive call} \\
+    & \code{mul  x0, x0, x19}           & \text{\scriptsize // Result = factorial(n-1) * n} \\
+    & \code{ldp  x19, xzr, [sp], \#16}  & \text{\scriptsize // Restore x19} \\
+    & \code{ldp  x29, x30, [sp], \#16}  & \text{\scriptsize // Restore FP/LR} \\
+    & \code{ret}                        & \\
+\code{.Lbase\_case:} & & \\
+    & \code{mov  x0, \#1}               & \text{\scriptsize // Base case result = 1} \\
+    & \code{ret}                        & \\
+\end{tabular}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 26
+% ============================================================
+
+\begin{frame}[fragile]{Worked Example 4: Passing > 8 Arguments}
+\begin{block}{Passing 9th and 10th Parameters via Stack}
+Parameters 1--8 in \bits{x0}--\bits{x7}; parameters 9 and 10 pushed to stack.
+\end{block}
+
+\vspace{0.1cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\begin{block}{Caller Side (Preparing Call)}
+\small
+\begin{verbatim}
+// Push 10th and 9th args
+mov  x8, #100
+mov  x9, #200
+stp  x9, x8, [sp, #-16]!
+
+bl   func_with_10_args
+
+add  sp, sp, #16 // Clean stack
+\end{verbatim}
+\end{block}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{block}{Callee Side (Reading Stack Args)}
+\small
+\begin{verbatim}
+func_with_10_args:
+    // Args 1-8 in x0-x7
+    // Arg 9 at [sp, #0]
+    // Arg 10 at [sp, #8]
+    ldr  x8, [sp, #0]  // 9th
+    ldr  x9, [sp, #8]  // 10th
+    ret
+\end{verbatim}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% Slide 27
+% ============================================================
+
+\begin{frame}{Common Function Linkage Bugs in Assembly}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{1. Overwriting Link Register:} Executing \code{bl} in a non-leaf function without saving \bits{x30} destroys the return path, causing infinite loops or crashes.
+  \item \key{2. Corrupting Callee Registers:} Modifying \bits{x19}--\bits{x28} without preserving them corrupts caller local variables.
+  \item \key{3. Stack Misalignment:} Adjusting \bits{sp} by 8 bytes instead of 16-byte multiples triggers hardware alignment faults.
+  \item \key{4. Unbalanced Stack Pointer:} Modifying \bits{sp} in body without restoring exact offsets leads to incorrect return targets.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Section 5 Divider
+% ============================================================
+
+\sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
+
+% ============================================================
+% Slide 28: Comprehensive Summary
+% ============================================================
+
+\begin{frame}{Topic 6: Comprehensive Summary}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item \key{Linkage Primitives:} \code{bl} saves return context ($\text{PC}+4$) into \bits{x30} and jumps; \code{ret} loads \bits{x30} back into $\text{PC}$.
+  \item \key{AAPCS64 Register Contract:}
+  \begin{itemize}\setlength{\itemsep}{1.5pt}
+    \item Parameters: Passed in \bits{x0}--\bits{x7}; returns in \bits{x0}/\bits{x1}.
+    \item Scratch Registers: \bits{x0}--\bits{x17} (Caller-saved).
+    \item Preserved Registers: \bits{x19}--\bits{x28} (Callee-saved).
+  \end{itemize}
+  \item \key{Activation Frames:} Anchor frame base with \bits{x29}; allocate stack space in 16-byte aligned blocks.
+  \item \key{Prologue/Epilogue:} Standard pre/post-indexed \code{stp}/\code{ldp} instructions handle saving and restoring \bits{x29}/\bits{x30} cleanly.
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 29: Self-Test Questions (Part 1)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: Linkage \& AAPCS64}
+
+\begin{enumerate}\setlength{\itemsep}{6pt}
+  \item \key{Leaf vs.\ Non-Leaf Function Linkage:} Why can a leaf function return safely without ever writing to the stack, whereas a non-leaf function must save \bits{x30} to memory?
+
+  \item \key{Register Preservation Contracts:} Suppose function \code{foo()} calls \code{bar()}. If \code{foo()} needs to maintain a loop counter value across the call, should it store that counter in \bits{x9} or \bits{x19}? Why?
+
+  \item \key{Parameter Passing Limits:} How are integer parameters handled when calling a C function declared with 10 scalar arguments: \code{void test(int a1, ..., int a10)}?
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Slide 30: Self-Test Questions (Part 2)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: Stack Frame Management}
+
+\begin{enumerate}\setlength{\itemsep}{6pt}
+  \item \key{Stack Allocation Alignment:} A non-leaf function saves \bits{x29}/\bits{x30} (16 bytes) and needs 20 bytes of local buffer space. What is the minimum frame size it must allocate on the stack to maintain AAPCS64 compliance?
+
+  \item \key{Prologue/Epilogue Verification:} Identify the bug in the following epilogue:
+  \small
+  \begin{tabular}{l}
+  \code{ldp x29, x30, [sp], \#16} \\
+  \code{ldr x19, [sp, \#16]} \\
+  \code{ret} \\
+  \end{tabular}
+
+  \item \key{Frame Pointer Chains:} How does saving \bits{x29} on the stack allow a runtime debugger like GDB to reconstruct the full sequence of function calls leading to a crash?
+\end{enumerate}
+
+\end{frame}
+
+\end{document}\documentclass[aspectratio=169,11pt,t]{beamer}
+
+% ============================================================
+% Theme and typography
+% ============================================================
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
+    CSCI 6461 --- Computer Systems Architecture (AArch64 Reference / RISC Philosophy)
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+
+\setbeamersize{
+  text margin left=0.65cm,
+  text margin right=0.65cm
+}
+
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% Block vertical padding adjustments
+\addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
+\addtobeamertemplate{block end}{}{\vspace{0.2em}}
+
+% Base list item separation
+\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
+\setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
+
+% ============================================================
+% Packages
+% ============================================================
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+
+\usetikzlibrary{
+  arrows.meta,
+  positioning,
+  shapes.geometric,
+  calc,
+  decorations.pathreplacing
+}
+
+% ============================================================
+% Colors
+% ============================================================
+
+\definecolor{navy}{RGB}{24,43,68}
+\definecolor{deepblue}{RGB}{45,88,130}
+\definecolor{lightblue}{RGB}{235,242,250}
+\definecolor{softgray}{RGB}{245,247,250}
+\definecolor{darkgray}{RGB}{25,28,32}
+\definecolor{gold}{RGB}{200,145,35}
+
+\setbeamercolor{palette primary}{bg=navy,fg=white}
+\setbeamercolor{palette secondary}{bg=deepblue,fg=white}
+\setbeamercolor{frametitle}{bg=navy,fg=white}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=white}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{date}{fg=white}
+\setbeamercolor{titlelike}{fg=white}
+\setbeamercolor{block title}{bg=deepblue,fg=white}
+\setbeamercolor{block body}{bg=lightblue,fg=darkgray}
+\setbeamercolor{normal text}{fg=darkgray,bg=white}
+
+% ============================================================
+% Formatting shortcuts
+% ============================================================
+
+\setlength{\parskip}{0pt}
+
+\newcommand{\key}[1]{\textbf{#1}}
+\newcommand{\bits}[1]{\texttt{#1}}
+\newcommand{\hex}[1]{\texttt{0x#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Section divider macro
+\newcommand{\sectiondivider}[2]{%
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries #1\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+\end{minipage}
+\end{frame}
+}
+
+% ============================================================
+% Metadata
+% ============================================================
+
+\title[Topic 6]{
+  Subroutines, Calling Conventions, \& the Stack
+}
+
+\subtitle{
+  Function linkage, register preservation rules, stack frame management,\\
+  and AAPCS64 architectural compliance
+}
+
+\author{
+  Computer Systems Architecture
+}
+
+\date{}
+
+% ============================================================
+% Document
+% ============================================================
+
+\begin{document}
+
+% ============================================================
+% Slide 1: Title Slide
+% ============================================================
+
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+
+\vspace{0.8cm}
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 6\par}
+\vspace{0.25cm}
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+ Subroutines, Calling Conventions,\\[0.08cm]
+ \& the Stack
+\par}
+\vspace{0.35cm}
+{\color{white!80}\large
+ Function linkage, register preservation rules, stack frame management,\\
+ and AAPCS64 architectural compliance
+\par}
+\end{minipage}
+
+\vfill
+{\color{white}\normalsize Dr. J. Burns\par}
+{\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
+\vspace{0.35cm}
+\end{frame}
+
+% ============================================================
+% Slide 2: Module Overview
+% ============================================================
+
+\begin{frame}{Topic 6: High-Level Module Roadmap}
+
+\begin{enumerate}\setlength{\itemsep}{10pt}
+  \item \key{Subroutine Linkage \& Control Flow}
+  \begin{itemize}
+    \item Function calls with \code{bl}, returns with \code{ret}, and the Link Register (\code{x30}).
+    \item Leaf vs.\ non-leaf subroutine execution mechanics.
+  \end{itemize}
+
+  \item \key{Procedure Call Standard (AAPCS64) \& Register Roles}
+  \begin{itemize}
+    \item Argument passing, return values, caller-saved vs.\ callee-saved contracts.
+    \item Interoperability between compiled C code and hand-written assembly.
+  \end{itemize}
+
+  \item \key{The Runtime Stack \& Activation Frames}
+  \begin{itemize}
+    \item Frame Pointer (\code{x29}) linkages, stack growth, and 16-byte alignment rules.
+    \item Constructing function prologues and epilogues.
+  \end{itemize}
+
+  \item \key{Assembly Implementation Patterns \& Worked Examples}
+  \begin{itemize}
+    \item Leaf functions, nested calls, recursive algorithms, and stack-passed parameters.
+  \end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Section 1 Divider
+% ============================================================
+
+\sectiondivider{PART 1}{Subroutine Linkage \& Control Flow}
+
+% ============================================================
+% Slide 3
+% ============================================================
+
+\begin{frame}{High-Level Function Execution Model}
+\large
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item \key{Subroutines} provide modular abstraction, reusability, and clean software architecture.
+  \item To execute a function call, the CPU must satisfy five core requirements:
+  \begin{enumerate}\setlength{\itemsep}{3pt}
+    \item \key{Pass Arguments:} Transfer input parameters to the function.
+    \item \key{Transfer Control:} Jump to the function's entry point address.
+    \item \key{Isolate Local State:} Provide memory space for function local variables.
+    \item \key{Return Value:} Pass computed results back to the caller.
+    \item \key{Resume Execution:} Return seamlessly to the instruction following the call.
+  \end{enumerate}
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 4
+% ============================================================
+
+\begin{frame}{The Link Register (\texttt{x30}) and Branch-with-Link (\texttt{bl})}
+
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Invoking a function requires remembering where to return when it completes.
+  \item \key{Branch with Link (\code{bl label}):} Atomically performs two operations:
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item Saves return address ($\text{PC} + 4$) into the \key{Link Register (\bits{x30} / \bits{lr})}.
+    \item Branches to target function: $\text{PC} \leftarrow \text{label}$.
+  \end{enumerate}
+\end{itemize}
+
+\vspace{0.2cm}
+\centering
+\begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
+  \node[draw=navy, fill=lightblue, rounded corners=2pt, minimum width=3.8cm, minimum height=0.6cm, font=\small\bfseries] (save) {1. $x_{30} \leftarrow \text{PC} + 4$};
+  \node[draw=gold!80!black, fill=gold!20, line width=1pt, rounded corners=2pt, right=1.2cm of save, minimum width=3.2cm, minimum height=0.6cm, font=\small\bfseries] (jump) {2. $\text{PC} \leftarrow \text{Target Address}$};
+  \draw[-{Latex}, thick, navy] (save) -- (jump);
+\end{tikzpicture}
+
+\vspace{0.3cm}
+\begin{block}{PC-Relative Calling Range}
+The \code{bl} instruction encodes a signed 26-bit immediate offset, allowing direct function calls within a $\pm 128\text{ MB}$ window of the current instruction.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 5
+% ============================================================
+
+\begin{frame}{Subroutine Return Mechanics (\texttt{ret})}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{Return from Subroutine (\code{ret}):} Redirects execution back to the caller by loading the target address from the Link Register into the Program Counter:
+  $$\text{PC} \leftarrow x_{30}$$
+  \item Execution resumes at the exact instruction immediately following the original \code{bl}.
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{block}{Example: Minimal Leaf Return Sequence}
+\small
+\begin{tabular}{ll}
+\code{caller\_func:} & \\
+    \quad \code{bl  helper\_func}  & \text{\scriptsize // x30 = address of next instruction; PC = helper\_func} \\
+    \quad \code{mov x1, x0}       & \text{\scriptsize // Execution resumes here after ret!} \\
+\code{helper\_func:} & \\
+    \quad \code{add x0, x0, \#1}  & \text{\scriptsize // Compute result} \\
+    \quad \code{ret}              & \text{\scriptsize // PC = x30} \\
+\end{tabular}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 6
+% ============================================================
+
+\begin{frame}{Leaf vs.\ Non-Leaf Functions}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\begin{block}{Leaf Functions}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item Calls \key{no other functions}.
+  \item Link Register (\bits{x30}) is never overwritten.
+  \item Can execute and return directly without saving \bits{x30} to the stack.
+  \item \key{Zero stack overhead!}
+\end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{block}{Non-Leaf Functions}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item Calls one or more \key{nested subroutines}.
+  \item Executing a nested \code{bl} \key{overwrites \bits{x30}} with the nested return address.
+  \item Must save \bits{x30} to the stack in its prologue before making any nested calls.
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.3cm}
+\normalsize
+\begin{block}{The Non-Leaf Rule}
+If a function calls another function, its own return address in \bits{x30} will be destroyed unless saved to memory upon entry.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 7
+% ============================================================
+
+\begin{frame}{Indirect Subroutine Calls (\texttt{blr})}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item When the target function address is determined dynamically at runtime, use \key{Branch with Link to Register (\code{blr xn})}.
+  \item Saves return address ($\text{PC} + 4$) into \bits{x30} and jumps to address held in register \bits{xn}.
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{block}{Primary Applications}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item \key{C Function Pointers:} \code{void (*func\_ptr)(int) = my\_callback;}
+  \item \key{Virtual Method Tables (vtables):} C++ polymorphism and object dispatch.
+  \item \key{Shared Library Veneers:} Dynamic linking and Symbol Jump Tables.
+\end{itemize}
+\end{block}
+
+\vspace{0.2cm}
+\small
+\code{ldr x2, [x0, \#8]} \quad \text{\scriptsize // Load function pointer from vtable} \\
+\code{blr x2}             \quad \text{\scriptsize // Call function indirectly via register x2}
+\end{frame}
+
+% ============================================================
+% Slide 8
+% ============================================================
+
+\begin{frame}{Subroutine Call Execution Trace}
+
+\centering
+\vspace{0.1cm}
+\begin{tikzpicture}[scale=0.82, every node/.style={transform shape}]
+  % Caller Timeline
+  \draw[navy, line width=1.5pt] (0,0) -- (0,4.5);
+  \node[anchor=south, font=\small\bfseries, navy] at (0,4.5) {Caller Code};
+  
+  % Callee Timeline
+  \draw[deepblue, line width=1.5pt] (5,0) -- (5,4.5);
+  \node[anchor=south, font=\small\bfseries, deepblue] at (5,4.5) {Callee Code};
+
+  % Call arrow
+  \draw[-{Latex}, gold!80!black, line width=1.2pt] (0,3.5) -- (5,2.8) node[midway, above, font=\tiny\bfseries] {1. \code{bl callee} ($x_{30} \leftarrow \text{PC}+4$)};
+  
+  % Callee execution
+  \node[anchor=west, font=\tiny] at (5.2,2.3) {Compute result...};
+  
+  % Return arrow
+  \draw[-{Latex}, navy, line width=1.2pt] (5,1.5) -- (0,0.8) node[midway, above, font=\tiny\bfseries] {2. \code{ret} ($\text{PC} \leftarrow x_{30}$)};
+
+  % Resume execution
+  \node[anchor=east, font=\tiny] at (-0.2,0.5) {Resume next instruction};
+\end{tikzpicture}
+
+\vspace{0.2cm}
+\normalsize
+Control flows smoothly from caller to callee and back using \bits{x30} as the hardware breadcrumb.
+\end{frame}
+
+% ============================================================
+% Section 2 Divider
+% ============================================================
+
+\sectiondivider{PART 2}{Procedure Call Standard \& Register Roles}
+
+% ============================================================
+% Slide 9
+% ============================================================
+
+\begin{frame}{Purpose of Procedure Call Standards (AAPCS64)}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{AAPCS64:} Procedure Call Standard for the ARM 64-bit Architecture.
+  \item Defines a strict software contract between caller and callee functions.
+  \item \key{Why Is an ABI Contract Mandatory?}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item Allows assembly code to seamlessly call C library functions (\code{printf}, \code{malloc}).
+    \item Enables C compilers (GCC, Clang) to interoperate with assembly routines.
+    \item Dictates parameter passing, return values, and register preservation rules.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 10
+% ============================================================
+
+\begin{frame}{Parameter Passing Registers (\texttt{x0}--\texttt{x7})}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Up to \key{8 integer or pointer parameters} are passed directly in registers \bits{x0} through \bits{x7}.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{cll}
+\toprule
+\textbf{Parameter Index} & \textbf{Register} & \textbf{C Language Example} \\
+\midrule
+1st Argument & \bits{x0} (\bits{w0}) & \code{int64\_t a} \\
+2nd Argument & \bits{x1} (\bits{w1}) & \code{char *str} \\
+3rd Argument & \bits{x2} (\bits{w2}) & \code{size\_t length} \\
+4th--8th Arguments & \bits{x3}--\bits{x7} & Additional scalar arguments \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+\normalsize
+\begin{block}{Overflow Arguments ($> 8$ Parameters)}
+Parameters beyond the 8th argument are passed on the runtime stack in reverse order.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 11
+% ============================================================
+
+\begin{frame}{Return Value Registers (\texttt{x0}--\texttt{x7})}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Functions return scalar results in registers without accessing memory:
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Return Data Type} & \textbf{Register Used} & \textbf{Description} \\
+\midrule
+32-bit Integer / Boolean & \bits{w0} & Lower 32 bits of register 0 \\
+64-bit Integer / Pointer & \bits{x0} & Full 64-bit register 0 \\
+128-bit Composite / Struct & \bits{x0} (lower), \bits{x1} (upper) & Split across two registers \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+\normalsize
+\begin{block}{Large Struct Returns ($> 16$ Bytes)}
+The caller allocates stack memory for the struct and passes an implicit pointer in register \key{\bits{x8}} (Indirect Result Location).
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 12
+% ============================================================
+
+\begin{frame}{Caller-Saved Registers (\texttt{x0}--\texttt{x17})}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Also known as \key{Scratch} or \key{Volatile} registers.
+  \item The callee function is free to overwrite these registers \key{without restoring them}.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Register Range} & \textbf{AAPCS64 Role} & \textbf{Callee Behavior} \\
+\midrule
+\bits{x0}--\bits{x7}   & Parameter passing / Return values & May overwrite freely \\
+\bits{x8}              & Indirect result location pointer  & May overwrite freely \\
+\bits{x9}--\bits{x15}  & Temporary caller scratch registers & May overwrite freely \\
+\bits{x16}--\bits{x17} & Intra-procedure linker scratch (IP0, IP1) & May overwrite freely \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+\begin{block}{Rule for Caller Functions}
+If a caller needs to preserve values in \bits{x0}--\bits{x17} across a subroutine call (\code{bl}), it \key{must save them to the stack before calling}.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 13
+% ============================================================
+
+\begin{frame}{Callee-Saved Registers (\texttt{x19}--\texttt{x28})}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Also known as \key{Preserved} or \key{Non-Volatile} registers.
+  \item Registers \bits{x19} through \bits{x28} hold long-lived variables across subroutine invocations.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{block}{The Callee Contract}
+If a subroutine modifies any register in \bits{x19}--\bits{x28}, it \key{must save the original value to the stack on entry} and \key{restore it before returning}.
+\end{block}
+
+\vspace{0.25cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\begin{block}{Callee Entry (Prologue)}
+\code{str x19, [sp, \#-16]!} \\
+\text{\scriptsize Preserves caller's x19 before modifying it.}
+\end{block}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{block}{Callee Exit (Epilogue)}
+\code{ldr x19, [sp], \#16} \\
+\text{\scriptsize Restores original x19 before ret.}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% Slide 14
+% ============================================================
+
+\begin{frame}{Special-Purpose ABI Registers}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Register} & \textbf{ABI Name} & \textbf{Architectural Role} \\
+\midrule
+\bits{x8}       & XR & Indirect result location pointer for struct returns \\
+\bits{x16}, \bits{x17} & IP0, IP1 & Intra-procedure call temporaries (used by dynamic linker) \\
+\bits{x18}      & PR & Platform register (reserved for OS kernel / thread pointer) \\
+\bits{x29}      & FP & Frame Pointer (base anchor for current activation frame) \\
+\bits{x30}      & LR & Link Register (holds function return address) \\
+\bits{sp}       & SP & Stack Pointer (holds current stack top; 16-byte aligned) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+\normalsize
+\key{Takeaway:} Never use \bits{x18}, \bits{x29}, \bits{x30}, or \bits{sp} as general scratchpad registers!
+\end{frame}
+
+% ============================================================
+% Slide 15
+% ============================================================
+
+\begin{frame}{Register Responsibility Summary}
+\begin{center}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{4.5cm}}
+\toprule
+\textbf{Registers} & \textbf{Role / Usage} & \textbf{Preservation Contract} \\
+\midrule
+\bits{x0}--\bits{x7}   & Parameters \& Return Values & \key{Caller-saved} (Callee can overwrite) \\[0.2em]
+\bits{x8}--\bits{x17}  & Scratch / Temporaries      & \key{Caller-saved} (Callee can overwrite) \\[0.2em]
+\bits{x19}--\bits{x28} & Preserved Local Variables  & \key{Callee-saved} (Callee must restore) \\[0.2em]
+\bits{x29} (\bits{fp}) & Frame Pointer              & \key{Callee-saved} (Callee must restore) \\[0.2em]
+\bits{x30} (\bits{lr}) & Link Register              & \key{Callee-saved} (if non-leaf) \\[0.2em]
+\bits{sp}              & Stack Pointer              & \key{Preserved} (Must balance exactly) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{frame}
+
+% ============================================================
+% Section 3 Divider
+% ============================================================
+
+\sectiondivider{PART 3}{The Runtime Stack \& Activation Frames}
+
+% ============================================================
+% Slide 16
+% ============================================================
+
+\begin{frame}{The Stack Memory Model}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item The runtime stack is a dynamic memory region allocated in process address space.
+  \item \key{Key Characteristics:}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item Grows \textbf{downward} from high memory addresses toward low memory addresses.
+    \item Stack Pointer (\bits{sp}) points to the current \key{lowest active address} (top of stack).
+    \item Operates on a Last-In, First-Out (LIFO) order.
+  \end{itemize}
+\end{itemize}
+
+\vspace{0.25cm}
+\begin{block}{Allocation vs.\ Deallocation}
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item \key{Push / Allocate:} Subtract from \bits{sp} (\code{sub sp, sp, \#32}).
+  \item \key{Pop / Deallocate:} Add to \bits{sp} (\code{add sp, sp, \#32}).
+\end{itemize}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 17
+% ============================================================
+
+\begin{frame}{Frame Pointer (\texttt{x29}) and Frame Chains}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item The \key{Frame Pointer (\bits{x29} / \bits{fp})} provides a fixed reference point within the activation frame for accessing arguments and local variables.
+  \item \key{The Frame Pointer Chain:}
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item Each function saves the previous caller's \bits{x29} on the stack.
+    \item \bits{x29} is updated to point to this saved location.
+    \item Forms a linked list of stack frames back to \code{main()}.
+  \end{itemize}
+\end{itemize}
+
+\vspace{0.2cm}
+\centering
+\begin{tikzpicture}[scale=0.85, every node/.style={transform shape}]
+  \draw[fill=lightblue, draw=navy] (0,1.6) rectangle (4.5,2.3) node[midway, font=\small\bfseries] {Caller Frame (\bits{x29} anchor)};
+  \draw[fill=softgray, draw=navy] (0,0.5) rectangle (4.5,1.2) node[midway, font=\small\bfseries] {Callee Frame (\bits{x29} anchor)};
+  \draw[-{Latex}, line width=1.2pt, gold!80!black] (2.25,0.85) -- (2.25,1.95) node[midway, right, font=\tiny\bfseries] {Points to previous frame};
+\end{tikzpicture}
+
+\vspace{0.2cm}
+\normalsize
+Essential for runtime debuggers (e.g., GDB) to generate call stack backtraces.
+\end{frame}
+
+% ============================================================
+% Slide 18
+% ============================================================
+
+\begin{frame}{Standard Activation Frame Structure}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item An \key{Activation Frame} stores all data necessary for a single function execution instance.
+  \item Saved in a standardized order:
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item Saved Link Register (\bits{x30}).
+    \item Saved Frame Pointer (\bits{x29}).
+    \item Saved Callee Registers (\bits{x19}--\bits{x28}).
+    \item Local Variables \& Buffers.
+  \end{enumerate}
+\end{itemize}
+\end{column}
+
+\begin{column}{0.44\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.75, every node/.style={transform shape}]
+  \draw[fill=lightblue, draw=navy] (0,3.6) rectangle (4.5,4.4) node[midway, font=\small\bfseries] {Saved LR (\bits{x30})};
+  \draw[fill=lightblue, draw=navy] (0,2.8) rectangle (4.5,3.6) node[midway, font=\small\bfseries] {Saved FP (\bits{x29} $\leftarrow$ \bits{fp})};
+  \draw[fill=softgray, draw=navy] (0,2.0) rectangle (4.5,2.8) node[midway, font=\small\bfseries] {Saved Callee (\bits{x19})};
+  \draw[fill=softgray, draw=navy, dashed] (0,1.2) rectangle (4.5,2.0) node[midway, font=\small] {Local Variables (16B pad)};
+  \node[anchor=east, font=\scriptsize\bfseries] at (0,4.4) {High Addr};
+  \node[anchor=east, font=\scriptsize\bfseries] at (0,1.2) {Stack Top (\bits{sp})};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% Slide 19
+% ============================================================
+
+\begin{frame}[fragile]{Function Prologue Mechanics}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item The \key{Prologue} is the setup code executed at the very beginning of a non-leaf function.
+  \item Performs three standard actions:
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{block}{Standard Prologue Template}
+\small
+\begin{verbatim}
+my_func:
+    // 1. Push FP and LR; allocate stack frame (32 bytes)
+    stp   x29, x30, [sp, #-32]!
+
+    // 2. Set Frame Pointer to bottom of frame link
+    mov   x29, sp
+
+    // 3. Save any callee-saved registers used in body
+    str   x19, [sp, #16]
+\end{verbatim}
+\end{block}
+
+\vspace{0.2cm}
+\normalsize
+Pre-indexed \code{stp} combines stack allocation and saving \bits{x29}/\bits{x30} into a single instruction.
+\end{frame}
+
+% ============================================================
+% Slide 20
+% ============================================================
+
+\begin{frame}[fragile]{Function Epilogue Mechanics}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item The \key{Epilogue} tears down the frame and restores state before returning.
+  \item Reverses the exact sequence performed by the prologue:
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{block}{Standard Epilogue Template}
+\small
+\begin{verbatim}
+    // 1. Restore saved callee registers
+    ldr   x19, [sp, #16]
+
+    // 2. Restore original FP and LR; release stack frame
+    ldp   x29, x30, [sp], #32
+
+    // 3. Return to caller
+    ret
+\end{verbatim}
+\end{block}
+
+\vspace{0.2cm}
+\normalsize
+Post-indexed \code{ldp} restores \bits{x29}/\bits{x30} and deallocates 32 stack bytes atomically.
+\end{frame}
+
+% ============================================================
+% Slide 21
+% ============================================================
+
+\begin{frame}[fragile]{Local Variable Allocation on the Stack}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.46\textwidth}
+\begin{block}{C Function with Local Array}
+\small
+\begin{verbatim}
+void process(void) {
+    uint64_t buffer[2];
+    buffer[0] = 10;
+    buffer[1] = 20;
+}
+\end{verbatim}
+\end{block}
+\end{column}
+
+\begin{column}{0.50\textwidth}
+\begin{block}{AArch64 Stack Allocation}
+\small
+\begin{verbatim}
+process:
+    // 16B (FP/LR) + 16B (buffer) = 32B
+    stp  x29, x30, [sp, #-32]!
+    mov  x29, sp
+
+    mov  x0, #10
+    str  x0, [sp, #16] // buffer[0]
+    mov  x0, #20
+    str  x0, [sp, #24] // buffer[1]
+
+    ldp  x29, x30, [sp], #32
+    ret
+\end{verbatim}
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.25cm}
+\normalsize
+Local stack variables are referenced using positive offsets from \bits{sp} or \bits{x29}.
+\end{frame}
+
+% ============================================================
+% Slide 22
+% ============================================================
+
+\begin{frame}{Stack Alignment and Padding Rules}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item AAPCS64 mandates that \key{\bits{sp} must be a multiple of 16 at all times}.
+  \item If local variables require 20 bytes, allocation must be padded up to 32 bytes ($16 + 16$).
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{block}{Calculating Frame Size}
+$$\text{Total Frame Size} = \text{align16}(\text{Header (16B)} + \text{Callee Regs} + \text{Local Variables})$$
+\end{block}
+
+\vspace{0.2cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{Requested Space} & \textbf{Padded Frame Allocation} & \textbf{Instruction} \\
+\midrule
+16 bytes & 16 bytes & \code{sub sp, sp, \#16} \\
+24 bytes & 32 bytes & \code{sub sp, sp, \#32} \\
+40 bytes & 48 bytes & \code{sub sp, sp, \#48} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{frame}
+
+% ============================================================
+% Section 4 Divider
+% ============================================================
+
+\sectiondivider{PART 4}{Worked Assembly Examples \& Patterns}
+
+% ============================================================
+% Slide 23
+% ============================================================
+
+\begin{frame}[fragile]{Worked Example 1: Minimal Leaf Function}
+\begin{block}{C Code: \texttt{int64\_t add\_three(int64\_t a, int64\_t b, int64\_t c)}}
+\end{block}
+
+\vspace{0.1cm}
+\begin{block}{AArch64 Assembly Implementation}
+\small
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\textit{// Inputs: x0 = a, x1 = b, x2 = c}} \\
+\code{add\_three:} & & \\
+    & \code{add x0, x0, x1}             & \text{\scriptsize // x0 = a + b} \\
+    & \code{add x0, x0, x2}             & \text{\scriptsize // x0 = (a + b) + c} \\
+    & \code{ret}                        & \text{\scriptsize // Return result in x0} \\
+\end{tabular}
+\end{block}
+
+\vspace{0.25cm}
+\normalsize
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item \key{Analysis:} Calls no subroutines; uses scratch registers \bits{x0}--\bits{x2}.
+  \item No stack allocation required; executes in 3 instructions.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 24
+% ============================================================
+
+\begin{frame}[fragile]{Worked Example 2: Non-Leaf Nested Function}
+\begin{block}{C Code: \texttt{int64\_t compute(int64\_t x)}}
+\small
+\begin{verbatim}
+int64_t compute(int64_t x) {
+    return add_three(x, 10, 20);
+}
+\end{verbatim}
+\end{block}
+
+\vspace{0.1cm}
+\begin{block}{AArch64 Assembly Implementation}
+\small
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\textit{// Input: x0 = x}} \\
+\code{compute:} & & \\
+    & \code{stp x29, x30, [sp, \#-16]!} & \text{\scriptsize // Save FP and LR (x30)} \\
+    & \code{mov x29, sp}                & \text{\scriptsize // Set up frame pointer} \\
+    & \code{mov x1, \#10}               & \text{\scriptsize // 2nd arg = 10} \\
+    & \code{mov x2, \#20}               & \text{\scriptsize // 3rd arg = 20} \\
+    & \code{bl  add\_three}             & \text{\scriptsize // Call add\_three (overwrites x30)} \\
+    & \code{ldp x29, x30, [sp], \#16}   & \text{\scriptsize // Restore FP and original LR} \\
+    & \code{ret}                        & \text{\scriptsize // Return to caller} \\
+\end{tabular}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 25
+% ============================================================
+
+\begin{frame}[fragile]{Worked Example 3: Recursive Factorial}
+\begin{block}{C Code: \texttt{uint64\_t factorial(uint64\_t n)}}
+\end{block}
+
+\vspace{0.1cm}
+\begin{block}{AArch64 Assembly Implementation}
+\small
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\textit{// Input: x0 = n}} \\
+\code{factorial:} & & \\
+    & \code{cmp  x0, \#1}               & \text{\scriptsize // Check n <= 1} \\
+    & \code{b.ls .Lbase\_case}          & \text{\scriptsize // Base case jump} \\
+    & \code{stp  x29, x30, [sp, \#-16]!} & \text{\scriptsize // Save FP and LR} \\
+    & \code{stp  x19, xzr, [sp, \#-16]!} & \text{\scriptsize // Save callee reg x19} \\
+    & \code{mov  x19, x0}               & \text{\scriptsize // Preserve n in x19 across call} \\
+    & \code{sub  x0, x0, \#1}           & \text{\scriptsize // Pass (n - 1) in x0} \\
+    & \code{bl   factorial}            & \text{\scriptsize // Recursive call} \\
+    & \code{mul  x0, x0, x19}           & \text{\scriptsize // Result = factorial(n-1) * n} \\
+    & \code{ldp  x19, xzr, [sp], \#16}  & \text{\scriptsize // Restore x19} \\
+    & \code{ldp  x29, x30, [sp], \#16}  & \text{\scriptsize // Restore FP/LR} \\
+    & \code{ret}                        & \\
+\code{.Lbase\_case:} & & \\
+    & \code{mov  x0, \#1}               & \text{\scriptsize // Base case result = 1} \\
+    & \code{ret}                        & \\
+\end{tabular}
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 26
+% ============================================================
+
+\begin{frame}[fragile]{Worked Example 4: Passing > 8 Arguments}
+\begin{block}{Passing 9th and 10th Parameters via Stack}
+Parameters 1--8 in \bits{x0}--\bits{x7}; parameters 9 and 10 pushed to stack.
+\end{block}
+
+\vspace{0.1cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\begin{block}{Caller Side (Preparing Call)}
+\small
+\begin{verbatim}
+// Push 10th and 9th args
+mov  x8, #100
+mov  x9, #200
+stp  x9, x8, [sp, #-16]!
+
+bl   func_with_10_args
+
+add  sp, sp, #16 // Clean stack
+\end{verbatim}
+\end{block}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{block}{Callee Side (Reading Stack Args)}
+\small
+\begin{verbatim}
+func_with_10_args:
+    // Args 1-8 in x0-x7
+    // Arg 9 at [sp, #0]
+    // Arg 10 at [sp, #8]
+    ldr  x8, [sp, #0]  // 9th
+    ldr  x9, [sp, #8]  // 10th
+    ret
+\end{verbatim}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% Slide 27
+% ============================================================
+
+\begin{frame}{Common Function Linkage Bugs in Assembly}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{1. Overwriting Link Register:} Executing \code{bl} in a non-leaf function without saving \bits{x30} destroys the return path, causing infinite loops or crashes.
+  \item \key{2. Corrupting Callee Registers:} Modifying \bits{x19}--\bits{x28} without preserving them corrupts caller local variables.
+  \item \key{3. Stack Misalignment:} Adjusting \bits{sp} by 8 bytes instead of 16-byte multiples triggers hardware alignment faults.
+  \item \key{4. Unbalanced Stack Pointer:} Modifying \bits{sp} in body without restoring exact offsets leads to incorrect return targets.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Section 5 Divider
+% ============================================================
+
+\sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
+
+% ============================================================
+% Slide 28: Comprehensive Summary
+% ============================================================
+
+\begin{frame}{Topic 6: Comprehensive Summary}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item \key{Linkage Primitives:} \code{bl} saves return context ($\text{PC}+4$) into \bits{x30} and jumps; \code{ret} loads \bits{x30} back into $\text{PC}$.
+  \item \key{AAPCS64 Register Contract:}
+  \begin{itemize}\setlength{\itemsep}{1.5pt}
+    \item Parameters: Passed in \bits{x0}--\bits{x7}; returns in \bits{x0}/\bits{x1}.
+    \item Scratch Registers: \bits{x0}--\bits{x17} (Caller-saved).
+    \item Preserved Registers: \bits{x19}--\bits{x28} (Callee-saved).
+  \end{itemize}
+  \item \key{Activation Frames:} Anchor frame base with \bits{x29}; allocate stack space in 16-byte aligned blocks.
+  \item \key{Prologue/Epilogue:} Standard pre/post-indexed \code{stp}/\code{ldp} instructions handle saving and restoring \bits{x29}/\bits{x30} cleanly.
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 29: Self-Test Questions (Part 1)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: Linkage \& AAPCS64}
+
+\begin{enumerate}\setlength{\itemsep}{6pt}
+  \item \key{Leaf vs.\ Non-Leaf Function Linkage:} Why can a leaf function return safely without ever writing to the stack, whereas a non-leaf function must save \bits{x30} to memory?
+
+  \item \key{Register Preservation Contracts:} Suppose function \code{foo()} calls \code{bar()}. If \code{foo()} needs to maintain a loop counter value across the call, should it store that counter in \bits{x9} or \bits{x19}? Why?
+
+  \item \key{Parameter Passing Limits:} How are integer parameters handled when calling a C function declared with 10 scalar arguments: \code{void test(int a1, ..., int a10)}?
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Slide 30: Self-Test Questions (Part 2)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: Stack Frame Management}
+
+\begin{enumerate}\setlength{\itemsep}{6pt}
+  \item \key{Stack Allocation Alignment:} A non-leaf function saves \bits{x29}/\bits{x30} (16 bytes) and needs 20 bytes of local buffer space. What is the minimum frame size it must allocate on the stack to maintain AAPCS64 compliance?
+
+  \item \key{Prologue/Epilogue Verification:} Identify the bug in the following epilogue:
+  \small
+  \begin{tabular}{l}
+  \code{ldp x29, x30, [sp], \#16} \\
+  \code{ldr x19, [sp, \#16]} \\
+  \code{ret} \\
+  \end{tabular}
+
+  \item \key{Frame Pointer Chains:} How does saving \bits{x29} on the stack allow a runtime debugger like GDB to reconstruct the full sequence of function calls leading to a crash?
+\end{enumerate}
+
+\end{frame}
+
+\end{document}
