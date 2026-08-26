@@ -14,7 +14,7 @@
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
-    CSCI 2406 --- Computer Architecture \& Organization (ARM / RISC Reference)
+    CSCI 2406 --- Computer Architecture \& Organization (ARM64 / AArch64 Reference)
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
@@ -118,7 +118,7 @@
 
 \subtitle{
   Architecture vs. Organization, ISA vs. Microarchitecture,\\
-  the Stored-Program Concept, and Memory Models
+  the Stored-Program Concept, and Memory Models in AArch64
 }
 
 \author{
@@ -145,7 +145,7 @@
 \vspace{0.3cm}
 {\color{white}\fontsize{20}{24}\selectfont\bfseries Computer Architecture \& Organization Fundamentals\par}
 \vspace{0.3cm}
-{\color{lightblue}\normalsize Abstraction Layers, ISA vs.\ Microarchitecture, Stored-Program Concept, and Memory Architectures\par}
+{\color{lightblue}\normalsize Abstraction Layers, ISA vs.\ Microarchitecture, Stored-Program Concept, and Memory Models in AArch64\par}
 \vspace{0.6cm}
 {\color{softgray}\small Computer Architecture \& Organization \quad\textbar\quad Topic 1\par}
 \end{minipage}
@@ -181,9 +181,9 @@
         \begin{column}{0.48\textwidth}
             \begin{block}{Software \& Emulation Stack}
                 \begin{itemize}
-                    \item \key{C \& ARM Assembly}: Core languages utilized for architecture programming.
-                    \item \key{CPUlator}: Web-based ARM simulator (\url{https://cpulator.01xz.net/?sys=arm}) to inspect step-by-step register updates.
-                    \item \key{QEMU}: Full-system emulator for AArch64 virtual execution.
+                    \item \key{C \& ARM64 Assembly}: Core languages utilized for architecture programming.
+                    \item \key{QEMU}: Full-system and user-space emulator for AArch64 virtual execution.
+                    \item \key{Compiler Explorer}: Live ARM64 assembly inspection from C source.
                 \end{itemize}
             \end{block}
         \end{column}
@@ -202,7 +202,7 @@
 % --- Slide 4: Lecture Roadmap ---
 \begin{frame}{Topic 1 Technical Roadmap}
     \begin{block}{Foundational Focus}
-        Understanding the bridge connecting high-level algorithms to the physical silicon execution substrate.
+        Understanding the bridge connecting high-level algorithms to the physical silicon execution substrate in modern 64-bit ARM systems.
     \end{block}
     \vspace{0.4em}
     \begin{itemize}
@@ -229,7 +229,7 @@
             % Layers
             \node[fill=navy, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,8) {Application Software};
             \node[fill=navy!90, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,7) {Operating Systems};
-            \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,6) {Architecture (ISA)};
+            \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,6) {Architecture (AArch64 ISA)};
             \node[fill=deepblue, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,5) {Microarchitecture};
             \node[fill=deepblue!80, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,4) {Logic Design};
             \node[fill=deepblue!60, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,3) {Digital Circuits};
@@ -240,7 +240,7 @@
             % Right side descriptions
             \node[anchor=west, text=navy] at (3.5,8) {C Programs, Algorithms, Apps};
             \node[anchor=west, text=navy] at (3.5,7) {Device Drivers, Schedulers, Virtual Memory};
-            \node[anchor=west, text=gold!60!black] at (3.5,6) {\textbf{Instructions, Programmer-Visible Registers}};
+            \node[anchor=west, text=gold!60!black] at (3.5,6) {\textbf{64-Bit Instructions, X Registers}};
             \node[anchor=west, text=navy] at (3.5,5) {Datapaths, Controllers, Pipelines, Caches};
             \node[anchor=west, text=navy] at (3.5,4) {Adders, ALUs, Register Files, Decoders};
             \node[anchor=west, text=navy] at (3.5,3) {and, or, not, xor Logic Gates};
@@ -263,7 +263,7 @@
                 \begin{itemize}
                     \item Applications compiled into machine binaries.
                     \item Operating systems managing hardware through architectural exception levels.
-                    \item Completely portable across any hardware implementing the identical ISA.
+                    \item Completely portable across any hardware implementing the identical AArch64 ISA.
                 \end{itemize}
             \end{block}
         \end{column}
@@ -296,9 +296,9 @@
     \vspace{0.3em}
     \begin{block}{Architectural Specifications Include:}
         \begin{itemize}
-            \item The complete \key{Instruction Set Architecture (ISA)} vocabulary.
-            \item Programmer-visible registers (\code{r0}--\code{r31}, program counter \code{pc}, status flags).
-            \item Instruction encodings, data formats (byte, halfword, word), and addressing modes.
+            \item The complete \key{Instruction Set Architecture (ISA)} vocabulary (AArch64).
+            \item Programmer-visible registers (\code{x0}--\code{x30}, stack pointer \code{sp}, program counter \code{pc}, status flags).
+            \item Instruction encodings, data formats (byte, halfword, word, doubleword), and addressing modes.
         \end{itemize}
     \end{block}
 \end{frame}
@@ -334,16 +334,16 @@
             Programmer / Compiler view & Hardware engineer / Silicon designer view \\
             Functional contract and behavior & Physical implementation and datapath \\
             Changes slowly across generations & Evolves rapidly with silicon manufacturing nodes \\
-            Example: Does an \code{mul} instruction exist? & Example: Is multiplication done via shift-and-add logic or a dedicated hardware multiplier? \\
+            Example: Does a 64-bit multiply exist? & Example: Is multiplication implemented via a hardware multiplier array or Booth recoder? \\
             Specifies visible registers \& flags & Specifies pipeline stages, ALU internal circuits \\
-            Software target (C, ARM assembly) & Hardware target (Verilog, VHDL, RTL) \\
+            Software target (C, ARM64 assembly) & Hardware target (Verilog, VHDL, RTL) \\
             \bottomrule
         \end{tabular}
     \end{table}
 \end{frame}
 
 % --- Slide 12: Architectural Longevity Example ---
-\begin{frame}{Real-World Continuity: The ARM Ecosystem}
+\begin{frame}{Real-World Continuity: The ARM64 Ecosystem}
     \begin{block}{The Economic Benefit of a Stable Architecture}
         Preserving the architecture allows software investments to persist indefinitely while the internal organization is completely overhauled for performance.
     \end{block}
@@ -353,15 +353,15 @@
             \begin{block}{Architectural Invariance}
                 \begin{itemize}
                     \item The \key{AArch64 ISA} defines instructions like \code{add}, \code{ldr}, and \code{cbz}.
-                    \item An ARM64 binary compiled in 2012 executes seamlessly on modern Apple M-series or AWS Graviton CPUs.
+                    \item An ARM64 binary compiled for early AArch64 systems executes seamlessly on modern Apple M-series or AWS Graviton CPUs.
                 \end{itemize}
             \end{block}
         \end{column}
         \begin{column}{0.48\textwidth}
             \begin{block}{Organizational Evolution}
                 \begin{itemize}
-                    \item 2012: In-order 2-wide pipelines, small 32\,KB L1 caches, 28\,nm process.
-                    \item Modern: Out-of-order 8-wide superscalar engines, unified L3 caches, 3\,nm process.
+                    \item Early Cores: In-order or narrower out-of-order execution pipelines.
+                    \item Modern Cores: Wide 8--9 issue out-of-order engines, deep multi-level caches, advanced matrix coprocessors.
                 \end{itemize}
             \end{block}
         \end{column}
@@ -381,9 +381,9 @@
         \item Different programs use different subsets, but all conform to the common ISA dictionary.
     \end{itemize}
     \vspace{0.3em}
-    \begin{block}{The Architectural Contract: \code{add r1, r2, r3}}
+    \begin{block}{The Architectural Contract: \code{add x1, x2, x3}}
         The ISA guarantees a single semantic state change:
-        $$\text{Register } r_1 \leftarrow \text{Register } r_2 + \text{Register } r_3$$
+        $$\text{Register } x_1 \leftarrow \text{Register } x_2 + \text{Register } x_3$$
         \begin{itemize}
             \item The architecture defines \textit{what} state update occurs upon completion.
             \item It does not state \textit{how} data moves across physical buses or wires inside the CPU.
@@ -392,20 +392,20 @@
 \end{frame}
 
 % --- Slide 15: Microarchitecture Execution Steps (No TikZ) ---
-\begin{frame}{Microarchitecture: Executing \code{add r1, r2, r3}}
-    \begin{block}{Register Transfer Steps for \code{add r1, r2, r3}}
+\begin{frame}{Microarchitecture: Executing \code{add x1, x2, x3}}
+    \begin{block}{Register Transfer Steps for \code{add x1, x2, x3}}
         \begin{enumerate}
-            \item \code{ra1 <- r2; ra2 <- r3} \hfill \textit{(Assert register read addresses)}
-            \item \code{rd1 <- RegisterFile[ra1]; rd2 <- RegisterFile[ra2]} \hfill \textit{(Read operand values)}
+            \item \code{ra1 <- x2; ra2 <- x3} \hfill \textit{(Assert register read addresses)}
+            \item \code{rd1 <- RegisterFile[ra1]; rd2 <- RegisterFile[ra2]} \hfill \textit{(Read 64-bit operand values)}
             \item \code{alu\_control <- add} \hfill \textit{(Configure ALU operation multiplexers)}
-            \item \code{alu\_result <- rd1 + rd2} \hfill \textit{(Execute 32-bit addition)}
+            \item \code{alu\_result <- rd1 + rd2} \hfill \textit{(Execute 64-bit addition)}
             \item \code{reg\_write <- 1} \hfill \textit{(Assert register file write enable)}
-            \item \code{RegisterFile[r1] <- alu\_result} \hfill \textit{(Commit result to destination register)}
+            \item \code{RegisterFile[x1] <- alu\_result} \hfill \textit{(Commit result to destination register)}
         \end{enumerate}
     \end{block}
     \vspace{0.3em}
     \begin{itemize}
-        \item \key{ISA View}: Add values in \code{r2} and \code{r3}; store sum into \code{r1}.
+        \item \key{ISA View}: Add 64-bit values in \code{x2} and \code{x3}; store sum into \code{x1}.
         \item \key{Microarchitecture View}: Sequence control signals, bus transfers, and ALU operations.
     \end{itemize}
 \end{frame}
@@ -413,26 +413,26 @@
 % --- Slide 16: Datapath Microarchitecture Diagram ---
 \begin{frame}{Visualizing the Microarchitectural Datapath}
     \begin{center}
-        \begin{tikzpicture}[scale=0.85, every node/.style={font=\footnotesize}]
-            % Register File
-            \draw[thick, fill=navy, text=white] (0,0) rectangle (2.8,3.2);
-            \node[text=white, font=\small\bfseries, align=center] at (1.4,1.4) {Register\\File};
-            \node[text=gold, anchor=west] at (0.1,2.8) {\code{ra1}};
-            \node[text=gold, anchor=west] at (0.1,2.0) {\code{ra2}};
-            \node[text=gold, anchor=west] at (0.1,0.6) {\code{wa} (\code{r1})};
+        \begin{tikzpicture}[scale=0.9, every node/.style={font=\footnotesize}]
+            % Register File (Expanded Size)
+            \draw[thick, fill=navy, text=white] (0,-0.2) rectangle (3.5,3.6);
+            \node[text=white, font=\small\bfseries, align=center] at (1.75,1.7) {64-Bit Register\\File};
+            \node[text=gold, anchor=west] at (0.2,3.1) {\code{ra1} (\code{x2})};
+            \node[text=gold, anchor=west] at (0.2,2.3) {\code{ra2} (\code{x3})};
+            \node[text=gold, anchor=west] at (0.2,0.4) {\code{wa} (\code{x1})};
             
             % ALU
-            \draw[thick, fill=deepblue, text=white] (5.5,0.8) -- (7.5,1.8) -- (7.5,2.8) -- (5.5,3.8) -- (5.5,2.6) -- (6.0,2.3) -- (5.5,2.0) -- cycle;
-            \node[text=white, font=\small\bfseries] at (6.6,2.3) {ALU};
+            \draw[thick, fill=deepblue, text=white] (6.0,0.8) -- (8.2,1.8) -- (8.2,2.8) -- (6.0,3.8) -- (6.0,2.6) -- (6.5,2.3) -- (6.0,2.0) -- cycle;
+            \node[text=white, font=\small\bfseries] at (7.1,2.3) {64-Bit ALU};
             
             % Routing Lines
-            \draw[thick, -Latex, draw=navy] (2.8,2.8) -- node[above]{\code{rd1 (r2)}} (5.5,3.3);
-            \draw[thick, -Latex, draw=navy] (2.8,2.0) -- node[below]{\code{rd2 (r3)}} (5.5,1.3);
-            \draw[thick, -Latex, draw=navy] (7.5,2.3) -- (8.5,2.3) -- (8.5,-0.4) -- (1.4,-0.4) -- node[left]{\code{alu\_result}} (1.4,0);
+            \draw[thick, -Latex, draw=navy] (3.5,3.1) -- node[above]{\code{rd1 (x2)}} (6.0,3.3);
+            \draw[thick, -Latex, draw=navy] (3.5,2.3) -- node[below]{\code{rd2 (x3)}} (6.0,1.3);
+            \draw[thick, -Latex, draw=navy] (8.2,2.3) -- (9.2,2.3) -- (9.2,-0.6) -- (1.75,-0.6) -- node[left]{\code{alu\_result}} (1.75,-0.2);
             
             % Control signals
-            \node[draw=gold, fill=lightblue, rounded corners=2pt] at (6.5,4.3) {\code{alu\_control = add}};
-            \draw[dashed, -Latex, draw=gold!70!black] (6.5,4.0) -- (6.5,3.1);
+            \node[draw=gold, fill=lightblue, rounded corners=2pt] at (7.1,4.3) {\code{alu\_control = add}};
+            \draw[dashed, -Latex, draw=gold!70!black] (7.1,4.0) -- (7.1,3.1);
         \end{tikzpicture}
     \end{center}
     \begin{itemize}
@@ -458,7 +458,7 @@
     \end{table}
     \vspace{0.2em}
     \begin{block}{Key Principle}
-        All four microarchitectures execute the identical compiled ARM binary accurately.
+        All four microarchitectures execute the identical compiled AArch64 binary accurately.
     \end{block}
 \end{frame}
 
@@ -489,22 +489,22 @@
 \begin{frame}{The CPU--Memory Interface: Three Fundamental Buses}
     \begin{center}
         \begin{tikzpicture}[scale=0.9, every node/.style={font=\small}]
-            % CPU Box
-            \draw[thick, fill=navy, text=white] (0,0) rectangle (3.5,3.6);
-            \node[text=white, font=\normalsize\bfseries, align=center] at (1.75,1.8) {Central\\Processing\\Unit (CPU)};
+            % CPU Box (Moved further left)
+            \draw[thick, fill=navy, text=white] (-1.0,0) rectangle (2.2,3.6);
+            \node[text=white, font=\normalsize\bfseries, align=center] at (0.6,1.8) {Central\\Processing\\Unit (CPU)};
             
             % Memory Box
-            \draw[thick, fill=lightblue, text=darkgray] (8.5,0) rectangle (12,3.6);
-            \node[text=navy, font=\normalsize\bfseries, align=center] at (10.25,1.8) {Memory\\System\\(RAM)};
+            \draw[thick, fill=lightblue, text=darkgray] (8.8,0) rectangle (12,3.6);
+            \node[text=navy, font=\normalsize\bfseries, align=center] at (10.4,1.8) {Memory\\System\\(RAM)};
             
-            % Buses
-            \draw[thick, -Latex, draw=navy] (3.5,2.8) -- node[above]{\textbf{Address Bus} (Unidirectional: CPU $\rightarrow$ RAM)} (8.5,2.8);
-            \draw[thick, Latex-Latex, draw=deepblue] (3.5,1.8) -- node[above]{\textbf{Data Bus} (Bidirectional: Read / Write)} (8.5,1.8);
-            \draw[thick, Latex-Latex, draw=gold!70!black] (3.5,0.8) -- node[above]{\textbf{Control Bus} (Read/Write Enable, Clock, Status)} (8.5,0.8);
+            % Buses (Adjusted endpoints with smaller font labels)
+            \draw[thick, -Latex, draw=navy] (2.2,2.8) -- node[above, font=\tiny]{\textbf{Address Bus} (64-Bit Pointer Space)} (8.8,2.8);
+            \draw[thick, Latex-Latex, draw=deepblue] (2.2,1.8) -- node[above, font=\tiny]{\textbf{Data Bus} (Bidirectional: Read / Write)} (8.8,1.8);
+            \draw[thick, Latex-Latex, draw=gold!70!black] (2.2,0.8) -- node[above, font=\tiny]{\textbf{Control Bus} (Read/Write Enable, Clock, Status)} (8.8,0.8);
         \end{tikzpicture}
     \end{center}
     \begin{itemize}
-        \item \key{Address Bus}: Selects the specific memory cell location to access.
+        \item \key{Address Bus}: Selects the specific memory cell location using 64-bit addresses.
         \item \key{Data Bus}: Transfers the numerical word to or from the selected cell.
         \item \key{Control Bus}: Dictates the direction of transfer (read vs. write) and timing signals.
     \end{itemize}
@@ -549,12 +549,12 @@
         A pattern of bits residing in a memory cell possesses no intrinsic, permanent identity. Its meaning is determined entirely by \key{how the CPU accesses and interprets it}.
     \end{block}
     \vspace{0.4em}
-    Consider a 32-bit word stored in memory at location \hex{0x00001000}:
+    Consider a 32-bit word stored in memory at location \hex{0x0000000000400000}:
     \vspace{0.2em}
     \begin{itemize}
-        \item If the \key{program counter (\code{pc})} points here $\rightarrow$ the CPU fetches and decodes it as an \key{ARM instruction}.
+        \item If the \key{program counter (\code{pc})} points here $\rightarrow$ the CPU fetches and decodes it as an \key{AArch64 instruction}.
         \item If an \key{arithmetic load instruction} reads this address $\rightarrow$ the CPU treats it as a \key{signed / unsigned integer}.
-        \item If a \key{pointer variable} holds this address $\rightarrow$ it is treated as a \key{memory reference}.
+        \item If a \key{pointer variable} holds this address $\rightarrow$ it is treated as a \key{64-bit memory reference}.
         \item If passed to a \key{display routine} $\rightarrow$ it is rendered as \key{ASCII/UTF-8 text characters}.
     \end{itemize}
 \end{frame}
@@ -696,7 +696,7 @@
 
 % --- Slide 28: Modified Harvard Architecture ---
 \begin{frame}{The Modern Standard: Modified Harvard Architecture}
-    Modern RISC systems (e.g., Apple M-series, ARM Cortex-A) merge both concepts:
+    Modern RISC systems (e.g., Apple M-series, ARM Cortex-A64) merge both concepts:
     \vspace{0.2em}
     \begin{center}
         \begin{tikzpicture}[scale=0.8, every node/.style={font=\footnotesize}]
@@ -769,7 +769,7 @@
     \end{block}
     \vspace{0.4em}
     \begin{block}{Question 2: ISA vs. Microarchitecture}
-        For the ARM instruction \code{add r1, r2, r3}, what does the ISA specify, and what internal actions belong to the microarchitecture?
+        For the AArch64 instruction \code{add x1, x2, x3}, what does the ISA specify, and what internal actions belong to the microarchitecture?
     \end{block}
     \vspace{0.4em}
     \begin{block}{Question 3: The Stored-Program Concept}
@@ -780,13 +780,13 @@
 % --- Slide 33: Self-Test: Solutions 1 & 2 ---
 \begin{frame}{Self-Test: Solutions 1 \& 2}
     \begin{block}{Solution 1}
-        \key{Architecture} is the software-visible specification (e.g., register count, ISA opcodes). \key{Organization} is the hardware implementation (e.g., pipeline depth, cache associativity).
+        \key{Architecture} is the software-visible specification (e.g., 64-bit register count, ISA opcodes). \key{Organization} is the hardware implementation (e.g., pipeline depth, cache associativity).
     \end{block}
     \vspace{0.3em}
     \begin{block}{Solution 2}
         \begin{itemize}
-            \item \key{ISA Specifies}: Add contents of \code{r2} to \code{r3} and place the result in \code{r1}.
-            \item \key{Microarchitecture Executes}: Read registers \code{r2} and \code{r3} via port addresses \code{ra1}/\code{ra2}, configure ALU control to \code{add}, assert write-enable (\code{reg\_write=1}), and commit to \code{r1}.
+            \item \key{ISA Specifies}: Add contents of \code{x2} to \code{x3} and place the 64-bit result in \code{x1}.
+            \item \key{Microarchitecture Executes}: Read registers \code{x2} and \code{x3} via port addresses \code{ra1}/\code{ra2}, configure ALU control to \code{add}, assert write-enable (\code{reg\_write=1}), and commit to \code{x1}.
         \end{itemize}
     \end{block}
 \end{frame}
@@ -797,14 +797,14 @@
         What is the primary structural difference between von Neumann and Harvard architectures, and why can Harvard machines achieve higher cycle efficiency?
     \end{block}
     \vspace{0.4em}
-    \begin{block}{Question 5: Modified Harvard Design}
+    \begin{block}{Topic 1 Self-Test Question 5: Modified Harvard Design}
         Explain what a Modified Harvard architecture is. How does Apple Silicon or ARM implement this concept in hardware?
     \end{block}
 \end{frame}
 
 % --- Slide 35: Self-Test: Solutions 4 \& 5 ---
 \begin{frame}{Self-Test: Solutions 4 \& 5}
-    \begin{block}{Solution 4}
+    \begin{block}{Solution 4}`'
         von Neumann uses a single unified bus and memory, causing serial access contention. Harvard uses independent buses and memories, allowing simultaneous instruction fetch and data operand load/store in the same clock cycle.
     \end{block}
     \vspace{0.3em}
