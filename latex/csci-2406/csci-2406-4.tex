@@ -1,0 +1,597 @@
+\documentclass[aspectratio=169,11pt,t]{beamer}
+
+% ============================================================
+% Theme and typography
+% ============================================================
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
+    CSCI 2406 --- Computer Architecture \& Organization (ARM64 / AArch64 Reference)
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+
+\setbeamersize{
+  text margin left=0.65cm,
+  text margin right=0.65cm
+}
+
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% Block vertical padding adjustments
+\addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
+\addtobeamertemplate{block end}{}{\vspace{0.2em}}
+
+% Base list item separation
+\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
+\setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
+
+% ============================================================
+% Packages
+% ============================================================
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{tikz}
+
+\usetikzlibrary{
+  arrows.meta,
+  positioning,
+  shapes.geometric,
+  calc,
+  decorations.pathreplacing
+}
+
+% ============================================================
+% Colors
+% ============================================================
+
+\definecolor{navy}{RGB}{24,43,68}
+\definecolor{deepblue}{RGB}{45,88,130}
+\definecolor{lightblue}{RGB}{235,242,250}
+\definecolor{softgray}{RGB}{245,247,250}
+\definecolor{darkgray}{RGB}{25,28,32}
+\definecolor{gold}{RGB}{200,145,35}
+
+\setbeamercolor{palette primary}{bg=navy,fg=white}
+\setbeamercolor{palette secondary}{bg=deepblue,fg=white}
+\setbeamercolor{frametitle}{bg=navy,fg=white}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=white}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{date}{fg=white}
+\setbeamercolor{titlelike}{fg=white}
+\setbeamercolor{block title}{bg=deepblue,fg=white}
+\setbeamercolor{block body}{bg=lightblue,fg=darkgray}
+\setbeamercolor{normal text}{fg=darkgray,bg=white}
+
+% ============================================================
+% Formatting shortcuts
+% ============================================================
+
+\setlength{\parskip}{0pt}
+
+\newcommand{\key}[1]{\textbf{#1}}
+\newcommand{\bits}[1]{\texttt{#1}}
+\newcommand{\hex}[1]{\texttt{0x#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Section divider macro
+\newcommand{\sectiondivider}[2]{%
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries #1\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+\end{minipage}
+\end{frame}
+}
+
+% ============================================================
+% Metadata
+% ============================================================
+
+\title[Topic 4]{
+  Integer Arithmetic and Performance Basics
+}
+
+\subtitle{
+  Addition, subtraction, multiplication, division, shifts,\\
+  condition flags, and CPU performance equations in AArch64
+}
+
+\author{
+  Computer Architecture \& Organization
+}
+
+\date{Topic 4}
+
+% ============================================================
+% Presentation Body
+% ============================================================
+
+\begin{document}
+
+% --- Slide 1: Title Slide ---
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.0cm}
+\begin{minipage}{0.9\textwidth}
+{\color{gold}\large\bfseries CSCI 2406: Topic 04\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{20}{24}\selectfont\bfseries Integer Arithmetic and Performance Basics\par}
+\vspace{0.3cm}
+{\color{lightblue}\normalsize Addition, Subtraction, Multiplication, Division, Shifts, NZCV Flags, and Execution Time Metrics in AArch64\par}
+\vspace{0.6cm}
+{\color{softgray}\small Computer Architecture \& Organization \quad\textbar\quad Topic 4\par}
+\end{minipage}
+\end{frame}
+
+% --- Slide 2: Topic Roadmap ---
+\begin{frame}{Topic 4 Technical Roadmap}
+    \begin{block}{Topic Objective}
+        Examine how arithmetic operations manipulate fixed-width bit patterns, how condition flags govern control flow, and how hardware performance is measured using instruction counts, CPI, and clock rates.
+    \end{block}
+    \vspace{0.4em}
+    \begin{itemize}
+        \item \key{Section 1}: Integer Addition, Subtraction, and Unsigned Wraparound
+        \item \key{Section 2}: Two's Complement Arithmetic and Signed Overflow
+        \item \key{Section 3}: AArch64 Condition Flags (NZCV) and Flag-Setting Instructions
+        \item \key{Section 4}: Multiplication, Division, and Logical/Arithmetic Shifts
+        \item \key{Section 5}: Processor Performance: Clock Rate, CPI, and CPU Time
+        \item \key{Section 6}: Summary and Worked Self-Test Exercises
+    \end{itemize}
+\end{frame}
+
+% ============================================================
+% SECTION 1
+% ============================================================
+\sectiondivider{Section 01}{Integer Addition, Subtraction,\\and Unsigned Wraparound}
+
+% --- Slide 4: Why Integer Arithmetic Matters ---
+\begin{frame}{Why Integer Arithmetic Matters}
+    Integer arithmetic executes constantly during program execution:
+    \vspace{0.2em}
+    \begin{itemize}
+        \item \key{Core Operations}: Memory addresses, loop counters, array indexing, and comparisons rely entirely on integer manipulation.
+        \item \key{Fixed-Width Registers}: AArch64 registers hold fixed-width values (32-bit \code{w} or 64-bit \code{x}).
+        \item \key{Arithmetic Effects}: Operations can wrap around, generate carries, or trigger signed overflows.
+        \item \key{Control Flow Integration}: Condition flags connect arithmetic outputs directly to subsequent control decisions.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 5: Binary Addition and Carry ---
+\begin{frame}{Binary Addition and Unsigned Ranges}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Addition Mechanics}
+                \begin{itemize}
+                    \item Proceeds from least significant bit (LSB) to most significant bit (MSB).
+                    \item $1 + 1$ produces $0$ with a carry out of $1$.
+                    \item Carries propagate across higher-order bit positions.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Unsigned Addition \& Carry Out}
+                \begin{itemize}
+                    \item Treats all bits strictly as magnitude.
+                    \item An $n$-bit destination keeps only the low-order $n$ bits.
+                    \item A carry-out indicates the mathematical result exceeded the range $0$ to $2^n - 1$.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+    \vspace{0.3em}
+    \begin{block}{Example (32-Bit Unsigned)}
+        $$\text{0xFFFFFFFF} + \text{0x00000001} = \text{0x00000000 with } C = 1$$
+    \end{block}
+\end{frame}
+
+% --- Slide 6: Binary Subtraction via Two's Complement ---
+\begin{frame}{Binary Subtraction Using Two's Complement}
+    Hardware avoids dedicated subtraction logic by reusing addition circuitry:
+    \vspace{0.2em}
+    \begin{itemize}
+        \item Subtraction ($A - B$) is computed as $A + (-B)$.
+        \item To form $-B$, invert all bits of $B$ (one's complement) and add $1$.
+        \item Any carry generated beyond the register width is discarded from the stored container.
+    \end{itemize}
+    \vspace{0.3em}
+    \begin{block}{4-Bit Subtraction Example ($6 - 3$)}
+        \begin{itemize}
+            \item $+3 = 0011_2 \rightarrow -3 = \text{invert}(0011) + 1 = 1100 + 1 = 1101_2$.
+            \item Compute $6 + (-3)$: $0110_2 + 1101_2 = 1\,0011_2$.
+            \item Discarding the carry bit yields stored result $0011_2 = +3_{10}$.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+% ============================================================
+% SECTION 2
+% ============================================================
+\sectiondivider{Section 02}{Two's Complement Arithmetic\\and Signed Overflow}
+
+% --- Slide 8: Signed vs Unsigned Interpretation ---
+\begin{frame}{Signed vs. Unsigned Interpretation}
+    The ALU operates exclusively on raw bit patterns without inherent data types:
+    \vspace{0.2em}
+    \begin{itemize}
+        \item The exact same bit container can be interpreted as either signed or unsigned.
+        \item Signed and unsigned addition execute via the identical underlying binary adder.
+        \item Carry and overflow flags interpret the output differently depending on intended data type.
+    \end{itemize}
+    \vspace{0.3em}
+    \begin{block}{Example (8-Bit Pattern: $1111\,1111_2$)}
+        \begin{itemize}
+            \item Unsigned interpretation equals $255$.
+            \item Signed two's complement interpretation equals $-1$.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+% --- Slide 9: Detecting Signed Overflow ---
+\begin{frame}{Detecting Signed Overflow}
+    \begin{block}{Definition of Signed Overflow}
+        Signed overflow occurs when the true mathematical result of a two's complement addition falls outside the representable signed range.
+    \end{block}
+    \vspace{0.3em}
+    \begin{itemize}
+        \item \key{Rule of Thumb}: Adding two positive values must not produce a negative result; adding two negative values must not produce a positive result.
+        \item Hardware records signed overflow in the \key{V} (Overflow) flag.
+    \end{itemize}
+    \vspace{0.2em}
+    \begin{block}{8-Bit Overflow Example}
+        $$0111\,1111_2 (+127) + 0000\,0001_2 (+1) = 1000\,0000_2 (-128),\ \text{with } V = 1$$
+    \end{block}
+\end{frame}
+
+% --- Slide 10: Carry vs. Overflow ---
+\begin{frame}{Carry versus Signed Overflow}
+    Carry and overflow evaluate distinct numerical conditions and are not interchangeable:
+    \vspace{0.3em}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Carry Flag ($C$)}
+                \begin{itemize}
+                    \item Relates primarily to unsigned arithmetic.
+                    \item Records carry out of the most significant bit.
+                    \item Example: $\text{0xFF} + \text{0x01} = \text{0x00}$, with $C = 1$ (unsigned wrap).
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Overflow Flag ($V$)}
+                \begin{itemize}
+                    \item Relates to signed two's complement arithmetic.
+                    \item Indicates a sign violation exceeding container bounds.
+                    \item Example: $\text{0x7F} + \text{0x01} = \text{0x80}$, with $V = 1$ (signed overflow).
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ============================================================
+% SECTION 3
+% ============================================================
+\sectiondivider{Section 03}{AArch64 Condition Flags (NZCV)\\and Flag-Setting Instructions}
+
+% --- Slide 12: AArch64 Condition Flags (NZCV) ---
+\begin{frame}{Processor State and Condition Flags (NZCV)}
+    Arithmetic results automatically update condition flags stored in \key{PSTATE}:
+    \vspace{0.2em}
+    \begin{center}
+        \small
+        \begin{tabular}{p{2.2cm} p{4.2cm} p{5.2cm}}
+            \toprule
+            \textbf{Flag} & \textbf{Condition Evaluated} & \textbf{Technical Meaning} \\
+            \midrule
+            \key{N (Negative)} & Result is negative signed value & Copied from MSB (bit 63 or 31) \\
+            \key{Z (Zero)} & Result equals exactly zero & Set ($1$) if all result bits are zero \\
+            \key{C (Carry)} & Unsigned carry or borrow & Unsigned overflow / carry out from MSB \\
+            \key{V (Overflow)} & Signed two's complement overflow & Signed range violation detected \\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+    \vspace{0.2em}
+    \begin{block}{Flag Persistence}
+        Once set, the NZCV flag pattern persists across subsequent instructions until modified by another arithmetic or comparison instruction.
+    \end{block}
+\end{frame}
+
+% --- Slide 13: Flag-Setting Instructions in AArch64 ---
+\begin{frame}{Flag-Setting Instructions: \code{adds}, \code{subs}, and \code{cmp}}
+    Standard instructions compute results without modifying flags unless explicitly requested:
+    \vspace{0.3em}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{The \code{s} Suffix Variant}
+                \begin{itemize}
+                    \item \code{adds x0, x1, x2}: Performs addition, stores sum in \code{x0}, and updates \key{NZCV} flags.
+                    \item \code{subs x3, x3, \#1}: Subtracts and updates flags.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Comparison (\code{cmp})}
+                \begin{itemize}
+                    \item \code{cmp x4, x5} is an alias for \code{subs xzr, x4, x5}.
+                    \item Subtracts operands to set flags, but \key{discards the result}.
+                    \item Feeds conditional branches like \code{b.eq} or \code{b.lt}.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ============================================================
+% SECTION 4
+% ============================================================
+\sectiondivider{Section 04}{Multiplication, Division,\\and Shifts}
+
+% --- Slide 15: Binary Multiplication ---
+\begin{frame}{Binary Multiplication Mechanics}
+    \begin{columns}[T]
+        \begin{column}{0.52\textwidth}
+            \begin{itemize}
+                \item Multiplication operates as repeated shifted additions.
+                \item Each multiplier bit selects a shifted copy of the multiplicand.
+                \item Multiplying two $n$-bit values produces a full product up to $2n$ bits wide.
+                \item Fixed-width registers typically retain only the lower $n$ bits of the product.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.42\textwidth}
+            \begin{block}{Example ($5 \times 3$)}
+                $$0101_2 \times 0011_2$$
+                $$= 0101_2 + 1010_2\text{ (shifted)}$$
+                $$= 1111_2 = 15_{10}$$
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 16: AArch64 Multiply and Divide Instructions ---
+\begin{frame}{AArch64 Multiply and Divide Instructions}
+    AArch64 provides dedicated hardware instructions for arithmetic expansion:
+    \vspace{0.3em}
+    \begin{center}
+        \small
+        \begin{tabular}{p{3.8cm} p{3.8cm} p{4.2cm}}
+            \toprule
+            \textbf{Instruction Syntax} & \textbf{Operation Performed} & \textbf{Architectural Effect} \\
+            \midrule
+            \code{mul x0, x1, x2} & 64-Bit Multiplication & $\code{x0} \leftarrow \code{x1} \times \code{x2}$ \\
+            \code{udiv x3, x4, x5} & Unsigned Division & $\code{x3} \leftarrow \code{x4} / \code{x5}$ (unsigned) \\
+            \code{sdiv x3, x4, x5} & Signed Division & $\code{x3} \leftarrow \code{x4} / \code{x5}$ (signed) \\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+    \vspace{0.2em}
+    \begin{block}{Microarchitectural Note}
+        Multiplication and division instructions typically exhibit higher instruction latency than simple single-cycle additions.
+    \end{block}
+\end{frame}
+
+% --- Slide 17: Logical and Arithmetic Shifts ---
+\begin{frame}{Logical and Arithmetic Shift Operations}
+    Shifts move bit patterns within a register to execute rapid scaling or isolation:
+    \vspace{0.3em}
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \begin{block}{Logical Shift Left (\code{lsl})}
+                \begin{itemize}
+                    \item Shifts bits left.
+                    \item Fills vacant low-order bits with zeros.
+                    \item Multiplies by powers of two ($2^n$).
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{block}{Logical Shift Right (\code{lsr})}
+                \begin{itemize}
+                    \item Shifts bits right.
+                    \item Fills vacant high-order bits with zeros.
+                    \item Unsigned division by $2^n$.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{block}{Arithmetic Shift Right (\code{asr})}
+                \begin{itemize}
+                    \item Shifts bits right.
+                    \item Preserves sign bit in high-order positions.
+                    \item Signed division by $2^n$.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ============================================================
+% SECTION 5
+% ============================================================
+\sectiondivider{Section 05}{Processor Performance:\\Clock Rate, CPI, and CPU Time}
+
+% --- Slide 19: Processor Performance Basics ---
+\begin{frame}{Processor Performance Basics}
+    \begin{block}{The Ultimate Metric: Execution Time}
+        Performance is measured strictly by total program execution time, not by clock frequency alone.
+    \end{block}
+    \vspace{0.3em}
+    \begin{itemize}
+        \item Processors execute ordered sequences of machine instructions.
+        \item Each instruction takes one or more clock cycles depending on complexity and hazards.
+        \item \key{CPI (Cycles Per Instruction)} summarizes the average execution cycles required per instruction across a workload.
+        \item Instruction count, CPI, and clock rate combine to determine overall performance.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 20: Clock Rate, Cycle Time, and CPI ---
+\begin{frame}{Clock Rate, Cycle Time, and CPI Formulas}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Frequency and Cycle Time}
+                \begin{itemize}
+                    \item \key{Clock Rate}: Cycles per second (e.g., $2 \text{ GHz} = 2 \times 10^9 \text{ cycles/s}$).
+                    \item \key{Cycle Time}: Duration of one clock cycle ($1 / \text{Clock Rate}$).
+                    \item Example: $2 \text{ GHz} \rightarrow 0.5 \text{ ns}$ cycle time.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Cycles Per Instruction (CPI)}
+                \begin{itemize}
+                    \item Average clock cycles consumed per instruction.
+                    \item Varies based on instruction mix, memory latency, and microarchitectural pipelining.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 21: CPU Execution Time Equation ---
+\begin{frame}{The CPU Execution Time Equation}
+    \begin{block}{Fundamental Performance Equation}
+        $$\text{CPU Time} = \text{Instruction Count} \times \text{CPI} \times \text{Clock Cycle Time}$$
+        $$\text{CPU Time} = \frac{\text{Instruction Count} \times \text{CPI}}{\text{Clock Rate}}$$
+    \end{block}
+    \vspace{0.2em}
+    \begin{itemize}
+        \item A higher clock rate does not guarantee faster execution if CPI or instruction count increases disproportionately.
+        \item \key{Worked Example}: $1,000,000$ instructions, $\text{CPI} = 2$, $1 \text{ GHz}$ clock rate:
+        $$\text{CPU Time} = \frac{1,000,000 \times 2}{1,000,000,000} = 0.002 \text{ seconds} = 2 \text{ ms}$$
+    \end{itemize}
+\end{frame}
+
+% ============================================================
+% SECTION 6
+% ============================================================
+\sectiondivider{Section 06}{Summary \& Self-Test}
+
+% --- Slide 23: Topic Summary ---
+\begin{frame}{Topic 4 Comprehensive Summary}
+    \begin{itemize}
+        \item \key{Binary Addition \& Subtraction}: Standard binary addition handles unsigned logic, while two's complement encoding allows the same adder to execute subtraction ($A + (-B)$).
+        \item \key{Signed Overflow}: Occurs when results exceed container bounds, tracked independently from unsigned carries via the $V$ flag.
+        \item \key{Condition Flags}: Instructions with the \code{s} suffix and \code{cmp} update \key{NZCV} flags in PSTATE to drive conditional branching.
+        \item \key{Arithmetic Extensions}: Multiplication (\code{mul}), division (\code{udiv}/\code{sdiv}), and shifts (\code{lsl}/\code{lsr}/\code{asr}) expand ALU capabilities.
+        \item \key{Performance Equation}: CPU execution time is a function of Instruction Count, CPI, and Clock Rate.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 24: Self-Test: Questions 1 & 2 ---
+\begin{frame}{Self-Test: Questions 1 \& 2}
+    \begin{block}{Question 1: Addition and Carry}
+        How does binary addition produce a carry, and what does the carry-out indicate for unsigned integer arithmetic?
+    \end{block}
+    \vspace{0.4em}
+    \begin{block}{Question 2: Two's Complement Subtraction}
+        How can subtraction be performed using two's complement addition without requiring dedicated hardware subtraction circuitry?
+    \end{block}
+\end{frame}
+
+% --- Slide 25: Self-Test: Solutions 1 & 2 ---
+\begin{frame}{Self-Test: Solutions 1 \& 2}
+    \begin{block}{Solution 1}
+        Binary addition generates a carry when the sum of bits in a column equals or exceeds $2$, propagating a $1$ into the next higher-order column. For unsigned arithmetic, a final carry-out indicates the result exceeded the representable range $0$ to $2^n - 1$.
+    \end{block}
+    \vspace{0.3em}
+    \begin{block}{Solution 2}
+        Subtraction ($A - B$) is computed as $A + (-B)$. The negative operand $-B$ is formed by inverting all bits of $B$ (one's complement) and adding $1$, allowing the standard binary adder to process subtractions directly.
+    \end{block}
+\end{frame}
+
+% --- Slide 26: Self-Test: Questions 3 & 4 ---
+\begin{frame}{Self-Test: Questions 3 \& 4}
+    \begin{block}{Question 3: Carry vs. Signed Overflow}
+        What is the fundamental difference between carry ($C$) and signed overflow ($V$)? Can an operation have carry without overflow?
+    \end{block}
+    \vspace{0.4em}
+    \begin{block}{Question 4: Flag-Setting Instructions}
+        What is the difference between \code{add} and \code{adds}, and how does \code{cmp} function as an alias for flag generation?
+    \end{block}
+\end{frame}
+
+% --- Slide 27: Self-Test: Solutions 3 & 4 ---
+\begin{frame}{Self-Test: Solutions 3 \& 4}
+    \begin{block}{Solution 3}
+        Carry tracks unsigned range overflow (carry out of MSB), whereas signed overflow ($V$) tracks two's complement sign violations. Yes, adding large unsigned numbers can set $C = 1$ without violating signed bounds ($V = 0$).
+    \end{block}
+    \vspace{0.3em}
+    \begin{block}{Solution 4}
+        \code{adds} computes the arithmetic sum and updates the NZCV condition flags in PSTATE, whereas standard \code{add} does not update flags. \code{cmp} subtracts operands to update flags for branching but discards the numeric result.
+    \end{block}
+\end{frame}
+
+% --- Slide 28: Self-Test: Questions 5 & 6 ---
+\begin{frame}{Self-Test: Questions 5 \& 6}
+    \begin{block}{Question 5: Shifts and Powers of Two}
+        What is the difference between \code{lsl}, \code{lsr}, and \code{asr}? When is each appropriate for multiplying or dividing by powers of two?
+    \end{block}
+    \vspace{0.4em}
+    \begin{block}{Question 6: CPU Performance Calculation}
+        Consider two processors running the same 1-million instruction program:
+        \begin{itemize}
+            \item Processor A: $\text{CPI} = 2$, Clock Rate $= 2 \text{ GHz}$
+            \item Processor B: $\text{CPI} = 1$, Clock Rate $= 1 \text{ GHz}$
+        \end{itemize}
+        Which processor has the lower execution time?
+    \end{block}
+\end{frame}
+
+% --- Slide 29: Self-Test: Solutions 5 & 6 ---
+\begin{frame}{Self-Test: Solutions 5 \& 6}
+    \begin{block}{Solution 5}
+        \code{lsl} shifts left (multiplies by $2^n$), \code{lsr} shifts right filling zeros (unsigned division by $2^n$), and \code{asr} shifts right preserving the sign bit (signed division by $2^n$).
+    \end{block}
+    \vspace{0.3em}
+    \begin{block}{Solution 6}
+        \begin{itemize}
+            \item Processor A Time: $(10^6 \times 2) / (2 \times 10^9) = 0.001 \text{ s}$ ($1 \text{ ms}$).
+            \item Processor B Time: $(10^6 \times 1) / (1 \times 10^9) = 0.001 \text{ s}$ ($1 \text{ ms}$).
+            \item Both processors achieve identical execution time.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+% --- Slide 30: Wrap-Up & Transition to Topic 5 ---
+\begin{frame}{Wrap-Up and Next Steps}
+    \begin{block}{Moving Forward to Topic 5}
+        Now that we have mastered integer arithmetic, condition flags, and basic performance metrics, our next session will explore:
+        \begin{itemize}
+            \item \key{Advanced AArch64 Addressing Modes}: Register-indirect, pre-index, and post-index memory loading.
+            \item \key{Subroutine Linkage \& Stack Frames}: How function calls, stack pointers (\code{sp}), and frame pointers (\code{x29}) manage local storage.
+        \end{itemize}
+    \end{block}
+    \vspace{0.3em}
+    \begin{center}
+        \textbf{End of Topic 4 --- Questions \& Discussion}
+    \end{center}
+\end{frame}
+
+\end{document}
