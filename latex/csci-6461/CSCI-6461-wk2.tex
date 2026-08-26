@@ -90,6 +90,22 @@
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 
+% Section divider macro
+\newcommand{\sectiondivider}[2]{%
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries #1\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+\end{minipage}
+\end{frame}
+}
+
 % ============================================================
 % Metadata
 % ============================================================
@@ -117,7 +133,7 @@
 \begin{document}
 
 % ============================================================
-% Slide 1
+% Slide 1: Title Slide
 % ============================================================
 
 \begin{frame}[plain]
@@ -148,7 +164,46 @@
 \end{frame}
 
 % ============================================================
-% Slide 2
+% Slide 2: Topics Overview
+% ============================================================
+
+\begin{frame}{Topic 2: Module Topics}
+
+\begin{enumerate}\setlength{\itemsep}{8pt}
+  \item \key{ISA Foundations \& The Semantic Trade-off Space}
+  \begin{itemize}
+    \item The programmer-visible hardware contract and complexity redistribution.
+    \item Granularity, memory access semantics, and early historical constraints.
+  \end{itemize}
+
+  \item \key{The CISC Architectural Model}
+  \begin{itemize}
+    \item Register-memory operations, variable-length encodings, advantages, and decode costs.
+  \end{itemize}
+
+  \item \key{The RISC Revolution \& Principles}
+  \begin{itemize}
+    \item Workload findings, load/store discipline, fixed 32-bit width, and compiler collaboration.
+    \item Comparative execution breakdown: AArch64 vs.\ x86-64.
+  \end{itemize}
+
+  \item \key{Quantitative Performance, Energy \& Modern Convergence}
+  \begin{itemize}
+    \item Iron Law evaluation, code density, pipeline regularity, and power/thermal constraints.
+    \item Modern x86 $\mu\text{op}$ decomposition, AArch64 scaling from Apple Silicon to cloud silicon.
+  \end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Section 1 Divider
+% ============================================================
+
+\sectiondivider{PART 1}{ISA Foundations \& Historical Context}
+
+% ============================================================
+% Slide 3
 % ============================================================
 
 \begin{frame}{What Is an Instruction Set Architecture?}
@@ -173,7 +228,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 3
+% Slide 4
 % ============================================================
 
 \begin{frame}{Why ISA Design Matters}
@@ -209,7 +264,7 @@ ISA design does not eliminate system complexity; it \key{redistributes} complexi
 \end{frame}
 
 % ============================================================
-% Slide 4
+% Slide 5
 % ============================================================
 
 \begin{frame}{The Central ISA Design Questions}
@@ -223,7 +278,7 @@ ISA design does not eliminate system complexity; it \key{redistributes} complexi
 \end{frame}
 
 % ============================================================
-% Slide 5
+% Slide 6
 % ============================================================
 
 \begin{frame}{Historical Constraints Shaped Early ISAs (CISC Era)}
@@ -237,7 +292,13 @@ ISA design does not eliminate system complexity; it \key{redistributes} complexi
 \end{frame}
 
 % ============================================================
-% Slide 6
+% Section 2 Divider
+% ============================================================
+
+\sectiondivider{PART 2}{The CISC Architectural Model}
+
+% ============================================================
+% Slide 7
 % ============================================================
 
 \begin{frame}{The Origins of CISC}
@@ -252,7 +313,7 @@ ISA design does not eliminate system complexity; it \key{redistributes} complexi
 \end{frame}
 
 % ============================================================
-% Slide 7
+% Slide 8
 % ============================================================
 
 \begin{frame}{The CISC Design Philosophy}
@@ -267,7 +328,7 @@ ISA design does not eliminate system complexity; it \key{redistributes} complexi
 \end{frame}
 
 % ============================================================
-% Slide 8
+% Slide 9
 % ============================================================
 
 \begin{frame}{CISC in Practice: Register-Memory Model}
@@ -305,7 +366,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 9
+% Slide 10
 % ============================================================
 
 \begin{frame}{Advantages of the CISC Approach}
@@ -319,7 +380,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 10
+% Slide 11
 % ============================================================
 
 \begin{frame}{The Microarchitectural Cost of CISC}
@@ -333,7 +394,13 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 11
+% Section 3 Divider
+% ============================================================
+
+\sectiondivider{PART 3}{The RISC Philosophy \& Principles}
+
+% ============================================================
+% Slide 12
 % ============================================================
 
 \begin{frame}{The 1980s Shift: Emergence of RISC}
@@ -347,7 +414,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 12
+% Slide 13
 % ============================================================
 
 \begin{frame}{The RISC Design Philosophy}
@@ -362,7 +429,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 13
+% Slide 14
 % ============================================================
 
 \begin{frame}{Foundational RISC Lineages}
@@ -376,7 +443,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 14
+% Slide 15
 % ============================================================
 
 \begin{frame}{RISC Principle: Simple and Regular Encodings}
@@ -390,7 +457,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 15
+% Slide 16
 % ============================================================
 
 \begin{frame}{RISC Principle: Load/Store Architecture}
@@ -409,7 +476,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 16
+% Slide 17
 % ============================================================
 
 \begin{frame}{RISC Principle: Register-Centric Computation}
@@ -423,7 +490,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 17
+% Slide 18
 % ============================================================
 
 \begin{frame}{RISC Principle: Fixed 32-Bit Instruction Width}
@@ -451,7 +518,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 18
+% Slide 19
 % ============================================================
 
 \begin{frame}{RISC Principle: Compiler-Friendly ISA}
@@ -469,7 +536,7 @@ One architectural instruction decomposes into four discrete hardware operations.
 \end{frame}
 
 % ============================================================
-% Slide 19
+% Slide 20
 % ============================================================
 
 \begin{frame}{Code Example: Memory Addition in RISC}
@@ -495,7 +562,7 @@ High-level expression: \code{c = a + b;} (where operands reside in memory)
 \end{frame}
 
 % ============================================================
-% Slide 20
+% Slide 21
 % ============================================================
 
 \begin{frame}{Code Example: Memory Addition in CISC}
@@ -520,7 +587,7 @@ High-level expression: \code{c = a + b;}
 \end{frame}
 
 % ============================================================
-% Slide 21
+% Slide 22
 % ============================================================
 
 \begin{frame}{Architectural vs. Microarchitectural Work}
@@ -548,7 +615,13 @@ The CISC program contains fewer architectural instructions, but the underlying a
 \end{frame}
 
 % ============================================================
-% Slide 22
+% Section 4 Divider
+% ============================================================
+
+\sectiondivider{PART 4}{Quantitative Performance \& Trade-offs}
+
+% ============================================================
+% Slide 23
 % ============================================================
 
 \begin{frame}{Instruction Count: Evaluation}
@@ -562,7 +635,7 @@ The CISC program contains fewer architectural instructions, but the underlying a
 \end{frame}
 
 % ============================================================
-% Slide 23
+% Slide 24
 % ============================================================
 
 \begin{frame}{Cycles Per Instruction (CPI) in RISC vs. CISC}
@@ -576,7 +649,7 @@ The CISC program contains fewer architectural instructions, but the underlying a
 \end{frame}
 
 % ============================================================
-% Slide 24
+% Slide 25
 % ============================================================
 
 \begin{frame}{Clock Cycle Time ($T_{\text{clk}}$) and Critical Paths}
@@ -590,7 +663,7 @@ The CISC program contains fewer architectural instructions, but the underlying a
 \end{frame}
 
 % ============================================================
-% Slide 25
+% Slide 26
 % ============================================================
 
 \begin{frame}{The Performance Equation (Iron Law)}
@@ -608,7 +681,7 @@ $$T_{\text{CPU}} = \mathit{IC} \times \mathit{CPI} \times T_{\text{clk}} = \frac
 \end{frame}
 
 % ============================================================
-% Slide 26
+% Slide 27
 % ============================================================
 
 \begin{frame}{Worked Performance Comparison}
@@ -652,7 +725,7 @@ The RISC machine executes $40\%$ more instructions, but completes the workload f
 \end{frame}
 
 % ============================================================
-% Slide 27
+% Slide 28
 % ============================================================
 
 \begin{frame}{Code Density and Memory Footprint}
@@ -667,7 +740,7 @@ The RISC machine executes $40\%$ more instructions, but completes the workload f
 \end{frame}
 
 % ============================================================
-% Slide 28
+% Slide 29
 % ============================================================
 
 \begin{frame}{Instruction Fetch \& Decode Complexity}
@@ -695,7 +768,7 @@ The RISC machine executes $40\%$ more instructions, but completes the workload f
 \end{frame}
 
 % ============================================================
-% Slide 29
+% Slide 30
 % ============================================================
 
 \begin{frame}{ISA Design and Pipeline Efficiency}
@@ -713,7 +786,7 @@ $$\boxed{\text{if}} \longrightarrow \boxed{\text{id}} \longrightarrow \boxed{\te
 \end{frame}
 
 % ============================================================
-% Slide 30
+% Slide 31
 % ============================================================
 
 \begin{frame}{ISA Design and Modern Compiler Optimization}
@@ -727,7 +800,7 @@ $$\boxed{\text{if}} \longrightarrow \boxed{\text{id}} \longrightarrow \boxed{\te
 \end{frame}
 
 % ============================================================
-% Slide 31
+% Slide 32
 % ============================================================
 
 \begin{frame}{Energy and Thermal Trade-offs}
@@ -759,7 +832,7 @@ Energy efficiency is determined by how effectively the microarchitecture minimiz
 \end{frame}
 
 % ============================================================
-% Slide 32
+% Slide 33
 % ============================================================
 
 \begin{frame}{Workload Energy: Energy per Program}
@@ -777,7 +850,7 @@ $$E_{\text{program}} = P_{\text{avg}} \times T_{\text{CPU}} = \mathit{IC} \times
 \end{frame}
 
 % ============================================================
-% Slide 33
+% Slide 34
 % ============================================================
 
 \begin{frame}{Power Dissipation and Thermal Throttling}
@@ -805,7 +878,7 @@ $$\text{Power} \longrightarrow \text{Heat} \longrightarrow \text{Throttling}$$
 \end{frame}
 
 % ============================================================
-% Slide 34
+% Slide 35
 % ============================================================
 
 \begin{frame}{Performance per Watt: Primary Evaluation Metric}
@@ -819,7 +892,7 @@ $$\text{Power} \longrightarrow \text{Heat} \longrightarrow \text{Throttling}$$
 \end{frame}
 
 % ============================================================
-% Slide 35
+% Slide 36
 % ============================================================
 
 \begin{frame}{Microarchitectural Convergence: Modern x86 Internals}
@@ -848,7 +921,7 @@ Modern x86 processors preserve the CISC ISA externally, but execute a \key{RISC 
 \end{frame}
 
 % ============================================================
-% Slide 36
+% Slide 37
 % ============================================================
 
 \begin{frame}{Complexity in Modern RISC ISAs}
@@ -866,7 +939,7 @@ Modern x86 processors preserve the CISC ISA externally, but execute a \key{RISC 
 \end{frame}
 
 % ============================================================
-% Slide 37
+% Slide 38
 % ============================================================
 
 \begin{frame}{RISC in Client and Desktop Computing}
@@ -883,7 +956,7 @@ Modern x86 processors preserve the CISC ISA externally, but execute a \key{RISC 
 \end{frame}
 
 % ============================================================
-% Slide 38
+% Slide 39
 % ============================================================
 
 \begin{frame}{RISC in Data Center Infrastructure}
@@ -901,7 +974,7 @@ Modern x86 processors preserve the CISC ISA externally, but execute a \key{RISC 
 \end{frame}
 
 % ============================================================
-% Slide 39
+% Slide 40
 % ============================================================
 
 \begin{frame}{Data Center Workload Classification}
@@ -947,7 +1020,7 @@ Modern x86 processors preserve the CISC ISA externally, but execute a \key{RISC 
 \end{frame}
 
 % ============================================================
-% Slide 40
+% Slide 41
 % ============================================================
 
 \begin{frame}{AArch64 Reference Architecture Overview}
@@ -958,16 +1031,10 @@ Modern x86 processors preserve the CISC ISA externally, but execute a \key{RISC 
   \item \key{Strict Load/Store Semantics:} Memory access occurs exclusively via \bits{ldr} and \bits{str}.
   \item \key{Platform Scope:} Standard architecture spanning mobile devices, client systems, servers, and supercomputers.
 \end{itemize}
-
-\vspace{0.3cm}
-\normalsize
-\begin{block}{Transition to Assembly}
-The next module moves from ISA design philosophy to concrete programming: the \key{AArch64 Programmer's Model, Register File, and Core Assembly Instructions}.
-\end{block}
 \end{frame}
 
 % ============================================================
-% Slide 41
+% Slide 42
 % ============================================================
 
 \begin{frame}{Modern ISA Comparison Summary}
@@ -982,7 +1049,7 @@ The next module moves from ISA design philosophy to concrete programming: the \k
 \end{frame}
 
 % ============================================================
-% Slide 42
+% Slide 43
 % ============================================================
 
 \begin{frame}{Summary: Evaluating Architectural Trade-offs}
@@ -998,6 +1065,65 @@ The next module moves from ISA design philosophy to concrete programming: the \k
 \begin{block}{Evaluation Framework}
 Rather than evaluating which architecture is inherently superior, quantify what trade-offs an ISA introduces and how the microarchitecture balances them for a given workload.
 \end{block}
+\end{frame}
+
+% ============================================================
+% Section 5 Divider
+% ============================================================
+
+\sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
+
+% ============================================================
+% Slide 44: Comprehensive Summary
+% ============================================================
+
+\begin{frame}{Topic 2: Comprehensive Summary}
+
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item \key{ISA Interface Contract:} The ISA redistributes complexity between compiler and hardware; it dictates instruction granularity, memory model, and encoding rules.
+  \item \key{CISC Heritage:} Originated under expensive memory constraints; leverages variable-length encoding and register-memory operations to maximize code density.
+  \item \key{RISC Philosophy:} Emphasizes fixed 32-bit instructions, load/store separation, large orthogonal register sets, and single-cycle pipeline friendliness.
+  \item \key{Microarchitectural Convergence:} Modern CISC processors decode complex instructions into internal RISC-like $\mu\text{ops}$ in hardware, incurring a front-end decode and power penalty.
+  \item \key{Quantitative Figure of Merit:} System performance and power must be evaluated via the Iron Law ($T_{\text{CPU}} = \frac{\mathit{IC} \times \mathit{CPI}}{f_{\text{clk}}}$) and Performance-per-Watt across complete workloads.
+  \item \key{Forward Transition:} Topic 3 explores the concrete AArch64 programmer's model, register conventions, and basic instruction execution.
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 45: Self-Test Questions (Part 1)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: ISA Principles \& Mechanics}
+
+\begin{enumerate}\setlength{\itemsep}{8pt}
+  \item \key{Load/Store Boundary:} Why does a strict load/store architecture (such as AArch64) simplify pipelined execution compared to an architecture that allows direct memory operands in arithmetic instructions?
+
+  \item \key{Parallel Instruction Fetch:} Explain why an 8-wide parallel instruction decoder is significantly simpler and more power-efficient to build for a fixed 32-bit RISC ISA than for a variable-length CISC ISA.
+
+  \item \key{Micro-operation Decomposition:} When an x86 processor executes \code{add [rdi + 8], rax}, how does the front-end decoder translate this single architectural instruction into internal micro-operations ($\mu\text{ops}$)?
+
+  \item \key{Code Density Trade-off:} Under what system constraints (e.g., cache sizes, memory bandwidth) does the superior code density of a CISC ISA translate to an execution performance advantage?
+\end{enumerate}
+
+\end{frame}
+
+% ============================================================
+% Slide 46: Self-Test Questions (Part 2)
+% ============================================================
+
+\begin{frame}{Self-Test Questions: Quantitative Analysis \& Power}
+
+\begin{enumerate}\setlength{\itemsep}{8pt}
+  \item \key{Iron Law Trade-off Calculation:} A benchmark compiled for AArch64 executes $1.5 \times 10^9$ instructions with an average CPI of $1.1$ on a 3.0\,GHz CPU. The same benchmark compiled for x86-64 executes $1.1 \times 10^9$ instructions with an average CPI of $1.6$ on a 3.2\,GHz CPU. Which architecture completes the task faster, and what is the speedup?
+
+  \item \key{Frontend Power Budget:} Why does front-end instruction decoding account for a higher percentage of core power in modern x86 processors than in modern AArch64 cores?
+
+  \item \key{Performance-per-Watt at Scale:} In cloud data centers, why has Performance-per-Watt largely superseded raw single-core clock frequency as the primary procurement and design metric?
+
+  \item \key{Microarchitectural Misconceptions:} Why is it technically inaccurate to describe modern high-performance AArch64 cores (such as Apple M-series or Neoverse cores) as ``simple processors''?
+\end{enumerate}
+
 \end{frame}
 
 \end{document}
