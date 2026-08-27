@@ -382,15 +382,15 @@
 \end{frame}
 
 % --- Slide 18: Shift Amounts and Width Limits ---
-\begin{frame}{Shift Amount Constraints}
+\begin{frame}{Shift Amount Constraints and Boundaries}
     Shift operations in AArch64 adhere to strict architectural limits:
     \vspace{0.3em}
     \begin{itemize}
-        \item For 32-bit (\code{W}) register operations, shift amounts range from $0$ to $31$.
-        \item For 64-bit (\code{X}) register operations, shift amounts range from $0$ to $63$.
-        \item Shifting by an amount equal to or exceeding the register width produces undefined results or assembler errors.
+        \item For 32-bit (\code{W}) register operations, shift amounts must range strictly from $0$ to $31$.
+        \item For 64-bit (\code{X}) register operations, shift amounts must range strictly from $0$ to $63$.
+        \item \key{Architectural Violation}: Shifting by an amount equal to or exceeding the register width ($32$ for W, $64$ for X) is illegal and triggers assembler errors or undefined behavior.
     \end{itemize}
-    \vspace{0.4em}
+    \vspace{0.2em}
     \begin{block}{Sign Maintenance}
         Logical shifts pad with zeros, whereas arithmetic right shift (\code{asr}) replicates the MSB to maintain two's complement sign validity.
     \end{block}
@@ -433,9 +433,9 @@
     Logical instructions (\code{and}, \code{orr}, \code{eor}) handle constants via a bitmask encoding system:
     \vspace{0.2em}
     \begin{itemize}
-        \item Logical immediates are formed by replicated bit patterns across the 32-bit or 64-bit word.
-        \item Encoded using combinations of element size, rotation, and pattern repetition.
-        \item Enables common bitmasks (such as byte flags or power-of-two selectors) to be embedded directly within single-cycle logical instructions.
+        \item Logical immediates are not arbitrary numbers; they are encoded as a replicated bit pattern across element sizes of $2, 4, 8, 16, 32,$ or $64$ bits.
+        \item \key{Assembler Restriction}: If a constant cannot be expressed as a repeating bitmask pattern, the assembler rejects it with an error (e.g., ``immediate cannot be encoded'').
+        \item Enables common bitmasks and flag selectors to be embedded directly within single-cycle logical instruction words.
     \end{itemize}
 \end{frame}
 
@@ -512,8 +512,8 @@
     \begin{itemize}
         \item \key{Arithmetic Instructions}: Execute addition, subtraction, and negation across 32-bit (\code{W}) and 64-bit (\code{X}) registers.
         \item \key{Logical Instructions}: Execute parallel bitwise boolean operations (\code{and}, \code{orr}, \code{eor}, \code{bic}, \code{mvn}) for masking and setting bits.
-        \item \key{Shift Operations}: Support scaling via \code{lsl}, \code{lsr}, \code{asr}, and \code{ror}, with hardware barrel-shifter integration.
-        \item \key{Constant Generation}: Managed through 12-bit arithmetic immediates, logical bitmasks, and wide moves (\code{movz}/\code{movk}).
+        \item \key{Shift Operations}: Support scaling via \code{lsl}, \code{lsr}, \code{asr}, and \code{ror}, with strict width boundaries and hardware barrel-shifter integration.
+        \item \key{Constant Generation}: Managed through 12-bit arithmetic immediates, bitmask encoding rules, and wide moves (\code{movz}/\code{movk}).
     \end{itemize}
 \end{frame}
 
@@ -541,23 +541,23 @@
 
 % --- Slide 31: Self-Test: Questions 3 & 4 ---
 \begin{frame}{Self-Test: Questions 3 \& 4}
-    \begin{block}{Question 3: The Barrel Shifter}
-        What is the architectural advantage of the AArch64 built-in barrel shifter during data-processing instructions?
+    \begin{block}{Question 3: Shift Limits and the Barrel Shifter}
+        What are the architectural shift limits for 32-bit and 64-bit registers in AArch64, and what is the primary advantage of the built-in barrel shifter?
     \end{block}
     \vspace{0.4em}
-    \begin{block}{Question 4: Constant Loading}
-        Why can't an AArch64 arithmetic instruction contain an arbitrary 64-bit constant directly, and how do compilers solve this limitation?
+    \begin{block}{Question 4: Constant Loading and Bitmasks}
+        Why might the assembler reject a logical immediate constant with an error, and how do compilers load wide 64-bit constants?
     \end{block}
 \end{frame}
 
 % --- Slide 32: Self-Test: Solutions 3 & 4 ---
 \begin{frame}{Self-Test: Solutions 3 \& 4}
     \begin{block}{Solution 3}
-        The barrel shifter allows a source operand to be shifted or scaled as part of the arithmetic or logical instruction in a single clock cycle, avoiding extra standalone shift instructions.
+        Shift amounts must range from $0$ to $31$ for W registers and $0$ to $63$ for X registers; shifting by or above the register width is illegal. The barrel shifter allows a source operand to be shifted as part of a datapath instruction in a single cycle.
     \end{block}
     \vspace{0.3em}
     \begin{block}{Solution 4}
-        Because instruction words are fixed at 32 bits, storage space is insufficient for both opcodes, register identifiers, and a 64-bit constant. Compilers resolve this using 12-bit immediates, logical bitmasks, or wide move sequences (\code{movz} / \code{movk}).
+        The assembler rejects constants that cannot be expressed as repeating bitmask patterns. Compilers construct wide 64-bit constants using wide move sequences like \code{movz} followed by one or more \code{movk} instructions.
     \end{block}
 \end{frame}
 
