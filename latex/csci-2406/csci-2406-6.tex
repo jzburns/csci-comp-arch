@@ -1,0 +1,609 @@
+\documentclass[aspectratio=169,11pt,t]{beamer}
+
+% ============================================================
+% Theme and typography
+% ============================================================
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
+    CSCI 2406 --- Computer Organization \& Architecture (ARM64 / AArch64 Reference)
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+
+\setbeamersize{
+  text margin left=0.65cm,
+  text margin right=0.65cm
+}
+
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% Block vertical padding adjustments
+\addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
+\addtobeamertemplate{block end}{}{\vspace{0.2em}}
+
+% Base list item separation
+\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
+\setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
+
+% ============================================================
+% Packages
+% ============================================================
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{tikz}
+
+\usetikzlibrary{
+  arrows.meta,
+  positioning,
+  shapes.geometric,
+  calc,
+  decorations.pathreplacing
+}
+
+% ============================================================
+% Colors
+% ============================================================
+
+\definecolor{navy}{RGB}{24,43,68}
+\definecolor{deepblue}{RGB}{45,88,130}
+\definecolor{lightblue}{RGB}{235,242,250}
+\definecolor{softgray}{RGB}{245,247,250}
+\definecolor{darkgray}{RGB}{25,28,32}
+\definecolor{gold}{RGB}{200,145,35}
+
+\setbeamercolor{palette primary}{bg=navy,fg=white}
+\setbeamercolor{palette secondary}{bg=deepblue,fg=white}
+\setbeamercolor{frametitle}{bg=navy,fg=white}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=white}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{date}{fg=white}
+\setbeamercolor{titlelike}{fg=white}
+\setbeamercolor{block title}{bg=deepblue,fg=white}
+\setbeamercolor{block body}{bg=lightblue,fg=darkgray}
+\setbeamercolor{normal text}{fg=darkgray,bg=white}
+
+% ============================================================
+% Formatting shortcuts
+% ============================================================
+
+\setlength{\parskip}{0pt}
+
+\newcommand{\key}[1]{\textbf{#1}}
+\newcommand{\bits}[1]{\texttt{#1}}
+\newcommand{\hex}[1]{\texttt{0x#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Section divider macro
+\newcommand{\sectiondivider}[2]{%
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries #1\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+\end{minipage}
+\end{frame}
+}
+
+% ============================================================
+% Metadata
+% ============================================================
+
+\title[Topic 6]{
+  Data Transfer and Addressing
+}
+
+\subtitle{
+  Load and store instructions, addressing modes,\\
+  memory access alignment, and traversal of arrays and pointers in AArch64
+}
+
+\author{
+  Computer Organization \& Architecture
+}
+
+\date{Topic 6}
+
+% ============================================================
+% Presentation Body
+% ============================================================
+
+\begin{document}
+
+% --- Slide 1: Title Slide ---
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.0cm}
+\begin{minipage}{0.9\textwidth}
+{\color{gold}\large\bfseries CSCI 2406: Topic 06\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{20}{24}\selectfont\bfseries Data Transfer and Addressing\par}
+\vspace{0.3cm}
+{\color{lightblue}\normalsize Load/Store architecture, addressing modes, memory alignment rules, and array/pointer traversal in AArch64\par}
+\vspace{0.6cm}
+{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad Topic 6\par}
+\end{minipage}
+\end{frame}
+
+% --- Slide 2: Topic Outline ---
+\begin{frame}{Topic 6 Outline}
+    \begin{block}{Topic Objective}
+        Analysis of AArch64 load-store memory architecture, memory addressing modes, alignment constraints, and data structure mapping for arrays and pointers.
+    \end{block}
+    \vspace{0.4em}
+    \begin{itemize}
+        \item \key{Section 1}: The Load-Store Architecture Paradigm
+        \item \key{Section 2}: Load and Store Instructions (\code{ldr}, \code{str})
+        \item \key{Section 3}: AArch64 Memory Addressing Modes
+        \item \key{Section 4}: Memory Access, Alignment, and Pair Transfers
+        \item \key{Section 5}: Traversing Arrays and Pointers
+        \item \key{Section 6}: Summary and Worked Self-Test Exercises
+    \end{itemize}
+\end{frame}
+
+% --- Slide 3: Introductory Concepts ---
+\begin{frame}{Bridging Processor Registers and Memory}
+    \begin{block}{The Memory Wall Challenge}
+        CPU execution speeds outpace main memory bandwidth; explicit data transfer instructions manage movement between high-speed registers and byte-addressed storage.
+    \end{block}
+    \vspace{0.4em}
+    \begin{itemize}
+        \item Arithmetic instructions operate exclusively on registers, never directly on memory.
+        \item Programs require specialized transfer instructions to read from and write to memory.
+        \item Efficient memory access depends on correct addressing mode selection and natural alignment.
+    \end{itemize}
+\end{frame}
+
+% ============================================================
+% SECTION 1
+% ============================================================
+\sectiondivider{Section 01}{The Load-Store Architecture Paradigm}
+
+% --- Slide 5: Load-Store Architecture Principles ---
+\begin{frame}{Load-Store Architecture Principles}
+    AArch64 follows a strict RISC load-store design philosophy:
+    \vspace{0.2em}
+    \begin{itemize}
+        \item \key{Separation of Concerns}: Computation instructions (\code{add}, \code{sub}) only process register operands. Memory instructions (\code{ldr}, \code{str}) only move data.
+        \item \key{No In-Memory Arithmetic}: An instruction cannot simultaneously fetch a value from memory, add to it, and store it back.
+        \item \key{Simplified Datapath}: Keeps hardware control logic streamlined, predictable, and optimized for pipelining.
+    \end{itemize}
+    \vspace{0.3em}
+    \begin{block}{Implication for Compilers}
+        C statements like \code{a = b + c;} compile into three distinct steps: load \code{b}, load \code{c}, add them in registers, and store the sum into \code{a}.
+    \end{block}
+\end{frame}
+
+% --- Slide 6: The Role of Memory Addresses ---
+\begin{frame}{Memory Addresses as Register Values}
+    Memory locations are targeted using 64-bit virtual addresses held in general-purpose registers:
+    \vspace{0.3em}
+    \begin{itemize}
+        \item The base address of a variable, array, or data structure is computed or loaded into an \code{X} register (e.g., \code{x1}).
+        \item Load/store instructions treat this register as a pointer referencing the target byte location.
+        \item Arithmetic operations can manipulate pointers dynamically (e.g., advancing through indices).
+    \end{itemize}
+    \vspace{0.4em}
+    \begin{block}{Pointer Register Rule}
+        Only 64-bit general-purpose registers (\code{x0}--\code{x30}) can serve as base address pointers in AArch64.
+    \end{block}
+\end{frame}
+
+% ============================================================
+% SECTION 2
+% ============================================================
+\sectiondivider{Section 02}{Load and Store Instructions}
+
+% --- Slide 8: Basic Load Instruction (LDR) ---
+\begin{frame}{Loading Data: The \code{ldr} Instruction}
+    The Load Register (\code{ldr}) instruction copies data from memory into a target register:
+    \vspace{0.3em}
+    \begin{itemize}
+        \item \key{Syntax Format}: \code{ldr destination\_reg, [base\_register]}
+        \item \key{64-bit Transfer}: \code{ldr x0, [x1]} loads 8 bytes from the address in \code{x1} into \code{x0}.
+        \item \key{32-bit Transfer}: \code{ldr w0, [x1]} loads 4 bytes into \code{w0}, zero-extending the upper 32 bits of \code{x0}.
+    \end{itemize}
+    \vspace{0.4em}
+    \begin{block}{Data Sizing Suffixes}
+        Sub-word loads are supported via explicit qualifiers like \code{ldrb} (byte) and \code{ldrh} (halfword), with sign-extended variants (\code{ldrsb}, \code{ldrsh}).
+    \end{block}
+\end{frame}
+
+% --- Slide 9: Basic Store Instruction (STR) ---
+\begin{frame}{Storing Data: The \code{str} Instruction}
+    The Store Register (\code{str}) instruction copies data from a register into memory:
+    \vspace{0.3em}
+    \begin{itemize}
+        \item \key{Syntax Format}: \code{str source\_reg, [base\_register]}
+        \item \key{64-bit Transfer}: \code{str x0, [x1]} writes the 8-byte contents of \code{x0} to the memory address held in \code{x1}.
+        \item \key{32-bit Transfer}: \code{str w0, [x1]} writes the lower 4 bytes of \code{w0} to memory.
+    \end{itemize}
+    \vspace{0.4em}
+    \begin{block}{Sub-Word Stores}
+        Corresponding store variants \code{strb} (store byte) and \code{strh} (store halfword) allow granular writing of lower register bytes to memory destinations.
+    \end{block}
+\end{frame}
+
+% --- Slide 10: Size Specifiers and Sign Extension ---
+\begin{frame}{Precision Data Sizing and Sign Extension}
+    AArch64 load instructions allow precise control over data width and extension behavior:
+    \vspace{0.2em}
+    \begin{center}
+        \small
+        \begin{tabular}{p{3.2cm} p{4.2cm} p{4.2cm}}
+            \toprule
+            \textbf{Instruction} & \textbf{Bytes Loaded} & \textbf{Extension Behavior} \\
+            \midrule
+            \code{ldrb w0, [x1]} & 1 Byte ($8$ bits) & Zero-extended to 32 bits in \code{w0} \\
+            \code{ldrsb x0, [x1]} & 1 Byte ($8$ bits) & Sign-extended to 64 bits in \code{x0} \\
+            \code{ldrh w0, [x1]} & 2 Bytes ($16$ bits) & Zero-extended to 32 bits in \code{w0} \\
+            \code{ldrsh x0, [x1]} & 2 Bytes ($16$ bits) & Sign-extended to 64 bits in \code{x0} \\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+    \vspace{0.2em}
+    \begin{block}{Sign Extension Importance}
+        When loading signed 8-bit or 16-bit integers into larger registers, using sign-extended variants (\code{ldrsb}/\code{ldrsh}) preserves negative values correctly.
+    \end{block}
+\end{frame}
+
+% ============================================================
+% SECTION 3
+% ============================================================
+\sectiondivider{Section 03}{AArch64 Memory Addressing Modes}
+
+% --- Slide 12: Overview of Addressing Modes ---
+\begin{frame}{Addressing Mode Classification}
+    An addressing mode defines how the CPU calculates the target memory address for a load or store instruction:
+    \vspace{0.2em}
+    \begin{itemize}
+        \item \key{Base Register (Indirect)}: Address is taken directly from the base register.
+        \item \key{Immediate Offset}: Adds a constant offset to the base register without modifying the base.
+        \item \key{Register Offset}: Adds a scaling or offset register to the base address.
+        \item \key{Pre-Indexed}: Applies an offset, updates the base register, and accesses memory.
+        \item \key{Post-Indexed}: Accesses memory using the base address, then updates the base register.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 13: Base Register (Indirect) Mode ---
+\begin{frame}{Base Register (Indirect) Addressing}
+    \begin{block}{Syntax and Semantics}
+        $$\code{ldr x0, [x1]}$$
+        The memory address is taken strictly from the contents of the base register \code{x1}. The base register remains unchanged after execution.
+    \end{block}
+    \vspace{0.3em}
+    \begin{itemize}
+        \item \key{Use Case}: Accessing a variable or dereferencing a pointer whose exact address is already loaded in a register.
+        \item Analogous to pointer dereferencing in C: \code{*ptr}.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 14: Immediate Offset Addressing ---
+\begin{frame}{Immediate Offset Addressing}
+    \begin{block}{Syntax and Semantics}
+        $$\code{ldr x0, [x1, \#16]}$$
+        Computes the target address by adding an immediate constant offset (\code{+\#16}) to the base register \code{x1}. The base register \code{x1} is \textbf{not} modified.
+    \end{block}
+    \vspace{0.3em}
+    \begin{itemize}
+        \item \key{Use Case}: Accessing fields within a structure or fixed offsets in a local stack frame.
+        \item Immediate range rules depend on transfer size (must align with data width constraints).
+    \end{itemize}
+\end{frame}
+
+% --- Slide 15: Pre-Indexed Addressing Mode ---
+\begin{frame}{Pre-Indexed Addressing Mode}
+    \begin{block}{Syntax and Semantics}
+        $$\code{ldr x0, [x1, \#8]!}$$
+        The immediate offset (\code{+\#8}) is added to base register \code{x1}. This new calculated address is used for the memory load, \textbf{and} is written back into \code{x1}.
+    \end{block}
+    \vspace{0.3em}
+    \begin{itemize}
+        \item Identified by the trailing exclamation mark (\code{!}).
+        \item \key{Use Case}: Updating a pointer before accessing the next sequential memory item.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 16: Post-Indexed Addressing Mode ---
+\begin{frame}{Post-Indexed Addressing Mode}
+    \begin{block}{Syntax and Semantics}
+        $$\code{ldr x0, [x1], \#8}$$
+        Data is loaded from the unmodified address in \code{x1}. After the memory access completes, the offset (\code{+\#8}) is added to \code{x1}, updating the pointer register.
+    \end{block}
+    \vspace{0.3em}
+    \begin{itemize}
+        \item Identified by placing the offset outside the square brackets.
+        \item \key{Use Case}: Fetching current array elements and automatically advancing the pointer for the next iteration.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 17: Register Offset Addressing ---
+\begin{frame}{Register Offset and Scaled Addressing}
+    AArch64 allows an index register to offset the base pointer, optionally scaled by data size:
+    \vspace{0.3em}
+    \begin{itemize}
+        \item \key{Syntax}: \code{ldr x0, [x1, x2]} $\rightarrow$ Address is $\code{x1} + \code{x2}$.
+        \item \key{Scaled Register Offset}: \code{ldr x0, [x1, x2, lsl \#3]} $\rightarrow$ Address is $\code{x1} + (\code{x2} \times 8)$.
+    \end{itemize}
+    \vspace{0.3em}
+    \begin{block}{Array Indexing Power}
+        Scaling shifts the index register by the exact byte width of the data item ($2^3 = 8$ bytes for doublewords), mapping C array subscripts directly into hardware addressing.
+    \end{block}
+\end{frame}
+
+% --- Slide 18: Addressing Mode Summary Table ---
+\begin{frame}{Addressing Mode Summary}
+    \begin{table}[]
+        \centering
+        \small
+        \begin{tabular}{p{2.6cm} p{4.2cm} p{2.4cm} p{2.8cm}}
+            \toprule
+            \textbf{Mode} & \textbf{AArch64 Assembly} & \textbf{Address} & \textbf{Base Register} \\
+            \midrule
+            Offset & \code{ldr x0, [x1, x2]} & $\code{x1} + \code{x2}$ & Unchanged \\
+            \hline
+            Pre-index & \code{ldr x0, [x1, x2]!} & $\code{x1} + \code{x2}$ & $\code{x1} = \code{x1} + \code{x2}$ \\
+            \hline
+            Post-index & \code{ldr x0, [x1], x2} & $\code{x1}$ & $\code{x1} = \code{x1} + \code{x2}$ \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    \vspace{0.2em}
+    \begin{block}{Note on Register vs. Immediate}
+        Offset and index quantities can be specified as general-purpose registers (as shown above) or compatible immediate byte constants (e.g., \code{\#8}).
+    \end{block}
+\end{frame}
+
+% ============================================================
+% SECTION 4
+% ============================================================
+\sectiondivider{Section 04}{Memory Access, Alignment,\\and Pair Transfers}
+
+% --- Slide 20: Memory Alignment Requirements ---
+\begin{frame}{Memory Alignment Rules in AArch64}
+    Data alignment dictates how memory addresses map to data sizes:
+    \vspace{0.2em}
+    \begin{itemize}
+        \item \key{Natural Alignment}: An $n$-byte data item must be stored at an address divisible by $n$.
+        \begin{itemize}
+            \item Doublewords ($8$ bytes) require addresses divisible by $8$.
+            \item Words ($4$ bytes) require addresses divisible by $4$.
+            \item Halfwords ($2$ bytes) require addresses divisible by $2$.
+        \end{itemize}
+        \item \key{Strict Enforcement}: Unlike x86, unaligned general-purpose memory accesses in AArch64 can trigger hardware alignment fault exceptions (unless explicitly permitted by specific architectural modes).
+    \end{itemize}
+\end{frame}
+
+% --- Slide 21: Load and Store Pair Instructions ---
+\begin{frame}{Load and Store Pair Instructions (\code{ldp} / \code{stp})}
+    AArch64 provides specialized instructions to transfer \textbf{two registers simultaneously}:
+    \vspace{0.3em}
+    \begin{itemize}
+        \item \key{Load Pair (\code{ldp})}: \code{ldp x0, x1, [x2]} loads two 64-bit registers from consecutive memory locations starting at \code{x2}.
+        \item \key{Store Pair (\code{stp})}: \code{stp x0, x1, [x2]} stores two 64-bit registers consecutively to memory.
+    \end{itemize}
+    \vspace{0.3em}
+    \begin{block}{Performance Efficiency}
+        Pair instructions utilize wide memory data buses, moving 16 bytes in a single instruction cycle and reducing overall instruction count.
+    \end{block}
+\end{frame}
+
+% --- Slide 22: Stack Operations Using STP and LDP ---
+\begin{frame}{Stack Operations via Pair Transfers}
+    Stack management relies heavily on pre-index and post-index pair instructions:
+    \vspace{0.3em}
+    \begin{block}{Pushing to the Stack (Pre-Index)}
+        $$\code{stp x29, x30, [sp, \#-16]!}$$
+        Decrements stack pointer (\code{sp}) by $16$ bytes, then stores frame pointer (\code{x29}) and link register (\code{x30}).
+    \end{block}
+    \vspace{0.2em}
+    \begin{block}{Popping from the Stack (Post-Index)}
+        $$\code{ldp x29, x30, [sp], \#16}$$
+        Loads registers from current \code{sp}, then increments stack pointer by $16$ bytes, restoring stack balance.
+    \end{block}
+\end{frame}
+
+% ============================================================
+% SECTION 5
+% ============================================================
+\sectiondivider{Section 05}{Traversing Arrays and Pointers}
+
+% --- Slide 24: Mapping C Arrays to Assembly ---
+\begin{frame}{Mapping C Arrays to AArch64 Assembly}
+    Arrays consist of contiguous memory locations holding elements of identical size:
+    \vspace{0.2em}
+    \begin{itemize}
+        \item Let \code{x1} hold the base address of an integer array (\code{int A[]}, where each element is 4 bytes).
+        \item Accessing element \code{A[i]} requires computing the effective address: $\text{Base} + (\text{Index} \times \text{Element Size})$.
+        \item Assembly implementations utilize scaled register offsets or pointer arithmetic loops.
+    \end{itemize}
+    \vspace{0.3em}
+    \begin{block}{Example Array Access}
+        \code{ldr w0, [x1, x2, lsl \#2]} loads \code{A[i]} into \code{w0}, where \code{x2} holds index \code{i} scaled by $2^2 = 4$.
+    \end{block}
+\end{frame}
+
+% --- Slide 25: Array Traversal via Pointer Arithmetic ---
+\begin{frame}{Array Traversal via Pointer Increments}
+    Loops often traverse arrays by incrementing pointers directly:
+    \vspace{0.3em}
+    \begin{itemize}
+        \item Initializing base pointer \code{x1} to the start of an array.
+        \item Using post-indexed loads to fetch data and advance the pointer in one instruction:
+        $$\code{ldr x0, [x1], \#8}$$
+        \item Eliminates the overhead of maintaining a separate loop index register.
+    \end{itemize}
+    \vspace{0.4em}
+    \begin{block}{Loop Termination}
+        Loops compare the current pointer against an end-of-array sentinel address using comparison (\code{cmp}) and conditional branch instructions.
+    \end{block}
+\end{frame}
+
+% --- Slide 26: Structs and Record Access ---
+\begin{frame}{Accessing Structures and Records}
+    Structures group heterogeneous data fields at fixed byte offsets from a base pointer:
+    \vspace{0.3em}
+    \begin{itemize}
+        \item Suppose a struct has fields at offsets $0$ (ID), $4$ (Age), and $8$ (Score).
+        \item Base address of struct instance held in pointer register \code{x1}.
+        \item Immediate offset addressing accesses individual members without modifying the base pointer:
+        \begin{itemize}
+            \item \code{ldr w0, [x1, \#0]} \quad (Load ID)
+            \item \code{ldr w2, [x1, \#4]} \quad (Load Age)
+            \item \code{ldr x3, [x1, \#8]} \quad (Load Score)
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% ============================================================
+% SECTION 6
+% ============================================================
+\sectiondivider{Section 06}{Summary \& Self-Test}
+
+% --- Slide 28: Topic Summary ---
+\begin{frame}{Topic 6 Comprehensive Summary}
+    \begin{itemize}
+        \item \key{Load-Store Paradigm}: Memory access is strictly restricted to explicit \code{ldr} and \code{str} instructions; arithmetic occurs exclusively in registers.
+        \item \key{Addressing Modes}: Supports base indirect, immediate offset, register offset, pre-indexed, and post-indexed pointer manipulation.
+        \item \key{Alignment Rules}: Natural alignment is strictly enforced to prevent hardware alignment faults.
+        \item \key{Pair Transfers}: \code{ldp} and \code{stp} optimize multi-register memory access and stack frame management.
+        \item \key{Data Structures}: Scaled offsets and post-indexing enable efficient traversal of arrays and structures.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 29: Self-Test: Questions 1 \& 2 ---
+\begin{frame}{Self-Test: Questions 1 \& 2}
+    \begin{block}{Question 1: Load-Store Architecture}
+        Why does AArch64 enforce a strict load-store architecture, prohibiting arithmetic instructions from directly operating on memory operands?
+    \end{block}
+    \vspace{0.4em}
+    \begin{block}{Question 2: Immediate vs. Indexed Addressing}
+        What is the primary operational difference between immediate offset addressing (\code{[x1, \#8]}) and pre-indexed addressing (\code{[x1, \#8]!})?
+    \end{block}
+\end{frame}
+
+% --- Slide 30: Self-Test: Solutions 1 \& 2 ---
+\begin{frame}{Self-Test: Solutions 1 \& 2}
+    \begin{block}{Solution 1}
+        Separating load/store operations from computation simplifies hardware datapath design, enables uniform instruction lengths, keeps pipelines predictable, and avoids complex multi-cycle memory-access execution cycles.
+    \end{block}
+    \vspace{0.3em}
+    \begin{block}{Solution 2}
+        Immediate offset adds the constant to the base register solely to calculate the target address, leaving the base register unchanged. Pre-indexed addressing calculates the address \textbf{and writes the updated address back} into the base register.
+    \end{block}
+\end{frame}
+
+% --- Slide 31: Self-Test: Questions 3 \& 4 ---
+\begin{frame}{Self-Test: Questions 3 \& 4}
+    \begin{block}{Question 3: Post-Indexed Array Traversal}
+        Explain how the instruction \code{ldr x0, [x1], \#8} executes step-by-step and why it is useful for array traversal.
+    \end{block}
+    \vspace{0.4em}
+    \begin{block}{Question 4: Memory Alignment}
+        What happens when an unaligned 64-bit doubleword load is executed on standard AArch64 hardware?
+    \end{block}
+\end{frame}
+
+% --- Slide 32: Self-Test: Solutions 3 \& 4 ---
+\begin{frame}{Self-Test: Solutions 3 \& 4}
+    \begin{block}{Solution 3}
+        It loads data from the current address in \code{x1} into \code{x0}, and then increments \code{x1} by $8$ bytes. This automates pointer advancement, making sequential array traversal concise and efficient.
+    \end{block}
+    \vspace{0.3em}
+    \begin{block}{Solution 4}
+        Unaligned accesses violate natural alignment rules and typically trigger a hardware alignment fault exception, crashing the program or invoking an OS trap handler.
+    \end{block}
+\end{frame}
+
+% --- Slide 33: Self-Test: Questions 5 \& 6 ---
+\begin{frame}{Self-Test: Questions 5 \& 6}
+    \begin{block}{Question 5: Pair Transfers on the Stack}
+        How do \code{stp} and \code{ldp} manage stack pointer updates during function entry and exit?
+    \end{block}
+    \vspace{0.4em}
+    \begin{block}{Question 6: Scaled Register Addressing}
+        In the instruction \code{ldr x0, [x1, x2, lsl \#3]}, what role does the \code{lsl \#3} modifier play in indexing an array of 64-bit integers?
+    \end{block}
+\end{frame}
+
+% --- Slide 34: Self-Test: Solutions 5 \& 6 ---
+\begin{frame}{Self-Test: Solutions 5 \& 6}
+    \begin{block}{Solution 5}
+        Using pre-indexed store pair (\code{stp ... [sp, \#-16]!}), the stack pointer is decremented and registers are saved in one atomic step. Post-indexed load pair (\code{ldp ... [sp], \#16}) restores registers and re-increments the stack pointer.
+    \end{block}
+    \vspace{0.3em}
+    \begin{block}{Solution 6}
+        The \code{lsl \#3} scales the index in \code{x2} by multiplying it by $2^3 = 8$ (the byte size of a 64-bit doubleword), correctly translating logical array indices into byte offsets.
+    \end{block}
+\end{frame}
+
+% --- Slide 35: Review: Addressing Mode Summary Table ---
+\begin{frame}{Review: Addressing Mode Summary Table}
+    \begin{table}[]
+        \centering
+        \small
+        \begin{tabular}{p{3.2cm} p{3.8cm} p{4.5cm}}
+            \toprule
+            \textbf{Addressing Mode} & \textbf{Assembly Syntax Example} & \textbf{Base Register State After Access} \\
+            \midrule
+            \key{Base Register} & \code{ldr x0, [x1]} & Unchanged \\
+            \key{Immediate Offset} & \code{ldr x0, [x1, \#16]} & Unchanged \\
+            \key{Pre-Indexed} & \code{ldr x0, [x1, \#8]!} & Updated ($\text{Base} + 8$) \\
+            \key{Post-Indexed} & \code{ldr x0, [x1], \#8} & Updated ($\text{Base} + 8$) \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+% --- Slide 36: Wrap-Up \& Transition to Topic 7 ---
+\begin{frame}{Wrap-Up \& Transition to Topic 7}
+    \begin{block}{Moving Forward to Topic 7}
+        Now that we have mastered memory data transfer, addressing modes, and alignment, our next session will explore:
+        \begin{itemize}
+            \item \key{Control Flow \& Branching}: Unconditional and conditional branches in AArch64.
+            \item \key{Subroutine Linkage}: Function calls (\code{bl}), return linkage (\code{ret}), and ABI parameter passing conventions.
+        \end{itemize}
+    \end{block}
+    \vspace{0.3em}
+    \begin{center}
+        \textbf{End of Topic 6 --- Questions \& Discussion}
+    \end{center}
+\end{frame}
+
+% --- Slide 37: Additional Source Notes ---
+\begin{frame}{Topic 6 Source Notes}
+    \begin{block}{Source Reference Verification}
+        \begin{itemize}
+            \item Load-store mechanics and offset calculations follow standard ARMv8/ARMv9 AArch64 ISA architecture guidelines.
+            \item Stack frame management conforms to standard Procedure Call Standard for the ARM 64-bit Architecture (AAPCS64).
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\end{document}
