@@ -224,7 +224,7 @@
     \vspace{0.2em}
     \begin{center}
         \begin{tikzpicture}[node distance=0.6cm, auto,
-            codebox/.style={rectangle, draw=navy, fill=lightblue, text=darkgray, font=\small\ttfamily, text width=9.5cm, align=left, rounded corners=2pt, minimum height=0.45cm}]
+            codebox/.style={rectangle, draw=navy, fill=lightblue, text=darkgray, font=\small\ttfamily, text width=11.5cm, align=left, rounded corners=2pt, minimum height=0.45cm}]
             \node [codebox] (c1) {ldr x1, [x0] \hfill // 1. Load 64-bit x from RAM into register x1};
             \node [codebox, below of=c1] (c2) {add x1, x1, \#5 \hfill // 2. Perform arithmetic within register file};
             \node [codebox, below of=c2] (c3) {str x1, [x0] \hfill // 3. Write updated 64-bit result back to RAM};
@@ -240,9 +240,9 @@
             \draw[thick, fill=softgray, text=navy] (0,0.5) rectangle (2.2,3.5);
             \node[font=\small\bfseries, align=center] at (1.1,2.0) {Main\\Memory\\(RAM)};
             
-            % Register File Box
+            % Register File Box (adjusted font size to prevent overflow)
             \draw[thick, fill=navy, text=white] (4.0,0.5) rectangle (6.7,3.5);
-            \node[font=\small\bfseries, align=center, text=white] at (5.35,2.0) {64-Bit Register\\File\\(\code{x0}--\code{x30}, \code{xzr})};
+            \node[font=\tiny\bfseries, align=center, text=white] at (5.35,2.0) {64-Bit Register File\\(\code{x0}--\code{x30}, \code{xzr})};
             
             % ALU Box
             \draw[thick, fill=deepblue, text=white] (8.5,1.0) -- (10.2,1.8) -- (10.2,2.2) -- (8.5,3.0) -- (8.5,2.3) -- (8.9,2.0) -- (8.5,1.7) -- cycle;
@@ -277,9 +277,9 @@
         \item \key{Dense Static Code}: High semantic density minimizes program size in RAM.
     \end{itemize}
     \vspace{0.2em}
-    \begin{alertblock}{Design Penalty}
+    \begin{block}{Design Penalty}
         Heavy silicon area and energy cost allocated to instruction decoding and complex hardware microcode control paths.
-    \end{alertblock}
+    \end{block}
 \end{frame}
 
 % --- Slide 10: Concrete Comparison: x += 5 ---
@@ -404,11 +404,11 @@
             \draw[thick, fill=navy, text=white] (0,1.2) rectangle (10,2.0);
             \node[text=white, font=\bfseries] at (5,1.6) {\code{Xn} (Full 64-Bit Register: Bits [63:0])};
             
-            % Lower 32-bit W register
-            \draw[thick, fill=gold!40, text=navy] (5,0.0) rectangle (10,0.8);
-            \node[text=navy, font=\bfseries] at (7.5,0.4) {\code{Wn} (Lower 32-Bit View: Bits [31:0])};
-            \draw[thick, dashed, fill=softgray, text=darkgray] (0,0.0) rectangle (5,0.8);
-            \node[text=darkgray] at (2.5,0.4) {\textit{Zeroed on 32-bit write}};
+            % Lower 32-bit W register (adjusted font size to avoid overflow/obscuring)
+            \draw[thick, fill=gold!40, text=navy] (4.5,0.0) rectangle (10,0.8);
+            \node[text=navy, font=\tiny\bfseries] at (7.25,0.4) {\code{Wn} (Lower 32-Bit View: Bits [31:0])};
+            \draw[thick, dashed, fill=softgray, text=darkgray] (0,0.0) rectangle (4.5,0.8);
+            \node[text=darkgray, font=\tiny] at (2.25,0.4) {\textit{Zeroed on 32-bit write}};
         \end{tikzpicture}
     \end{center}
     \vspace{0.2em}
@@ -606,7 +606,7 @@
     \vspace{0.3em}
     \begin{center}
         \begin{tikzpicture}[node distance=0.6cm, auto,
-            membox/.style={rectangle, draw=navy, fill=lightblue, text=darkgray, font=\small\ttfamily, text width=10.2cm, align=left, rounded corners=2pt, minimum height=0.55cm}]
+            membox/.style={rectangle, draw=navy, fill=lightblue, text=darkgray, font=\small\ttfamily, text width=11.2cm, align=left, rounded corners=2pt, minimum height=0.55cm}]
             \node [membox] (m1) {ldr x1, [x2] \hfill // Load 64-bit doubleword at address in x2 into x1};
             \node [membox, below of=m1] (m2) {str w5, [x3] \hfill // Store 32-bit word from w5 into memory address in x3};
             \node [membox, below of=m2] (m3) {ldr x1, [x2, \#8] \hfill // Immediate offset: Load from address (x2 + 8) into x1};
@@ -687,15 +687,15 @@
     \end{center}
 \end{frame}
 
-% --- Slide 27: Assembly Decisions (Fixed Alignment) ---
+% --- Slide 27: Assembly Decisions (Fixed Alignment & Margin Clearance) ---
 \begin{frame}{Assembly Decisions: The Compare-and-Branch Pattern}
     High-level \code{if-else} statements are implemented via a 2-step assembly pattern:
-    \vspace{0.3em}
-    \begin{columns}[T]
+    \vspace{-1em}
+    \begin{columns}[T,onlytextwidth]
         \begin{column}{0.48\textwidth}
             \begin{block}{Step 1: Evaluate Condition}
                 \code{cmp x1, x2}
-                \vspace{0.2em}
+                \vspace{0.02em}
                 \begin{itemize}
                     \item Subtracts \code{x2} from \code{x1} internally.
                     \item Updates \key{NZCV} flags in \code{PSTATE}.
@@ -705,7 +705,7 @@
         \begin{column}{0.48\textwidth}
             \begin{block}{Step 2: Test Flags \& Branch}
                 \code{b.eq equal\_label}
-                \vspace{0.2em}
+                \vspace{0.02em}
                 \begin{itemize}
                     \item Evaluates flag state ($Z == 1$).
                     \item If true $\rightarrow$ updates \code{pc} to label.
@@ -713,9 +713,9 @@
             \end{block}
         \end{column}
     \end{columns}
-    \vspace{0.3em}
+    \vspace{0.05em}
     \begin{block}{Complete Conditional Pattern}
-        \vspace{0.1em}
+        \vspace{0.01em}
         \centering
         \small
         \begin{tabular}{@{}ll@{}}
@@ -727,7 +727,7 @@
             \code{\quad add x0, x1, x2} & \code{// True-block: executed if x1 == x2} \\
             \code{end\_block:}           & 
         \end{tabular}
-        \vspace{0.1em}
+        \vspace{0.01em}
     \end{block}
 \end{frame}
 
@@ -760,9 +760,9 @@
         \end{column}
     \end{columns}
     \vspace{0.3em}
-    \begin{alertblock}{Microarchitectural Advantage}
+    \begin{block}{Microarchitectural Advantage}
         Fuses comparison and control-flow evaluation into a single instruction without clobbering condition flag state.
-    \end{alertblock}
+    \end{block}
 \end{frame}
 
 % ============================================================
