@@ -203,12 +203,20 @@
 % --- Slide 6: Symbolic Labels in Assembly ---
 \begin{frame}{Symbolic Labels as Branch Targets}
     Hardcoding absolute memory addresses in assembly is error-prone and inflexible:
-    \vspace{0.3em}
+    \vspace{0.2em}
     \begin{itemize}
-        \item Assemblers and linkers use \key{symbolic labels} (e.g., \code{loop:}, \code{exit:}, \code{else\_block:}) to mark target destinations.
-        \item The assembler translates labels into PC-relative offsets encoded directly into the branch instruction word.
-        \item Keeps code position-independent and adaptable during code re-compilation and linking.
+        \item \key{Symbolic Labels} (e.g., \code{loop:}, \code{exit:}, \code{else\_block:}) provide human-readable names for target destinations.
+        \item \key{The Assembler's Role}: Replaces labels with numerical offsets relative to the current Program Counter (\code{PC}).
+        \item \key{Position Independence}: Allows code blocks to be relocated anywhere in memory without breaking branch references.
     \end{itemize}
+    \vspace{0.2em}
+    \begin{block}{Two-Pass Assembly Resolution}
+        \begin{enumerate}
+            \small
+            \item \textbf{Pass 1}: The assembler scans the source, records every label's relative distance, and builds a symbol table.
+            \item \textbf{Pass 2}: It computes the exact instruction-byte offsets and encodes them into the branch instruction word.
+        \end{enumerate}
+    \end{block}
 \end{frame}
 
 % --- Slide 7: PC-Relative Addressing ---
