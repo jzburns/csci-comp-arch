@@ -197,6 +197,7 @@
         \end{column}
     \end{columns}
 \end{frame}
+
 % --- Slide 4: Lecture Outline ---
 \begin{frame}{Topic 1 Outline}
     \begin{block}{Foundational Focus}
@@ -224,27 +225,34 @@
     \vspace{0.2em}
     \begin{center}
         \begin{tikzpicture}[xscale=0.85, yscale=0.48, every node/.style={font=\footnotesize\bfseries}]
-            % Layers
-            \node[fill=navy, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,8) {Application Software};
-            \node[fill=navy!90, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,7) {Operating Systems};
-            \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,6) {Architecture (AArch64 ISA)};
-            \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,5) {Organization (Microarchitecture)};
-            \node[fill=deepblue!80, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,4) {Logic Design};
-            \node[fill=deepblue!60, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,3) {Digital Circuits};
-            \node[fill=lightblue, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,2) {Analog Circuits};
-            \node[fill=lightblue!70, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,1) {Electronic Devices};
-            \node[fill=softgray, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,0) {Solid-State Physics};
+            % Layers with clear individual separation so no borders get covered
+            \node[fill=navy, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,8.2) {Application Software};
+            \node[fill=navy!90, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,7.1) {Operating Systems};
+            
+            % Highlighted layers with explicit spacing so all four dashed borders are fully visible
+            \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt, draw=navy, thick, dashed] at (0,6.0) {Architecture (AArch64 ISA)};
+            \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt, draw=navy, thick, dashed] at (0,4.9) {Organization (Microarchitecture)};
+            
+            % Lower layers
+            \node[fill=deepblue!80, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,3.75) {Logic Design};
+            \node[fill=deepblue!60, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,2.7) {Digital Circuits};
+            \node[fill=lightblue, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,1.6) {Analog Circuits};
+            \node[fill=lightblue!70, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,0.5) {Electronic Devices};
+            \node[fill=softgray, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,-0.6) {Solid-State Physics};
 
             % Right side descriptions
-            \node[anchor=west, text=navy] at (3.5,8) {C Programs, Algorithms, Apps};
-            \node[anchor=west, text=navy] at (3.5,7) {Device Drivers, Schedulers, Virtual Memory};
-            \node[anchor=west, text=gold!60!black] at (3.5,6) {\textbf{64-Bit Instructions, X Registers}};
-            \node[anchor=west, text=gold!60!black] at (3.5,5) {\textbf{Datapaths, Controllers, Pipelines, Caches}};
-            \node[anchor=west, text=navy] at (3.5,4) {Adders, ALUs, Register Files, Decoders};
-            \node[anchor=west, text=navy] at (3.5,3) {and, or, not, xor Logic Gates};
-            \node[anchor=west, text=darkgray] at (3.5,2) {Differential Amplifiers, Filters, Clocks};
-            \node[anchor=west, text=darkgray] at (3.5,1) {NMOS / PMOS Field-Effect Transistors};
-            \node[anchor=west, text=darkgray] at (3.5,0) {Electron Transport in Silicon Substrates};
+            \node[anchor=west, text=navy] at (3.5,8.2) {C Programs, Algorithms, Apps};
+            \node[anchor=west, text=navy] at (3.5,7.1) {Device Drivers, Schedulers, Virtual Memory};
+            
+            % Highlighted text boxes on the right with dashed borders
+            \node[anchor=west, text=navy, draw=navy, thick, dashed, inner sep=3pt, rounded corners=1pt] at (3.5,6.0) {\textbf{64-Bit Instructions, X Registers}};
+            \node[anchor=west, text=navy, draw=navy, thick, dashed, inner sep=3pt, rounded corners=1pt] at (3.5,4.9) {\textbf{Datapaths, Controllers, Pipelines, Caches}};
+            
+            \node[anchor=west, text=navy] at (3.5,3.8) {Adders, ALUs, Register Files, Decoders};
+            \node[anchor=west, text=navy] at (3.5,2.7) {and, or, not, xor Logic Gates};
+            \node[anchor=west, text=darkgray] at (3.5,1.6) {Differential Amplifiers, Filters, Clocks};
+            \node[anchor=west, text=darkgray] at (3.5,0.5) {NMOS / PMOS Field-Effect Transistors};
+            \node[anchor=west, text=darkgray] at (3.5,-0.6) {Electron Transport in Silicon Substrates};
         \end{tikzpicture}
     \end{center}
 \end{frame}
@@ -254,7 +262,6 @@
     \begin{block}{CSCI 2406 Focus}
         Our course focuses on the critical boundary that translates logical intent into physical electrical actions: computer architecture and organization.
     \end{block}
-    \vspace{0.4em}
     \begin{columns}[T,onlytextwidth]
         \begin{column}{0.48\textwidth}
             \begin{block}{Above the Boundary (Architecture / Software)}
