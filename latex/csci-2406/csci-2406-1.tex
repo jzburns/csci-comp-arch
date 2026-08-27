@@ -117,7 +117,7 @@
 }
 
 \subtitle{
-  Architecture vs. Organization, ISA vs. Microarchitecture,\\
+  Architecture vs.\ Organization, ISA vs.\ Microarchitecture,\\
   the Stored-Program Concept, and Memory Models in AArch64
 }
 
@@ -145,7 +145,7 @@
 \vspace{0.3cm}
 {\color{white}\fontsize{20}{24}\selectfont\bfseries Computer Architecture \& Organization Fundamentals\par}
 \vspace{0.3cm}
-{\color{lightblue}\normalsize Abstraction Layers, ISA vs.\ Microarchitecture, Stored-Program Concept, and Memory Models in AArch64\par}
+{\color{lightblue}\normalsize Abstraction Layers, Architecture vs.\ Organization, Stored-Program Concept, and Memory Models in AArch64\par}
 \vspace{0.6cm}
 {\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad Topic 1\par}
 \end{minipage}
@@ -153,8 +153,8 @@
 
 % --- Slide 2: Course Information & Logistics ---
 \begin{frame}{Course Information \& Administration}
-    \begin{columns}[T]
-        \begin{column}{0.5\textwidth}
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.48\textwidth}
             \begin{block}{Instructor Contact}
                 \begin{itemize}
                     \item \key{Email}: \code{jburns@ada.edu.az}
@@ -177,7 +177,7 @@
 
 % --- Slide 3: Laboratory Tools & Simulation Environment ---
 \begin{frame}{Tools, Emulation, and Assessments}
-    \begin{columns}[T]
+    \begin{columns}[T,onlytextwidth]
         \begin{column}{0.48\textwidth}
             \begin{block}{Software \& Emulation Stack}
                 \begin{itemize}
@@ -188,17 +188,15 @@
             \end{block}
         \end{column}
         \begin{column}{0.48\textwidth}
-            \begin{block}{Evaluation \& Assignments}
+            \begin{block}{Online Programming Resources}
                 \begin{itemize}
-                    \item Exams drawn directly from lecture slides, class notes, and lab problem sets.
-                    \item 2 Individual Take-Home Assignments.
-                    \item Peer discussion is encouraged, but all submitted code and write-ups must be strictly authentic work.
+                    \item \key{WebAssembliss}: Browser-based ARM64 Linux assembly environment:\\\url{https://web.assembliss.app/editor/arm64_linux/}
+                    \item \key{CPUlator}: Interactive web-based ARM32 / ARMv7 system simulator:\\\url{https://cpulator.01xz.net/?sys=arm}
                 \end{itemize}
             \end{block}
         \end{column}
     \end{columns}
 \end{frame}
-
 % --- Slide 4: Lecture Outline ---
 \begin{frame}{Topic 1 Outline}
     \begin{block}{Foundational Focus}
@@ -211,7 +209,7 @@
         \item \key{Section 3}: Instruction Set Architecture (ISA) versus Microarchitecture
         \item \key{Section 4}: The Stored-Program Concept \& Execution Cycle
         \item \key{Section 5}: Memory Models: von Neumann, Harvard, and Modified Harvard
-        \item \key{Section 6}: Grand Synthesis \& Interactive Self-Test Review
+        \item \key{Section 6}: Summary and Interactive Self-Test Review
     \end{itemize}
 \end{frame}
 
@@ -230,7 +228,7 @@
             \node[fill=navy, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,8) {Application Software};
             \node[fill=navy!90, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,7) {Operating Systems};
             \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,6) {Architecture (AArch64 ISA)};
-            \node[fill=deepblue, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,5) {Microarchitecture};
+            \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,5) {Organization (Microarchitecture)};
             \node[fill=deepblue!80, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,4) {Logic Design};
             \node[fill=deepblue!60, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,3) {Digital Circuits};
             \node[fill=lightblue, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,2) {Analog Circuits};
@@ -241,7 +239,7 @@
             \node[anchor=west, text=navy] at (3.5,8) {C Programs, Algorithms, Apps};
             \node[anchor=west, text=navy] at (3.5,7) {Device Drivers, Schedulers, Virtual Memory};
             \node[anchor=west, text=gold!60!black] at (3.5,6) {\textbf{64-Bit Instructions, X Registers}};
-            \node[anchor=west, text=navy] at (3.5,5) {Datapaths, Controllers, Pipelines, Caches};
+            \node[anchor=west, text=gold!60!black] at (3.5,5) {\textbf{Datapaths, Controllers, Pipelines, Caches}};
             \node[anchor=west, text=navy] at (3.5,4) {Adders, ALUs, Register Files, Decoders};
             \node[anchor=west, text=navy] at (3.5,3) {and, or, not, xor Logic Gates};
             \node[anchor=west, text=darkgray] at (3.5,2) {Differential Amplifiers, Filters, Clocks};
@@ -253,13 +251,13 @@
 
 % --- Slide 7: The Central Divide ---
 \begin{frame}{Where Software Meets Hardware}
-    \begin{block}{The Strategic Core of CSCI 2406}
-        Our course focuses on the critical boundary that translates logical intent into physical electrical actions: \key{Architecture} and \key{Microarchitecture}.
+    \begin{block}{CSCI 2406 Focus}
+        Our course focuses on the critical boundary that translates logical intent into physical electrical actions: computer architecture and organization.
     \end{block}
     \vspace{0.4em}
-    \begin{columns}[T]
+    \begin{columns}[T,onlytextwidth]
         \begin{column}{0.48\textwidth}
-            \begin{block}{Above the Boundary (Software)}
+            \begin{block}{Above the Boundary (Architecture / Software)}
                 \begin{itemize}
                     \item Applications compiled into machine binaries.
                     \item Operating systems managing hardware through architectural exception levels.
@@ -268,9 +266,9 @@
             \end{block}
         \end{column}
         \begin{column}{0.48\textwidth}
-            \begin{block}{Below the Boundary (Hardware)}
+            \begin{block}{Below the Boundary (Organization / Hardware)}
                 \begin{itemize}
-                    \item Microarchitecture (datapaths and state controllers).
+                    \item Organization and microarchitecture (datapaths and state controllers).
                     \item Digital circuits and gate-level logic.
                     \item Silicon fabrication nodes and thermal design power (TDP) constraints.
                 \end{itemize}
@@ -323,7 +321,7 @@
 \end{frame}
 
 % --- Slide 11: Direct Comparison Table ---
-\begin{frame}{Architecture vs. Organization: Direct Contrast}
+\begin{frame}{Architecture vs.\ Organization: Direct Contrast}
     \begin{table}[]
         \centering
         \small
@@ -342,17 +340,17 @@
     \end{table}
 \end{frame}
 
-% --- Slide 12: Architectural Longevity Example ---
-\begin{frame}{Real-World Continuity: The ARM64 Ecosystem}
-    \begin{block}{The Economic Benefit of a Stable Architecture}
-        Preserving the architecture allows software investments to persist indefinitely while the internal organization is completely overhauled for performance.
+% --- Slide 12: Architectural Stability and Hardware Evolution ---
+\begin{frame}{Architectural Stability and Hardware Evolution}
+    \begin{block}{The Benefit of a Stable Architecture}
+        Preserving the instruction set architecture allows software investments to persist indefinitely while hardware design is continuously overhauled to boost performance.
     \end{block}
     \vspace{0.3em}
-    \begin{columns}[T]
+    \begin{columns}[T,onlytextwidth]
         \begin{column}{0.48\textwidth}
             \begin{block}{Architectural Invariance}
                 \begin{itemize}
-                    \item The \key{AArch64 ISA} defines instructions like \code{add}, \code{ldr}, and \code{cbz}.
+                    \item The \key{AArch64 ISA} defines standard instructions like \code{add}, \code{ldr}, and \code{cbz}.
                     \item An ARM64 binary compiled for early AArch64 systems executes seamlessly on modern Apple M-series or AWS Graviton CPUs.
                 \end{itemize}
             \end{block}
@@ -360,8 +358,8 @@
         \begin{column}{0.48\textwidth}
             \begin{block}{Organizational Evolution}
                 \begin{itemize}
-                    \item Early Cores: In-order or narrower out-of-order execution pipelines.
-                    \item Modern Cores: Wide 8--9 issue out-of-order engines, deep multi-level caches, advanced matrix coprocessors.
+                    \item \textbf{Early Cores}: In-order or narrower out-of-order execution pipelines.
+                    \item \textbf{Modern Cores}: Wide-issue out-of-order engines, deep multi-level caches, and advanced execution units.
                 \end{itemize}
             \end{block}
         \end{column}
@@ -414,25 +412,25 @@
 \begin{frame}{Visualizing the Microarchitectural Datapath}
     \begin{center}
         \begin{tikzpicture}[scale=0.9, every node/.style={font=\footnotesize}]
-            % Register File (Expanded Size)
+            % Register File (Expanded Size, lowered text positioning)
             \draw[thick, fill=navy, text=white] (0,-0.2) rectangle (3.5,3.6);
-            \node[text=white, font=\small\bfseries, align=center] at (1.75,1.7) {64-Bit Register\\File};
+            \node[text=white, font=\small\bfseries, align=center] at (1.75,1.5) {64-Bit Register\\File};
             \node[text=gold, anchor=west] at (0.2,3.1) {\code{ra1} (\code{x2})};
             \node[text=gold, anchor=west] at (0.2,2.3) {\code{ra2} (\code{x3})};
             \node[text=gold, anchor=west] at (0.2,0.4) {\code{wa} (\code{x1})};
             
-            % ALU
-            \draw[thick, fill=deepblue, text=white] (6.0,0.8) -- (8.2,1.8) -- (8.2,2.8) -- (6.0,3.8) -- (6.0,2.6) -- (6.5,2.3) -- (6.0,2.0) -- cycle;
-            \node[text=white, font=\small\bfseries] at (7.1,2.3) {64-Bit ALU};
+            % ALU (Reduced size and multi-line wrapped text)
+            \draw[thick, fill=deepblue, text=white] (6.2,1.2) -- (7.8,1.8) -- (7.8,2.8) -- (6.2,3.4) -- (6.2,2.5) -- (6.6,2.3) -- (6.2,2.1) -- cycle;
+            \node[text=white, font=\tiny\bfseries, align=center] at (7.0,2.3) {64-Bit \\ ALU};
             
-            % Routing Lines
-            \draw[thick, -Latex, draw=navy] (3.5,3.1) -- node[above]{\code{rd1 (x2)}} (6.0,3.3);
-            \draw[thick, -Latex, draw=navy] (3.5,2.3) -- node[below]{\code{rd2 (x3)}} (6.0,1.3);
-            \draw[thick, -Latex, draw=navy] (8.2,2.3) -- (9.2,2.3) -- (9.2,-0.6) -- (1.75,-0.6) -- node[left]{\code{alu\_result}} (1.75,-0.2);
+            % Routing Lines (Altered y-coordinates on the left to remove slope)
+            \draw[thick, -Latex, draw=navy] (3.5,2.7) -- node[above]{\code{rd1 (x2)}} (6.2,2.7);
+            \draw[thick, -Latex, draw=navy] (3.5,1.9) -- node[below]{\code{rd2 (x3)}} (6.2,1.9);
+            \draw[thick, -Latex, draw=navy] (7.8,2.3) -- (8.8,2.3) -- (8.8,-0.6) -- (1.75,-0.6) -- node[left]{\code{alu\_result}} (1.75,-0.2);
             
             % Control signals
-            \node[draw=gold, fill=lightblue, rounded corners=2pt] at (7.1,4.3) {\code{alu\_control = add}};
-            \draw[dashed, -Latex, draw=gold!70!black] (7.1,4.0) -- (7.1,3.1);
+            \node[draw=gold, fill=lightblue, rounded corners=2pt, font=\scriptsize] at (7.0,4.0) {\code{alu\_control = add}};
+            \draw[dashed, -Latex, draw=gold!70!black] (7.0,3.7) -- (7.0,3.1);
         \end{tikzpicture}
     \end{center}
     \begin{itemize}
@@ -480,9 +478,9 @@
         \item \key{Make Decisions}: Alters control flow dynamically based on evaluated conditions (e.g., conditional branches).
     \end{itemize}
     \vspace{0.2em}
-    \begin{alertblock}{Core Breakthrough}
+    \begin{block}{Core Advantage}
         Reprogramming does not require physical rewiring; it simply requires loading new numbers into memory.
-    \end{alertblock}
+    \end{block}
 \end{frame}
 
 % --- Slide 20: CPU and Memory Interface ---
@@ -512,7 +510,7 @@
 
 % --- Slide 21: Memory Cell Indexing ---
 \begin{frame}{Memory as an Array of Numbered Cells}
-    \begin{columns}[T]
+    \begin{columns}[T,onlytextwidth]
         \begin{column}{0.55\textwidth}
             \key{How Memory is Structured}:
             \begin{itemize}
@@ -564,22 +562,29 @@
     The processor continuously steps through code using the \key{program counter (\code{pc})}:
     \vspace{0.3em}
     \begin{center}
-        \begin{tikzpicture}[node distance=1.8cm, auto,
-            stage/.style={rectangle, draw=navy, fill=lightblue, text=darkgray, font=\small\bfseries, text width=1.6cm, align=center, rounded corners=2pt, minimum height=1.0cm},
+        \begin{tikzpicture}[node distance=0.4cm, auto,
+            stage/.style={rectangle, draw=navy, fill=lightblue, text=darkgray, font=\small\bfseries, text width=1.9cm, minimum width=2.1cm, minimum height=1.0cm, align=center, rounded corners=2pt},
             arr/.style={draw=navy, -Latex, thick}]
-            \node [stage] (fetch) {1. Fetch\\at [\code{pc}]};
-            \node [stage, right of=fetch] (decode) {2. Decode\\Opcode};
-            \node [stage, right of=decode] (exec) {3. Execute\\in ALU};
-            \node [stage, right of=exec] (mem) {4. Memory\\Access};
-            \node [stage, right of=mem] (wb) {5. Write\\Back};
-            \node [stage, below of=exec, fill=gold, text=navy, text width=3.8cm] (pc) {Increment \code{pc}\\($\code{pc} \leftarrow \code{pc} + 4$ or Target)};
             
+            % All 5 nodes placed sequentially with explicit identical dimensions
+            \node [stage] (fetch) {1. Fetch\\at [\code{pc}]};
+            \node [stage, right=0.4cm of fetch] (decode) {2. Decode\\Opcode};
+            \node [stage, right=0.4cm of decode] (exec) {3. Execute\\in ALU};
+            \node [stage, right=0.4cm of exec] (mem) {4. Memory\\Access};
+            \node [stage, right=0.4cm of mem] (wb) {5. Write\\Back};
+            
+            % PC Increment block centered below execution/memory stages
+            \node [rectangle, draw=navy, fill=gold, text=navy, font=\small\bfseries, text width=4.2cm, minimum height=1.0cm, align=center, rounded corners=2pt, below=0.8cm of exec] (pc) {Increment \code{pc}\\($\code{pc} \leftarrow \code{pc} + 4$ or Target)};
+            
+            % Correct left-to-right forward progression arrows
             \path [arr] (fetch) -- (decode);
             \path [arr] (decode) -- (exec);
             \path [arr] (exec) -- (mem);
             \path [arr] (mem) -- (wb);
-            \path [arr] (wb) |- (pc);
-            \path [arr] (pc) -| (fetch);
+            
+            % Route from Writeback down and back to PC update, then loop back to Fetch
+            \path [arr] (wb.east) -- ++(0.3,0) |- (pc.east);
+            \path [arr] (pc.west) -| (fetch.south);
         \end{tikzpicture}
     \end{center}
     \vspace{0.1em}
@@ -595,7 +600,7 @@
 
 % --- Slide 25: von Neumann Architecture ---
 \begin{frame}{The von Neumann Architecture}
-    \begin{columns}[T]
+    \begin{columns}[T,onlytextwidth]
         \begin{column}{0.55\textwidth}
             \key{Core Characteristics}:
             \begin{itemize}
@@ -629,7 +634,7 @@
 
 % --- Slide 26: Harvard Architecture ---
 \begin{frame}{The Harvard Architecture}
-    \begin{columns}[T]
+    \begin{columns}[T,onlytextwidth]
         \begin{column}{0.55\textwidth}
             \key{Core Characteristics}:
             \begin{itemize}
@@ -642,26 +647,26 @@
         \begin{column}{0.42\textwidth}
             \begin{center}
                 \begin{tikzpicture}[scale=0.72, every node/.style={font=\tiny}]
-                    \draw[thick, fill=navy, text=white] (2.0,0) rectangle (3.8,4.0);
-                    \node[text=white, font=\small\bfseries, align=center] at (2.9,2.0) {CPU};
+                    \draw[thick, fill=navy, text=white] (2.2,0) rectangle (4.0,4.0);
+                    \node[text=white, font=\small\bfseries, align=center] at (3.1,2.0) {CPU};
                     
-                    % Data Mem Left
-                    \draw[thick, fill=lightblue] (-0.8,0.5) rectangle (0.8,3.5);
-                    \node[font=\bfseries, align=center] at (0,2.0) {Data\\Memory};
+                    % Data Mem Left (enlarged width)
+                    \draw[thick, fill=lightblue] (-1.2,0.5) rectangle (0.8,3.5);
+                    \node[font=\bfseries, align=center] at (-0.2,2.0) {Data\\Memory};
                     
-                    % Program Mem Right
-                    \draw[thick, fill=lightblue] (5.0,0.5) rectangle (6.6,3.5);
-                    \node[font=\bfseries, align=center] at (5.8,2.0) {Program\\Memory};
+                    % Program Mem Right (enlarged width)
+                    \draw[thick, fill=lightblue] (5.4,0.5) rectangle (7.4,3.5);
+                    \node[font=\bfseries, align=center] at (6.4,2.0) {Program\\Memory};
                     
                     % Data Bus Left
-                    \draw[thick, -Latex] (2.0,3.0) -- (0.8,3.0);
-                    \draw[thick, Latex-Latex] (2.0,2.0) -- (0.8,2.0);
-                    \draw[thick, Latex-Latex] (2.0,1.0) -- (0.8,1.0);
+                    \draw[thick, -Latex] (2.2,3.0) -- (0.8,3.0);
+                    \draw[thick, Latex-Latex] (2.2,2.0) -- (0.8,2.0);
+                    \draw[thick, Latex-Latex] (2.2,1.0) -- (0.8,1.0);
                     
                     % Inst Bus Right
-                    \draw[thick, -Latex] (3.8,3.0) -- (5.0,3.0);
-                    \draw[thick, Latex-Latex] (3.8,2.0) -- (5.0,2.0);
-                    \draw[thick, Latex-Latex] (3.8,1.0) -- (5.0,1.0);
+                    \draw[thick, -Latex] (4.0,3.0) -- (5.4,3.0);
+                    \draw[thick, Latex-Latex] (4.0,2.0) -- (5.4,2.0);
+                    \draw[thick, Latex-Latex] (4.0,1.0) -- (5.4,1.0);
                 \end{tikzpicture}
             \end{center}
         \end{column}
@@ -674,7 +679,7 @@
         The decisive architectural issue is not simply where bytes are stored. It is \key{whether instruction access and data access are structurally separated}.
     \end{block}
     \vspace{0.4em}
-    \begin{columns}[T]
+    \begin{columns}[T,onlytextwidth]
         \begin{column}{0.48\textwidth}
             \begin{block}{Single Shared Bus (vN)}
                 \begin{itemize}
@@ -700,25 +705,25 @@
     \vspace{0.2em}
     \begin{center}
         \begin{tikzpicture}[scale=0.8, every node/.style={font=\footnotesize}]
-            % Main memory
-            \draw[thick, fill=softgray, text=navy] (1,4.0) rectangle (9,5.0);
+            % Main memory (wider box to prevent text overflow)
+            \draw[thick, fill=softgray, text=navy] (0.2,4.0) rectangle (9.8,5.0);
             \node[font=\small\bfseries, align=center] at (5,4.5) {Unified Main Memory (Program + Data)};
             
-            % Split caches
-            \draw[thick, fill=lightblue, text=darkgray] (0.5,2.2) rectangle (4.2,3.0);
-            \node[font=\bfseries, align=center] at (2.35,2.6) {L1 Data Cache};
-            \draw[thick, fill=lightblue, text=darkgray] (5.8,2.2) rectangle (9.5,3.0);
-            \node[font=\bfseries, align=center] at (7.65,2.6) {L1 Instruction Cache};
+            % Split caches (wider boxes with smaller font)
+            \draw[thick, fill=lightblue, text=darkgray] (0.2,2.2) rectangle (4.6,3.0);
+            \node[font=\scriptsize\bfseries, align=center] at (2.4,2.6) {L1 Data Cache};
+            \draw[thick, fill=lightblue, text=darkgray] (5.4,2.2) rectangle (9.8,3.0);
+            \node[font=\scriptsize\bfseries, align=center] at (7.6,2.6) {L1 Instruction Cache};
             
             % CPU Box
             \draw[thick, fill=navy, text=white] (1.5,0.0) rectangle (8.5,1.2);
             \node[font=\normalsize\bfseries, text=white, align=center] at (5,0.6) {Central Processing Unit (CPU)};
             
             % Connectors
-            \draw[thick, Latex-Latex, draw=deepblue] (2.35,1.2) -- node[left]{\code{data path}} (2.35,2.2);
-            \draw[thick, Latex-Latex, draw=deepblue] (7.65,1.2) -- node[right]{\code{instruction path}} (7.65,2.2);
-            \draw[thick, Latex-Latex, draw=navy] (2.35,3.0) -- (4.2,4.0);
-            \draw[thick, Latex-Latex, draw=navy] (7.65,3.0) -- (5.8,4.0);
+            \draw[thick, Latex-Latex, draw=deepblue] (2.4,1.2) -- node[left]{\code{data path}} (2.4,2.2);
+            \draw[thick, Latex-Latex, draw=deepblue] (7.6,1.2) -- node[right]{\code{instruction path}} (7.6,2.2);
+            \draw[thick, Latex-Latex, draw=navy] (2.4,3.0) -- (4.2,4.0);
+            \draw[thick, Latex-Latex, draw=navy] (7.6,3.0) -- (5.8,4.0);
         \end{tikzpicture}
     \end{center}
     \vspace{-0.2em}
@@ -753,8 +758,8 @@
 % --- Slide 31: Comprehensive Lecture Summary ---
 \begin{frame}{Topic Summary}
     \begin{itemize}
-        \item \key{Architecture vs. Organization}: Architecture is the programmer-visible specification (the \textit{what}); Organization is the internal hardware implementation (the \textit{how}).
-        \item \key{ISA vs. Microarchitecture}: ISA is the instruction vocabulary contract; Microarchitecture specifies the datapath and control sequencing.
+        \item \key{Architecture vs.\ Organization}: Architecture is the programmer-visible specification (the \textit{what}); Organization is the internal hardware implementation (the \textit{how}).
+        \item \key{ISA vs.\ Microarchitecture}: ISA is the instruction vocabulary contract; Microarchitecture specifies the datapath and control sequencing.
         \item \key{Stored-Program Concept}: Instructions are stored as binary numbers in memory alongside data; meaning is determined by how the CPU accesses them.
         \item \key{von Neumann Architecture}: Shares a single memory and bus system for both instructions and data.
         \item \key{Harvard Architecture}: Uses separate memory modules and dedicated buses for concurrent instruction and data access.
@@ -764,11 +769,11 @@
 
 % --- Slide 32: Self-Test: Questions 1 & 2 ---
 \begin{frame}{Self-Test: Questions 1 \& 2}
-    \begin{block}{Question 1: Architecture vs. Organization}
+    \begin{block}{Question 1: Architecture vs.\ Organization}
         What is the difference between computer architecture and computer organization? Provide two specific features belonging to each domain.
     \end{block}
     \vspace{0.4em}
-    \begin{block}{Question 2: ISA vs. Microarchitecture}
+    \begin{block}{Question 2: ISA vs.\ Microarchitecture}
         For the AArch64 instruction \code{add x1, x2, x3}, what does the ISA specify, and what internal actions belong to the microarchitecture?
     \end{block}
     \vspace{0.4em}
