@@ -162,7 +162,7 @@
         \item \key{Section 2}: Two's Complement Arithmetic and Signed Overflow
         \item \key{Section 3}: AArch64 Condition Flags (NZCV) and Flag-Setting Instructions
         \item \key{Section 4}: Multiplication, Division, and Logical/Arithmetic Shifts
-        \item \key{Section 5}: Processor Performance: Clock Rate, CPI, and CPU Time
+        \item \key{Section 5}: Processor Performance: The Iron Law and Instruction Mix
         \item \key{Section 6}: Summary and Worked Self-Test Exercises
     \end{itemize}
 \end{frame}
@@ -435,7 +435,7 @@
 % ============================================================
 % SECTION 5
 % ============================================================
-\sectiondivider{Section 05}{Processor Performance:\\Clock Rate, CPI, and CPU Time}
+\sectiondivider{Section 05}{Processor Performance:\\The Iron Law and Instruction Mix}
 
 % --- Slide 19: Processor Performance Basics ---
 \begin{frame}{Processor Performance Basics}
@@ -451,41 +451,39 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 20: Clock Rate, Cycle Time, and CPI ---
-\begin{frame}{Clock Rate, Cycle Time, and CPI Formulas}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Frequency and Cycle Time}
-                \begin{itemize}
-                    \item \key{Clock Rate}: Cycles per second (e.g., $2 \text{ GHz} = 2 \times 10^9 \text{ cycles/s}$).
-                    \item \key{Cycle Time}: Duration of one clock cycle ($1 / \text{Clock Rate}$).
-                    \item Example: $2 \text{ GHz} \rightarrow 0.5 \text{ ns}$ cycle time.
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Cycles Per Instruction (CPI)}
-                \begin{itemize}
-                    \item Average clock cycles consumed per instruction.
-                    \item Varies based on instruction mix, memory latency, and microarchitectural pipelining.
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% --- Slide 21: CPU Execution Time Equation ---
-\begin{frame}{The CPU Execution Time Equation}
-    \begin{block}{Fundamental Performance Equation}
-        $$\text{CPU Time} = \text{Instruction Count} \times \text{CPI} \times \text{Clock Cycle Time}$$
-        $$\text{CPU Time} = \frac{\text{Instruction Count} \times \text{CPI}}{\text{Clock Rate}}$$
+% --- Slide 20: The Iron Law of Processor Performance ---
+\begin{frame}{The Iron Law of Processor Performance}
+    \begin{block}{Deconstructing CPU Execution Time}
+        Performance is governed by the product of three fundamental metrics:
+        $$\text{CPU Time} = \frac{\text{Instructions}}{\text{Program}} \times \frac{\text{Clock Cycles}}{\text{Instruction (CPI)}} \times \frac{\text{Seconds}}{\text{Clock Cycle}}$$
     \end{block}
     \vspace{0.2em}
     \begin{itemize}
-        \item A higher clock rate does not guarantee faster execution if CPI or instruction count increases disproportionately.
-        \item \key{Worked Example}: $1,000,000$ instructions, $\text{CPI} = 2$, $1 \text{ GHz}$ clock rate:
-        $$\text{CPU Time} = \frac{1,000,000 \times 2}{1,000,000,000} = 0.002 \text{ seconds} = 2 \text{ ms}$$
+        \item \key{Instruction Count}: Determined by ISA efficiency, compiler optimization level, and source algorithm complexity.
+        \item \key{Average CPI}: Determined by microarchitecture design (pipelining, memory hierarchy, functional unit latencies).
+        \item \key{Clock Cycle Time}: Determined by semiconductor technology, circuit design, and critical path propagation delays.
+        \item \key{Trade-off Caution}: Optimizing one variable often degrades another (e.g., aggressive compiler optimizations might lower instruction count but increase average CPI).
     \end{itemize}
+\end{frame}
+
+% --- Slide 21: Advanced Performance Analysis & Workload Mix ---
+\begin{frame}{Advanced Analysis: Variable CPI Workloads}
+    When instructions have differing latencies, average CPI is calculated via the instruction mix:
+    $$\text{Average CPI} = \sum_{i=1}^{n} (\text{CPI}_i \times \text{Fraction}_i)$$
+    \vspace{0.2em}
+    \begin{block}{Challenging Example}
+        A program executes $10^9$ instructions with three classes:
+        \begin{itemize}
+            \item \textbf{Class A} ($\text{CPI} = 1$): 50\% of instructions
+            \item \textbf{Class B} ($\text{CPI} = 2$): 30\% of instructions
+            \item \textbf{Class C} ($\text{CPI} = 4$): 20\% of instructions
+        \end{itemize}
+        \textbf{Calculate Average CPI \& Execution Time ($2 \text{ GHz}$ Clock):}
+        \begin{itemize}
+            \item $\text{Avg CPI} = (1 \times 0.5) + (2 \times 0.3) + (4 \times 0.2) = 0.5 + 0.6 + 0.8 = \mathbf{1.9}$
+            \item $\text{CPU Time} = \frac{10^9 \times 1.9}{2 \times 10^9 \text{ cycles/s}} = \mathbf{0.95 \text{ seconds}}$
+        \end{itemize}
+    \end{block}
 \end{frame}
 
 % ============================================================
@@ -500,7 +498,7 @@
         \item \key{Signed Overflow}: Occurs when results exceed container bounds, tracked independently from unsigned carries via the $V$ flag.
         \item \key{Condition Flags}: Instructions with the \code{s} suffix and \code{cmp} update \key{NZCV} flags in PSTATE to drive conditional branching.
         \item \key{Arithmetic Extensions}: Multiplication (\code{mul}), division (\code{udiv}/\code{sdiv}), and shifts (\code{lsl}/\code{lsr}/\code{asr}) expand ALU capabilities.
-        \item \key{Performance Equation}: CPU execution time is a function of Instruction Count, CPI, and Clock Rate.
+        \item \key{Iron Law Performance}: CPU execution time is fundamentally tied to Instruction Count, average CPI (via instruction mix), and Clock Rate.
     \end{itemize}
 \end{frame}
 
