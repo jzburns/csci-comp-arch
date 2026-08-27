@@ -128,7 +128,7 @@
 \date{Topic 3}
 
 % ============================================================
-% Presentation Body (35 Frames Total)
+% Presentation Body (36 Frames Total)
 % ============================================================
 
 \begin{document}
@@ -394,31 +394,31 @@
     \vspace{0.2em}
     \begin{center}
         \begin{tikzpicture}[scale=0.9, every node/.style={font=\small}]
-            % Input boxes
-            \node[draw=navy, fill=lightblue, text=darkgray, rounded corners=2pt, text width=4.0cm, align=center] at (0,2.2) {
+            % Input boxes (top boxes centered at y = 2.4, height spans roughly from y = 2.0 to 2.8)
+            \node[draw=navy, fill=lightblue, text=darkgray, rounded corners=2pt, text width=4.0cm, align=center] (b1) at (0,2.4) {
                 \textbf{$-9$ (5-bit Two's Complement)}\\
                 \code{10111}
             };
-            \node[draw=navy, fill=lightblue, text=darkgray, rounded corners=2pt, text width=4.0cm, align=center] at (6.0,2.2) {
+            \node[draw=navy, fill=lightblue, text=darkgray, rounded corners=2pt, text width=4.0cm, align=center] (b2) at (6.0,2.4) {
                 \textbf{$+6$ (5-bit Positive)}\\
                 \code{00110}
             };
             
             % Adder box
-            \node[draw=navy, fill=navy, text=white, rounded corners=3pt, text width=5.0cm, align=center, minimum height=0.8cm] at (3.0,0.8) {
+            \node[draw=navy, fill=navy, text=white, rounded corners=3pt, text width=5.0cm, align=center, minimum height=0.8cm] (adder) at (3.0,0.7) {
                 \textbf{Simple Hardware Adder}
             };
             
             % Output box
-            \node[draw=gold, fill=gold!20, text=navy, rounded corners=2pt, text width=4.0cm, align=center] at (3.0,-0.6) {
+            \node[draw=gold, fill=gold!20, text=navy, rounded corners=2pt, text width=4.0cm, align=center] (out) at (3.0,-1.0) {
                 \textbf{Result: $-3$}\\
                 \code{11101}
             };
             
-            % Arrows
-            \draw[thick, -Latex, draw=navy] (0,1.6) -- (2.0,1.2);
-            \draw[thick, -Latex, draw=navy] (6.0,1.6) -- (4.0,1.2);
-            \draw[thick, -Latex, draw=navy] (3.0,0.4) -- (3.0,0.0);
+            % Arrows starting precisely from the bottom borders of the input boxes down to the adder
+            \draw[thick, -Latex, draw=navy] (b1.south) -- (2.0,1.1);
+            \draw[thick, -Latex, draw=navy] (b2.south) -- (4.0,1.1);
+            \draw[thick, -Latex, draw=navy] (3.0,0.3) -- (3.0,-0.45);
         \end{tikzpicture}
     \end{center}
     \vspace{-0.1em}
