@@ -589,18 +589,15 @@
     \begin{table}[]
         \centering
         \small
+        \rowcolors{2}{lightblue!50}{white}
         \begin{tabular}{p{2.5cm} p{3.2cm} p{4.8cm}}
-            \toprule
-            \textbf{Register Range} & \textbf{Role / Category} & \textbf{Preservation Rule} \\
+            \rowcolor{navy}
+            {\color{white}\textbf{Register Range}} & {\color{white}\textbf{Role / Category}} & {\color{white}\textbf{Preservation Rule}} \\
             \midrule
             \code{x0}--\code{x7} & Argument passing \& Return values & Caller-saved (Volatile) \\
-            \hline
             \code{x8}--\code{x15} & Intra-procedure scratch registers & Caller-saved (Volatile) \\
-            \hline
             \code{x19}--\code{x29} & Local variable storage & Callee-saved (Non-volatile) \\
-            \hline
             \code{x30} (\code{lr}) & Link Register (Return address) & Managed via Subroutine Call \\
-            \hline
             \code{x31} (\code{sp}) & Stack Pointer & Maintained 16-byte aligned \\
             \bottomrule
         \end{tabular}
