@@ -637,18 +637,19 @@
 \end{frame}
 
 % --- Slide 35: Wrap-Up \& Transition to Topic 8 ---
-\begin{frame}{Wrap-Up \& Transition to Topic 8}
-    \begin{block}{Moving Forward to Topic 8}
-        Now that we have mastered comparison flags, conditional branches, and loop translation, our next session will explore:
+\begin{frame}{Wrap-Up and Next Steps}
+    \begin{block}{Transition to Topic 8}
+        Building upon branching and control flow mechanics, the next module examines:
         \begin{itemize}
-            \item \key{Subroutines and Function Calls}: Using \code{bl} (Branch with Link) and \code{ret}.
-            \item \key{ABI Parameter Passing}: Register conventions (\code{x0}--\code{x7}) and stack frame management for nested function calls.
+            \item \key{Procedures and the Stack}: Managing modular software execution and runtime memory spaces.
+            \item \key{Procedure Calls and Returns}: Utilizing branch-with-link (\code{bl}) and return (\code{ret}) instructions.
+            \item \key{Stack Organization}: Structuring stack frames, frame pointers (\code{x29}), and stack pointer alignments.
+            \item \key{Parameter Passing}: Distributing arguments and return values across registers (\code{x0}--\code{x7}).
+            \item \key{Calling Conventions}: Enforcing standards for caller-saved and callee-saved register preservation.
         \end{itemize}
     \end{block}
-    \vspace{0.3em}
-    \begin{center}
-        \textbf{End of Topic 7 --- Questions \& Discussion}
-    \end{center}
 \end{frame}
+
+\end{document}
 
 \end{document}
