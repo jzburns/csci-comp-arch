@@ -325,7 +325,24 @@
     \begin{block}{Prologue Instruction Breakdown}
         \small
         \begin{tabbing}
-            \quad \code{sub sp, sp, \#32} \quad\quad \= \textit{// Step 1: Decrement stack pointer by 32 bytes} \\
+            \quad \code{sub sp, sp, \#32} \quad\quad\quad\quad \= \textit{// Step 1: Decrement stack pointer by 32 bytes} \\
+            \quad \code{stp x29, x30, [sp, \#16]} \> \textit{// Step 2: Store Frame Pointer and Link Register} \\
+            \quad \code{add x29, sp, \#16} \> \textit{// Step 3: Establish new Frame Pointer reference}
+        \end{tabbing}
+    \end{block}
+    \vspace{0.2em}
+    \begin{itemize}
+        \item \key{Pre-indexed Alternative}: Compilers often combine allocation and storage using a single writeback instruction: \code{stp x29, x30, [sp, \#-32]!} followed by \code{mov x29, sp}.
+        \item Maintains strict 16-byte stack boundary alignment required by AArch64 hardware specifications.
+    \end{itemize}
+\end{frame}% --- Slide 14: Concrete Stack Allocation Example ---
+\begin{frame}{Concrete Stack Allocation Example}
+    Allocating local storage and saving register context during a function prologue:
+    \vspace{0.2em}
+    \begin{block}{Prologue Instruction Breakdown}
+        \small
+        \begin{tabbing}
+            \quad \code{sub sp, sp, \#32} \quad\quad\quad\quad \= \textit{// Step 1: Decrement stack pointer by 32 bytes} \\
             \quad \code{stp x29, x30, [sp, \#16]} \> \textit{// Step 2: Store Frame Pointer and Link Register} \\
             \quad \code{add x29, sp, \#16} \> \textit{// Step 3: Establish new Frame Pointer reference}
         \end{tabbing}
