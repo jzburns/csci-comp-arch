@@ -128,7 +128,7 @@
 \date{Topic 3}
 
 % ============================================================
-% Presentation Body (36 Frames Total)
+% Presentation Body (37 Frames Total)
 % ============================================================
 
 \begin{document}
@@ -336,7 +336,7 @@
     \vspace{0.2em}
     \begin{itemize}
         \item \key{Fixed-Width Bound}: When an unsigned addition or operation exceeds the maximum representable value ($2^n - 1$), the fixed-width register cannot expand.
-        \item \key{Truncation \& Modular Behavior}: High-order carry bits exceeding the bit-width are truncated, leaving the remainder value constrained to the modular range modulo ${2^n}$.
+        \item \key{Truncation \& Modular Behavior}: High-order carry bits exceeding the bit-width are truncated, leaving the remainder value constrained to the modular range $\pmod{2^n}$.
         \item Processors record unsigned carry-out conditions in status flags.
     \end{itemize}
     \vspace{0.3em}
@@ -449,14 +449,34 @@
 % --- Slide 20: Signed Overflow Detection ---
 \begin{frame}{Signed Arithmetic Overflow}
     \begin{block}{Definition of Signed Overflow}
-        Signed overflow occurs when the true mathematical result of an operation falls outside the representable signed range of the destination container.
+        Signed overflow occurs when two numbers of the \textbf{same sign} are added and the result produces a number of the \textbf{opposite sign}, falling outside the representable signed range.
     \end{block}
     \vspace{0.3em}
     \begin{itemize}
-        \item \key{Symptom}: Adding two positive numbers yields a negative result, or adding two negative numbers yields a positive result.
-        \item \key{Detection}: Hardware cannot detect overflow merely by looking at the final bit pattern; it evaluates carry inputs and outputs into the MSB.
+        \item \key{Structural Symptom}: Adding two positive numbers yields a negative result, or adding two negative numbers yields a positive result.
+        \item \key{Detection}: Hardware evaluates carry inputs and outputs into the MSB rather than just looking at the final bit pattern.
         \item \key{Status Flags}: AArch32/AArch64 condition flags record signed overflow in the \key{V} (Overflow) flag.
         \item Example: In 8-bit math, $127 + 1 = 0111\,1111 + 0000\,0001 = 1000\,0000 (-128)$, triggering an immediate overflow exception/flag.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 21: Interpreting Carry and Overflow Flags ---
+\begin{frame}{Do Carry and Overflow Represent Error Conditions?}
+    \begin{block}{Status Flags vs. Hardware Errors}
+        Hardware status flags (\textbf{C} and \textbf{V}) are \textbf{not} automatic error exceptions; they are arithmetic indicators that software can inspect.
+    \end{block}
+    \vspace{0.3em}
+    \begin{itemize}
+        \item \key{Carry Flag (C)}: Indicates an unsigned overflow or borrow out of the MSB. 
+        \begin{itemize}
+            \small
+            \item \emph{Error?}: Only an error if the program intended to treat the data strictly as bounded unsigned integers (e.g., in standard multi-word arithmetic or address calculations, carry is expected and used).
+        \end{itemize}
+        \item \key{Overflow Flag (V)}: Indicates signed wraparound (adding two numbers of the same sign yielded the opposite sign). 
+        \begin{itemize}
+            \small
+            \item \emph{Error?}: Critical for signed integer math, as it flags unintended numeric corruption. However, hardware does not halt; software must explicitly check branches (e.g., \code{b.vs}) to handle it.
+        \end{itemize}
     \end{itemize}
 \end{frame}
 
@@ -465,7 +485,7 @@
 % ============================================================
 \sectiondivider{Section 05}{Memory Endianness and\\Data Alignment in AArch64}
 
-% --- Slide 22: Memory as a Byte-Addressed Structure ---
+% --- Slide 23: Memory as a Byte-Addressed Structure ---
 \begin{frame}{Memory as a Byte-Addressed Structure}
     AArch64 memory is organized as a linear array of individually addressable bytes:
     \vspace{0.2em}
@@ -480,7 +500,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 23: Endianness Definition ---
+% --- Slide 24: Endianness Definition ---
 \begin{frame}{Endianness: Ordering Multi-Byte Values}
     \begin{block}{Definition}
         \key{Endianness} defines the sequential byte ordering used when storing multi-byte values across consecutive memory addresses.
@@ -506,7 +526,7 @@
     \end{columns}
 \end{frame}
 
-% --- Slide 24: Endianness in AArch64 ---
+% --- Slide 25: Endianness in AArch64 ---
 \begin{frame}{Little-Endian Layout in AArch64 Practice}
     AArch64 systems default to little-endian memory organization:
     \vspace{0.2em}
@@ -522,7 +542,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 25: Data Alignment in AArch64 ---
+% --- Slide 26: Data Alignment in AArch64 ---
 \begin{frame}{Data Alignment in AArch64}
     \begin{block}{Definition of Natural Alignment}
         Data alignment requires that a variable of size $n$ bytes be stored at a memory address that is an exact multiple of $n$.
@@ -542,7 +562,7 @@
 % ============================================================
 \sectiondivider{Section 06}{Summary \& Self-Test}
 
-% --- Slide 27: Topic Summary ---
+% --- Slide 28: Topic Summary ---
 \begin{frame}{Topic 3 Comprehensive Summary}
     \begin{itemize}
         \item \key{Fixed-Width Representation}: Information is stored as bit patterns whose semantics depend entirely on software and ISA interpretation.
@@ -553,7 +573,7 @@
     \end{itemize}
 \end{frame}
 
-% --- Slide 28: Self-Test: Questions 1 & 2 ---
+% --- Slide 29: Self-Test: Questions 1 & 2 ---
 \begin{frame}{Self-Test: Questions 1 \& 2}
     \begin{block}{Question 1: Bits, Words, and Bases}
         What is the relationship between bits, bytes, words, and 64-bit AArch64 registers? Why is hexadecimal universally preferred over binary when inspecting memory dumps?
@@ -564,7 +584,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 29: Self-Test: Solutions 1 & 2 ---
+% --- Slide 30: Self-Test: Solutions 1 & 2 ---
 \begin{frame}{Self-Test: Solutions 1 \& 2}
     \begin{block}{Solution 1}
         Bits are binary digits; 8 bits make a byte; words are 32 bits; AArch64 general-purpose registers are 64 bits (doublewords) wide. Hexadecimal is compact, mapping each single character directly to a 4-bit nibble without conversion fuzziness.
@@ -575,7 +595,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 30: Self-Test: Questions 3 & 4 ---
+% --- Slide 31: Self-Test: Questions 3 & 4 ---
 \begin{frame}{Self-Test: Questions 3 \& 4}
     \begin{block}{Question 3: Two's Complement Negation}
         How do you form the two's complement negative of a positive binary number? What signed range is representable in a 32-bit two's complement integer container?
@@ -586,7 +606,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 31: Self-Test: Solutions 3 & 4 ---
+% --- Slide 32: Self-Test: Solutions 3 & 4 ---
 \begin{frame}{Self-Test: Solutions 3 \& 4}
     \begin{block}{Solution 3}
         To form a two's complement negative, take the binary magnitude, invert every bit (one's complement), and add $1$. A 32-bit two's complement container spans $-2^{31}$ to $2^{31} - 1$ ($-2,147,483,648$ to $+2,147,483,647$).
@@ -597,7 +617,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 32: Self-Test: Questions 5 & 6 ---
+% --- Slide 33: Self-Test: Questions 5 & 6 ---
 \begin{frame}{Self-Test: Questions 5 \& 6}
     \begin{block}{Question 5: Endianness in Memory}
         What is the fundamental difference between little-endian and big-endian byte ordering? Which convention does AArch64 use by default?
@@ -608,7 +628,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 33: Self-Test: Solutions 5 & 6 ---
+% --- Slide 34: Self-Test: Solutions 5 & 6 ---
 \begin{frame}{Self-Test: Solutions 5 \& 6}
     \begin{block}{Solution 5}
         Little-endian stores the least significant byte (LSB) at the lowest memory address, whereas big-endian stores the most significant byte (MSB) at the lowest address. AArch64 uses little-endian byte ordering by default.
@@ -619,7 +639,7 @@
     \end{block}
 \end{frame}
 
-% --- Slide 34: Review & Concept Verification ---
+% --- Slide 35: Review & Concept Verification ---
 \begin{frame}{Review: Summary Table of Data Types}
     \begin{table}[]
         \centering
@@ -637,22 +657,20 @@
     \end{table}
 \end{frame}
 
-% --- Slide 35: Wrap-Up & Transition to Topic 4 ---
+% --- Slide 36: Wrap-Up & Transition to Topic 4 ---
 \begin{frame}{Wrap-Up and Next Steps}
-    \begin{block}{Moving Forward to Topic 4}
-        Now that we understand how integers, bit patterns, and data layouts are represented at the machine level, we will build upon this foundation to study:
+    \begin{block}{Transition to Topic 4}
         \begin{itemize}
-            \item \key{Integer Arithmetic \& Floating-Point Representation}: How ALUs execute shifts, multiplications, and IEEE-754 floating-point values.
-            \item \key{Advanced AArch64 Addressing Modes}: Direct, indirect, register-offset, and stack pointer manipulation in assembly.
+            \item \key{Integer Arithmetic and Performance Basics}: Evaluating fundamental ALU operations alongside processor timing metrics.
+            \item \key{Integer Addition, Subtraction, and Shifts}: How ALUs execute core arithmetic and bitwise shifting instructions.
+            \item \key{Multiplication and Division}: Hardware mechanics for scaling operations and handling remainders.
+            \item \key{Condition Flags}: Practical tracking of carry, overflow, and status indicators in execution flow.
+            \item \key{Performance Metrics}: Evaluating clock rate, CPI (Cycles Per Instruction), and total execution time.
         \end{itemize}
     \end{block}
-    \vspace{0.3em}
-    \begin{center}
-        \textbf{End of Topic 3 --- Questions \& Discussion}
-    \end{center}
 \end{frame}
 
-% --- Slide 36: Additional Source Verification ---
+% --- Slide 37: Additional Source Verification ---
 \begin{frame}{Topic 3 Source Notes}
     \begin{block}{Source Reference Verification}
         \begin{itemize}
