@@ -336,7 +336,7 @@
     \vspace{0.2em}
     \begin{itemize}
         \item \key{Fixed-Width Bound}: When an unsigned addition or operation exceeds the maximum representable value ($2^n - 1$), the fixed-width register cannot expand.
-        \item \key{Truncation \& Modular Behavior}: High-order carry bits exceeding the bit-width are truncated, leaving the remainder value constrained to the modular range ($\pmod{2^n}$).
+        \item \key{Truncation \& Modular Behavior}: High-order carry bits exceeding the bit-width are truncated, leaving the remainder value constrained to the modular range modulo ${2^n}$.
         \item Processors record unsigned carry-out conditions in status flags.
     \end{itemize}
     \vspace{0.3em}
