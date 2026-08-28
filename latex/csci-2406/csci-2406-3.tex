@@ -330,19 +330,19 @@
     \end{block}
 \end{frame}
 
-% --- Slide 14: Unsigned Arithmetic Wraparound ---
-\begin{frame}{Unsigned Arithmetic and Wraparound}
+% --- Slide 14: Unsigned Arithmetic Overflow ---
+\begin{frame}{Unsigned Arithmetic and Fixed-Width Limits}
     Unsigned operations are evaluated modulo $2^n$ for an $n$-bit container:
     \vspace{0.2em}
     \begin{itemize}
-        \item \key{Overflow Behavior}: If an arithmetic operation exceeds the maximum representable value ($2^n - 1$), high-order carry bits are discarded.
-        \item \key{Wraparound}: The stored result wraps around circularly within the fixed container width.
+        \item \key{Fixed-Width Bound}: When an unsigned addition or operation exceeds the maximum representable value ($2^n - 1$), the fixed-width register cannot expand.
+        \item \key{Truncation \& Modular Behavior}: High-order carry bits exceeding the bit-width are truncated, leaving the remainder value constrained to the modular range ($\pmod{2^n}$).
         \item Processors record unsigned carry-out conditions in status flags.
     \end{itemize}
     \vspace{0.3em}
-    \begin{block}{Classic Wraparound Example}
+    \begin{block}{Classic Overflow Example}
         In 8-bit unsigned arithmetic:
-        $$255 + 1 = 1111\,1111_2 + 1 = 0000\,0000_2 = 0$$
+        $$255 + 1 = 1111\,1111_2 + 1 = 0000\,0000_2 = 0 \quad (\text{with Carry Out})$$
     \end{block}
 \end{frame}
 
@@ -547,7 +547,7 @@
     \begin{itemize}
         \item \key{Fixed-Width Representation}: Information is stored as bit patterns whose semantics depend entirely on software and ISA interpretation.
         \item \key{Base Conversions}: Binary ($Base\ 2$) and Hexadecimal ($Base\ 16$) provide readable notations for digital machine states.
-        \item \key{Unsigned Integers}: Represent non-negative values with strict wraparound modulo $2^n$.
+        \item \key{Unsigned Integers}: Represent non-negative values with strict upper limits and modulo truncation upon overflow.
         \item \key{Two's Complement}: The industry standard for signed integers, enabling negative values without special ALU hardware.
         \item \key{Endianness \& Alignment}: AArch64 utilizes little-endian byte ordering and strict natural data alignment for memory access performance.
     \end{itemize}
@@ -559,7 +559,7 @@
         What is the relationship between bits, bytes, words, and 64-bit AArch64 registers? Why is hexadecimal universally preferred over binary when inspecting memory dumps?
     \end{block}
     \vspace{0.4em}
-    \begin{block}{Question 2: Unsigned Wraparound}
+    \begin{block}{Question 2: Unsigned Arithmetic Limits}
         What range of values can be represented by an unsigned $n$-bit integer? What happens when an 8-bit unsigned accumulator holding $255$ has $1$ added to it?
     \end{block}
 \end{frame}
@@ -571,7 +571,7 @@
     \end{block}
     \vspace{0.3em}
     \begin{block}{Solution 2}
-        An unsigned $n$-bit container spans $0$ to $2^n - 1$. Adding $1$ to $255$ in an 8-bit container triggers arithmetic wraparound modulo $2^8$, resulting in $0$ and setting the carry flag.
+        An unsigned $n$-bit container spans $0$ to $2^n - 1$. Adding $1$ to $255$ in an 8-bit container exceeds the fixed-width capacity, resulting in truncation modulo $2^8$, producing $0$ and setting the carry flag.
     \end{block}
 \end{frame}
 
