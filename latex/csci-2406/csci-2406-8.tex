@@ -415,18 +415,34 @@
 % ============================================================
 \sectiondivider{Section 04}{Parameter Passing and AAPCS64 Calling Conventions}
 
-% --- Slide 20: Argument Passing via Registers ---
-\begin{frame}{Passing Function Arguments (\code{x0}--\code{x7})}
-    To maximize speed, AArch64 passes arguments through general-purpose registers:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \key{Registers \code{x0} through \code{x7}}: Designated for passing the first 8 integer/pointer arguments to a subroutine.
-        \item Using registers is exponentially faster than pushing and popping variables from main memory.
-    \end{itemize}
-    \vspace{0.3em}
-    \begin{block}{Order Convention}
-        Argument 1 goes in \code{x0}, Argument 2 in \code{x1}, up to Argument 8 in \code{x7}.
+% --- Slide 20 Companion: C-to-Assembly Argument Passing Example ---
+\begin{frame}{Example: C Arguments to AArch64 Registers (\code{x0}--\code{x3})}
+    \begin{block}{C Source vs.\ Generated AArch64 Assembly}
+        \small
+        \begin{tabular}{p{0.45\textwidth} p{0.49\textwidth}}
+            \toprule
+            \textbf{C Function Call} & \textbf{AArch64 Assembly Execution} \\
+            \midrule
+            \begin{tabular}{@{}l@{}}
+                \code{int res =} \\
+                \quad \code{compute\_sum(10, 20, 30, 40);}
+            \end{tabular}
+            & 
+            \begin{tabular}{@{}l@{}}
+                \code{mov w0, \#10} \hfill \textit{// Arg 1 $\rightarrow$ w0} \\
+                \code{mov w1, \#20} \hfill \textit{// Arg 2 $\rightarrow$ w1} \\
+                \code{mov w2, \#30} \hfill \textit{// Arg 3 $\rightarrow$ w2} \\
+                \code{mov w3, \#40} \hfill \textit{// Arg 4 $\rightarrow$ w3} \\
+                \code{bl  compute\_sum} \hfill \textit{// Branch to callee}
+            \end{tabular} \\
+            \bottomrule
+        \end{tabular}
     \end{block}
+    \vspace{0.1em}
+    \begin{itemize}
+        \item \key{Callee Execution}: \code{compute\_sum} receives the inputs directly from \code{w0}--\code{w3} without needing to access main memory.
+        \item \key{Return Value}: The final computed sum is placed in \code{w0} before executing \code{ret}.
+    \end{itemize}
 \end{frame}
 
 % --- Slide 21: Handling More Than 8 Arguments ---
