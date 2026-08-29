@@ -85,7 +85,7 @@
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
-\vspace{0.9cm}
+\vspace*{\fill}
 
 \begin{minipage}{0.88\textwidth}
 {\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 1\par}
@@ -109,7 +109,7 @@ Abstraction, stored-program organization, data representation, and processor per
 {\color{white}\normalsize Dr. J. Burns\par}
 {\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
 
-\vspace{0.35cm}
+\vspace*{\fill}
 \end{frame}
 
 % --- Section Divider 1 ---
@@ -118,28 +118,29 @@ Abstraction, stored-program organization, data representation, and processor per
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
+\vspace*{\fill}
 \begin{minipage}{0.85\textwidth}
 {\color{gold}\large\bfseries PART 1\par}
 \vspace{0.3cm}
 {\color{white}\fontsize{22}{26}\selectfont\bfseries Architecture Foundations \& Abstraction\par}
 \end{minipage}
+\vspace*{\fill}
 \end{frame}
 
 \begin{frame}{What Is Computer Architecture?}
 
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Computer architecture connects \key{software-visible behavior} with \key{hardware implementation}.
-  \item Hardware provides an interface that software can rely on.
-  \item The implementation of that interface determines performance and efficiency.
-  \item Architectural design involves correctness, performance, power, area, and cost.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Connects \key{software-visible behavior} with \key{hardware implementation}.
+  \item Provides a reliable interface that software can target without knowing underlying physics.
+  \item Implementation choices strictly determine performance, efficiency, and hardware limits.
+  \item Design is a balancing act between correctness, performance, power, area, and cost.
+  \item It serves as the translation layer between abstract algorithms and physical electrons.
 \end{itemize}
 
-\vspace{0.35cm}
+\vspace{0.4cm}
 
 \begin{block}{Course Approach}
-\key{Design approach:} RISC principles.\\
-\key{Reference ISA:} AArch64.
+\key{Design approach:} RISC principles.\quad\quad \key{Reference ISA:} AArch64.
 \end{block}
 
 \end{frame}
@@ -148,7 +149,7 @@ Abstraction, stored-program organization, data representation, and processor per
 
 Computers manage immense complexity by enforcing clean hierarchical interfaces:
 
-\vspace{0.2em}
+\vfill
 
 \begin{center}
 
@@ -295,6 +296,7 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 \begin{itemize}
   \item Variables, arrays, branches
   \item Function calls, data types
+  \item Dynamic memory allocation
 \end{itemize}
 \end{block}
 
@@ -304,15 +306,15 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 \begin{itemize}
   \item Register allocation, cache misses
   \item Branch prediction, stack frames
-  \item Overflow and sign extension
+  \item Overflow, sign extension, page faults
 \end{itemize}
 \end{block}
 
 \end{columns}
 
-\vspace{0.35cm}
+\vfill
 
-Performance-sensitive software often exposes lower-level machine behavior.
+Performance-sensitive software often exposes lower-level machine behavior, requiring programmers to actively optimize for spatial locality, predictable branching, and cache-friendly data structures to prevent severe execution penalties.
 
 \end{frame}
 
@@ -373,11 +375,11 @@ Performance-sensitive software often exposes lower-level machine behavior.
 \end{tikzpicture}
 \end{center}
 
-\vspace{0.15cm}
+\vfill
 
 \small
 
-The ISA is the boundary between program representation and processor execution.
+The ISA is the rigid boundary between program representation and processor execution. Understanding this translation pipeline is essential for debugging performance bottlenecks that occur directly at the hardware-software interface.
 
 \end{frame}
 
@@ -391,7 +393,7 @@ The ISA is the boundary between program representation and processor execution.
 \begin{itemize}
   \item Instruction encodings \& behavior
   \item Registers \bits{x0}--\bits{x30}, \bits{sp}, PSTATE
-  \item Memory and exception behavior
+  \item Memory, exception behavior, and privilege levels
 \end{itemize}
 \end{block}
 
@@ -401,27 +403,43 @@ The ISA is the boundary between program representation and processor execution.
 \begin{itemize}
   \item Pipeline organization, superscalar width
   \item In-order or out-of-order execution
-  \item Branch prediction, cache structures
+  \item Branch prediction, arithmetic latency
 \end{itemize}
 \end{block}
 
 \end{columns}
 
-\vspace{0.25cm}
+\vfill
 
-Different processors can implement the same ISA using different microarchitectures.
+Different processors can implement the exact same ISA using radically different microarchitectures, allowing legacy software to remain portable and functional across multiple generations of continuous hardware scaling.
 
 \end{frame}
 
-\begin{frame}{RISC Design Principles and AArch64 Encoding}
+\begin{frame}{RISC Design Principles}
 
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item RISC designs emphasize regular instruction formats and explicit load/store architecture.
-  \item AArch64 instructions are fixed-width \key{32-bit words}, aligned on 4-byte boundaries.
-  \item Destination (\code{Rd}) and source operands (\code{Rn}, \code{Rm}) use fixed 5-bit register-number fields.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item \key{Load/Store Architecture:} Memory is accessed exclusively through specific load and store instructions, keeping complex arithmetic isolated to registers.
+  \item \key{Simplified Decoding:} Fixed-length instruction encodings streamline the fetch and decode stages, enabling higher clock frequencies.
+  \item \key{Abundant Registers:} A large, uniform register file minimizes the need to spill temporary variables to slower main memory.
 \end{itemize}
 
-\vspace{0.15cm}
+\vspace{0.4cm}
+
+\begin{block}{The RISC Philosophy}
+Complexity is deliberately pushed to the compiler, allowing the hardware implementation to focus entirely on executing simple, uniform operations at maximum throughput.
+\end{block}
+
+\end{frame}
+
+\begin{frame}{AArch64 Encoding Structure}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item AArch64 instructions are fixed-width \key{32-bit words}, strictly aligned on 4-byte boundaries in memory.
+  \item Destination (\code{Rd}) and source operands (\code{Rn}, \code{Rm}) use fixed 5-bit register-number fields across most formats.
+  \item The remaining bits encode the opcode, shift modifiers, and immediate values, ensuring the processor can map the entire operation locally.
+\end{itemize}
+
+\vfill
 
 \begin{block}{
 Example: 64-Bit Addition
@@ -429,9 +447,13 @@ Example: 64-Bit Addition
 }
 \centering
 \small
-Encoding maps \code{Rd = x0}, \code{Rn = x1}, and \code{Rm = x2}
+Encoding cleanly maps \code{Rd = x0}, \code{Rn = x1}, and \code{Rm = x2}
 within the uniform 32-bit word.
 \end{block}
+
+\vfill
+
+This uniform structural alignment completely avoids the complex, multi-cycle sequential decode logic required by variable-length architectures like x86.
 
 \end{frame}
 
@@ -441,23 +463,24 @@ within the uniform 32-bit word.
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
+\vspace*{\fill}
 \begin{minipage}{0.85\textwidth}
 {\color{gold}\large\bfseries PART 2\par}
 \vspace{0.3cm}
 {\color{white}\fontsize{22}{26}\selectfont\bfseries Stored-Program Organization \& Memory\par}
 \end{minipage}
+\vspace*{\fill}
 \end{frame}
 
 \begin{frame}{The Stored-Program Concept}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item A stored-program computer keeps \key{instructions and data in memory as binary information}.
-  \item The processor does not inherently ``know'' that a memory word is code or data; interpretation depends on how that address is used.
-  \item The \key{Program Counter (\bits{pc})} identifies the address of the next instruction to be fetched.
+  \item The processor does not inherently ``know'' that a memory word is code or data; interpretation depends entirely on how that address is used.
+  \item The \key{Program Counter (\bits{pc})} identifies the address of the next instruction to be fetched into the execution pipeline.
 \end{itemize}
 
-\vspace{0.2cm}
+\vfill
 
 \begin{center}
 \begin{tikzpicture}[scale=0.9,every node/.style={transform shape}]
@@ -511,13 +534,11 @@ within the uniform 32-bit word.
 \end{tikzpicture}
 \end{center}
 
-\vspace{0.2cm}
+\vfill
 
 \small
 
-The stored-program idea makes software possible:
-changing memory contents can change both the data being processed
-and the instructions being executed.
+The stored-program idea makes agile software deployment possible: changing memory contents can change both the data being processed and the instructions being executed without rewiring hardware.
 
 \end{frame}
 
@@ -528,7 +549,7 @@ and the instructions being executed.
 \code{add x0, x1, x2}
 \end{block}
 
-\vspace{0.1cm}
+\vfill
 
 \begin{center}
 \begin{tikzpicture}[
@@ -558,17 +579,19 @@ and the instructions being executed.
 \end{tikzpicture}
 \end{center}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{itemize}\setlength{\itemsep}{3pt}
-  \item For ordinary sequential execution, the next instruction is typically at the next 4-byte address.
-  \item Branches, exceptions, and returns can replace the ordinary sequential next-\bits{pc} value.
-  \item Real processors overlap these activities through pipelining rather than completing one instruction fully before starting the next.
+  \item For ordinary sequential execution, the next instruction is fetched at the next consecutive 4-byte address.
+  \item Branches, execution exceptions, and subroutine returns dynamically replace the ordinary sequential next-\bits{pc} value.
+  \item Real processors aggressively overlap these activities through deep pipelining to increase overall throughput.
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}{Memory Topologies: von Neumann, Harvard, Modified Harvard}
+
+\vfill
 
 \begin{center}
 \begin{tikzpicture}[scale=0.82,every node/.style={transform shape}]
@@ -706,18 +729,11 @@ and the instructions being executed.
 \end{tikzpicture}
 \end{center}
 
-\vspace{0.2cm}
+\vfill
 
 \begin{itemize}\setlength{\itemsep}{3pt}
-
-  \item Modern high-performance processors commonly use a
-  \key{modified Harvard organization}: separate first-level
-  instruction/data caches with a unified software-visible address space.
-
-  \item The key architectural question is not just
-  ``where is memory?'' but
-  \key{which paths instruction fetch and data access use}.
-
+  \item Modern high-performance processors commonly use a \key{modified Harvard organization}: separate first-level instruction/data caches with a unified software-visible address space.
+  \item The key architectural question is not just ``where is memory?'' but \key{which paths instruction fetch and data access use}.
 \end{itemize}
 
 \end{frame}
@@ -726,11 +742,11 @@ and the instructions being executed.
 
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item A JIT compiler or runtime system may \key{generate machine instructions by writing bytes as data}.
-  \item Those writes travel through the data side of the memory hierarchy.
-  \item The instruction side may still hold an older copy of the same address, so simply jumping to the new bytes may be unsafe.
+  \item Those writes physically travel through the data side of the processor's memory hierarchy.
+  \item The instruction side may still hold an older, stale copy of the same address, making it unsafe to jump blindly to the newly written bytes.
 \end{itemize}
 
-\vspace{0.4cm}
+\vfill
 
 \centering
 \begin{tikzpicture}[
@@ -747,11 +763,11 @@ and the instructions being executed.
   \draw[-{Latex}, thick, navy] (sync) -- (inst);
 \end{tikzpicture}
 
-\vspace{0.4cm}
+\vfill
 
 \small
 
-The exact AArch64 cache-maintenance and barrier instructions are system-software details that will be revisited after caches and the memory hierarchy are developed.
+The exact AArch64 cache-maintenance and barrier instructions are system-software details that will be heavily revisited, as failure to synchronize data and instruction streams will result in executing unpredictable garbage instructions.
 
 \end{frame}
 
@@ -762,17 +778,17 @@ The exact AArch64 cache-maintenance and barrier instructions are system-software
 \column{0.47\textwidth}
 
 \begin{block}{Design Tension}
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Small storage can be very fast.
-  \item Large storage is cheaper per bit but slower.
-  \item No single technology gives maximum speed, capacity, and low cost simultaneously.
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item Small storage can be extremely fast.
+  \item Large storage is cheap per bit but slow.
+  \item No single technology maximizes speed, capacity, and cost simultaneously.
 \end{itemize}
 \end{block}
 
 \column{0.49\textwidth}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.83,every node/.style={transform shape}]
+\begin{tikzpicture}[scale=0.75,every node/.style={transform shape}]
 
 \node[
   draw=navy,
@@ -821,39 +837,38 @@ The exact AArch64 cache-maintenance and barrier instructions are system-software
 
 \end{columns}
 
-\vspace{0.25cm}
+\vspace{0.3cm}
 
 \begin{block}{Why the Hierarchy Works: Locality}
-\key{Temporal locality:} recently used data is likely to be used again.\\
-\key{Spatial locality:} nearby data is likely to be used soon.
+Programs rarely access memory randomly. They exhibit:
+\begin{itemize}\setlength{\itemsep}{1pt}
+  \item \textbf{Temporal Locality:} Recently accessed items (e.g., active stack frames) are highly likely to be reused soon.
+  \item \textbf{Spatial Locality:} Items located near recently accessed data (e.g., arrays) are likely to be accessed soon.
+\end{itemize}
 \end{block}
 
 \end{frame}
 
 \begin{frame}{The Memory Wall}
 
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item Processor execution capability has improved much faster than off-chip DRAM latency.
-  \item A cache hierarchy attempts to keep the processor working on nearby copies of frequently used instructions and data.
-  \item When locality fails and a request must go farther down the hierarchy, execution may stall for many cycles.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Processor execution capability has scaled much faster than off-chip DRAM latency.
+  \item A cache hierarchy attempts to keep the processor working on nearby copies of frequently used data.
+  \item When locality fails and a request travels down the hierarchy, the processor must stall for many cycles.
+  \item While memory bandwidth scales reasonably well, physical memory \emph{latency} remains a strict bottleneck.
 \end{itemize}
 
 \vspace{0.2cm}
 
 \begin{block}{Illustrative Latency Scale}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item Registers: roughly a few pipeline resources away
-  \item L1 cache: typically only a few cycles
-  \item Lower-level caches: tens of cycles
-  \item DRAM: often hundreds of processor cycles
-\end{itemize}
+Registers (1 cycle) $\rightarrow$ L1 Cache ($\sim$3 cycles) $\rightarrow$ Lower Caches (10--40 cycles) $\rightarrow$ DRAM (100+ cycles)
 \end{block}
 
 \vspace{0.15cm}
 
 \small
 
-Exact latencies are implementation-dependent; the architectural lesson is the large gap between nearby and distant storage.
+Exact latencies are implementation-dependent; the architectural lesson is the exponential gap between nearby and distant storage.
 
 \end{frame}
 
@@ -863,12 +878,13 @@ Exact latencies are implementation-dependent; the architectural lesson is the la
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
+\vspace*{\fill}
 \begin{minipage}{0.85\textwidth}
 {\color{gold}\large\bfseries PART 3\par}
 \vspace{0.3cm}
 {\color{white}\fontsize{22}{26}\selectfont\bfseries Binary Representation \& Arithmetic\par}
 \end{minipage}
+\vspace*{\fill}
 \end{frame}
 
 \begin{frame}{Bits and Interpretive Context}
@@ -876,9 +892,10 @@ Exact latencies are implementation-dependent; the architectural lesson is the la
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item Hardware stores binary bit patterns; \key{meaning comes from context}.
   \item The stored-program model therefore permits the same memory bytes to be interpreted differently depending on how they are used.
+  \item Hardware enforces no inherent "type safety"—using a float operation on an integer bit-pattern simply produces meaningless numerical garbage.
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{center}
 
@@ -908,7 +925,7 @@ $-1{,}962{,}803{,}168_{10}$
 
 \end{center}
 
-\vspace{0.15cm}
+\vfill
 
 \small
 
@@ -921,9 +938,10 @@ Bits do not carry a built-in ``type''; instructions and software conventions det
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item In positional binary, each bit contributes a power of two ($\text{Value} = \sum_{i=0}^{n-1} b_i 2^i$).
   \item Hexadecimal is a compact notation for binary because one hex digit represents exactly four bits.
+  \item Exceeding the maximum representable value ($2^n - 1$ for unsigned $n$ bits) results in arithmetic overflow, wrapping the value back to zero.
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{block}{Example}
 \centering
@@ -945,7 +963,7 @@ $=
   \item In little-endian storage, the least-significant byte is placed first.
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{center}
 \begin{tikzpicture}[scale=0.9,every node/.style={transform shape}]
@@ -975,12 +993,18 @@ $=
 \end{tikzpicture}
 \end{center}
 
-\vspace{0.25cm}
+\vfill
 
-\begin{block}{Little-Endian Rule}
-\centering
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Little-Endian Rule (AArch64, x86)}
 Lowest address $\rightarrow$ least-significant byte
 \end{block}
+\column{0.48\textwidth}
+\begin{block}{Big-Endian Rule (Network Protocol)}
+Lowest address $\rightarrow$ most-significant byte
+\end{block}
+\end{columns}
 
 \end{frame}
 
@@ -990,13 +1014,13 @@ Lowest address $\rightarrow$ least-significant byte
   \item A signed representation should support positive and negative values while keeping arithmetic hardware simple.
   \item Two's complement provides:
   \begin{itemize}\setlength{\itemsep}{2pt}
-    \item one representation of zero,
-    \item the same binary adder for signed and unsigned addition,
+    \item one single representation of zero (avoiding $+0$ and $-0$ ambiguity),
+    \item the same binary adder logic for signed and unsigned addition,
     \item simple subtraction through addition of a negated operand.
   \end{itemize}
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{block}{Signed Interpretation}
 For an $n$-bit two's-complement number, $\text{Value} = -b_{n-1}2^{n-1} + \sum_{i=0}^{n-2} b_i2^i$.
@@ -1031,11 +1055,12 @@ $-5 = \bits{11111011}$
 
 \end{block}
 
-\vspace{0.2cm}
+\vfill
 
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item The bit pattern can also be evaluated directly ($-128 + 64 + 32 + 16 + 8 + 2 + 1 = -5$).
   \item An $n$-bit two's-complement integer ranges from $-2^{n-1}$ to $2^{n-1}-1$.
+  \item Because the number line wraps modulo the bit-width boundary, arithmetic operations naturally overflow into correct representations without special hardware cases.
 \end{itemize}
 
 \end{frame}
@@ -1047,7 +1072,7 @@ $-5 = \bits{11111011}$
   \item Two's-complement negation gives $-B = \sim B + 1$, so subtraction becomes $A-B = A + (\sim B) + 1$.
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{center}
 \begin{tikzpicture}[scale=0.9,every node/.style={transform shape}]
@@ -1101,6 +1126,11 @@ $-5 = \bits{11111011}$
 \end{tikzpicture}
 \end{center}
 
+\vfill
+
+\small
+Using a single unified adder design drastically reduces the chip area and power required to implement mathematical execution units.
+
 \end{frame}
 
 \begin{frame}{Sign Extension and Zero Extension}
@@ -1109,7 +1139,7 @@ $-5 = \bits{11111011}$
   \item When a smaller value is widened, the upper bits must be filled in a way that preserves the intended numeric meaning.
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{columns}[T,onlytextwidth]
 
@@ -1129,19 +1159,19 @@ Example: \code{ldrb} preserves the unsigned magnitude of an 8-bit value.
 
 \end{columns}
 
-\vspace{0.2cm}
+\vfill
 
 \begin{block}{Why It Matters}
-Using the wrong extension changes the interpreted value and can invalidate comparisons, bounds checks, or address calculations.
+Using the wrong extension changes the interpreted value and can invalidate comparisons, bounds checks, or address calculations—frequently leading to buffer overflow vulnerabilities.
 \end{block}
 
 \end{frame}
 
 \begin{frame}{AArch64 NZCV Condition Flags}
 
-Arithmetic instructions can update status flags in PSTATE:
+Arithmetic instructions update status flags in the PSTATE register to describe the result characteristics:
 
-\vspace{0.15cm}
+\vfill
 
 \small
 
@@ -1160,21 +1190,21 @@ V & Overflow & Signed mathematical result is outside the destination range \\
 
 \end{center}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{block}{Same Bits, Different Questions}
 For \(\mathtt{1111}_2 + \mathtt{0001}_2\) in 4 bits, the stored result is \(\mathtt{0000}_2\).\\
-Unsigned interpretation: $15+1=16$ produces carry-out ($C=1$).\\
-Signed interpretation: $-1+1=0$ does not overflow ($V=0$).
+Unsigned interpretation: $15+1=16$ produces a carry-out ($C=1$).\\
+Signed interpretation: $-1+1=0$ does not overflow the limits ($V=0$).
 \end{block}
 
 \end{frame}
 
 \begin{frame}{Signed vs.\ Unsigned Conditional Branching}
 
-After \code{cmp x0, x1}, the processor has conceptually subtracted the operands and set NZCV.
+After \code{cmp x0, x1}, the processor has conceptually subtracted the operands and set NZCV. The compiler maps C-level types (e.g., \code{int} vs \code{unsigned int}) to specific branch mnemonics.
 
-\vspace{0.15cm}
+\vfill
 
 \small
 
@@ -1213,7 +1243,7 @@ Lower / Higher or Equal
 
 \end{center}
 
-\vspace{0.2cm}
+\vfill
 
 \begin{block}{Why the Mnemonic Depends on Interpretation}
 The same 64-bit pattern can represent a negative signed integer or a very large unsigned integer. The correct branch condition follows the program's intended interpretation, not the raw bits alone.
@@ -1227,23 +1257,25 @@ The same 64-bit pattern can represent a negative signed integer or a very large 
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
+\vspace*{\fill}
 \begin{minipage}{0.85\textwidth}
 {\color{gold}\large\bfseries PART 4\par}
 \vspace{0.3cm}
 {\color{white}\fontsize{22}{26}\selectfont\bfseries Quantitative Processor Performance\par}
 \end{minipage}
+\vspace*{\fill}
 \end{frame}
 
 \begin{frame}{Defining Performance: Latency and Throughput}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item For a fixed workload, $\text{Performance} = \frac{1}{\text{Execution Time}}$.
-  \item \key{Latency:} time required to complete one task.
+  \item \key{Latency:} time required to complete one isolated task.
   \item \key{Throughput:} number of tasks completed per unit time.
+  \item Some applications are strictly latency-bound (e.g., high-frequency trading), while others are throughput-bound (e.g., batch video encoding).
 \end{itemize}
 
-\vspace{0.2cm}
+\vfill
 
 \centering
 \begin{tikzpicture}[
@@ -1256,26 +1288,27 @@ The same 64-bit pattern can represent a negative signed integer or a very large 
   \node[boxthru, right=of lat] (thru) {\textbf{Throughput:} one task may finish each cycle};
 \end{tikzpicture}
 
-\vspace{0.2cm}
+\vfill
 
 \small
 
-IPC is one measure of instruction throughput inside a processor, not a universal measure of application-task throughput.
+IPC (Instructions Per Cycle) is a measure of instruction throughput inside a processor, but it is not a universal measure of overall application-task throughput.
 
 \end{frame}
 
 \begin{frame}{Dynamic Instruction Count and Average CPI}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{Dynamic Instruction Count (IC):} the actual number of instructions executed for a particular run.
+  \item \key{Dynamic Instruction Count (IC):} the actual number of instructions executed during runtime for a particular run.
   \item \key{Cycles Per Instruction (CPI):} workload-average cycles per retired instruction ($\text{CPI} = \frac{\text{Total Clock Cycles}}{\text{Dynamic Instruction Count}}$).
-  \item Different instructions, cache misses, dependencies, and branch mispredictions can contribute different delays.
+  \item Different instructions, cache misses, dependencies, and branch mispredictions can contribute different execution delays.
+  \item Aggressive compiler optimizations often lower IC, but may inadvertently increase CPI if the remaining instructions are highly memory-dependent.
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{block}{CPI Is Not a Fixed Property of the Processor}
-A processor can exhibit different CPI values on different programs, inputs, and memory-access patterns.
+A processor will naturally exhibit wildly different CPI values on different programs, data inputs, and memory-access patterns.
 \end{block}
 
 \end{frame}
@@ -1297,7 +1330,7 @@ T_{\text{clk}}
 \]
 \end{block}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{center}
 
@@ -1330,10 +1363,10 @@ critical-path delay, implementation choices
 
 \end{center}
 
-\vspace{0.15cm}
+\vfill
 
-\begin{block}{Important}
-These factors are \key{not independent}. A design change that improves one factor can worsen another.
+\begin{block}{Important Trade-Offs}
+These factors are \key{not independent}. A design change that improves one factor can often worsen another (e.g., deeper pipelines increase clock speed but also increase stall CPI).
 \end{block}
 
 \end{frame}
@@ -1384,7 +1417,7 @@ T_B
 
 \end{columns}
 
-\vspace{0.2cm}
+\vfill
 
 \[
 \text{Speedup}
@@ -1398,14 +1431,15 @@ T_B
 
 \small
 
-The equation compares measured assumptions; the numbers alone do not prove which microarchitectural feature caused the difference.
+The Iron Law equation strictly compares measured assumptions; the numerical results alone do not prove which microarchitectural feature inherently caused the difference.
 
 \end{frame}
 
 \begin{frame}{The Megahertz Myth and Speedup}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item A higher clock frequency does not guarantee better performance because IC and CPI also matter.
+  \item A higher clock frequency does not guarantee better overall performance because IC and CPI heavily alter execution time.
+  \item Pure frequency scaling is largely constrained today by power dissipation limits (the end of Dennard scaling).
   \item \key{Speedup} compares old and new execution times:
   \begin{center}
   $\text{Speedup} = \frac{T_{\text{old}}}{T_{\text{new}}} = \frac{\text{Performance}_{\text{new}}}{\text{Performance}_{\text{old}}}$
@@ -1421,13 +1455,13 @@ The equation compares measured assumptions; the numbers alone do not prove which
 \begin{frame}{Amdahl's Law: Why Partial Optimization Is Limited}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Suppose only fraction $f$ of execution time can be accelerated.
-  \item Even a huge improvement to that fraction cannot eliminate the time spent in the unaffected portion $(1-f)$.
+  \item Suppose only fraction $f$ of an application's execution time can be accelerated through architectural enhancements.
+  \item Even an infinitely huge improvement to that fraction cannot eliminate the bottleneck of the unaffected portion $(1-f)$.
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 
-\begin{block}{Amdahl's Law}
+\begin{block}{Amdahl's Law Equation}
 \[
 S_{\text{overall}}
 =
@@ -1436,7 +1470,7 @@ S_{\text{overall}}
 \]
 \end{block}
 
-\vspace{0.15cm}
+\vfill
 
 \begin{columns}[T,onlytextwidth]
 
@@ -1473,14 +1507,15 @@ S_{\max}
 \begin{frame}{Benchmarking and Architectural Trade-Offs}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Simple metrics such as MIPS are unreliable across different ISAs because instruction counts and instruction meanings differ.
-  \item Benchmark suites such as SPEC CPU use representative workloads to compare complete systems more meaningfully.
+  \item Simple metrics such as MIPS (Millions of Instructions Per Second) are unreliable across different ISAs because instruction counts and instruction meanings drastically differ.
+  \item Benchmark suites such as SPEC CPU use highly representative workloads to compare complete systems reliably.
+  \item These benchmark suites rely on geometric means to accurately summarize normalized performance scores across diverse programs without skewing averages.
 \end{itemize}
 
-\vspace{0.2cm}
+\vfill
 
 \begin{block}{Trade-Offs Preview}
-Later topics will quantify how choices such as pipeline depth, issue width, and cache capacity can improve one performance factor while increasing complexity, latency, power, or another Iron-Law term.
+Later topics will quantify how choices such as pipeline depth, issue width, and cache capacity can improve one performance factor while simultaneously increasing complexity, latency, power, or another Iron-Law term.
 \end{block}
 
 \end{frame}
@@ -1491,33 +1526,44 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
+\vspace*{\fill}
 \begin{minipage}{0.85\textwidth}
 {\color{gold}\large\bfseries SUMMARY \& ASSESSMENT\par}
 \vspace{0.3cm}
 {\color{white}\fontsize{22}{26}\selectfont\bfseries Review and Self-Test Questions\par}
 \end{minipage}
+\vspace*{\fill}
 \end{frame}
 
 \begin{frame}{Topic 1 Summary: Architecture \& Memory}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item \key{Abstraction Layers:} Systems span from high-level software down to physical devices, with the ISA forming the key software/hardware contract.
-  \item \key{Stored-Program Model:} Instructions and data are represented as bits in memory; \bits{pc} directs instruction fetch.
-  \item \key{Modified Harvard Organization:} Separate first-level instruction/data paths can coexist with a unified software-visible address space.
-  \item \key{Memory Hierarchy:} Multiple storage levels exploit temporal and spatial locality to reduce average access time.
+  \item \key{Stored-Program Model:} Instructions and data are represented uniformly as bits in memory; \bits{pc} directs instruction fetch.
+  \item \key{Modified Harvard Organization:} Separate first-level instruction/data paths can efficiently coexist with a unified software-visible address space.
+  \item \key{Memory Hierarchy:} Multiple storage levels systematically exploit temporal and spatial locality to drastically reduce average access time.
 \end{itemize}
+
+\vfill
+\begin{block}{Core Takeaway}
+System software must actively manage these boundaries, as failing to synchronize data stores with instruction fetch paths causes catastrophic execution errors.
+\end{block}
 
 \end{frame}
 
 \begin{frame}{Topic 1 Summary: Representation \& Performance}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Two's Complement:} Signed integers use a representation that supports one zero and a unified addition/subtraction datapath.
-  \item \key{Condition Flags:} NZCV distinguishes unsigned carry behavior from signed overflow behavior.
-  \item \key{The Iron Law:} CPU execution time depends jointly on instruction count, average CPI, and clock period.
-  \item \key{Amdahl's Law:} Overall speedup is limited by the fraction of execution time that is not improved.
+  \item \key{Two's Complement:} Signed integers use a representation that supports one zero and a unified hardware addition/subtraction datapath.
+  \item \key{Condition Flags:} NZCV correctly distinguishes unsigned carry boundaries from signed arithmetic overflow limits.
+  \item \key{The Iron Law:} CPU execution time depends jointly and inextricably on instruction count, average CPI, and clock period.
+  \item \key{Amdahl's Law:} Overall speedup is mathematically limited by the fraction of execution time that remains untouched by enhancements.
 \end{itemize}
+
+\vfill
+\begin{block}{Core Takeaway}
+Microarchitectural performance improvements are never free; optimizing one facet of the Iron Law usually requires complex concessions in power, pipeline depth, or compiler efficiency.
+\end{block}
 
 \end{frame}
 
@@ -1532,17 +1578,20 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
     \item Size of the L1 instruction cache.
     \item Binary machine encoding of the \code{add} instruction.
   \end{itemize}
+  \vspace{0.2cm}
 
   \item \key{Two's Complement Construction:}
-  Show the steps required to encode $-37$ as an 8-bit two's-complement value.
+  Show the mathematical logic and bitwise inversion steps required to reliably encode $-37$ as an 8-bit two's-complement value.
+  \vspace{0.2cm}
 
   \item \key{Carry vs.\ Overflow:}
   In a 4-bit ALU evaluating
   \(\mathtt{1001}_2 + \mathtt{1100}_2\),
-  determine the output sum, Carry flag ($C$), and Signed Overflow flag ($V$).
+  determine the output sum, Carry flag ($C$), and Signed Overflow flag ($V$). Explain why they differ.
 
 \end{enumerate}
 
+\vfill
 \end{frame}
 
 \begin{frame}{Self-Test Questions: Performance \& Memory}
@@ -1552,18 +1601,21 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
   \item \key{Iron Law Analysis:}
   A compiler optimization decreases dynamic instruction count by $20\%$,
   but increases average CPI by $15\%$.
-  Does performance improve?
+  Does overall application performance improve?
   Calculate the exact speedup.
+  \vspace{0.2cm}
 
   \item \key{Amdahl's Law Application:}
-  Memory stalls account for $70\%$ of execution time.
-  In order to achieve an overall speedup of $2.5\times$, what must the speedup of the memory portion be?
+  Memory stalls strictly account for $70\%$ of application execution time.
+  In order to achieve an overall hardware speedup of $2.5\times$, what exact speedup must be targeted in the memory portion alone?
+  \vspace{0.2cm}
 
   \item \key{Generated Code and Split Caches:}
-  Why can a runtime system that writes new machine instructions need synchronization before those instructions are safely fetched and executed?
+  Explain precisely why a runtime system that dynamically writes new machine instructions requires barrier synchronization before those instructions are safely fetched and executed.
 
 \end{enumerate}
 
+\vfill
 \end{frame}
 
 \begin{frame}{Looking Ahead}
@@ -1573,15 +1625,18 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
 RISC vs.\ CISC: Instruction Set Design Principles \& Trade-offs
 \end{block}
 
-\vspace{0.3cm}
+\vfill
 
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item \key{Complexity Distribution:}
-  Examining how different Instruction Set Architectures distribute complexity between software and hardware.
-  \item \key{Key Trade-offs:}
-  Evaluating instruction encoding, decode complexity, pipeline efficiency, and quantitative performance impact.
+  Examining how different Instruction Set Architectures deliberately distribute complexity between the compiler software and the hardware execution units.
+  \item \key{Key Architectural Trade-offs:}
+  Evaluating how instruction encoding length, decode logic complexity, pipeline efficiency, and register pressure impact quantitative processor performance.
+  \item \key{Historical Context:}
+  Understanding why x86 dominates desktop computing while AArch64 and ARM dominate the mobile and efficiency-first sectors.
 \end{itemize}
 
+\vfill
 \end{frame}
 
 \end{document}
