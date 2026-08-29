@@ -1,9 +1,5 @@
 \documentclass[aspectratio=169,11pt,t]{beamer}
 
-% ============================================================
-% Theme and typography
-% ============================================================
-
 \usetheme{Madrid}
 \usecolortheme{default}
 \usefonttheme{professionalfonts}
@@ -22,9 +18,11 @@
 }
 
 \setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
+
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
+
 \setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
 \setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
 
@@ -34,6 +32,7 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{tikz}
+
 \usetikzlibrary{
   arrows.meta,
   positioning,
@@ -68,33 +67,18 @@
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 
-\newcommand{\sectiondivider}[2]{%
-\begin{frame}[plain]
-\begin{tikzpicture}[remember picture,overlay]
-\fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
-\end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
-{\color{gold}\large\bfseries #1\par}
-\vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
-\end{minipage}
-\end{frame}
+\title[Topic 1]{Introduction to Computing Systems\\\& Binary Foundations}
+
+\subtitle{
+  Abstraction, stored-program organization, data representation,\\
+  and processor performance
 }
 
-\title[Topic 1]{Introduction to Computing Systems\\\& Binary Foundations}
-\subtitle{Abstraction, stored-program organization, data representation, and processor performance}
 \author{Computer Systems Architecture}
 \date{}
 
 \begin{document}
 
-% ============================================================
-% Slide 1
-% ============================================================
-
-% Slide 1
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
@@ -128,17 +112,20 @@ Abstraction, stored-program organization, data representation, and processor per
 \vspace{0.35cm}
 \end{frame}
 
-% ============================================================
-% PART 1
-% ============================================================
+% --- Section Divider 1 ---
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries PART 1\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries Architecture Foundations \& Abstraction\par}
+\end{minipage}
+\end{frame}
 
-\sectiondivider{PART 1}{Architecture Foundations \& Abstraction}
-
-% ============================================================
-% Slide 2
-% ============================================================
-
-% Slide 2
 \begin{frame}{What Is Computer Architecture?}
 
 \begin{itemize}\setlength{\itemsep}{7pt}
@@ -157,77 +144,181 @@ Abstraction, stored-program organization, data representation, and processor per
 
 \end{frame}
 
-% ============================================================
-% Slide 3: The Full Abstraction Stack
-% ============================================================
-
-% Slide 3
 \begin{frame}{The 9 Levels of Computer Abstraction}
-    Computers manage immense complexity by enforcing clean hierarchical interfaces:
-    \vspace{0.2em}
-    \begin{center}
-        \begin{tikzpicture}[xscale=0.85, yscale=0.48, every node/.style={font=\footnotesize\bfseries}]
-            \node[fill=navy, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,8.2) {Application Software};
-            \node[fill=navy!90, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,7.1) {Operating Systems};
-            \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt, draw=navy, thick, dashed] at (0,6.0) {Architecture (AArch64 ISA)};
-            \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt, draw=navy, thick, dashed] at (0,4.9) {Organization (Microarchitecture)};
-            \node[fill=deepblue!80, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,3.75) {Logic Design};
-            \node[fill=deepblue!60, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,2.7) {Digital Circuits};
-            \node[fill=lightblue, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,1.6) {Analog Circuits};
-            \node[fill=lightblue!70, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,0.5) {Electronic Devices};
-            \node[fill=softgray, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,-0.6) {Solid-State Physics};
 
-            \node[anchor=west, text=navy] at (3.5,8.2) {C Programs, Algorithms, Apps};
-            \node[anchor=west, text=navy] at (3.5,7.1) {Device Drivers, Schedulers, Virtual Memory};
-            \node[anchor=west, text=navy, draw=navy, thick, dashed, inner sep=3pt, rounded corners=1pt] at (3.5,6.0) {\textbf{64-Bit Instructions, X Registers}};
-            \node[anchor=west, text=navy, draw=navy, thick, dashed, inner sep=3pt, rounded corners=1pt] at (3.5,4.9) {\textbf{Datapaths, Controllers, Pipelines, Caches}};
-            \node[anchor=west, text=navy] at (3.5,3.8) {Adders, ALUs, Register Files, Decoders};
-            \node[anchor=west, text=navy] at (3.5,2.7) {and, or, not, xor Logic Gates};
-            \node[anchor=west, text=darkgray] at (3.5,1.6) {Differential Amplifiers, Filters, Clocks};
-            \node[anchor=west, text=darkgray] at (3.5,0.5) {NMOS / PMOS Field-Effect Transistors};
-            \node[anchor=west, text=darkgray] at (3.5,-0.6) {Electron Transport in Silicon Substrates};
-        \end{tikzpicture}
-    \end{center}
+Computers manage immense complexity by enforcing clean hierarchical interfaces:
+
+\vspace{0.2em}
+
+\begin{center}
+
+\begin{tikzpicture}[
+  xscale=0.85,
+  yscale=0.48,
+  every node/.style={font=\footnotesize\bfseries}
+]
+
+\node[
+  fill=navy,
+  text=white,
+  minimum width=6cm,
+  minimum height=0.45cm,
+  rounded corners=1pt
+] at (0,8.2) {Application Software};
+
+\node[
+  fill=navy!90,
+  text=white,
+  minimum width=6cm,
+  minimum height=0.45cm,
+  rounded corners=1pt
+] at (0,7.1) {Operating Systems};
+
+\node[
+  fill=gold,
+  text=navy,
+  minimum width=6cm,
+  minimum height=0.45cm,
+  rounded corners=1pt,
+  draw=navy,
+  thick,
+  dashed
+] at (0,6.0) {Architecture (AArch64 ISA)};
+
+\node[
+  fill=gold,
+  text=navy,
+  minimum width=6cm,
+  minimum height=0.45cm,
+  rounded corners=1pt,
+  draw=navy,
+  thick,
+  dashed
+] at (0,4.9) {Organization (Microarchitecture)};
+
+\node[
+  fill=deepblue!80,
+  text=white,
+  minimum width=6cm,
+  minimum height=0.45cm,
+  rounded corners=1pt
+] at (0,3.75) {Logic Design};
+
+\node[
+  fill=deepblue!60,
+  text=white,
+  minimum width=6cm,
+  minimum height=0.45cm,
+  rounded corners=1pt
+] at (0,2.7) {Digital Circuits};
+
+\node[
+  fill=lightblue,
+  text=darkgray,
+  minimum width=6cm,
+  minimum height=0.45cm,
+  rounded corners=1pt
+] at (0,1.6) {Analog Circuits};
+
+\node[
+  fill=lightblue!70,
+  text=darkgray,
+  minimum width=6cm,
+  minimum height=0.45cm,
+  rounded corners=1pt
+] at (0,0.5) {Electronic Devices};
+
+\node[
+  fill=softgray,
+  text=darkgray,
+  minimum width=6cm,
+  minimum height=0.45cm,
+  rounded corners=1pt
+] at (0,-0.6) {Solid-State Physics};
+
+\node[anchor=west,text=navy] at (3.5,8.2)
+  {C Programs, Algorithms, Apps};
+
+\node[anchor=west,text=navy] at (3.5,7.1)
+  {Device Drivers, Schedulers, Virtual Memory};
+
+\node[
+  anchor=west,
+  text=navy,
+  draw=navy,
+  thick,
+  dashed,
+  inner sep=3pt,
+  rounded corners=1pt
+] at (3.5,6.0)
+  {\textbf{64-Bit Instructions, X Registers}};
+
+\node[
+  anchor=west,
+  text=navy,
+  draw=navy,
+  thick,
+  dashed,
+  inner sep=3pt,
+  rounded corners=1pt
+] at (3.5,4.9)
+  {\textbf{Datapaths, Controllers, Pipelines, Caches}};
+
+\node[anchor=west,text=navy] at (3.5,3.8)
+  {Adders, ALUs, Register Files, Decoders};
+
+\node[anchor=west,text=navy] at (3.5,2.7)
+  {and, or, not, xor Logic Gates};
+
+\node[anchor=west,text=darkgray] at (3.5,1.6)
+  {Differential Amplifiers, Filters, Clocks};
+
+\node[anchor=west,text=darkgray] at (3.5,0.5)
+  {NMOS / PMOS Field-Effect Transistors};
+
+\node[anchor=west,text=darkgray] at (3.5,-0.6)
+  {Electron Transport in Silicon Substrates};
+
+\end{tikzpicture}
+
+\end{center}
+
 \end{frame}
 
-% ============================================================
-% Slide 4
-% ============================================================
-
-% Slide 4
 \begin{frame}{When Abstractions Leak}
 
 \begin{columns}[T,onlytextwidth]
+
 \column{0.48\textwidth}
+
 \begin{block}{Software View}
 \begin{itemize}
-  \item Variables, Arrays, Branches
-  \item Function calls, Data types
+  \item Variables, arrays, branches
+  \item Function calls, data types
 \end{itemize}
 \end{block}
 
 \column{0.48\textwidth}
+
 \begin{block}{Architectural Effect}
 \begin{itemize}
-  \item Register allocation, Cache misses
-  \item Branch prediction, Stack frames
+  \item Register allocation, cache misses
+  \item Branch prediction, stack frames
   \item Overflow and sign extension
 \end{itemize}
 \end{block}
+
 \end{columns}
 
 \vspace{0.35cm}
+
 Performance-sensitive software often exposes lower-level machine behavior.
+
 \end{frame}
 
-% ============================================================
-% Slide 5
-% ============================================================
-
-% Slide 5
 \begin{frame}{From Source Code to Execution}
 
-\centering
+\begin{center}
 \begin{tikzpicture}[
   node distance=0.25cm,
   box/.style={
@@ -240,34 +331,62 @@ Performance-sensitive software often exposes lower-level machine behavior.
     minimum height=0.42cm
   }
 ]
-\node[box] (c) {High-level source: \code{c = a + b;}};
-\node[box, below=of c] (asm) {Assembly: \code{add x0, x1, x2}};
-\node[box, below=of asm] (obj) {Object / executable representation};
-\node[box, below=of obj] (inst) {Fetched instruction word: \code{0x8b020020}};
-\node[box, below=of inst] (uarch) {Microarchitecture: fetch, decode, execute, retire};
-\node[box, below=of uarch] (logic) {Hardware: datapaths, storage, and control logic};
 
-\draw[-{Latex[length=2mm]}, thick, navy] (c) -- (asm) node[midway,right,font=\tiny\bfseries,text=deepblue]{Compiler};
-\draw[-{Latex[length=2mm]}, thick, navy] (asm) -- (obj) node[midway,right,font=\tiny\bfseries,text=deepblue]{Assembler / linker};
-\draw[-{Latex},thick, navy] (obj) -- (inst) node[midway,right,font=\tiny\bfseries,text=deepblue]{Load / fetch};
-\draw[-{Latex[length=2mm]}, thick, navy] (inst) -- (uarch) node[midway,right,font=\tiny\bfseries,text=deepblue]{Decode};
-\draw[-{Latex[length=2mm]}, thick, navy] (uarch) -- (logic) node[midway,right,font=\tiny\bfseries,text=deepblue]{Implementation};
+\node[box] (c)
+  {High-level source: \code{c = a + b;}};
+
+\node[box,below=of c] (asm)
+  {Assembly: \code{add x0, x1, x2}};
+
+\node[box,below=of asm] (obj)
+  {Object / executable representation};
+
+\node[box,below=of obj] (inst)
+  {Fetched instruction word: \code{0x8b020020}};
+
+\node[box,below=of inst] (uarch)
+  {Microarchitecture: fetch, decode, execute, retire};
+
+\node[box,below=of uarch] (logic)
+  {Hardware: datapaths, storage, and control logic};
+
+\draw[-{Latex[length=2mm]},thick,navy]
+  (c) -- (asm)
+  node[midway,right,font=\tiny\bfseries,text=deepblue]{Compiler};
+
+\draw[-{Latex[length=2mm]},thick,navy]
+  (asm) -- (obj)
+  node[midway,right,font=\tiny\bfseries,text=deepblue]{Assembler / linker};
+
+\draw[-{Latex},thick,navy]
+  (obj) -- (inst)
+  node[midway,right,font=\tiny\bfseries,text=deepblue]{Load / fetch};
+
+\draw[-{Latex[length=2mm]},thick,navy]
+  (inst) -- (uarch)
+  node[midway,right,font=\tiny\bfseries,text=deepblue]{Decode};
+
+\draw[-{Latex[length=2mm]},thick,navy]
+  (uarch) -- (logic)
+  node[midway,right,font=\tiny\bfseries,text=deepblue]{Implementation};
+
 \end{tikzpicture}
+\end{center}
 
 \vspace{0.15cm}
+
 \small
+
 The ISA is the boundary between program representation and processor execution.
+
 \end{frame}
 
-% ============================================================
-% Slide 6
-% ============================================================
-
-% Slide 6
 \begin{frame}{ISA and Microarchitecture}
 
 \begin{columns}[T,onlytextwidth]
+
 \column{0.48\textwidth}
+
 \begin{block}{Instruction Set Architecture}
 \begin{itemize}
   \item Instruction encodings \& behavior
@@ -277,573 +396,1203 @@ The ISA is the boundary between program representation and processor execution.
 \end{block}
 
 \column{0.48\textwidth}
+
 \begin{block}{Microarchitecture}
 \begin{itemize}
-  \item Pipeline organization, Superscalar width
+  \item Pipeline organization, superscalar width
   \item In-order or out-of-order execution
-  \item Branch prediction, Cache structures
+  \item Branch prediction, cache structures
 \end{itemize}
 \end{block}
+
 \end{columns}
 
 \vspace{0.25cm}
+
 Different processors can implement the same ISA using different microarchitectures.
+
 \end{frame}
 
-% ============================================================
-% Slide 7
-% ============================================================
-
-% Slide 7
 \begin{frame}{RISC Design Principles and AArch64 Encoding}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item RISC designs emphasize regular instruction formats and explicit load/store architecture.
   \item AArch64 instructions are fixed-width \key{32-bit words}, aligned on 4-byte boundaries.
-  \item Destination (\code{Rd}) and source operands (\code{Rn}, \code{Rm}) use fixed 5-bit register fields ($2^5 = 32$).
+  \item Destination (\code{Rd}) and source operands (\code{Rn}, \code{Rm}) use fixed 5-bit register-number fields.
 \end{itemize}
 
 \vspace{0.15cm}
-\begin{block}{Example: 64-Bit Addition (\texttt{add x0, x1, x2} $\implies$ \texttt{0x8b020020})}
+
+\begin{block}{
+Example: 64-Bit Addition
+(\texttt{add x0, x1, x2} $\implies$ \texttt{0x8b020020})
+}
 \centering
-\small Encoding maps \code{Rd = x0}, \code{Rn = x1}, \code{Rm = x2} within the uniform 32-bit word.
+\small
+Encoding maps \code{Rd = x0}, \code{Rn = x1}, and \code{Rm = x2}
+within the uniform 32-bit word.
 \end{block}
 
 \end{frame}
 
-% ============================================================
-% PART 2
-% ============================================================
+% --- Section Divider 2 ---
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries PART 2\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries Stored-Program Organization \& Memory\par}
+\end{minipage}
+\end{frame}
 
-\sectiondivider{PART 2}{Stored-Program Organization \& Memory}
-
-% ============================================================
-% Slide 8
-% ============================================================
-
-% Slide 8
-\begin{frame}{The Stored-Program Concept \& Execution Cycle}
+\begin{frame}{The Stored-Program Concept}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Instructions and data share a unified memory space, encoded as binary numbers.
-  \item The processor maintains a Program Counter (\bits{pc}) pointing to the next instruction.
+  \item A stored-program computer keeps \key{instructions and data in memory as binary information}.
+  \item The processor does not inherently ``know'' that a memory word is code or data; interpretation depends on how that address is used.
+  \item The \key{Program Counter (\bits{pc})} identifies the address of the next instruction to be fetched.
 \end{itemize}
 
-\vspace{0.15cm}
-\centering
-\begin{tikzpicture}[node distance=0.5cm]
-\node[draw=navy, fill=lightblue, rounded corners=2pt, minimum width=2.0cm, minimum height=0.6cm, font=\bfseries] (f) {Fetch};
-\node[draw=navy, fill=lightblue, rounded corners=2pt, right=of f, minimum width=2.0cm, minimum height=0.6cm, font=\bfseries] (d) {Decode};
-\node[draw=navy, fill=lightblue, rounded corners=2pt, right=of d, minimum width=2.0cm, minimum height=0.6cm, font=\bfseries] (e) {Execute};
-\node[draw=navy, fill=deepblue, text=white, rounded corners=2pt, right=of e, minimum width=2.0cm, minimum height=0.6cm, font=\bfseries] (w) {Complete};
+\vspace{0.2cm}
 
-\draw[-{Latex},thick,navy] (f)--(d);
-\draw[-{Latex},thick,navy] (d)--(e);
-\draw[-{Latex},thick,navy] (e)--(w);
+\begin{center}
+\begin{tikzpicture}[scale=0.9,every node/.style={transform shape}]
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  minimum width=4.2cm,
+  minimum height=2.0cm
+] (mem) {
+  \begin{tabular}{c}
+  \textbf{Memory}\\[0.1cm]
+  instructions\\
+  data
+  \end{tabular}
+};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=2pt,
+  right=1.3cm of mem,
+  minimum width=2.8cm,
+  minimum height=0.8cm,
+  font=\small\bfseries
+] (pc) {Program Counter};
+
+\node[
+  draw=gold!80!black,
+  fill=gold!20,
+  rounded corners=2pt,
+  below=0.45cm of pc,
+  minimum width=2.8cm,
+  minimum height=0.8cm,
+  font=\small\bfseries
+] (cpu) {Processor};
+
+\draw[-{Latex},thick,navy]
+  (pc.west) -- (mem.east)
+  node[midway,above,font=\tiny\bfseries]{instruction address};
+
+\draw[-{Latex},thick,navy]
+  (mem.east) -- (cpu.west)
+  node[midway,below,font=\tiny\bfseries]{instruction / data};
+
+\draw[-{Latex},thick,gold!80!black]
+  (cpu.north) -- (pc.south)
+  node[midway,right,font=\tiny\bfseries]{next \bits{pc}};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.2cm}
+
+\small
+
+The stored-program idea makes software possible:
+changing memory contents can change both the data being processed
+and the instructions being executed.
+
+\end{frame}
+
+\begin{frame}{Memory Topologies: von Neumann, Harvard, Modified Harvard}
+
+\centering
+
+\begin{tikzpicture}[scale=0.82,every node/.style={transform shape}]
+
+% ------------------------------------------------------------
+% von Neumann
+% ------------------------------------------------------------
+
+\node[font=\small\bfseries,navy] at (-5.3,2.6)
+  {von Neumann};
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  minimum width=2.3cm,
+  minimum height=0.8cm
+] (cpu1) at (-5.3,1.6) {CPU};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=2pt,
+  minimum width=2.8cm,
+  minimum height=1.2cm,
+  align=center
+] (mem1) at (-5.3,-0.1) {Unified\\Code + Data};
+
+\draw[{Latex}-{Latex},thick,navy]
+  (cpu1) -- (mem1);
+
+\node[
+  font=\tiny,
+  align=center
+] at (-5.3,-1.2)
+  {Shared memory path\\for instructions and data};
+
+% ------------------------------------------------------------
+% Pure Harvard
+% ------------------------------------------------------------
+
+\node[font=\small\bfseries,navy] at (0,2.6)
+  {Pure Harvard};
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  minimum width=2.3cm,
+  minimum height=0.8cm
+] (cpu2) at (0,1.6) {CPU};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=2pt,
+  minimum width=2.2cm,
+  minimum height=0.9cm,
+  align=center
+] (imem) at (-1.25,-0.1) {Instruction\\Memory};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=2pt,
+  minimum width=2.2cm,
+  minimum height=0.9cm,
+  align=center
+] (dmem) at (1.25,-0.1) {Data\\Memory};
+
+\draw[{Latex}-{Latex},thick,navy]
+  (cpu2.south west) -- (imem.north);
+
+\draw[{Latex}-{Latex},thick,navy]
+  (cpu2.south east) -- (dmem.north);
+
+\node[
+  font=\tiny,
+  align=center
+] at (0,-1.2)
+  {Separate instruction\\and data paths};
+
+% ------------------------------------------------------------
+% Modified Harvard
+% ------------------------------------------------------------
+
+\node[font=\small\bfseries,navy] at (5.3,2.6)
+  {Modified Harvard};
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  minimum width=2.3cm,
+  minimum height=0.8cm
+] (cpu3) at (5.3,1.6) {CPU};
+
+\node[
+  draw=navy,
+  fill=gold!20,
+  rounded corners=2pt,
+  minimum width=1.8cm,
+  minimum height=0.7cm
+] (ic) at (4.2,0.3) {L1 I-cache};
+
+\node[
+  draw=navy,
+  fill=gold!20,
+  rounded corners=2pt,
+  minimum width=1.8cm,
+  minimum height=0.7cm
+] (dc) at (6.4,0.3) {L1 D-cache};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=2pt,
+  minimum width=3.2cm,
+  minimum height=0.8cm,
+  align=center
+] (mem3) at (5.3,-1.0) {Unified Lower Memory};
+
+\draw[{Latex}-{Latex},thick,navy]
+  (cpu3.south west) -- (ic.north);
+
+\draw[{Latex}-{Latex},thick,navy]
+  (cpu3.south east) -- (dc.north);
+
+\draw[{Latex}-{Latex},thick,navy]
+  (ic.south) -- (mem3.north west);
+
+\draw[{Latex}-{Latex},thick,navy]
+  (dc.south) -- (mem3.north east);
+
 \end{tikzpicture}
 
 \vspace{0.2cm}
-Real processors overlap instruction execution via pipelining, while branches and exceptions alter the standard sequential flow.
+
+\begin{itemize}\setlength{\itemsep}{3pt}
+
+  \item Modern high-performance processors commonly use a
+  \key{modified Harvard organization}: separate first-level
+  instruction/data caches with a unified software-visible address space.
+
+  \item The key architectural question is not just
+  ``where is memory?'' but
+  \key{which paths instruction fetch and data access use}.
+
+\end{itemize}
+
 \end{frame}
 
-% ============================================================
-% Slide 9
-% ============================================================
+\begin{frame}{Modified Harvard and Newly Generated Code}
 
-% Slide 9
-\begin{frame}{Memory Topologies: von Neumann, Harvard, Modified Harvard}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item A JIT compiler or runtime system may \key{generate machine instructions by writing bytes as data}.
+  \item Those writes travel through the data side of the memory hierarchy.
+  \item The instruction side may still hold an older copy of the same address, so simply jumping to the new bytes may be unsafe.
+\end{itemize}
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.88,every node/.style={transform shape}]
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  minimum width=2.5cm,
+  minimum height=0.75cm,
+  font=\small\bfseries
+] (jit) {JIT writes code};
+
+\node[
+  draw=navy,
+  fill=gold!20,
+  rounded corners=2pt,
+  right=0.8cm of jit,
+  minimum width=2.6cm,
+  minimum height=0.75cm,
+  font=\small\bfseries
+] (dside) {Data-side copy};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=2pt,
+  right=0.8cm of dside,
+  minimum width=2.6cm,
+  minimum height=0.75cm,
+  font=\small\bfseries
+] (iside) {Instruction-side copy};
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  right=0.8cm of iside,
+  minimum width=2.4cm,
+  minimum height=0.75cm,
+  font=\small\bfseries
+] (exec) {Execute};
+
+\draw[-{Latex},thick,navy]
+  (jit) -- (dside);
+
+\draw[-{Latex},thick,gold!80!black]
+  (dside) -- (iside)
+  node[midway,above,font=\tiny\bfseries]{synchronize};
+
+\draw[-{Latex},thick,navy]
+  (iside) -- (exec);
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.15cm}
+
+\begin{block}{Conceptual Synchronization}
+\centering
+\key{Make data writes visible}
+$\rightarrow$
+\key{synchronize}
+$\rightarrow$
+\key{discard stale instruction copies}
+$\rightarrow$
+\key{execute}
+\end{block}
+
+\vspace{0.1cm}
+
+\small
+
+The exact AArch64 cache-maintenance and barrier instructions are system-software details that will be revisited after caches and the memory hierarchy are developed.
+
+\end{frame}
+
+\begin{frame}{Memory Hierarchy: Why Multiple Levels Exist}
 
 \begin{columns}[T,onlytextwidth]
-\column{0.32\textwidth}
-\begin{block}{von Neumann}
-Shared memory and bus path; instruction and data access contend for bandwidth.
+
+\column{0.47\textwidth}
+
+\begin{block}{Design Tension}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item Small storage can be very fast.
+  \item Large storage is cheaper per bit but slower.
+  \item No single technology gives maximum speed, capacity, and low cost simultaneously.
+\end{itemize}
 \end{block}
 
-\column{0.32\textwidth}
-\begin{block}{Pure Harvard}
-Separate memories and buses for code and data; enables parallel access.
-\end{block}
+\column{0.49\textwidth}
 
-\column{0.32\textwidth}
-\begin{block}{Modified Harvard}
-Unified software address space with split L1 instruction and data caches.
-\end{block}
+\begin{center}
+\begin{tikzpicture}[scale=0.83,every node/.style={transform shape}]
+
+\node[
+  draw=navy,
+  fill=gold!25,
+  rounded corners=2pt,
+  minimum width=3.0cm,
+  minimum height=0.55cm,
+  font=\small\bfseries
+] at (0,2.2) {Registers};
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  minimum width=3.8cm,
+  minimum height=0.55cm,
+  font=\small\bfseries
+] at (0,1.35) {L1 / L2 / L3 Caches};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=2pt,
+  minimum width=4.6cm,
+  minimum height=0.55cm,
+  font=\small\bfseries
+] at (0,0.5) {DRAM};
+
+\node[
+  draw=navy,
+  fill=white,
+  rounded corners=2pt,
+  minimum width=5.4cm,
+  minimum height=0.55cm,
+  font=\small\bfseries
+] at (0,-0.35) {Persistent Storage};
+
+\draw[-{Latex},thick,navy]
+  (2.9,2.2) -- (2.9,-0.35);
+
+\node[rotate=-90,font=\tiny\bfseries] at (3.25,0.9)
+  {larger capacity, higher latency};
+
+\end{tikzpicture}
+\end{center}
+
 \end{columns}
 
 \vspace{0.25cm}
-Modern high-performance processors (including AArch64) utilize Modified Harvard topologies.
+
+\begin{block}{Why the Hierarchy Works: Locality}
+\key{Temporal locality:} recently used data is likely to be used again.\\
+\key{Spatial locality:} nearby data is likely to be used soon.
+\end{block}
+
 \end{frame}
 
-% ============================================================
-% Slide 10
-% ============================================================
-
-% Slide 10
-\begin{frame}{Modified Harvard \& Self-Modifying Code (SMC)}
+\begin{frame}{The Memory Wall}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Split L1 $I\text{-cache}$ and $D\text{-cache}$ require explicit synchronization when runtime compilers (JIT) write code as data.
-  \item AArch64 requires explicit cache cleaning, barrier instructions, and instruction invalidation:
+  \item Processor execution capability has improved much faster than off-chip DRAM latency.
+  \item A cache hierarchy attempts to keep the processor working on nearby copies of frequently used instructions and data.
+  \item When locality fails and a request must go farther down the hierarchy, execution may stall for many cycles.
 \end{itemize}
 
-\vspace{0.15cm}
-\begin{block}{Required Synchronization Sequence}
-\small
-\code{dc cvau, x0} $\to$ \code{dsb ish} $\to$ \code{ic ivau, x0} $\to$ \code{dsb ish} $\to$ \code{isb}
-\end{block}
+\vspace{0.2cm}
 
-\vspace{0.15cm}
-Ensures visibility between data modifications and subsequent instruction fetches.
-\end{frame}
-
-% ============================================================
-% Slide 11
-% ============================================================
-
-% Slide 11
-\begin{frame}{Memory Hierarchy \& The Memory Wall}
-
-\begin{columns}[T,onlytextwidth]
-\column{0.50\textwidth}
-\begin{block}{Hierarchy Tiers}
+\begin{block}{Illustrative Latency Scale}
 \begin{itemize}\setlength{\itemsep}{2pt}
-  \item \key{Registers:} $\approx 1$ cycle
-  \item \key{L1 Cache:} $3\text{--}4$ cycles
-  \item \key{L2/L3 Cache:} $10\text{--}60$ cycles
-  \item \key{DRAM (Main Memory):} $200\text{+}$ cycles
-  \item \key{Persistent Storage:} SSD/NVMe
+  \item Registers: roughly a few pipeline resources away
+  \item L1 cache: typically only a few cycles
+  \item Lower-level caches: tens of cycles
+  \item DRAM: often hundreds of processor cycles
 \end{itemize}
 \end{block}
 
-\column{0.46\textwidth}
-\begin{block}{The Memory Wall}
-Processor compute capability scales much faster than DRAM latency, making cache management, locality, and prefetching critical to performance.
-\end{block}
-\end{columns}
+\vspace{0.15cm}
+
+\small
+
+Exact latencies are implementation-dependent; the architectural lesson is the large gap between nearby and distant storage.
 
 \end{frame}
 
-% ============================================================
-% PART 3
-% ============================================================
+% --- Section Divider 3 ---
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries PART 3\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries Binary Representation \& Arithmetic\par}
+\end{minipage}
+\end{frame}
 
-\sectiondivider{PART 3}{Binary Representation \& Arithmetic}
-
-% ============================================================
-% Slide 12
-% ============================================================
-
-% Slide 12
 \begin{frame}{Bits and Interpretive Context}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Hardware stores uninterpreted binary bit patterns ($\{0, 1\}^n$).
-  \item An $n$-bit field yields $2^n$ combinations; meaning depends entirely on the active instruction context.
+  \item Hardware stores binary bit patterns; \key{meaning comes from context}.
+  \item The stored-program model therefore permits the same memory bytes to be interpreted differently depending on how they are used.
 \end{itemize}
 
 \vspace{0.15cm}
+
 \begin{center}
+
 \footnotesize
+
 \begin{tabular}{ll}
 \toprule
-\textbf{Interpretation Perspective} & \textbf{Meaning of 32-bit Word \hex{8b020020}} \\
+\textbf{Interpretation Perspective}
+&
+\textbf{Meaning of 32-bit Word \hex{8b020020}}
+\\
 \midrule
-AArch64 Machine Instruction & \code{add x0, x1, x2} \\
-Unsigned 32-bit Integer     & $2{,}332{,}164{,}128_{10}$ \\
-Signed 32-bit Integer       & $-1{,}962{,}803{,}168_{10}$ \\
+AArch64 Machine Instruction
+&
+\code{add x0, x1, x2}
+\\
+Unsigned 32-bit Integer
+&
+$2{,}332{,}164{,}128_{10}$
+\\
+Signed 32-bit Integer
+&
+$-1{,}962{,}803{,}168_{10}$
+\\
 \bottomrule
 \end{tabular}
+
+\end{center}
+
+\vspace{0.15cm}
+
+\small
+
+Bits do not carry a built-in ``type''; instructions and software conventions determine the interpretation.
+
+\end{frame}
+
+\begin{frame}{Positional Binary and Hexadecimal}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item In positional binary, each bit contributes a power of two ($\text{Value} = \sum_{i=0}^{n-1} b_i 2^i$).
+  \item Hexadecimal is a compact notation for binary because one hex digit represents exactly four bits.
+\end{itemize}
+
+\vspace{0.15cm}
+
+\begin{block}{Example}
+\centering
+\bits{10110110}$_2$
+$=
+128 + 32 + 16 + 4 + 2
+=
+182_{10}
+=
+\hex{b6}$
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Endianness: Mapping Multi-Byte Values to Memory}
+
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Endianness determines which byte of a multi-byte value occupies the lowest memory address.
+  \item In little-endian storage, the least-significant byte is placed first.
+\end{itemize}
+
+\vspace{0.15cm}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9,every node/.style={transform shape}]
+
+\node[font=\small\bfseries] at (0,1.2)
+  {Store 32-bit value \hex{12345678} starting at address \hex{1000}};
+
+\foreach \x/\addr/\val in {
+  0/1000/78,
+  2/1001/56,
+  4/1002/34,
+  6/1003/12
+}{
+  \draw[fill=lightblue,draw=navy]
+    (\x,0) rectangle ++(1.8,0.75);
+
+  \node at (\x+0.9,0.38)
+    {\texttt{0x\val}};
+
+  \node[
+    font=\tiny\bfseries,
+    anchor=north
+  ] at (\x+0.9,0)
+    {\texttt{0x\addr}};
+}
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.25cm}
+
+\begin{block}{Little-Endian Rule}
+\centering
+Lowest address $\rightarrow$ least-significant byte
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Why Two's Complement?}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item A signed representation should support positive and negative values while keeping arithmetic hardware simple.
+  \item Two's complement provides:
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item one representation of zero,
+    \item the same binary adder for signed and unsigned addition,
+    \item simple subtraction through addition of a negated operand.
+  \end{itemize}
+\end{itemize}
+
+\vspace{0.15cm}
+
+\begin{block}{Signed Interpretation}
+For an $n$-bit two's-complement number, $\text{Value} = -b_{n-1}2^{n-1} + \sum_{i=0}^{n-2} b_i2^i$.
+\end{block}
+
+\emph{Give the most-significant bit a negative weight, and add the remaining positive bit weights normally.}
+
+\end{frame}
+
+\begin{frame}{Constructing a Negative Two's-Complement Number}
+
+\begin{block}{Example: Represent $-5$ in 8 Bits}
+\centering
+\large
+
+$+5 = \bits{00000101}$
+
+\vspace{0.12cm}
+
+Invert all bits:
+\bits{11111010}
+
+\vspace{0.12cm}
+
+Add 1:
+\bits{11111011}
+
+\vspace{0.12cm}
+
+Therefore,
+$-5 = \bits{11111011}$
+
+\end{block}
+
+\vspace{0.2cm}
+
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item The bit pattern can also be evaluated directly ($-128 + 64 + 32 + 16 + 8 + 2 + 1 = -5$).
+  \item An $n$-bit two's-complement integer ranges from $-2^{n-1}$ to $2^{n-1}-1$.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Unified Adder Datapath and Subtraction}
+
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item The same $n$-bit adder can operate on bit patterns interpreted as either signed or unsigned integers.
+  \item Two's-complement negation gives $-B = \sim B + 1$, so subtraction becomes $A-B = A + (\sim B) + 1$.
+\end{itemize}
+
+\vspace{0.15cm}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9,every node/.style={transform shape}]
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  minimum width=2.1cm,
+  minimum height=0.65cm,
+  font=\small\bfseries
+] (a) {$A$};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=2pt,
+  right=0.8cm of a,
+  minimum width=2.1cm,
+  minimum height=0.65cm,
+  font=\small\bfseries
+] (b) {$B$ or $\sim B$};
+
+\node[
+  draw=gold!80!black,
+  fill=gold!20,
+  rounded corners=2pt,
+  right=0.8cm of b,
+  minimum width=2.5cm,
+  minimum height=0.65cm,
+  font=\small\bfseries
+] (add) {Adder};
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  right=0.8cm of add,
+  minimum width=2.3cm,
+  minimum height=0.65cm,
+  font=\small\bfseries
+] (r) {Result};
+
+\draw[-{Latex},thick,navy] (a) -- (b);
+\draw[-{Latex},thick,navy] (b) -- (add);
+\draw[-{Latex},thick,navy] (add) -- (r);
+
+\node[font=\tiny\bfseries] at (5.5,-0.55)
+  {carry-in = 1 for subtraction};
+
+\end{tikzpicture}
 \end{center}
 
 \end{frame}
 
-% ============================================================
-% Slide 13
-% ============================================================
-
-% Slide 13
-\begin{frame}{Positional Systems \& Endianness}
-
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{Positional Binary:} $\text{Value} = \sum_{i=0}^{n-1} b_i 2^i$. Hexadecimal compresses nibbles ($4\text{ bits} = 1\text{ hex digit}$).
-  \item \key{Byte Ordering (Endianness):} Dictates how multi-byte values map to memory addresses.
-  \begin{itemize}\setlength{\itemsep}{2pt}
-    \item \textbf{Little-Endian (AArch64 / x86):} Least Significant Byte (LSB) stored at the lowest address.
-    \item \textbf{Big-Endian:} Most Significant Byte (MSB) stored at the lowest address.
-  \end{itemize}
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 14
-% ============================================================
-
-% Slide 14
-\begin{frame}{Two's-Complement Representation \& Ranges}
-
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item Signed integers utilize two's complement, where the MSB carries a negative positional weight ($-2^{n-1}$).
-  \item \key{Negation Property:} $-x = \sim x + 1$.
-\end{itemize}
-
-\vspace{0.15cm}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Unsigned Ranges ($0$ to $2^n - 1$)}
-\begin{itemize}\setlength{\itemsep}{1pt}
-  \item 8-bit: $0$ to $255$
-  \item 32-bit: $0$ to $4.29 \times 10^9$
-  \item 64-bit: $0$ to $1.84 \times 10^{19}$
-\end{itemize}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Two's Complement ($-2^{n-1}$ to $2^{n-1}-1$)}
-\begin{itemize}\setlength{\itemsep}{1pt}
-  \item 8-bit: $-128$ to $+127$
-  \item 32-bit: $\pm 2.14 \times 10^9$
-  \item 64-bit: $\pm 9.22 \times 10^{18}$
-\end{itemize}
-\end{block}
-\end{columns}
-
-\end{frame}
-
-% ============================================================
-% Slide 15
-% ============================================================
-
-% Slide 15
-\begin{frame}{Unified Adder Datapath \& Extension Rules}
+\begin{frame}{Sign Extension and Zero Extension}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item The identical hardware adder supports signed and unsigned addition; subtraction uses $A - B = A + (\sim B) + 1$.
-  \item \key{Promotion Rules:}
-  \begin{itemize}\setlength{\itemsep}{2pt}
-    \item \textbf{Sign Extension (\code{ldrsb}):} Replicates the MSB across upper bits to preserve negative values.
-    \item \textbf{Zero Extension (\code{ldrb}):} Pads upper bits with zeros to preserve unsigned magnitude.
-  \end{itemize}
+  \item When a smaller value is widened, the upper bits must be filled in a way that preserves the intended numeric meaning.
 \end{itemize}
 
 \vspace{0.15cm}
-\begin{block}{Security Warning}
-Zero-extending a signed negative integer converts $-1$ into a massive positive value, breaking array bounds checks.
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{Signed Widening}
+\key{Sign extension} replicates the source sign bit.\\
+Example: \code{ldrsb} preserves a negative 8-bit value when widened.
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Unsigned Widening}
+\key{Zero extension} fills upper bits with zeros.\\
+Example: \code{ldrb} preserves the unsigned magnitude of an 8-bit value.
+\end{block}
+
+\end{columns}
+
+\vspace{0.2cm}
+
+\begin{block}{Why It Matters}
+Using the wrong extension changes the interpreted value and can invalidate comparisons, bounds checks, or address calculations.
 \end{block}
 
 \end{frame}
 
-% ============================================================
-% Slide 16
-% ============================================================
-
-% Slide 16
 \begin{frame}{AArch64 NZCV Condition Flags}
 
 Arithmetic instructions can update status flags in PSTATE:
 
 \vspace{0.15cm}
+
 \small
+
 \begin{center}
+
 \begin{tabular}{cll}
 \toprule
 Flag & Name & Evaluation Meaning \\
 \midrule
-N & Negative & Result MSB is 1 (negative signed value) \\
-Z & Zero     & All result bits are zero \\
-C & Carry    & Unsigned carry-out (add) or No-Borrow ($\ge$, sub) \\
-V & Overflow & Signed arithmetic overflow range violation \\
+N & Negative & Most-significant result bit is 1 \\
+Z & Zero & All result bits are zero \\
+C & Carry & Unsigned carry-out (add) or no-borrow (sub) \\
+V & Overflow & Signed mathematical result is outside the destination range \\
 \bottomrule
 \end{tabular}
+
 \end{center}
 
 \vspace{0.15cm}
-Explicit flag-setting instructions use the \code{s} suffix (\code{adds}, \code{subs}, or alias \code{cmp}).
+
+\begin{block}{Same Bits, Different Questions}
+For \(\mathtt{1111}_2 + \mathtt{0001}_2\) in 4 bits, the stored result is \(\mathtt{0000}_2\).\\
+Unsigned interpretation: $15+1=16$ produces carry-out ($C=1$).\\
+Signed interpretation: $-1+1=0$ does not overflow ($V=0$).
+\end{block}
+
 \end{frame}
 
-% ============================================================
-% Slide 17
-% ============================================================
-
-% Slide 17
 \begin{frame}{Signed vs.\ Unsigned Conditional Branching}
 
-After a comparison (\code{cmp x0, x1}), conditional branches test specific flag combinations:
+After \code{cmp x0, x1}, the processor has conceptually subtracted the operands and set NZCV.
 
 \vspace{0.15cm}
+
 \small
+
 \begin{center}
+
 \begin{tabular}{llll}
 \toprule
 Branch & Context & Flag Condition & Meaning \\
 \midrule
-\code{b.eq} / \code{b.ne} & Universal & $Z=1$ / $Z=0$ & Equal / Not Equal \\
-\code{b.lt} / \code{b.ge} & \textbf{Signed} & $N \neq V$ / $N = V$ & Less Than / Greater or Equal \\
-\code{b.lo} / \code{b.hs} & \textbf{Unsigned} & $C=0$ / $C=1$ & Lower ($<$) / Higher or Equal ($\ge$) \\
+\code{b.eq} / \code{b.ne}
+&
+Universal
+&
+$Z=1$ / $Z=0$
+&
+Equal / Not Equal
+\\
+\code{b.lt} / \code{b.ge}
+&
+Signed
+&
+$N \neq V$ / $N = V$
+&
+Less Than / Greater or Equal
+\\
+\code{b.lo} / \code{b.hs}
+&
+Unsigned
+&
+$C=0$ / $C=1$
+&
+Lower / Higher or Equal
+\\
 \bottomrule
 \end{tabular}
+
 \end{center}
 
 \vspace{0.2cm}
-Choosing the correct mnemonic (\code{b.lo} for memory pointers vs.\ \code{b.lt} for signed integers) is vital for correctness.
-\end{frame}
 
-% ============================================================
-% PART 4
-% ============================================================
-
-\sectiondivider{PART 4}{Quantitative Processor Performance}
-
-% ============================================================
-% Slide 18
-% ============================================================
-
-% Slide 18
-\begin{frame}{Defining Performance and Execution Time}
-
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item For a fixed workload, performance is inversely proportional to execution time:
-  $$\text{Performance} = \frac{1}{\text{Execution Time}}$$
-  \item \key{CPU Execution Time ($T_{\text{CPU}}$):} Time spent executing instructions on behalf of the application process.
-  \item Clock period and frequency are reciprocals: $T_{\text{clk}} = \frac{1}{f_{\text{clk}}}$.
-\end{itemize}
-
-\vspace{0.15cm}
-\begin{block}{Latency vs.\ Throughput}
-\textbf{Latency:} Time to complete one task.\\
-\textbf{Throughput:} Tasks completed per unit time (e.g., IPC).
+\begin{block}{Why the Mnemonic Depends on Interpretation}
+The same 64-bit pattern can represent a negative signed integer or a very large unsigned integer. The correct branch condition follows the program's intended interpretation, not the raw bits alone.
 \end{block}
 
 \end{frame}
 
-% ============================================================
-% Slide 19
-% ============================================================
+% --- Section Divider 4 ---
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries PART 4\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries Quantitative Processor Performance\par}
+\end{minipage}
+\end{frame}
 
-% Slide 19
-\begin{frame}{Dynamic Instruction Count vs.\ CPI}
+\begin{frame}{Defining Performance: Latency and Throughput}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{Dynamic Instruction Count (IC):} The actual number of instructions executed at runtime (dependent on inputs and loops).
-  \item \key{Cycles Per Instruction (CPI):} Average clock cycles required per instruction:
-  $$\text{CPI} = \frac{\text{Total Clock Cycles}}{\text{Dynamic Instruction Count}} \qquad \text{IPC} = \frac{1}{\text{CPI}}$$
-  \item Modern \key{superscalar cores} fetch and execute multiple instructions per cycle in parallel ($\text{CPI} < 1.0$, or $\text{IPC} > 1.0$).
+  \item For a fixed workload, $\text{Performance} = \frac{1}{\text{Execution Time}}$.
+  \item \key{Latency:} time required to complete one task.
+  \item \key{Throughput:} number of tasks completed per unit time.
 \end{itemize}
+
+\vspace{0.15cm}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9,every node/.style={transform shape}]
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=2pt,
+  minimum width=4.2cm,
+  minimum height=0.75cm
+] at (-2.6,0.6)
+  {\textbf{Latency:} one task takes 5 cycles};
+
+\node[
+  draw=navy,
+  fill=gold!20,
+  rounded corners=2pt,
+  minimum width=4.8cm,
+  minimum height=0.75cm
+] at (2.8,0.6)
+  {\textbf{Throughput:} one task may finish each cycle};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.2cm}
+
+\small
+
+IPC is one measure of instruction throughput inside a processor, not a universal measure of application-task throughput.
 
 \end{frame}
 
-% ============================================================
-% Slide 20
-% ============================================================
+\begin{frame}{Dynamic Instruction Count and Average CPI}
 
-% Slide 20
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item \key{Dynamic Instruction Count (IC):} the actual number of instructions executed for a particular run.
+  \item \key{Cycles Per Instruction (CPI):} workload-average cycles per retired instruction ($\text{CPI} = \frac{\text{Total Clock Cycles}}{\text{Dynamic Instruction Count}}$).
+  \item Different instructions, cache misses, dependencies, and branch mispredictions can contribute different delays.
+\end{itemize}
+
+\vspace{0.15cm}
+
+\begin{block}{CPI Is Not a Fixed Property of the Processor}
+A processor can exhibit different CPI values on different programs, inputs, and memory-access patterns.
+\end{block}
+
+\end{frame}
+
 \begin{frame}{The Iron Law of Processor Performance}
 
 \begin{block}{The Fundamental CPU Performance Equation}
-$$T_{\text{CPU}} = \text{Instruction Count (IC)} \times \text{CPI} \times T_{\text{clk}} = \frac{\text{IC} \times \text{CPI}}{f_{\text{clk}}}$$
+\[
+T_{\text{CPU}}
+=
+\text{Instruction Count (IC)}
+\times
+\text{CPI}
+\times
+T_{\text{clk}}
+=
+\frac{\text{IC}\times\text{CPI}}
+     {f_{\text{clk}}}
+\]
 \end{block}
 
 \vspace{0.15cm}
+
 \begin{center}
+
 \footnotesize
+
 \begin{tabular}{lll}
 \toprule
-Component & Influenced By & Design Trade-off \\
+Component & Influenced By & Examples \\
 \midrule
-\textbf{IC}   & Algorithm, Compiler, ISA & CISC vs.\ RISC instruction density \\
-\textbf{CPI}  & Pipeline, Memory hierarchy & Out-of-order complexity, Cache misses \\
-\textbf{$T_{\text{clk}}$} & Pipeline depth, Circuit nodes & Higher frequency requires deeper pipelines \\
+\textbf{IC}
+&
+Algorithm, compiler, ISA
+&
+instruction selection, code structure
+\\
+\textbf{CPI}
+&
+Pipeline, dependencies, memory hierarchy
+&
+stalls, speculation, cache misses
+\\
+\textbf{$T_{\text{clk}}$}
+&
+Circuit paths, pipeline organization
+&
+critical-path delay, implementation choices
+\\
 \bottomrule
 \end{tabular}
+
 \end{center}
+
+\vspace{0.15cm}
+
+\begin{block}{Important}
+These factors are \key{not independent}. A design change that improves one factor can worsen another.
+\end{block}
 
 \end{frame}
 
-% ============================================================
-% Slide 21
-% ============================================================
-
-% Slide 21
 \begin{frame}{Iron Law: Comparative Evaluation Example}
 
 \begin{columns}[T,onlytextwidth]
+
 \column{0.48\textwidth}
-\begin{block}{Machine A (Deep Pipeline)}
+
+\begin{block}{Machine A}
 \begin{itemize}\setlength{\itemsep}{1pt}
   \item $\text{IC} = 1.0 \times 10^9$
   \item $\text{CPI} = 2.0$
   \item $f_{\text{clk}} = 4.0\text{ GHz}$
 \end{itemize}
-$$T_A = \frac{1.0 \times 10^9 \times 2.0}{4.0 \times 10^9} = \mathbf{0.50\text{ s}}$$
+
+\[
+T_A
+=
+\frac{1.0 \times 10^9 \times 2.0}
+     {4.0 \times 10^9}
+=
+\mathbf{0.50\text{ s}}
+\]
+
 \end{block}
 
 \column{0.48\textwidth}
-\begin{block}{Machine B (Wide Out-of-Order)}
+
+\begin{block}{Machine B}
 \begin{itemize}\setlength{\itemsep}{1pt}
-  \item $\text{IC} = 1.2 \times 10^9$ (+20\% IC)
-  \item $\text{CPI} = 0.8$ (High IPC)
+  \item $\text{IC} = 1.2 \times 10^9$
+  \item $\text{CPI} = 0.8$
   \item $f_{\text{clk}} = 2.5\text{ GHz}$
 \end{itemize}
-$$T_B = \frac{1.2 \times 10^9 \times 0.8}{2.5 \times 10^9} = \mathbf{0.384\text{ s}}$$
+
+\[
+T_B
+=
+\frac{1.2 \times 10^9 \times 0.8}
+     {2.5 \times 10^9}
+=
+\mathbf{0.384\text{ s}}
+\]
+
 \end{block}
+
 \end{columns}
 
 \vspace{0.2cm}
-$$\text{Speedup} = \frac{T_A}{T_B} = \frac{0.50}{0.384} \approx \mathbf{1.30\times\text{ faster for Machine B}}$$
+
+\[
+\text{Speedup}
+=
+\frac{T_A}{T_B}
+=
+\frac{0.50}{0.384}
+\approx
+\mathbf{1.30\times}
+\]
+
+\small
+
+The equation compares measured assumptions; the numbers alone do not prove which microarchitectural feature caused the difference.
 
 \end{frame}
 
-% ============================================================
-% Slide 22
-% ============================================================
-
-% Slide 22
-\begin{frame}{The Megahertz Myth \& Speedup Definition}
+\begin{frame}{The Megahertz Myth and Speedup}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{The Megahertz Myth:} Assuming higher clock frequency guarantees better performance. Core efficiency (lower CPI) often outweighs raw clock speed.
-  \item \key{Speedup ($S$):} Quantifies performance gains from optimizations:
-  $$\text{Speedup} = \frac{\text{Execution Time}_{\text{old}}}{\text{Execution Time}_{\text{new}}} = \frac{\text{Performance}_{\text{new}}}{\text{Performance}_{\text{old}}}$$
-  \item If runtime drops from $10\text{ s}$ to $4\text{ s}$, Speedup $= \frac{10}{4} = \mathbf{2.5\times}$ ($60\%$ runtime reduction).
+  \item A higher clock frequency does not guarantee better performance because IC and CPI also matter.
+  \item \key{Speedup} compares old and new execution times ($\text{Speedup} = \frac{T_{\text{old}}}{T_{\text{new}}} = \frac{\text{Performance}_{\text{new}}}{\text{Performance}_{\text{old}}}$).
+  \item If runtime drops from $10\text{ s}$ to $4\text{ s}$, $\text{Speedup} = \frac{10}{4} = 2.5\times$.
 \end{itemize}
 
 \end{frame}
 
-% ============================================================
-% Slide 23
-% ============================================================
+\begin{frame}{Amdahl's Law: Why Partial Optimization Is Limited}
 
-% Slide 23
-\begin{frame}{Amdahl's Law: The Law of Diminishing Returns}
-
-\begin{block}{Amdahl's Law Equation}
-$$S_{\text{overall}} = \frac{1}{(1 - f) + \frac{f}{S_{\text{enhanced}}}}$$
-\end{block}
-
-\vspace{0.15cm}
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item $f$: Fraction of execution time subjected to acceleration ($0 \le f \le 1$).
-  \item $S_{\text{enhanced}}$: Speedup factor achieved exclusively on that fraction.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Suppose only fraction $f$ of execution time can be accelerated.
+  \item Even a huge improvement to that fraction cannot eliminate the time spent in the unaffected portion $(1-f)$.
 \end{itemize}
 
 \vspace{0.15cm}
-\begin{block}{Worked Example ($f = 0.60, S_{\text{enhanced}} = 10$)}
-$$S_{\text{overall}} = \frac{1}{(1 - 0.60) + \frac{0.60}{10}} = \frac{1}{0.40 + 0.06} \approx \mathbf{2.17\times}$$
+
+\begin{block}{Amdahl's Law}
+\[
+S_{\text{overall}}
+=
+\frac{1}
+     {(1-f)+\frac{f}{S_{\text{enhanced}}}}
+\]
 \end{block}
+
+\vspace{0.15cm}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.52\textwidth}
+
+\begin{block}{Worked Example}
+For $f=0.60$ and $S_{\text{enhanced}}=10$:
+\[
+S_{\text{overall}}
+=
+\frac{1}{0.40+0.06}
+\approx
+2.17\times
+\]
+\end{block}
+
+\column{0.44\textwidth}
+
+\begin{block}{Limiting Case}
+If that 60\% became infinitely fast:
+\[
+S_{\max}
+=
+\frac{1}{0.40}
+=
+2.5\times
+\]
+\end{block}
+
+\end{columns}
 
 \end{frame}
 
-% ============================================================
-% Slide 24
-% ============================================================
-
-% Slide 24
 \begin{frame}{Benchmarking and Architectural Trade-Offs}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{MIPS Flaw:} Instructions per second metrics fail across different ISAs because instruction densities vary. Standard suites (SPEC CPU) measure real application workloads.
-  \item \key{Key Architectural Trade-Offs:}
-  \begin{itemize}\setlength{\itemsep}{2pt}
-    \item \textbf{Deeper Pipelines:} Shorter clock period vs.\ higher branch misprediction penalties.
-    \item \textbf{Wider Issue Widths:} Lower CPI vs.\ exponential hardware complexity and power consumption.
-    \item \textbf{Larger Caches:} Lower miss rates vs.\ increased die area and latency.
-  \end{itemize}
+  \item Simple metrics such as MIPS are unreliable across different ISAs because instruction counts and instruction meanings differ.
+  \item Benchmark suites such as SPEC CPU use representative workloads to compare complete systems more meaningfully.
 \end{itemize}
+
+\vspace{0.2cm}
+
+\begin{block}{Trade-Offs Preview}
+Later topics will quantify how choices such as pipeline depth, issue width, and cache capacity can improve one performance factor while increasing complexity, latency, power, or another Iron-Law term.
+\end{block}
 
 \end{frame}
 
-% ============================================================
-% Section 5 Divider
-% ============================================================
+% --- Section Divider 5 ---
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace{1.5cm}
+\begin{minipage}{0.85\textwidth}
+{\color{gold}\large\bfseries SUMMARY \& ASSESSMENT\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries Review and Self-Test Questions\par}
+\end{minipage}
+\end{frame}
 
-\sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
-
-% ============================================================
-% Slide 25: Comprehensive Summary (1/2)
-% ============================================================
-
-% Slide 25
 \begin{frame}{Topic 1 Summary: Architecture \& Memory}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Abstraction Layers:} Systems span from high-level software down to physical solid-state physics, anchored by the ISA contract.
-  \item \key{ISA vs.\ Microarchitecture:} The ISA defines software-visible behavior and registers; microarchitecture handles the physical pipeline implementation.
-  \item \key{Modified Harvard Topologies:} Separates L1 instruction and data caches while presenting a unified software address space.
-  \item \key{Memory Wall:} Growing latency gaps between fast CPU logic and slow DRAM require deep cache hierarchies and spatial/temporal locality.
+  \item \key{Abstraction Layers:} Systems span from high-level software down to physical devices, with the ISA forming the key software/hardware contract.
+  \item \key{Stored-Program Model:} Instructions and data are represented as bits in memory; \bits{pc} directs instruction fetch.
+  \item \key{Modified Harvard Organization:} Separate first-level instruction/data paths can coexist with a unified software-visible address space.
+  \item \key{Memory Hierarchy:} Multiple storage levels exploit temporal and spatial locality to reduce average access time.
 \end{itemize}
 
 \end{frame}
 
-% ============================================================
-% Slide 26: Comprehensive Summary (2/2)
-% ============================================================
-
-% Slide 26
 \begin{frame}{Topic 1 Summary: Representation \& Performance}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Two's Complement:} Standard signed integer representation enabling unified adder datapath logic ($A + \sim B + 1$).
-  \item \key{Condition Flags:} NZCV flags separate unsigned carry ($C$) from signed overflow ($V$) behavior.
-  \item \key{The Iron Law:} CPU execution time depends jointly on instruction count, CPI, and clock period ($T_{\text{CPU}} = \frac{\text{IC} \times \text{CPI}}{f_{\text{clk}}}$).
-  \item \key{Amdahl's Law:} Overall speedup is strictly constrained by the non-accelerated fraction of code.
+  \item \key{Two's Complement:} Signed integers use a representation that supports one zero and a unified addition/subtraction datapath.
+  \item \key{Condition Flags:} NZCV distinguishes unsigned carry behavior from signed overflow behavior.
+  \item \key{The Iron Law:} CPU execution time depends jointly on instruction count, average CPI, and clock period.
+  \item \key{Amdahl's Law:} Overall speedup is limited by the fraction of execution time that is not improved.
 \end{itemize}
 
 \end{frame}
 
-% ============================================================
-% Slide 27: Self-Test Questions (Part 1)
-% ============================================================
-
-% Slide 27
 \begin{frame}{Self-Test Diagnostic Questions: Architecture \& Binary}
 
 \begin{enumerate}\setlength{\itemsep}{6pt}
+
   \item \key{ISA vs.\ Microarchitecture:} Categorize the following:
+
   \begin{itemize}\setlength{\itemsep}{1.5pt}
     \item Number of visible registers (\bits{x0}--\bits{x30}).
     \item Size of the L1 instruction cache.
     \item Binary machine encoding of the \code{add} instruction.
   \end{itemize}
 
-  \item \key{Two's Complement Evaluation:} Convert the 8-bit hex byte \hex{a5} into an unsigned integer and a signed two's complement integer.
+  \item \key{Two's Complement Construction:}
+  Show the steps required to encode $-37$ as an 8-bit two's-complement value.
 
-  \item \key{Carry vs.\ Overflow:} In a 4-bit ALU evaluating $\bits{1001}_2 + \bits{1100}_2$, determine the output sum, the Carry flag ($C$), and the Signed Overflow flag ($V$).
+  \item \key{Carry vs.\ Overflow:}
+  In a 4-bit ALU evaluating
+  \(\mathtt{1001}_2 + \mathtt{1100}_2\),
+  determine the output sum, Carry flag ($C$), and Signed Overflow flag ($V$).
+
 \end{enumerate}
 
 \end{frame}
 
-% ============================================================
-% Slide 28: Self-Test Questions (Part 2)
-% ============================================================
-
-% Slide 28
-\begin{frame}{Self-Test Diagnostic Questions: Performance \& Amdahl}
+\begin{frame}{Self-Test Questions: Performance \& Memory}
 
 \begin{enumerate}\setlength{\itemsep}{6pt}
-  \item \key{Iron Law Analysis:} A compiler optimization decreases dynamic instruction count by $20\%$ ($\text{IC}_{\text{new}} = 0.80 \times \text{IC}_{\text{old}}$), but increases average CPI by $15\%$ ($\text{CPI}_{\text{new}} = 1.15 \times \text{CPI}_{\text{old}}$). Does performance improve? Calculate the exact speedup.
 
-  \item \key{Amdahl's Law Application:} Memory access stalls account for $70\%$ of execution time ($f = 0.70$). If a redesigned memory subsystem accelerates memory accesses by $4\times$ ($S_{\text{enhanced}} = 4$), calculate the overall system speedup.
+  \item \key{Iron Law Analysis:}
+  A compiler optimization decreases dynamic instruction count by $20\%$,
+  but increases average CPI by $15\%$.
+  Does performance improve?
+  Calculate the exact speedup.
 
-  \item \key{Cache Synchronization:} Why must a dynamic runtime JIT compiler issue explicit cache maintenance operations before executing newly generated machine code on a modified Harvard architecture?
+  \item \key{Amdahl's Law Application:}
+  Memory stalls account for $70\%$ of execution time.
+  In order to achieve an overall speedup of $2.5\times$, what must the speedup of the memory portion be?
+
+  \item \key{Generated Code and Split Caches:}
+  Why can a runtime system that writes new machine instructions need synchronization before those instructions are safely fetched and executed?
+
 \end{enumerate}
 
 \end{frame}
 
-% ============================================================
-% Slide 29: Looking Ahead
-% ============================================================
-
-% Slide 29
 \begin{frame}{Looking Ahead}
 
 \begin{block}{Next Lecture Preview}
-\key{Our Next Topic:} RISC vs.\ CISC: Instruction Set Design Principles \& Trade-offs
+\key{Our Next Topic:}
+RISC vs.\ CISC: Instruction Set Design Principles \& Trade-offs
 \end{block}
 
 \vspace{0.3cm}
+
 \begin{itemize}\setlength{\itemsep}{7pt}
-  \item \key{Complexity Distribution:} Examining how different Instruction Set Architectures distribute complexity between software and hardware.
-  \item \key{Key Trade-offs:} Evaluating instruction encoding, decode complexity, pipeline efficiency, and quantitative performance impact.
+  \item \key{Complexity Distribution:}
+  Examining how different Instruction Set Architectures distribute complexity between software and hardware.
+  \item \key{Key Trade-offs:}
+  Evaluating instruction encoding, decode complexity, pipeline efficiency, and quantitative performance impact.
 \end{itemize}
 
 \end{frame}
