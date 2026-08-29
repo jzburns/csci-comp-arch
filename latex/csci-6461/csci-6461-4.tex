@@ -116,7 +116,7 @@
 }
 
 \subtitle{
-  ALU mechanics, barrel shifting, bitwise operations,\\
+  ALU mechanics, shifted-register operands, bitwise operations,\\
   condition flags, structured branches, and conditional selection
 }
 
@@ -152,7 +152,7 @@
 \par}
 \vspace{0.35cm}
 {\color{white!80}\large
- ALU mechanics, barrel shifting, bitwise operations,\\
+ ALU mechanics, shifted-register operands, bitwise operations,\\
  condition flags, structured branches, and conditional selection
 \par}
 \end{minipage}
@@ -172,7 +172,7 @@
 \begin{enumerate}\setlength{\itemsep}{12pt}
   \item \key{ALU Operations: Arithmetic, Shifting, \& Bitwise Logic}
   \begin{itemize}
-    \item Addition, subtraction, multiplication, division, and barrel shifter integration.
+    \item Addition, subtraction, multiplication, division, and shifted-register operands.
     \item Bitwise logic (\code{and}, \code{orr}, \code{eor}, \code{bic}) and bitfield extraction (\code{ubfx}).
   \end{itemize}
 
@@ -203,7 +203,7 @@
 \begin{frame}{Arithmetic Primitives: Addition \& Subtraction}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Standard AArch64 ALU instructions use a \key{3-operand non-destructive format}:
+  \item Many AArch64 data-processing instructions use a \key{3-operand non-destructive format}:
   $$\code{op\quad destination,\; source1,\; source2}$$
 \end{itemize}
 
@@ -235,10 +235,11 @@
 % Slide 4
 % ============================================================
 
-\begin{frame}{The Barrel Shifter: Free Second-Operand Shifts}
+\begin{frame}{Shifted-Register Operands and Shift Operations}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item The ALU datapath passes the second source operand through a hardware \key{barrel shifter} before computation at \key{zero extra cycle penalty}.
+  \item The AArch64 ISA allows many instructions to encode a shifted register operand directly within the instruction word.
+  \item Execution latency for shifted operands depends on the specific processor implementation.
 \end{itemize}
 
 \vspace{0.2cm}
@@ -249,18 +250,18 @@
 \toprule
 \textbf{Shift Type} & \textbf{Mnemonic} & \textbf{Operation Meaning} \\
 \midrule
-Logical Shift Left  & \code{lsl \#k} & $x \ll k$ \quad (Multiplication by $2^k$, zero-fill) \\
-Logical Shift Right & \code{lsr \#k} & $x \gg k$ \quad (Unsigned division by $2^k$, zero-fill) \\
-Arithmetic Shift Right & \code{asr \#k} & $x \gg k$ \quad (Signed division by $2^k$, sign-fill) \\
+Logical Shift Left  & \code{lsl \#k} & Equivalent to multiplication by $2^k$ modulo the register width (zero-fill). \\
+Logical Shift Right & \code{lsr \#k} & Equivalent to floor division by $2^k$ (zero-fill). \\
+Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift (replicates sign bit; differs from truncation toward zero for negative numbers). \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 \begin{block}{Integrated Shift-Add Examples}
 \small
 \begin{tabular}{lll}
-\code{add x0, x1, x2, lsl \#3} & $\implies x_0 \leftarrow x_1 + (x_2 \times 8)$ & (Array indexing by 8-byte doubleword) \\
+\code{add x0, x1, x2, lsl \#3} & $\implies x_0 \leftarrow x_1 + (x_2 \times 8)$ & (Scale an index by 8 bytes) \\
 \code{sub x0, x1, x2, lsr \#1} & $\implies x_0 \leftarrow x_1 - (x_2 / 2)$     & (Subtract half of unsigned value) \\
 \end{tabular}
 \end{block}
@@ -273,7 +274,7 @@ Arithmetic Shift Right & \code{asr \#k} & $x \gg k$ \quad (Signed division by $2
 \begin{frame}{Integer Multiplication \& Division}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Dedicated hardware units compute 64-bit and 32-bit products and quotients.
+  \item AArch64 defines instructions for integer multiplication and division, leaving the underlying microarchitectural execution units implementation-dependent.
 \end{itemize}
 
 \vspace{0.15cm}
@@ -285,8 +286,8 @@ Arithmetic Shift Right & \code{asr \#k} & $x \gg k$ \quad (Signed division by $2
 \textbf{Instruction} & \textbf{RTL Semantic Action} & \textbf{Description} \\
 \midrule
 \code{mul  x0, x1, x2}        & $x_0 \leftarrow x_1 \times x_2$         & 64-bit integer product (lower 64 bits) \\
-\code{madd x0, x1, x2, x3}    & $x_0 \leftarrow x3 + (x_1 \times x_2)$ & Fused Multiply-Accumulate \\
-\code{msub x0, x1, x2, x3}    & $x_0 \leftarrow x_3 - (x_1 \times x_2)$ & Fused Multiply-Subtract \\
+\code{madd x0, x1, x2, x3}    & $x_0 \leftarrow x_3 + (x_1 \times x_2)$ & Multiply-Add \\
+\code{msub x0, x1, x2, x3}    & $x_0 \leftarrow x_3 - (x_1 \times x_2)$ & Multiply-Subtract \\
 \code{sdiv x0, x1, x2}        & $x_0 \leftarrow x_1 / x_2$             & Signed division \\
 \code{udiv x0, x1, x2}        & $x_0 \leftarrow x_1 / x_2$             & Unsigned division \\
 \bottomrule
@@ -307,7 +308,7 @@ AArch64 division by zero does \textbf{not} raise an exception; it returns \bits{
 \begin{frame}{Bitwise Logic Primitives}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Standard bitwise operations act bit-by-bit across all 64 (or 32) bits in parallel.
+  \item Bitwise operations apply independently to each corresponding bit position.
 \end{itemize}
 
 \vspace{0.15cm}
@@ -341,7 +342,7 @@ AArch64 division by zero does \textbf{not} raise an exception; it returns \bits{
 \begin{frame}{Bitfield Extraction: \texttt{ubfx}}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Hardware can extract packed fields without explicit manual mask-and-shift steps.
+  \item AArch64 provides bitfield instructions that extract packed fields without explicit manual mask-and-shift steps.
   \item \code{ubfx xd, xn, \#lsb, \#width}: Unsigned bitfield extract.
 \end{itemize}
 
@@ -361,7 +362,7 @@ AArch64 division by zero does \textbf{not} raise an exception; it returns \bits{
 \begin{block}{Example: Extract 8-bit Field Starting at Bit 16}
 \small
 \begin{tabular}{lll}
-\textbf{Standard Approach:} & \code{lsr x0, x1, \#16} \quad $\to$ \quad \code{and x0, x0, \#0xff} & (2 instructions) \\
+\textbf{Mask-and-shift approach:} & \code{lsr x0, x1, \#16} \quad $\to$ \quad \code{and x0, x0, \#0xff} & (2 instructions) \\
 \textbf{Bitfield Extract:}  & \code{ubfx x0, x1, \#16, \#8}                                       & \key{1 instruction!} \\
 \end{tabular}
 \end{block}
@@ -381,11 +382,11 @@ AArch64 division by zero does \textbf{not} raise an exception; it returns \bits{
 \begin{frame}{The NZCV Condition Flags}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Flag bits reside in \bits{pstate} and record status of the most recent flag-setting ALU operation.
-  \item Standard instructions (\code{add}, \code{sub}) leave flags unchanged; ``\code{s}'' variants update flags.
+  \item Flag bits reside in \bits{pstate} and record status of the most recent instruction that updates NZCV.
+  \item Common flag-setting forms include instructions with an ``\code{s}'' suffix and explicit comparisons.
 \end{itemize}
 
-\vspace{0.2cm}
+\vspace{-0.2cm}
 \begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
@@ -393,15 +394,16 @@ AArch64 division by zero does \textbf{not} raise an exception; it returns \bits{
 \toprule
 \textbf{Flag} & \textbf{Name} & \textbf{Condition Set to 1} \\
 \midrule
-\key{N} & \textbf{Negative} & Result bit 63 is 1 (negative in signed interpretation) \\
-\key{Z} & \textbf{Zero}     & Result is exactly zero \\
-\key{C} & \textbf{Carry}    & Unsigned carry-out (addition) or \key{no borrow} (subtraction) \\
-\key{V} & \textbf{Overflow} & Signed arithmetic overflow (result sign is mathematically invalid) \\
+\key{N} & \textbf{Negative} & The most-significant bit of the result is 1. \\
+\key{Z} & \textbf{Zero}     & Result is exactly zero. \\
+\key{C} & \textbf{Carry}    & Unsigned carry-out (addition) or \key{no borrow} (subtraction). \\
+\key{V} & \textbf{Overflow} & The signed mathematical result cannot be represented in the destination width. \\
 \bottomrule
+\tabularnewline
 \end{tabular}
 \end{center}
 
-\vspace{0.2cm}
+\vspace{-0.5cm}
 \begin{block}{Carry Flag in Subtraction}
 In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow required). $\text{C} = 0$ indicates $A < B$ (unsigned borrow occurred).
 \end{block}
@@ -427,8 +429,9 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \midrule
 \code{cmp x0, x1} & \code{subs xzr, x0, x1} & Sets NZCV based on $x_0 - x_1$ \\
 \code{cmn x0, x1} & \code{adds xzr, x0, x1} & Sets NZCV based on $x_0 + x_1$ (Compare Negative) \\
-\code{tst x0, x1} & \code{ands xzr, x0, x1} & Sets N, Z based on $x_0 \land x_1$ (Bit Test) \\
+\code{tst x0, x1} & \code{ands xzr, x0, x1} & Sets N and Z from result; clears C and V to 0 (Bit Test) \\
 \bottomrule
+\tabularnewline
 \end{tabular}
 \end{center}
 
@@ -463,15 +466,19 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \code{b.gt} & Signed Greater Than ($>$) & $(\text{Z} == 0) \land (\text{N} == \text{V})$ & \key{Signed} \\
 \code{b.ge} & Signed Greater or Equal ($\ge$) & $\text{N} == \text{V}$ & \key{Signed} \\
 \midrule
-\code{b.lo} & Unsigned Lower ($<$)      & $\text{C} == 0$           & \key{Unsigned (Pointers)} \\
-\code{b.hi} & Unsigned Higher ($>$)     & $(\text{C} == 1) \land (\text{Z} == 0)$ & \key{Unsigned (Pointers)} \\
+\code{b.lo} & Unsigned Lower ($<$)      & $\text{C} == 0$           & \key{Unsigned / Addresses} \\
+\code{b.hs} & Unsigned Higher or Same ($\ge$) & $\text{C} == 1$      & \key{Unsigned / Addresses} \\
+\code{b.hi} & Unsigned Higher ($>$)     & $(\text{C} == 1) \land (\text{Z} == 0)$ & \key{Unsigned / Addresses} \\
+\code{b.ls} & Unsigned Lower or Equal ($\le$) & $(\text{C} == 0) \lor (\text{Z} == 1)$ & \key{Unsigned / Addresses} \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.2cm}
+\vspace{-0.35cm}
 \normalsize
-\key{Takeaway:} Always use \code{b.lo}/\code{b.hi} for pointer bounds and memory addresses.
+\begin{block}{Usage Context}
+Unsigned conditions are appropriate when the program semantics treat the values as unsigned or address-like quantities.
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -501,7 +508,7 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \small
 \begin{tabular}{ll}
 \code{cbz x0, .Lhandle\_null} & \text{\scriptsize // If ptr == NULL, jump} \\
-\code{ldr x1, [x0]}           & \text{\scriptsize // Safe memory access} \\
+\code{ldr x1, [x0]}           & \text{\scriptsize // Access non-null pointer} \\
 \end{tabular}
 \end{block}
 \end{column}
@@ -511,7 +518,7 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \small
 \begin{tabular}{ll}
 \code{.Lloop:} & \\
-\code{subs x1, x1, \#1} & \text{\scriptsize // count--} \\
+\code{sub  x1, x1, \#1} & \text{\scriptsize // count-- (flags not needed)} \\
 \code{cbnz x1, .Lloop}  & \text{\scriptsize // Loop until count == 0} \\
 \end{tabular}
 \end{block}
@@ -546,7 +553,8 @@ if (x > y) {
 \begin{block}{AArch64 Assembly Mapping}
 \small
 \begin{tabular}{ll}
-\multicolumn{2}{l}{\textit{// Assume: x0=x, x1=y, x2=result}} \\
+\multicolumn{2}{l}{\textit{// Assume: x, y are signed int64\_t}} \\
+\multicolumn{2}{l}{\textit{// x0=x, x1=y, x2=result}} \\
 \code{cmp  x0, x1}        & \text{\scriptsize // Compare x and y} \\
 \code{b.le .Lelse}        & \text{\scriptsize // Invert test: jump if x <= y} \\
 \code{sub  x2, x0, x1}    & \text{\scriptsize // Then-body: result = x - y} \\
@@ -576,6 +584,7 @@ if (x > y) {
 \begin{verbatim}
 // Compute array sum
 int64_t i = 0;
+int64_t n = ...; // signed bound
 while (i < n) {
     sum += arr[i];
     i++;
@@ -585,7 +594,7 @@ while (i < n) {
 \end{column}
 
 \begin{column}{0.52\textwidth}
-\begin{block}{Optimized AArch64 Loop}
+\begin{block}{Bottom-Tested AArch64 Loop}
 \small
 \begin{tabular}{ll}
 \multicolumn{2}{l}{\textit{// x0=arr, x1=n, x2=i, x3=sum}} \\
@@ -606,7 +615,7 @@ while (i < n) {
 
 \vspace{0.25cm}
 \normalsize
-\key{Efficiency Rule:} Placing the branch at the bottom requires only \key{1 branch per iteration}.
+\key{Efficiency Rule:} Placing the branch at the bottom requires only one loop-closing conditional branch in the steady-state loop body.
 \end{frame}
 
 % ============================================================
@@ -617,16 +626,17 @@ while (i < n) {
 
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item Pipelined processors speculatively execute instructions ahead of branches.
-  \item An unpredictable branch misprediction wastes $12\text{--}20$ clock cycles flushing the pipeline.
-  \item \key{Conditional Select (\code{csel}):} Evaluates condition flags and moves data in $1\text{ cycle}$ with \textbf{0 branch misprediction risk}.
+  \item An unpredictable branch misprediction can cost many clock cycles depending on pipeline depth.
+  \item \key{Conditional Select (\code{csel}):} Selects between operands based on condition flags without introducing a control-flow branch (execution latency is implementation-dependent).
+  \item \key{Performance Note:} Branchless execution removes misprediction risk but can lengthen dependency chains; a highly predictable branch can sometimes outperform conditional selection.
 \end{itemize}
 
 \vspace{0.15cm}
-\begin{block}{Branchless Maximum: $\code{result} = (x_1 > x_2) \mathbin{?} x_1 : x_2$}
+\begin{block}{Signed Maximum: $\code{result} = (x_1 > x_2) \mathbin{?} x_1 : x_2$}
 \small
 \begin{tabular}{lll}
 \code{cmp  x1, x2}          & \text{\scriptsize // Set NZCV flags based on x1 - x2} \\
-\code{csel x0, x1, x2, gt}  & \text{\scriptsize // If x1 > x2, x0 = x1; else x0 = x2 (No jumps!)} \\
+\code{csel x0, x1, x2, gt}  & \text{\scriptsize // Uses signed \texttt{gt} condition (use \texttt{hi} for unsigned)} \\
 \end{tabular}
 \end{block}
 
@@ -634,8 +644,8 @@ while (i < n) {
 \begin{block}{Related Branchless Helpers}
 \small
 \begin{tabular}{lll}
-\code{cset w0, eq}          & $w_0 \leftarrow (\text{cond} \mathbin{?} 1 : 0)$ & (Convert condition to boolean 1 or 0) \\
-\code{cinc x0, x1, eq}      & $x_0 \leftarrow x_1 + (\text{cond} \mathbin{?} 1 : 0)$ & (Conditional increment) \\
+\code{cset w0, eq}          & $w_0 \leftarrow (\text{eq} \mathbin{?} 1 : 0)$ & (Convert condition to boolean 1 or 0) \\
+\code{cinc x0, x1, eq}      & $x_0 \leftarrow x_1 + (\text{eq} \mathbin{?} 1 : 0)$ & (Conditional increment) \\
 \end{tabular}
 \end{block}
 \end{frame}
@@ -653,11 +663,11 @@ while (i < n) {
 \begin{frame}{Topic 4: Comprehensive Summary}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{ALU Integration:} AArch64 embeds a barrel shifter into the second source operand path, giving single-cycle shift-adds (\code{add x0, x1, x2, lsl \#3}).
-  \item \key{Bitwise Primitives:} Native support for \code{and}, \code{orr}, \code{eor}, and bit clearing via \code{bic}; field extraction via \code{ubfx}.
-  \item \key{Selective Flag Updates:} Only ``\code{s}'' variants (\code{adds}, \code{subs}) and comparisons (\code{cmp}, \code{tst}) update NZCV; carry flag is active ($C=1$) when subtraction does not borrow.
-  \item \key{Control Flow Idioms:} Conditional jumps invert high-level conditions; loop inversion cuts branch overhead to 1 branch per iteration.
-  \item \key{Branch Elimination:} Conditional select instructions (\code{csel}, \code{cset}) avoid pipeline misprediction penalties for simple decision paths.
+  \item \key{Instruction Encoding:} Many AArch64 instructions encode a shifted register operand within a single instruction.
+  \item \key{Bitwise Primitives:} Bitwise operations apply independently to each corresponding bit position, with native support for \code{and}, \code{orr}, \code{eor}, and bit clearing via \code{bic}; field extraction via \code{ubfx}.
+  \item \key{Flag-Setting Forms:} Common flag-setting forms include ``\code{s}'' variants (\code{adds}, \code{subs}) and explicit comparisons (\code{cmp}, \code{tst}); carry flag is active ($C=1$) when subtraction does not borrow.
+  \item \key{Control Flow Idioms:} A common control-flow layout inverts the condition so one path falls through; loop inversion cuts branch overhead to one loop-closing branch in steady state.
+  \item \key{Branch Elimination:} Conditional select instructions (\code{csel}, \code{cset}) avoid misprediction risk, though performance trade-offs depend on pipeline depth and dependency chains.
 \end{itemize}
 
 \end{frame}
@@ -690,12 +700,12 @@ while (i < n) {
 \begin{enumerate}\setlength{\itemsep}{7pt}
   \item \key{Loop Inversion Benefit:} Why do optimizing compilers place the conditional loop branch at the bottom of the loop body rather than at the top?
 
-  \item \key{Branchless Translation:} Write an equivalent 2-instruction branchless AArch64 snippet using \code{cmp} and \code{csel} to implement:
+  \item \key{Branchless Translation:} Write an equivalent 3-instruction branchless AArch64 sequence using \code{cmp}, \code{neg}, and \code{csel} to implement:
   $$\code{int64\_t abs\_val = (val < 0) ? -val : val;}$$
 
   \item \key{Fused Branch Instructions:} When should an assembly programmer use \code{cbz x0, label} instead of \code{cmp x0, \#0} followed by \code{b.eq label}?
 
-  \item \key{Branch Misprediction Trade-off:} Under what conditions will \code{csel} dramatically outperform a standard branching \code{if-else} sequence?
+  \item \key{Branch Misprediction Trade-off:} What factors determine whether \code{csel} or a conditional branch is faster?
 \end{enumerate}
 
 \end{frame}
