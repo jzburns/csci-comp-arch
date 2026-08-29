@@ -683,84 +683,30 @@ and the instructions being executed.
   \item The instruction side may still hold an older copy of the same address, so simply jumping to the new bytes may be unsafe.
 \end{itemize}
 
-\vspace{0.2cm}
+\vspace{0.4cm}
 
-\begin{center}
-\begin{tikzpicture}[scale=0.88,every node/.style={transform shape}]
-
-\node[
-  draw=navy,
-  fill=lightblue,
-  rounded corners=2pt,
-  minimum width=2.5cm,
-  minimum height=0.75cm,
-  font=\small\bfseries
-] (jit) {JIT writes code};
-
-\node[
-  draw=navy,
-  fill=gold!20,
-  rounded corners=2pt,
-  right=0.8cm of jit,
-  minimum width=2.6cm,
-  minimum height=0.75cm,
-  font=\small\bfseries
-] (dside) {Data-side copy};
-
-\node[
-  draw=navy,
-  fill=softgray,
-  rounded corners=2pt,
-  right=0.8cm of dside,
-  minimum width=2.6cm,
-  minimum height=0.75cm,
-  font=\small\bfseries
-] (iside) {Instruction-side copy};
-
-\node[
-  draw=navy,
-  fill=lightblue,
-  rounded corners=2pt,
-  right=0.8cm of iside,
-  minimum width=2.4cm,
-  minimum height=0.75cm,
-  font=\small\bfseries
-] (exec) {Execute};
-
-\draw[-{Latex},thick,navy]
-  (jit) -- (dside);
-
-\draw[-{Latex},thick,gold!80!black]
-  (dside) -- (iside)
-  node[midway,above,font=\tiny\bfseries]{synchronize};
-
-\draw[-{Latex},thick,navy]
-  (iside) -- (exec);
-
-\end{tikzpicture}
-\end{center}
-
-\vspace{0.15cm}
-
-\begin{block}{Conceptual Synchronization}
 \centering
-\key{Make data writes visible}
-$\rightarrow$
-\key{synchronize}
-$\rightarrow$
-\key{discard stale instruction copies}
-$\rightarrow$
-\key{execute}
-\end{block}
+\begin{tikzpicture}[
+  scale=0.85, 
+  every node/.style={transform shape},
+  box/.style={draw=navy, fill=lightblue, rounded corners=2pt, minimum width=3.2cm, minimum height=1.0cm, align=center, font=\small\bfseries},
+  syncbox/.style={draw=gold!80!black, fill=gold!20, line width=1pt, rounded corners=2pt, minimum width=3.6cm, minimum height=1.1cm, align=center, font=\small\bfseries}
+]
+  \node[box] (data) {1. Write Code\\(Data Side / D-Cache)};
+  \node[syncbox, right=1.0cm of data] (sync) {2. Cache Synchronization\\(DC Clean $\rightarrow$ IC Invalidate)};
+  \node[box, right=1.0cm of sync] (inst) {3. Fetch Code\\(Instruction Side / I-Cache)};
 
-\vspace{0.1cm}
+  \draw[-{Latex}, thick, navy] (data) -- (sync);
+  \draw[-{Latex}, thick, navy] (sync) -- (inst);
+\end{tikzpicture}
+
+\vspace{0.4cm}
 
 \small
 
 The exact AArch64 cache-maintenance and barrier instructions are system-software details that will be revisited after caches and the memory hierarchy are developed.
 
 \end{frame}
-
 \begin{frame}{Memory Hierarchy: Why Multiple Levels Exist}
 
 \begin{columns}[T,onlytextwidth]
