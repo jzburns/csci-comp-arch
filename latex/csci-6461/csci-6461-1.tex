@@ -366,7 +366,7 @@ Performance-sensitive software often exposes lower-level machine behavior.
   (inst) -- (uarch)
   node[midway,right,font=\tiny\bfseries,text=deepblue]{Decode};
 
-\draw[-{Latex[length=2mm]},thick,navy]
+\draw[-{Latex},thick,navy]
   (uarch) -- (logic)
   node[midway,right,font=\tiny\bfseries,text=deepblue]{Implementation};
 
@@ -521,10 +521,56 @@ and the instructions being executed.
 
 \end{frame}
 
+\begin{frame}{From Fetch to Completion: One Instruction}
+
+\begin{block}{Example Instruction}
+\centering
+\code{add x0, x1, x2}
+\end{block}
+
+\vspace{0.1cm}
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=0.35cm,
+  box/.style={
+    draw=navy,
+    fill=lightblue,
+    rounded corners=2pt,
+    minimum width=2.25cm,
+    minimum height=0.75cm,
+    align=center,
+    font=\small\bfseries
+  }
+]
+
+\node[box] (fetch) {Fetch\\instruction at \bits{pc}};
+\node[box,right=of fetch] (decode) {Decode\\opcode + registers};
+\node[box,right=of decode] (read) {Read\\\bits{x1}, \bits{x2}};
+\node[box,right=of read] (exec) {Execute\\addition};
+\node[box,right=of exec] (write) {Write\\result to \bits{x0}};
+
+\draw[-{Latex},thick,navy] (fetch) -- (decode);
+\draw[-{Latex},thick,navy] (decode) -- (read);
+\draw[-{Latex},thick,navy] (read) -- (exec);
+\draw[-{Latex},thick,navy] (exec) -- (write);
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.15cm}
+
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item For ordinary sequential execution, the next instruction is typically at the next 4-byte address.
+  \item Branches, exceptions, and returns can replace the ordinary sequential next-\bits{pc} value.
+  \item Real processors overlap these activities through pipelining rather than completing one instruction fully before starting the next.
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}{Memory Topologies: von Neumann, Harvard, Modified Harvard}
 
-\centering
-
+\begin{center}
 \begin{tikzpicture}[scale=0.82,every node/.style={transform shape}]
 
 % ------------------------------------------------------------
@@ -658,6 +704,7 @@ and the instructions being executed.
   (dc.south) -- (mem3.north east);
 
 \end{tikzpicture}
+\end{center}
 
 \vspace{0.2cm}
 
@@ -707,6 +754,7 @@ and the instructions being executed.
 The exact AArch64 cache-maintenance and barrier instructions are system-software details that will be revisited after caches and the memory hierarchy are developed.
 
 \end{frame}
+
 \begin{frame}{Memory Hierarchy: Why Multiple Levels Exist}
 
 \begin{columns}[T,onlytextwidth]
@@ -1195,31 +1243,18 @@ The same 64-bit pattern can represent a negative signed integer or a very large 
   \item \key{Throughput:} number of tasks completed per unit time.
 \end{itemize}
 
-\vspace{0.15cm}
+\vspace{0.2cm}
 
-\begin{center}
-\begin{tikzpicture}[scale=0.9,every node/.style={transform shape}]
-
-\node[
-  draw=navy,
-  fill=lightblue,
-  rounded corners=2pt,
-  minimum width=4.2cm,
-  minimum height=0.75cm
-] at (-2.6,0.6)
-  {\textbf{Latency:} one task takes 5 cycles};
-
-\node[
-  draw=navy,
-  fill=gold!20,
-  rounded corners=2pt,
-  minimum width=4.8cm,
-  minimum height=0.75cm
-] at (2.8,0.6)
-  {\textbf{Throughput:} one task may finish each cycle};
-
+\centering
+\begin{tikzpicture}[
+  node distance=0.6cm,
+  every node/.style={transform shape},
+  boxlat/.style={draw=navy, fill=lightblue, rounded corners=2pt, minimum width=5.6cm, minimum height=0.8cm, align=center, font=\small},
+  boxthru/.style={draw=navy, fill=gold!20, line width=1pt, rounded corners=2pt, minimum width=5.6cm, minimum height=0.8cm, align=center, font=\small}
+]
+  \node[boxlat] (lat) {\textbf{Latency:} one task takes 5 cycles};
+  \node[boxthru, right=of lat] (thru) {\textbf{Throughput:} one task may finish each cycle};
 \end{tikzpicture}
-\end{center}
 
 \vspace{0.2cm}
 
@@ -1369,10 +1404,16 @@ The equation compares measured assumptions; the numbers alone do not prove which
 
 \begin{frame}{The Megahertz Myth and Speedup}
 
-\begin{itemize}\setlength{\itemsep}{5pt}
+\begin{itemize}\setlength{\itemsep}{6pt}
   \item A higher clock frequency does not guarantee better performance because IC and CPI also matter.
-  \item \key{Speedup} compares old and new execution times ($\text{Speedup} = \frac{T_{\text{old}}}{T_{\text{new}}} = \frac{\text{Performance}_{\text{new}}}{\text{Performance}_{\text{old}}}$).
-  \item If runtime drops from $10\text{ s}$ to $4\text{ s}$, $\text{Speedup} = \frac{10}{4} = 2.5\times$.
+  \item \key{Speedup} compares old and new execution times:
+  \begin{center}
+  $\text{Speedup} = \frac{T_{\text{old}}}{T_{\text{new}}} = \frac{\text{Performance}_{\text{new}}}{\text{Performance}_{\text{old}}}$
+  \end{center}
+  \item If runtime drops from $10\text{ s}$ to $4\text{ s}$:
+  \begin{center}
+  $\text{Speedup} = \frac{10}{4} = 2.5\times$
+  \end{center}
 \end{itemize}
 
 \end{frame}
