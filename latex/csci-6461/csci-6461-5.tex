@@ -218,7 +218,7 @@
 
 \vspace{0.3cm}
 \begin{block}{The Architectural Rule}
-ALU instructions process \emph{only} registers. Memory access is isolated strictly into explicit \code{ldr} (read) and \code{str} (write) commands.
+ALU instructions process \emph{only} registers. Memory access is performed by load/store-family instructions.
 \end{block}
 \end{frame}
 
@@ -232,8 +232,8 @@ ALU instructions process \emph{only} registers. Memory access is isolated strict
 \begin{column}{0.48\textwidth}
 \begin{block}{The Pipeline Contract}
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item An arithmetic instruction (\code{add}, \code{sub}) will never cause a cache miss.
-  \item Instructions have predictable pipeline flow.
+  \item Arithmetic instructions do not directly access data memory.
+  \item Simplifies datapath organization and dependency tracking.
   \item Simplifies out-of-order execution and dependency tracking.
 \end{itemize}
 \end{block}
@@ -294,7 +294,7 @@ ALU instructions process \emph{only} registers. Memory access is isolated strict
 \vspace{0.15cm}
 \begin{itemize}\setlength{\itemsep}{2pt}
   \item 1 complex instruction.
-  \item Hardware decoder must split this internally into multiple micro-operations.
+  \item Hardware decoder may decode into one or more internal micro-operations depending on implementation.
 \end{itemize}
 \end{block}
 \end{column}
@@ -312,8 +312,8 @@ ALU instructions process \emph{only} registers. Memory access is isolated strict
 \begin{frame}{Addressing Memory: Bytes, Words, and Doublewords}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Memory is a linear sequence of \key{8-bit bytes}, each with a unique 64-bit address.
-  \item AArch64 uses register naming to determine the size of the memory transaction:
+  \item Memory is a linear sequence of \key{8-bit bytes}, accessed via 64-bit virtual addresses (though implemented virtual/physical address widths are smaller).
+  \item The instruction/access size determines the transfer width:
 \end{itemize}
 
 \vspace{0.2cm}
@@ -375,22 +375,22 @@ Replicate the sign bit to preserve negative values.
 % Slide 8
 % ============================================================
 
-\begin{frame}{Unsigned Loads: Automatic Zero-Extension}
+\begin{frame}{Byte, Halfword, and 32-Bit Word Loads}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Standard sub-word loads (\code{ldrb}, \code{ldrh}, \code{ldr wt}) \key{automatically clear all upper bits to zero}.
+  \item Byte and halfword loads such as \code{ldrb} and \code{ldrh} zero-extend into \code{wt}; a 32-bit \code{ldr wt} writes \code{wt}, which clears the upper 32 bits of \code{xt}.
 \end{itemize}
 
 \vspace{0.2cm}
 \centering
 \begin{tikzpicture}[scale=0.92, every node/.style={transform shape}]
-  \draw[fill=softgray, draw=navy, dashed] (0,0) rectangle (5.5,0.65);
-  \node at (2.75, 0.325) {\small\textbf{Automatically Cleared to Zeros (Bits 63:8)}};
-  \draw[fill=lightblue, draw=navy, thick] (5.5,0) rectangle (8.0,0.65);
-  \node at (6.75, 0.325) {\small\textbf{Byte (7:0)}};
+  \draw[fill=softgray, draw=navy, dashed] (0,0) rectangle (10.5,0.65);
+  \node at (5.25, 0.325) {\small\textbf{Automatically Cleared to Zeros (Bits 63:8)}};
+  \draw[fill=lightblue, draw=navy, thick] (10.5,0) rectangle (12.0,0.65);
+  \node at (11.25, 0.325) {\small\textbf{Byte (7:0)}};
   \node[anchor=south, font=\tiny\bfseries] at (0.2, 0.65) {Bit 63};
-  \node[anchor=south, font=\tiny\bfseries] at (5.5, 0.65) {Bit 8};
-  \node[anchor=south, font=\tiny\bfseries] at (7.8, 0.65) {Bit 0};
+  \node[anchor=south, font=\tiny\bfseries] at (10.5, 0.65) {Bit 8};
+  \node[anchor=south, font=\tiny\bfseries] at (11.9, 0.65) {Bit 0};
 \end{tikzpicture}
 
 \vspace{0.3cm}
@@ -416,13 +416,13 @@ Replicate the sign bit to preserve negative values.
 \vspace{0.2cm}
 \centering
 \begin{tikzpicture}[scale=0.92, every node/.style={transform shape}]
-  \draw[fill=gold!25, draw=navy] (0,0) rectangle (5.5,0.65);
-  \node at (2.75, 0.325) {\small\textbf{Sign Bit Replicated (All 1s if negative)}};
-  \draw[fill=lightblue, draw=navy, thick] (5.5,0) rectangle (8.0,0.65);
-  \node at (6.75, 0.325) {\small\textbf{Byte (7:0)}};
+  \draw[fill=gold!25, draw=navy] (0,0) rectangle (10.5,0.65);
+  \node at (5.25, 0.325) {\small\textbf{Sign Bit Replicated (All 1s if negative)}};
+  \draw[fill=lightblue, draw=navy, thick] (10.5,0) rectangle (12.0,0.65);
+  \node at (11.25, 0.325) {\small\textbf{Byte (7:0)}};
   \node[anchor=south, font=\tiny\bfseries] at (0.2, 0.65) {Bit 63};
-  \node[anchor=south, font=\tiny\bfseries] at (5.5, 0.65) {Bit 8};
-  \node[anchor=south, font=\tiny\bfseries] at (7.8, 0.65) {Bit 0};
+  \node[anchor=south, font=\tiny\bfseries] at (10.5, 0.65) {Bit 8};
+  \node[anchor=south, font=\tiny\bfseries] at (11.9, 0.65) {Bit 0};
 \end{tikzpicture}
 
 \vspace{0.3cm}
@@ -534,9 +534,9 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
 \vspace{0.2cm}
 \centering
 \begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
-  \draw[fill=lightblue, draw=navy] (0,0) rectangle (3.0,0.6) node[midway, font=\small] {Base Address (\bits{x0})};
-  \draw[fill=gold!30, draw=navy] (3.0,0) rectangle (4.5,0.6) node[midway, font=\small] {$+ \text{Offset}$};
-  \draw[-{Latex}, thick, navy] (4.5,0.3) -- (6.0,0.3) node[right, font=\small\bfseries] {Target Memory Address};
+  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small, minimum width=3.0cm, minimum height=0.6cm] (base) {Base Address (\bits{x0})};
+  \node[draw=navy, fill=gold!30, rounded corners=3pt, font=\small, right=0.3cm of base, minimum width=1.5cm, minimum height=0.6cm] (off) {$+ \text{Offset}$};
+  \draw[-{Latex}, thick, navy] (off.east) -- ++(1.5,0) node[right, font=\small\bfseries] {Target Memory Address};
 \end{tikzpicture}
 
 \vspace{0.3cm}
@@ -567,8 +567,8 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
 \end{itemize}
 
 \vspace{0.25cm}
-\begin{block}{Negative or Unaligned Offsets (\texttt{ldur}/\texttt{stur})}
-If an offset is negative or unaligned, use unscaled load/store: \code{ldur xt, [xn, \#-8]}.
+\begin{block}{Signed Unscaled Offsets (\texttt{ldur}/\texttt{stur})}
+For signed unscaled immediate offsets (which do not scale by operand size and can be negative), use \code{ldur xt, [xn, \#-8]}.
 \end{block}
 \end{frame}
 
@@ -663,7 +663,7 @@ If an offset is negative or unaligned, use unscaled load/store: \code{ldur xt, [
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item Uses an index register ($x_m$) multiplied by element size to access array items:
   $$\code{ldr xt, [xn, xm, lsl \#shift]}$$
-  \item Hardware computes $\text{Base} + (\text{Index} \times \text{Size})$ with \key{zero extra cycle penalty}.
+  \item The instruction encodes the scaled register offset directly, though implementation latency depends on the processor.
 \end{itemize}
 
 \vspace{0.2cm}
@@ -679,6 +679,7 @@ Halfword (\code{uint16})& \code{ldrh w0, [x1, x2, lsl \#1]} & $\text{EA} = x_1 +
 Word (\code{uint32})    & \code{ldr  w0, [x1, x2, lsl \#2]} & $\text{EA} = x_1 + (x_2 \times 4)$ \\
 Doubleword (\code{uint64})& \code{ldr  x0, [x1, x2, lsl \#3]} & $\text{EA} = x_1 + (x_2 \times 8)$ \\
 \bottomrule
+\tabularnewline
 \end{tabular}
 \end{center}
 
@@ -695,7 +696,7 @@ Directly implements high-level array access: \code{val = arr[i];}.
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item In C code, loop counter variables are frequently 32-bit integers (\code{int i}).
-  \item Memory addresses are always 64 bits.
+  \item AArch64 address calculations use 64-bit general-purpose registers.
   \item AArch64 can extend and scale a 32-bit index register in one step:
 \end{itemize}
 
@@ -720,23 +721,23 @@ Directly implements high-level array access: \code{val = arr[i];}.
 \begin{frame}{Mode 5: PC-Relative Global Variable Access}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Modern programs use Position-Independent Code (PIC) so code can load anywhere in memory.
-  \item Global variables are addressed relative to the current \key{Program Counter (\bits{pc})}.
-  \item Access is performed in a clean two-step sequence:
+  \item Position-Independent Code (PIC) allows code to load anywhere in memory.
+  \item Global variables are often addressed relative to the current \key{Program Counter (\bits{pc})}, though GOT-based sequences may also be used.
+  \item A common page-relative pattern involves a two-step sequence:
 \end{itemize}
 
 \vspace{0.2cm}
-\begin{block}{Loading a Global Variable}
+\begin{block}{Loading a Global Variable (Common Pattern)}
 \small
 \begin{tabular}{ll}
-\texttt{adrp x0, my\_global}             & \text{\scriptsize // Step 1: Form base address of the 4KB page} \\
-\texttt{ldr  x1, [x0, :lo12:my\_global]} & \text{\scriptsize // Step 2: Add page offset and load value} \\
+\texttt{adrp x0, my\_global}              & \text{\scriptsize // Step 1: Form base address of the 4KB page} \\
+\texttt{ldr  x1, [x0, \#:lo12:my\_global]} & \text{\scriptsize // Step 2: Add page offset and load value} \\
 \end{tabular}
 \end{block}
 
 \vspace{0.25cm}
 \normalsize
-Can reach any global data variable within $\pm 4\text{ GB}$ of the current instruction.
+Can reach any global data variable within $\pm 4\text{ GB}$ of the current instruction (for the standard small model).
 \end{frame}
 
 % ============================================================
@@ -747,20 +748,20 @@ Can reach any global data variable within $\pm 4\text{ GB}$ of the current instr
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item How do we load arbitrary 64-bit constants that cannot fit in an instruction?
-  \item The compiler places the 64-bit constant in a \key{literal pool} near the code and uses a PC-relative load.
+  \item \code{ldr x0, =constant} is an assembler pseudo-instruction; the assembler may choose a literal pool or another constant-materialization sequence.
 \end{itemize}
 
 \vspace{0.2cm}
 \begin{block}{Assembly Syntax}
 \small
 \begin{tabular}{ll}
-\code{ldr x0, =0x0123456789abcdef} & \text{\scriptsize // Pseudo-instruction: compiler generates literal load} \\
+\code{ldr x0, =0x0123456789abcdef} & \text{\scriptsize // Pseudo-instruction: assembler generates constant loading sequence} \\
 \end{tabular}
 \end{block}
 
 \vspace{0.25cm}
 \normalsize
-The processor fetches the constant directly from the nearby text segment without runtime math.
+If a literal pool is selected, the instruction performs a PC-relative load from the nearby constant.
 \end{frame}
 
 % ============================================================
@@ -778,7 +779,7 @@ The processor fetches the constant directly from the nearby text segment without
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item AArch64 provides dedicated instructions to move \key{two registers in one command}:
   $$\code{ldp\quad x0,\; x1,\; [x2]} \qquad \code{stp\quad x0,\; x1,\; [x2]}$$
-  \item Transfers 16 contiguous bytes across a 128-bit memory bus transaction.
+  \item Reduces instruction count by handling two registers per memory transfer instruction.
 \end{itemize}
 
 \vspace{0.2cm}
@@ -793,6 +794,7 @@ The processor fetches the constant directly from the nearby text segment without
 \code{ldp x29, x30, [sp], \#16}   & Restore FP \& LR, adjust stack      & Function exit (epilogue) \\
 \code{ldp x0, x1, [x2]}           & Load two 64-bit values into x0, x1  & Fast struct/buffer copy \\
 \bottomrule
+\tabularnewline
 \end{tabular}
 \end{center}
 \end{frame}
@@ -812,9 +814,8 @@ The processor fetches the constant directly from the nearby text segment without
 \end{tabular}
 \vspace{0.15cm}
 \begin{itemize}\setlength{\itemsep}{2pt}
-  \item 2 instructions.
-  \item 2 separate 64-bit bus requests.
-  \item Breaks 16-byte stack alignment.
+  \item Requires 2 separate instructions.
+  \item Higher instruction footprint.
 \end{itemize}
 \end{block}
 \end{column}
@@ -827,9 +828,8 @@ The processor fetches the constant directly from the nearby text segment without
 \end{tabular}
 \vspace{0.15cm}
 \begin{itemize}\setlength{\itemsep}{2pt}
-  \item 1 single instruction.
-  \item 1 unified 128-bit bus transaction.
-  \item Naturally maintains 16-byte stack alignment.
+  \item Uses a single instruction.
+  \item Stores two registers with one instruction.
 \end{itemize}
 \end{block}
 \end{column}
@@ -837,7 +837,7 @@ The processor fetches the constant directly from the nearby text segment without
 
 \vspace{0.35cm}
 \normalsize
-\key{Efficiency Impact:} Cuts memory instructions in function prologues and epilogues by $50\%$.
+\key{Efficiency Impact:} Cuts the memory instruction count for the shown pair of saves/restores by $50\%$.
 \end{frame}
 
 % ============================================================
@@ -861,7 +861,7 @@ The processor fetches the constant directly from the nearby text segment without
   \draw[fill=lightblue, draw=navy] (0,0) rectangle (4,0.6) node[midway, font=\footnotesize] {64-bit Word [Bytes 0--7]};
 \end{tikzpicture}
 \vspace{0.1cm}
-Single memory transaction within one cache line. Fast and efficient.
+Typically maps cleanly to memory access structures without boundary crossing.
 \end{block}
 \end{column}
 
@@ -874,7 +874,7 @@ Single memory transaction within one cache line. Fast and efficient.
   \draw[fill=gold!30, draw=navy] (2,0) rectangle (4,0.6) node[midway, font=\tiny] {Cache Line 2};
 \end{tikzpicture}
 \vspace{0.1cm}
-Crosses boundary. Requires two memory cycles and extra logic to stitch data.
+May require additional internal accesses, especially when crossing cache-line or page boundaries.
 \end{block}
 \end{column}
 \end{columns}
@@ -884,12 +884,12 @@ Crosses boundary. Requires two memory cycles and extra logic to stitch data.
 % Slide 25
 % ============================================================
 
-\begin{frame}{Stack Alignment: A Strict Architectural Rule}
+\begin{frame}{Stack Alignment: An AAPCS64 ABI Requirement}
 \large
 \begin{itemize}\setlength{\itemsep}{7pt}
-  \item The AArch64 ABI strictly enforces \key{16-byte alignment on the Stack Pointer (\bits{sp})}.
-  \item Any memory operation using \bits{sp} when $\bits{sp} \pmod{16} \neq 0$ triggers a hardware alignment exception.
-  \item When allocating local variables or saving registers, total stack space must always be padded to a multiple of 16 bytes.
+  \item The standard AArch64 procedure call standard (AAPCS64) mandates a strict \key{16-byte alignment rule for the Stack Pointer (\bits{sp})} as a core ABI requirement.
+  \item Violating 16-byte alignment can cause compatibility issues, ABI violations, or runtime faults in certain software environments and exception handlers.
+  \item When allocating local variables or saving registers, stack-frame allocation is normally rounded to a multiple of 16 bytes.
 \end{itemize}
 
 \vspace{0.3cm}
@@ -898,7 +898,7 @@ Crosses boundary. Requires two memory cycles and extra logic to stitch data.
 \begin{tabular}{lll}
 \code{sub sp, sp, \#16} & \text{\scriptsize // Correct: 16-byte multiple} \\
 \code{sub sp, sp, \#32} & \text{\scriptsize // Correct: 32-byte multiple} \\
-\code{sub sp, sp, \#8}  & \text{\scriptsize // ERROR: Violates 16-byte alignment!} \\
+\code{sub sp, sp, \#8}  & \text{\scriptsize // Violation of AAPCS64 16-byte ABI requirement} \\
 \end{tabular}
 \end{block}
 \end{frame}
@@ -935,12 +935,12 @@ my_func:
 \begin{column}{0.44\textwidth}
 \centering
 \begin{tikzpicture}[scale=0.78, every node/.style={transform shape}]
-  \draw[fill=lightblue, draw=navy] (0,3.6) rectangle (4.2,4.4) node[midway, font=\small\bfseries] {Saved LR (\bits{x30})};
-  \draw[fill=lightblue, draw=navy] (0,2.8) rectangle (4.2,3.6) node[midway, font=\small\bfseries] {Saved FP (\bits{x29})};
-  \draw[fill=softgray, draw=navy] (0,2.0) rectangle (4.2,2.8) node[midway, font=\small\bfseries] {Saved Callee (\bits{x19})};
-  \draw[fill=softgray, draw=navy, dashed] (0,1.2) rectangle (4.2,2.0) node[midway, font=\small] {Padding (16B aligned)};
-  \node[anchor=east, font=\scriptsize\bfseries] at (0,4.4) {High Addr};
-  \node[anchor=east, font=\scriptsize\bfseries] at (0,1.2) {Stack Top (\bits{sp})};
+  \draw[fill=softgray, draw=navy, dashed] (0,3.6) rectangle (4.2,4.4) node[midway, font=\small] {Padding / Unused ($+24$ to $+31$)};
+  \draw[fill=softgray, draw=navy] (0,2.8) rectangle (4.2,3.6) node[midway, font=\small\bfseries] {Saved Callee (\bits{x19}, $+16$)} ;
+  \draw[fill=lightblue, draw=navy] (0,2.0) rectangle (4.2,2.8) node[midway, font=\small\bfseries] {Saved LR (\bits{x30}, $+8$)};
+  \draw[fill=lightblue, draw=navy] (0,1.2) rectangle (4.2,2.0) node[midway, font=\small\bfseries] {Saved FP (\bits{x29}, $+0$)};
+  \node[anchor=east, font=\scriptsize\bfseries] at (0,4.4) {High Addr ($+32$)};
+  \node[anchor=east, font=\scriptsize\bfseries] at (0,1.2) {Stack Top (\bits{sp}, $+0$)};
 \end{tikzpicture}
 \end{column}
 \end{columns}
@@ -951,8 +951,7 @@ my_func:
 % ============================================================
 
 \begin{frame}[fragile]{Worked Pattern 1: Stepping Through an Array}
-\begin{block}{Goal: Sum $N$ 64-bit Integers}
-\end{block}
+\small \key{Goal:} Sum $N$ 64-bit Integers
 
 \vspace{0.1cm}
 \begin{block}{AArch64 Implementation (Using Post-Indexed Addressing)}
@@ -965,7 +964,7 @@ my_func:
 \code{.Lbody:} & & \\
     & \code{ldr  x3, [x0], \#8}     & \text{\scriptsize // Load element AND increment pointer by 8} \\
     & \code{add  x2, x2, x3}        & \text{\scriptsize // sum += element} \\
-    & \code{subs x1, x1, \#1}       & \text{\scriptsize // count--} \\
+    & \code{sub  x1, x1, \#1}       & \text{\scriptsize // count-- (flags not needed)} \\
     & \code{cbnz x1, .Lbody}        & \text{\scriptsize // Loop if count != 0} \\
 \code{.Ldone:} & & \\
     & \code{mov  x0, x2}           & \text{\scriptsize // Return sum in x0} \\
@@ -983,8 +982,7 @@ Post-indexing eliminates a separate \code{add x0, x0, \#8} instruction inside th
 % ============================================================
 
 \begin{frame}[fragile]{Worked Pattern 2: Indexed Array Search}
-\begin{block}{Goal: Check Element at Index $i$ in Array}
-\end{block}
+\small \key{Goal:} Check Element at Index $i$ in Array
 
 \vspace{0.1cm}
 \begin{block}{AArch64 Implementation (Using Scaled Register Offset)}
@@ -1009,8 +1007,7 @@ Combines index scaling and load into a single instruction without modifying the 
 % ============================================================
 
 \begin{frame}[fragile]{Worked Pattern 3: Copying a Data Block}
-\begin{block}{Goal: Copy 32 Bytes from Source to Destination}
-\end{block}
+\small \key{Goal:} Copy 32 Bytes from Source to Destination
 
 \vspace{0.1cm}
 \begin{block}{AArch64 Implementation (Using Paired Transfers)}
@@ -1050,6 +1047,7 @@ Sequential Array Stepping     & Post-Indexed Auto-Update      & \code{ldr x2, [x
 Random Array Index (\code{a[i]})& Scaled Register Offset     & \code{ldr x2, [x0, x1, lsl \#3]} \\
 Global Variable Reference     & PC-Relative Page Offset       & \code{adrp} $+$ \code{ldr} \\
 \bottomrule
+\tabularnewline
 \end{tabular}
 \end{center}
 \end{frame}
@@ -1061,14 +1059,14 @@ Global Variable Reference     & PC-Relative Page Offset       & \code{adrp} $+$ 
 \begin{frame}{Hardware Memory Access: The Cache Line View}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Hardware does not fetch individual bytes from DRAM; it fetches \key{64-byte Cache Lines}.
-  \item \key{Spatial Locality:} Accessing contiguous memory (e.g., sequential array stepping) ensures data for subsequent loads is already in L1 cache.
-  \item Choosing sequential addressing modes helps the processor hardware prefetcher predict memory access patterns accurately.
+  \item Hardware fetches memory in blocks known as \key{Cache Lines} (implementation-dependent; 64 bytes is common).
+  \item \key{Spatial Locality:} Accessing contiguous memory (e.g., sequential array stepping) often improves spatial locality and prefetch effectiveness.
+  \item Choosing sequential addressing modes helps processor hardware prefetchers predict memory access patterns accurately.
 \end{itemize}
 
 \vspace{0.25cm}
 \begin{block}{Performance Insight}
-Sequential post-indexed access patterns maximize cache line utilization, running significantly faster than scattered random access.
+Sequential post-indexed access patterns tend to use cache lines efficiently, running significantly faster than scattered random access.
 \end{block}
 \end{frame}
 
@@ -1082,7 +1080,7 @@ Sequential post-indexed access patterns maximize cache line utilization, running
   \item \key{Wrong Sizing:} Using \code{ldr} (64-bit) instead of \code{ldr wt} (32-bit) on an array of integers reads adjacent memory as garbage.
   \item \key{Missing Sign Extension:} Using \code{ldrb} instead of \code{ldrsb} on negative numbers corrupts signed comparisons.
   \item \key{Incorrect Shift Scale:} Using \code{lsl \#2} instead of \code{lsl \#3} on an array of 64-bit pointers accesses the wrong memory location.
-  \item \key{Stack Misalignment:} Adjusting \bits{sp} by non-16-byte multiples triggers hardware crashes.
+  \item \key{Stack Misalignment:} Violating AAPCS64 16-byte stack alignment conventions can lead to compliance or runtime issues.
 \end{itemize}
 \end{frame}
 
@@ -1099,16 +1097,16 @@ Sequential post-indexed access patterns maximize cache line utilization, running
 \begin{frame}{Topic 5: Comprehensive Summary}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{RISC Load/Store Discipline:} Arithmetic operations are strictly decoupled from memory; only explicit \code{ldr}/\code{str} touch memory.
+  \item \key{Load/Store Discipline:} Arithmetic operations are strictly decoupled from memory; data transfers are handled by load/store-family instructions.
   \item \key{Data Widths \& Extensions:} Sub-word loads zero-extend by default; signed data requires explicit \code{ldrsb}, \code{ldrsh}, or \code{ldrsw} to preserve negative values.
   \item \key{Core Addressing Modes:}
   \begin{itemize}\setlength{\itemsep}{1.5pt}
     \item Standard offset (\code{[xn, \#imm]}): Base remains unchanged.
     \item Pre-indexed (\code{[xn, \#imm]!}): Base updated before access (push).
     \item Post-indexed (\code{[xn], \#imm}): Base updated after access (pop / loop step).
-    \item Scaled register offset (\code{[xn, xm, lsl \#3]}): Hardware array indexing.
+    \item Scaled register offset (\code{[xn, xm, lsl \#3]}): base-plus-scaled-index addressing in one instruction.
   \end{itemize}
-  \item \key{Paired Transfers \& Stack Alignment:} \code{ldp}/\code{stp} move 16 bytes per instruction; stack pointer must maintain 16-byte alignment.
+  \item \key{Paired Transfers \& Stack Layout:} \code{ldp}/\code{stp} reduce instruction count for multi-register transfers; AAPCS64 mandates 16-byte stack alignment.
 \end{itemize}
 
 \end{frame}
@@ -1149,9 +1147,9 @@ Sequential post-indexed access patterns maximize cache line utilization, running
   $$\code{stp x29, x30, [sp, \#-16]!}$$
   How does \bits{sp} change, and where are \bits{x29} and \bits{x30} stored?
 
-  \item \key{Stack Alignment Enforcement:} Why does AArch64 require the stack pointer to be 16-byte aligned even when storing a single 8-byte register?
+  \item \key{Stack Alignment Enforcement:} Why does the AAPCS64 ABI require the stack pointer to be 16-byte aligned even when storing a single 8-byte register?
 
-  \item \key{Position-Independent Code:} Why does loading a global variable address in AArch64 require a page-relative instruction (\code{adrp}) followed by an offset load?
+  \item \key{Position-Independent References:} Why are \code{adrp} and offset/GOT sequences commonly used for position-independent global references in AArch64?
 \end{enumerate}
 
 \end{frame}
