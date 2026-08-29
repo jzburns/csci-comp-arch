@@ -830,117 +830,22 @@ $$S_{\text{overall}} = \frac{1}{(1 - 0.60) + \frac{0.60}{10}} = \frac{1}{0.40 + 
 \end{frame}
 
 % ============================================================
-% Slides 29 to 40: Optional buffer / Modular backup slides
+% Slide 29: Looking Ahead
 % ============================================================
 
 % Slide 29
-\begin{frame}{Backup Slide 29: Detailed Instruction Encoding Table}
-\footnotesize
-\centering
-\begin{tabular}{lll}
-\toprule
-Field Name & Width & Description \\
-\midrule
-\bits{sf} & 1 bit & Formats 32-bit ($0$) vs 64-bit ($1$) register operation \\
-\bits{op} & Variable & Primary operation class specifier \\
-\bits{Rd} & 5 bits & Destination register specifier ($0\text{--}31$) \\
-\bits{Rn} & 5 bits & First source register specifier ($0\text{--}31$) \\
-\bits{Rm} & 5 bits & Second source register specifier ($0\text{--}31$) \\
-\bottomrule
-\end{tabular}
-\end{frame}
+\begin{frame}{Looking Ahead}
 
-% Slide 30
-\begin{frame}{Backup Slide 30: SPEC Benchmark Methodology}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Standardizes CPU performance comparisons across independent hardware vendors.
-  \item Executes real applications (Compilers, compression, physics simulations, quantum chemistry).
-  \item Prevents vendor benchmark gaming by forbidding specialized compiler flags that violate language standards.
+\begin{block}{Next Lecture Preview}
+\key{Our Next Topic:} RISC vs.\ CISC: Instruction Set Design Principles \& Trade-offs
+\end{block}
+
+\vspace{0.3cm}
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item \key{Complexity Distribution:} Examining how different Instruction Set Architectures distribute complexity between software and hardware.
+  \item \key{Key Trade-offs:} Evaluating instruction encoding, decode complexity, pipeline efficiency, and quantitative performance impact.
 \end{itemize}
-\end{frame}
 
-% Slide 31
-\begin{frame}{Backup Slide 31: Floating-Point IEEE 754 Representation}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Standardized under IEEE 754 for single (32-bit) and double (64-bit) precision real numbers.
-  \item Layout: Sign bit ($1\text{b}$) + Biased Exponent ($8\text{b}$ or $11\text{b}$) + Normalized Mantissa / Fraction ($23\text{b}$ or $52\text{b}$).
-  \item Value formula: $(-1)^{\text{sign}} \times 1.\text{mantissa}_2 \times 2^{\text{exponent} - \text{bias}}$.
-\end{itemize}
-\end{frame}
-
-% Slide 32
-\begin{frame}{Backup Slide 32: Branch Prediction \& Pipeline Penalties}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Deep pipelines require branch predictors to guess conditional outcomes before execution.
-  \item \key{Misprediction Penalty:} When a guess fails, all speculative instructions fetched downstream must be flushed from the pipeline.
-  \item Penalty scales directly with pipeline depth (e.g., $15\text{--}20$ cycles wasted per miss).
-\end{itemize}
-\end{frame}
-
-% Slide 33
-\begin{frame}{Backup Slide 33: Multi-Core Scalability \& Amdahl's Limit}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Amdahl's Law governs parallel computing limits: serial execution bottlenecks cap parallel speedups regardless of core count ($N \to \infty$).
-  \item \key{Gustafson's Law:} Scales problem size with core count, demonstrating that scaled speedup can grow linearly if workload scales proportionally.
-\end{itemize}
-\end{frame}
-
-% Slide 34
-\begin{frame}{Backup Slide 34: Virtual Memory Address Translation}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Separates user-space application memory from physical RAM via page tables.
-  \item Managed by the Memory Management Unit (MMU) and Translation Lookaside Buffer (TLB).
-  \item Enables process isolation, memory protection, and swapping to disk.
-\end{itemize}
-\end{frame}
-
-% Slide 35
-\begin{frame}{Backup Slide 35: Instruction-Level Parallelism (ILP)}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Measures how simultaneously independent instructions can be executed within a program.
-  \item Exploited via dynamic scheduling, register renaming, and speculative out-of-order execution engines.
-\end{itemize}
-\end{frame}
-
-% Slide 36
-\begin{frame}{Backup Slide 36: Power and Energy Scaling (Dennard Scaling)}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Dennard Scaling:} As transistors get smaller, power density stays constant because power drops in proportion to area.
-  \item Voltage scaling stalled around 2005 due to leakage current, leading to the multicore era and Dark Silicon constraints.
-\end{itemize}
-\end{frame}
-
-% Slide 37
-\begin{frame}{Backup Slide 37: Pipelining Structural vs.\ Data Hazards}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \textbf{Structural Hazard:} Hardware resource conflict (e.g., single memory port for code and data).
-  \item \textbf{Data Hazard:} Instruction depends on result of a previous unretired instruction (RAW, WAR, WAW). Resolved via forwarding or stalls.
-\end{itemize}
-\end{frame}
-
-% Slide 38
-\begin{frame}{Backup Slide 38: Register Renaming Mechanics}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Maps architectural registers (\bits{x0}--\bits{x30}) to a larger pool of physical rename registers.
-  \item Eliminates false dependencies (WAW and WAR hazards) caused by limited architectural register names.
-\end{itemize}
-\end{frame}
-
-% Slide 39
-\begin{frame}{Backup Slide 39: Speculative Execution \& Security}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Processors execute instructions down predicted branch paths before evaluation completes.
-  \item \key{Side-Channel Vulnerabilities:} Speculative execution leaves microarchitectural traces in caches (Spectre, Meltdown), allowing unauthorized data inference across security domains.
-\end{itemize}
-\end{frame}
-
-% Slide 40
-\begin{frame}{Backup Slide 40: Next Steps in Systems Architecture}
-\begin{center}
-{\large\bfseries Next Steps in Systems Architecture}\\[0.4cm]
-Now that we have established system abstractions, binary arithmetic, and performance equations,\\[0.3em]
-we will transition directly into the \textbf{AArch64 Programmer's Model and Assembly Fundamentals}.
-\end{center}
 \end{frame}
 
 \end{document}
