@@ -98,12 +98,13 @@
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
+\vspace*{\fill}
 \begin{minipage}{0.85\textwidth}
 {\color{gold}\large\bfseries #1\par}
 \vspace{0.3cm}
 {\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
 \end{minipage}
+\vspace*{\fill}
 \end{frame}
 }
 
@@ -143,7 +144,7 @@
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
-\vspace{0.8cm}
+\vspace*{\fill}
 \begin{minipage}{0.88\textwidth}
 {\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 3\par}
 \vspace{0.25cm}
@@ -161,7 +162,7 @@
 \vfill
 {\color{white}\normalsize Dr. J. Burns\par}
 {\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
-\vspace{0.35cm}
+\vspace*{\fill}
 \end{frame}
 
 % ============================================================
@@ -170,7 +171,8 @@
 
 \begin{frame}{Topic 3: Module Topics}
 
-\begin{enumerate}\setlength{\itemsep}{6pt}
+\vfill
+\begin{enumerate}\setlength{\itemsep}{8pt}
   \item \key{Architectural State \& The Hardware Contract}
   \begin{itemize}
     \item Concrete definition of architectural state vs.\ microarchitectural structures.
@@ -194,6 +196,7 @@
     \item Data movement, arithmetic/logical operations, NZCV condition flags, and condition codes.
   \end{itemize}
 \end{enumerate}
+\vfill
 
 \end{frame}
 
@@ -222,26 +225,26 @@
   \end{itemize}
 \end{itemize}
 
+\vfill
+\begin{block}{State Checkpointing}
+Operating systems actively rely on the strict definition of architectural state to successfully suspend and resume millions of threads per second without computational corruption.
+\end{block}
+
 \end{frame}
 
 % ============================================================
-% Slide 4
+% Slide 4 (FIXED: Reduced padding and flattened nested lists)
 % ============================================================
 
 \begin{frame}{Architectural vs.\ Microarchitectural State}
+\vfill
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Architectural State (Visible Contract)}
 \begin{itemize}\setlength{\itemsep}{3pt}
   \item Defined strictly by the ISA specification.
-  \item Software and compilers directly read and write this state.
-  \item Examples:
-  \begin{itemize}
-    \item Registers \bits{x0}--\bits{x30}
-    \item Program counter (\bits{pc})
-    \item Architectural memory space
-    \item Flag bits (N, Z, C, V)
-  \end{itemize}
+  \item Software directly reads/writes this state.
+  \item \key{Examples:} Registers \bits{x0}--\bits{x30}, \bits{pc}, architectural memory, NZCV flags.
 \end{itemize}
 \end{block}
 \end{column}
@@ -250,40 +253,35 @@
 \begin{block}{Microarchitectural State (Hidden)}
 \begin{itemize}\setlength{\itemsep}{3pt}
   \item Internal hardware implementation details.
-  \item Invisible to software correctness; exists solely for performance.
-  \item Examples:
-  \begin{itemize}
-    \item Pipeline register latches
-    \item L1/L2/L3 cache line contents
-    \item Branch Target Buffers (BTB)
-    \item Physical register rename tables
-  \end{itemize}
+  \item Invisible to software correctness.
+  \item \key{Examples:} Pipeline latches, L1/L2 caches, Branch Target Buffers, rename tables.
 \end{itemize}
 \end{block}
 \end{column}
 \end{columns}
 
-\vspace{0.25cm}
-\key{Architectural Boundary:} Hardware may execute instructions out of order across hidden buffers, but must commit results sequentially to architectural state.
+\vfill
+\begin{block}{The Execution Boundary}
+Hardware may wildly execute instructions out of order across hidden microarchitectural buffers, but it \key{must} commit all final mathematical results sequentially to the visible architectural state.
+\end{block}
 \end{frame}
 
 % ============================================================
-% Slide 5
+% Slide 5 (FIXED: Flattened sub-bullets into a single line)
 % ============================================================
 
 \begin{frame}{The AArch64 Execution State}
 
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item \key{AArch64:} 64-bit execution state introduced in ARMv8-A.
-  \item \key{Flat 64-bit Virtual Addressing:} Registers hold 64-bit pointers (architectural address space up to $2^{64}$ bytes; OS implementations typically configure 48-bit or 52-bit spaces).
-  \item \key{Uniform 32-bit Instructions:} Fixed 4-byte width, aligned to 4-byte memory boundaries.
-  \item \key{Clean-Slate RISC Design (Eliminates A32 Quirks):}
-  \begin{itemize}\setlength{\itemsep}{1.5pt}
-    \item No universal conditional execution on every instruction.
-    \item No load/store-multiple (replaced by paired \code{ldp}/\code{stp}).
-    \item Program Counter (\bits{pc}) is decoupled from general-purpose registers.
-  \end{itemize}
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{AArch64:} Pure 64-bit execution state introduced in ARMv8-A.
+  \item \key{Flat 64-bit Virtual Addressing:} Registers hold 64-bit pointers (architectural address space up to $2^{64}$ bytes). Fixed 4-byte instruction width remains permanently aligned to 4-byte memory boundaries.
+  \item \key{Clean-Slate RISC Design:} Eliminates legacy A32 quirks by removing universal conditional execution, removing \code{ldm}/\code{stm} loops, and decoupling the Program Counter (\bits{pc}) entirely from the general register file.
 \end{itemize}
+
+\vfill
+\begin{block}{The Legacy-Free Advantage}
+By abandoning strict backwards compatibility with 32-bit ARM inside the AArch64 execution mode, engineers freed up massive decode logic and instruction-encoding space.
+\end{block}
 
 \end{frame}
 
@@ -292,25 +290,27 @@
 % ============================================================
 
 \begin{frame}{Privilege Levels (Exception Levels)}
+\vspace{-1em}  
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
-\begin{block}{AArch64 Exception Levels (EL0--EL3)}
+\begin{block}{AArch64 Exception Levels}
+\small
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item \key{EL0 (Application):} Unprivileged user execution space (standard application code).
-  \item \key{EL1 (OS Kernel):} Privileged operating system kernel (Linux, macOS/XNU).
-  \item \key{EL2 (Hypervisor):} Virtualization layer managing guest OS instances.
-  \item \key{EL3 (Secure Monitor):} Firmware, secure boot, and security management.
+  \item \key{EL0 (Application):} Unprivileged user execution space.
+  \item \key{EL1 (OS Kernel):} Privileged operating system kernel.
+  \item \key{EL2 (Hypervisor):} Virtualization layer for guest OSs.
+  \item \key{EL3 (Secure Monitor):} Firmware and security management.
 \end{itemize}
 \end{block}
 \end{column}
 
 \begin{column}{0.48\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.82, every node/.style={transform shape}]
-  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small\bfseries, minimum width=4.8cm, minimum height=0.65cm] (el0) {EL0: User Space / Apps};
-  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small\bfseries, below=0.3cm of el0, minimum width=4.8cm, minimum height=0.65cm] (el1) {EL1: Operating System};
-  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small\bfseries, below=0.3cm of el1, minimum width=4.8cm, minimum height=0.65cm] (el2) {EL2: Hypervisor};
-  \node[draw=navy, fill=gold!25, draw=gold, rounded corners=3pt, font=\small\bfseries, below=0.3cm of el2, minimum width=4.8cm, minimum height=0.65cm] (el3) {EL3: Secure Monitor};
+\begin{tikzpicture}[scale=0.75, every node/.style={transform shape}]
+  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small\bfseries, minimum width=4.8cm, minimum height=0.6cm] (el0) {EL0: User Space / Apps};
+  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small\bfseries, below=0.25cm of el0, minimum width=4.8cm, minimum height=0.6cm] (el1) {EL1: Operating System};
+  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small\bfseries, below=0.25cm of el1, minimum width=4.8cm, minimum height=0.6cm] (el2) {EL2: Hypervisor};
+  \node[draw=navy, fill=gold!25, draw=gold, rounded corners=3pt, font=\small\bfseries, below=0.25cm of el2, minimum width=4.8cm, minimum height=0.6cm] (el3) {EL3: Secure Monitor};
   \draw[-{Latex}, thick, navy] (el0) -- (el1);
   \draw[-{Latex}, thick, navy] (el1) -- (el2);
   \draw[-{Latex}, thick, navy] (el2) -- (el3);
@@ -318,8 +318,10 @@
 \end{column}
 \end{columns}
 
-\vspace{0.2cm}
-Course focus: Standard general-purpose user-space execution model (\key{EL0/EL1}).
+\vfill
+\begin{block}{Course Scope}
+Our architectural analysis focuses exclusively on the standard general-purpose user-space execution model (\key{EL0}) and its direct interactions with the OS (\key{EL1}).
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -334,13 +336,13 @@ Course focus: Standard general-purpose user-space execution model (\key{EL0/EL1}
 
 \begin{frame}{General-Purpose Registers: \texttt{x0}--\texttt{x30}}
 
-\begin{itemize}\setlength{\itemsep}{3.5pt}
-  \item AArch64 provides \key{31 general-purpose registers} (\bits{x0}--\bits{x30}), each \key{64 bits wide} ($8\text{ bytes}$).
-  \item \key{Orthogonal Design:} Any register can serve as source, destination, or base address pointer.
-  \item \key{Simplified ISA:} Eliminates dedicated register constraints from legacy architectures.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item AArch64 provides \key{31 general-purpose registers} (\bits{x0}--\bits{x30}), each exactly \key{64 bits wide} ($8\text{ bytes}$).
+  \item \key{Orthogonal Design:} Any of these registers can serve interchangeably as a source, destination, or base address pointer without restriction.
+  \item \key{Simplified ISA:} Eliminates the highly dedicated register constraints (e.g., implicit counter registers) found in legacy architectures like x86.
 \end{itemize}
 
-\vspace{0.25cm}
+\vfill
 \centering
 \begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
   \draw[fill=lightblue, draw=navy, thick] (0,0) rectangle (9.0,0.5);
@@ -348,6 +350,11 @@ Course focus: Standard general-purpose user-space execution model (\key{EL0/EL1}
   \node[anchor=south, font=\tiny\bfseries] at (0.3, 0.5) {Bit 63};
   \node[anchor=south, font=\tiny\bfseries] at (8.7, 0.5) {Bit 0};
 \end{tikzpicture}
+
+\vfill
+\begin{block}{Why Exactly 31 Registers?}
+RISC instructions allocate precisely 5 bits to encode a register operand ($2^5 = 32$). AArch64 dedicates 31 of these slots to general storage and reserves the 32nd slot for a hardwired Zero Register / Stack Pointer alias.
+\end{block}
 
 \end{frame}
 
@@ -359,11 +366,11 @@ Course focus: Standard general-purpose user-space execution model (\key{EL0/EL1}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item Every 64-bit \bits{x} register has a corresponding 32-bit view denoted as \bits{w0} through \bits{w30}.
-  \item \bits{wN} represents the \key{lower 32 bits (bits 31:0)} of register \bits{xN}.
-  \item Enables efficient execution of 32-bit integer operations without separate hardware register files.
+  \item \bits{wN} represents the \key{lower 32 bits (bits 31:0)} of the physical register \bits{xN}.
+  \item This aliasing enables efficient execution of native 32-bit integer operations (like C \code{int} variables) without requiring separate hardware register files.
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 \centering
 \begin{tikzpicture}[scale=0.85, every node/.style={transform shape}]
   \draw[fill=softgray, draw=navy, dashed] (0,0) rectangle (6.0,0.65);
@@ -376,9 +383,9 @@ Course focus: Standard general-purpose user-space execution model (\key{EL0/EL1}
   \draw[thick, decoration={brace, mirror, raise=4pt}, decorate] (0,0) -- (11.5,0) node[midway, below=6pt, font=\small\bfseries] {\texttt{xN} Full 64-Bit Register};
 \end{tikzpicture}
 
-\vspace{0.2cm}
-\begin{block}{Zero-Extension Rule on 32-Bit Writes}
-Writing to a \bits{w} register \key{automatically clears (zero-extends)} the upper 32 bits of the corresponding \bits{x} register to zero.
+\vfill
+\begin{block}{Zero-Extension Safety Rule}
+Writing any data to a 32-bit \bits{w} register \key{automatically zero-extends} the value, completely wiping out the upper 32 bits of the corresponding \bits{x} register to clear out potential garbage data.
 \end{block}
 \end{frame}
 
@@ -389,13 +396,13 @@ Writing to a \bits{w} register \key{automatically clears (zero-extends)} the upp
 \begin{frame}{The Zero Register: \texttt{xzr} and \texttt{wzr}}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Encoded as register number 31 in most instruction contexts.
+  \item Encoded as register number 31 within most standard ALU instruction contexts.
   \item \key{Read Behavior:} Always returns the constant value \bits{0} (64-bit \bits{0} for \bits{xzr}, 32-bit \bits{0} for \bits{wzr}).
-  \item \key{Write Behavior:} Discards any value written to it (serves as a discard target).
-  \item \key{Architectural Benefit:} Eliminates dedicated zero-loading instructions and comparison formats.
+  \item \key{Write Behavior:} Silently discards any value written to it (serving as a digital bit-bucket).
+  \item \key{Architectural Benefit:} Eliminates the need to design dedicated zero-loading instructions or comparison formats, vastly simplifying the ISA.
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 \begin{block}{Common Idioms Using the Zero Register}
 \small
 \begin{tabular}{lll}
@@ -415,13 +422,14 @@ Writing to a \bits{w} register \key{automatically clears (zero-extends)} the upp
 % ============================================================
 
 \begin{frame}{Special-Purpose Registers: \texttt{sp}, \texttt{pc}, \texttt{lr}}
+\vfill
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Stack Pointer (\texttt{sp})}
 \begin{itemize}\setlength{\itemsep}{3pt}
   \item Dedicated register holding current stack top address.
-  \item Must maintain \key{16-byte alignment} when accessing memory in standard AArch64 ABI.
-  \item Arithmetic on \bits{sp} is restricted to explicit stack allocations/deallocations.
+  \item Must strictly maintain \key{16-byte alignment} when accessing memory in the ABI.
+  \item Arithmetic on \bits{sp} is restricted exclusively to stack allocations/deallocations.
 \end{itemize}
 \end{block}
 \end{column}
@@ -430,33 +438,33 @@ Writing to a \bits{w} register \key{automatically clears (zero-extends)} the upp
 \begin{block}{Program Counter (\texttt{pc})}
 \begin{itemize}\setlength{\itemsep}{3pt}
   \item Holds memory address of executing instruction.
-  \item Advances by $+4$ bytes on sequential execution.
-  \item \key{Cannot} be read or written directly as a general data register (no direct $\code{mov x0, pc}$), but can be accessed indirectly via PC-relative addressing (\code{adr}, \code{adrp}).
+  \item \key{Cannot} be read or written directly as a data register (no $\code{mov x0, pc}$).
+  \item Accessed indirectly via PC-relative addressing (\code{adr}, \code{adrp}).
   \item Modified via branch and call instructions.
 \end{itemize}
 \end{block}
 \end{column}
 \end{columns}
 
-\vspace{0.2cm}
+\vfill
 \begin{block}{Link Register (\texttt{x30} / \texttt{lr})}
-Holds the return address generated by subroutine branch-with-link instructions (\code{bl}, \code{blr}).
+Holds the direct return address generated by subroutine branch-with-link instructions (\code{bl}, \code{blr}). A function returning execution merely writes this value back into the \bits{pc}.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 11: Definitions First (Caller vs Callee-Saved) - with negative vspace
+% Slide 11
 % ============================================================
 
 \begin{frame}{The Calling Convention: Caller- vs.\ Callee-Saved}
-\vspace{-0.2cm}
+\vfill
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Caller-Saved Registers (\texttt{x0}--\texttt{x17})}
 \begin{itemize}\setlength{\itemsep}{3pt}
-  \item Used for temporary computations and arguments.
-  \item The caller must save them to memory/stack before making a subroutine call if their values are needed later.
-  \item The called function (callee) is free to overwrite them without restoring.
+  \item Primarily used for temporary scratch computations and argument passing.
+  \item The caller \key{must} save them to the stack before making a subroutine call if their values are needed later.
+  \item The called function (callee) is completely free to overwrite them without restoring.
 \end{itemize}
 \end{block}
 \end{column}
@@ -464,30 +472,30 @@ Holds the return address generated by subroutine branch-with-link instructions (
 \begin{column}{0.48\textwidth}
 \begin{block}{Callee-Saved Registers (\texttt{x19}--\texttt{x28})}
 \begin{itemize}\setlength{\itemsep}{3pt}
-  \item Used to hold long-lived variables across calls.
-  \item If a called function modifies any of these, it \key{must save the original value to the stack} and restore it before returning.
-  \item Protects caller state across subroutines.
+  \item Safely holds long-lived variables across multiple function calls.
+  \item If a called function modifies any of these, it \key{must save the original value to the stack} and successfully restore it before returning.
+  \item Guarantees protection of caller state.
 \end{itemize}
 \end{block}
 \end{column}
 \end{columns}
 
-\vspace{0.25cm}
-\begin{block}{Design Trade-off}
-Balancing caller- and callee-saved registers minimizes unnecessary memory traffic during deeply nested function calls.
+\vfill
+\begin{block}{The Efficiency Trade-off}
+Balancing caller- and callee-saved registers across the ABI deliberately minimizes unnecessary memory traffic and stack spilling during deeply nested software logic.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 12: Register File Overview Table Second
+% Slide 12 (FIXED: Reduced font size and padding)
 % ============================================================
 
 \begin{frame}{AArch64 Register File Overview}
-\vspace{-0.1cm}
+\vfill
 \begin{center}
-\footnotesize
+\scriptsize
 \renewcommand{\arraystretch}{0.95}
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{lll}
 \toprule
 \textbf{Register} & \textbf{Architectural Role} & \textbf{Preserved Across Calls? (ABI)} \\
@@ -506,22 +514,22 @@ Balancing caller- and callee-saved registers minimizes unnecessary memory traffi
 \tabularnewline
 \end{tabular}
 \end{center}
+\vfill
 \end{frame}
 
 % ============================================================
-% Slide 13
+% Slide 13 (FIXED: Table scaled down, block compressed)
 % ============================================================
 
 \begin{frame}{Process State: \texttt{pstate} and Condition Flags}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item The processor maintains an internal process state register (\bits{pstate}).
-  \item The upper 4 bits contain the \key{NZCV Arithmetic Condition Flags}:
+  \item The processor maintains an internal process state register (\bits{pstate}). The upper 4 bits evaluate the \key{NZCV Arithmetic Condition Flags}:
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 \begin{center}
-\small
+\footnotesize
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{cll}
 \toprule
@@ -535,9 +543,9 @@ Balancing caller- and callee-saved registers minimizes unnecessary memory traffi
 \end{tabular}
 \end{center}
 
-\vspace{0.2cm}
+\vfill
 \begin{block}{Selective Flag Updates}
-Standard ALU instructions (\code{add}, \code{sub}, \code{and}) do \key{not} modify flags. Only instructions with an ``\code{s}'' suffix (\code{adds}, \code{subs}, \code{ands}) or comparison instructions (\code{cmp}) update NZCV.
+Standard ALU instructions (\code{add}, \code{sub}) do \key{not} modify flags. Only instructions with an ``\code{s}'' suffix (\code{adds}, \code{subs}) or comparison instructions (\code{cmp}) update NZCV natively.
 \end{block}
 \end{frame}
 
@@ -554,15 +562,15 @@ Standard ALU instructions (\code{add}, \code{sub}, \code{and}) do \key{not} modi
 \begin{frame}{Memory Organization \& Byte Addressing}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Memory is organized as a contiguous sequence of \key{8-bit bytes}.
-  \item Every byte has a unique 64-bit memory address.
-  \item Data operands span multiple consecutive byte addresses based on type size:
+  \item Memory is physically organized as a contiguous sequence of \key{8-bit bytes}.
+  \item Every individual byte is assigned a unique 64-bit architectural address.
+  \item Data operands span multiple consecutive byte addresses scaling by standard powers of two:
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.0}
+\renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{8pt}
 \begin{tabular}{lcll}
 \toprule
@@ -578,6 +586,11 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{tabular}
 \end{center}
 
+\vfill
+\begin{block}{64-Bit Pointer Limitations}
+While AArch64 uses 64-bit pointers, current physical silicon and page table designs typically cap valid virtual address space addressing to 48 or 52 bits to save translation overhead.
+\end{block}
+
 \end{frame}
 
 % ============================================================
@@ -585,18 +598,18 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 % ============================================================
 
 \begin{frame}{Memory Alignment Rules}
-
+\vspace{-1em} 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item An access to an $n$-byte operand is \key{naturally aligned} if its memory address is an exact multiple of $n$: $\text{Address} \pmod n = 0$.
+  \item An access to an $n$-byte operand is \key{naturally aligned} if its memory address is an exact mathematical multiple of $n$: $\text{Address} \pmod n = 0$.
   \item \key{Alignment Requirements:}
   \begin{itemize}\setlength{\itemsep}{2pt}
     \item 32-bit Word access: Address must be a multiple of 4 ($\text{Address} \pmod 4 = 0$).
     \item 64-bit Doubleword access: Address must be a multiple of 8 ($\text{Address} \pmod 8 = 0$).
-    \item Instruction fetch: Address must be a multiple of 4.
+    \item Instruction fetch: Address must always be a strict multiple of 4.
   \end{itemize}
 \end{itemize}
 
-\vspace{0.15cm}
+\vfill
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Aligned Access (Single Transaction)}
@@ -620,19 +633,21 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{column}
 \end{columns}
 
-\vspace{0.15cm}
-Unaligned memory accesses can cross cache-line boundaries, requiring multiple memory transactions and degrading performance.
+\vfill
+\begin{block}{Alignment Penalties}
+Unaligned memory accesses can cross cache-line boundaries, requiring multiple memory transactions and severely degrading bandwidth. Strict environments will throw a hardware fault on unaligned access.
+\end{block}
 \end{frame}
 
 % ============================================================
-% Slide 16 (Box removed, plain text used instead)
+% Slide 16
 % ============================================================
 
 \begin{frame}{Byte Ordering: Little-Endian vs.\ Big-Endian}
 
 \small Storage of 32-bit Word \hex{0a0b0c0d} at Base Address \hex{1000}: Demonstrating how multi-byte values are mapped into sequential byte-addressable memory locations.
 
-\vspace{0.15cm}
+\vfill
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Little-Endian (AArch64 Default)}
@@ -675,38 +690,46 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 \end{column}
 \end{columns}
 
-\vspace{0.15cm}
-\footnotesize AArch64 is bi-endian by design, but standard OS environments (Linux, macOS, Windows) execute in \key{little-endian} mode.
+\vfill
+\begin{block}{Network Interoperability}
+While standard OS environments execute exclusively in \key{little-endian} mode, raw incoming internet packets adhere strictly to Big-Endian network order, requiring byte-swap instructions (\code{rev}) to parse correctly.
+\end{block}
 \end{frame}
 
 % ============================================================
-% Slide 17
+% Slide 17 (FIXED: Reduced TikZ scale and block density)
 % ============================================================
 
 \begin{frame}{The Process Address Space Layout}
+\vfill
 \begin{columns}[T]
-\begin{column}{0.52\textwidth}
-\begin{itemize}\setlength{\itemsep}{5pt}
+\begin{column}{0.58\textwidth}
+\begin{itemize}\setlength{\itemsep}{6pt}
   \item \key{Text (Code):} Read-only machine instructions.
-  \item \key{Data / BSS:} Global and static variables.
+  \item \key{Data / BSS:} Globally accessible and static variables.
   \item \key{Heap:} Dynamically allocated memory via \code{malloc}; grows \textbf{upward} toward higher addresses.
-  \item \key{Stack:} Local function variables and saved registers; grows \textbf{downward} toward lower addresses.
+  \item \key{Stack:} Local function variables and saved caller state; grows \textbf{downward} toward lower addresses.
 \end{itemize}
 \end{column}
 
-\begin{column}{0.44\textwidth}
+\begin{column}{0.38\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.8, every node/.style={transform shape}]
+\begin{tikzpicture}[scale=0.65, every node/.style={transform shape}]
   \draw[fill=lightblue, draw=navy] (0,4.0) rectangle (4.5,4.7) node[midway, font=\small\bfseries] {Stack (Grows Down $\downarrow$)};
   \draw[fill=softgray, draw=navy, dashed] (0,2.6) rectangle (4.5,4.0) node[midway, font=\footnotesize] {Unallocated Address Space};
   \draw[fill=lightblue, draw=navy] (0,1.9) rectangle (4.5,2.6) node[midway, font=\small\bfseries] {Heap (Grows Up $\uparrow$)};
   \draw[fill=lightblue, draw=navy] (0,1.2) rectangle (4.5,1.9) node[midway, font=\small\bfseries] {Data / BSS (Globals)};
   \draw[fill=lightblue, draw=navy] (0,0.5) rectangle (4.5,1.2) node[midway, font=\small\bfseries] {Text (Executable Code)};
-  \node[anchor=east, font=\tiny\bfseries] at (0,4.7) {High Address ($2^{48}-1$)};
-  \node[anchor=east, font=\tiny\bfseries] at (0,0.5) {Low Address (\hex{0000})};
+  \node[anchor=east, font=\tiny\bfseries] at (0,4.7) {High ($2^{48}-1$)};
+  \node[anchor=east, font=\tiny\bfseries] at (0,0.5) {Low (\hex{0000})};
 \end{tikzpicture}
 \end{column}
 \end{columns}
+
+\vfill
+\begin{block}{Stack-Heap Collision}
+The expansive unallocated gap ensures the Heap and Stack operate independently. Unchecked recursion causes the stack to crash into the heap, resulting in a segmentation fault.
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -716,21 +739,20 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 \sectiondivider{PART 4}{Foundational Instruction Classes}
 
 % ============================================================
-% Slide 18
+% Slide 18 (FIXED: Table scale 1.0, condensed text)
 % ============================================================
 
 \begin{frame}{Instruction Syntax Conventions}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Standard AArch64 assembly follows a strict operand ordering:
-  $$\code{mnemonic\quad destination,\; source1,\; source2\_or\_immediate}$$
-  \item \key{Destination First:} Leftmost operand receives the computed result.
-  \item \key{Three-Operand Format:} Non-destructive; source registers are preserved.
+  \item Standard AArch64 assembly strictly follows: \code{mnemonic  dst, src1, src2\_or\_imm}
+  \item \key{Three-Operand Format:} Computation safely preserves the source registers.
 \end{itemize}
 
-\vspace{0.2cm}
+\vfill
 \begin{center}
 \small
+\renewcommand{\arraystretch}{1.0}
 \begin{tabular}{lll}
 \toprule
 \textbf{Assembly Example} & \textbf{RTL Operation} & \textbf{Description} \\
@@ -741,15 +763,22 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 \bottomrule
 \end{tabular}
 \end{center}
+
+\vfill
+\begin{block}{Non-Destructive Architecture}
+Unlike x86's destructive two-operand syntax (\code{add eax, ebx} modifies \code{eax}), AArch64 retains original variables post-computation by routing output to a third register.
+\end{block}
 \end{frame}
 
 % ============================================================
-% Slide 19
+% Slide 19 (FIXED: Standardized arraystretch, tight block)
 % ============================================================
 
 \begin{frame}{Arithmetic Instructions: Addition \& Subtraction}
+\vfill
 \begin{center}
 \small
+\renewcommand{\arraystretch}{1.0}
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{lll}
 \toprule
@@ -766,28 +795,26 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 \end{tabular}
 \end{center}
 
-\vspace{0.15cm}
-\begin{block}{Immediate Variants}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item \code{add xd, xn, \#imm12}: Adds a 12-bit unsigned immediate ($0\text{ to } 4095$).
-  \item Can optionally be shifted left by 12 bits: \code{add xd, xn, \#imm12, lsl \#12}.
-\end{itemize}
+\vfill
+\begin{block}{Immediate Scaling}
+Immediate values (\code{\#imm12}) span $0\text{ to }4095$ and can be natively shifted left by 12 bits in hardware via \code{lsl \#12}.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 20
+% Slide 20 (FIXED: Standardized arraystretch, tight block)
 % ============================================================
 
 \begin{frame}{Logical Operations: Bitwise Manipulation}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Bitwise operations execute independently across all 64 (or 32) parallel bit slices.
+  \item Bitwise operations execute concurrently across all 64 parallel bit slices in the ALU.
 \end{itemize}
 
-\vspace{0.1cm}
+\vfill
 \begin{center}
 \small
+\renewcommand{\arraystretch}{1.0}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{lll}
 \toprule
@@ -797,15 +824,15 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 \code{orr  xd, xn, xm}  & Bitwise OR  & $x_d \leftarrow x_n \lor x_m$ \\
 \code{eor  xd, xn, xm}  & Bitwise XOR & $x_d \leftarrow x_n \oplus x_m$ \\
 \code{bic  xd, xn, xm}  & Bit Clear (AND NOT) & $x_d \leftarrow x_n \land (\sim x_m)$ \\
-\code{mvn  xd, xm}      & Bitwise NOT (Alias: \code{orn xd, xzr, xm}) & $x_d \leftarrow \sim x_m$ \\
+\code{mvn  xd, xm}      & Bitwise NOT & $x_d \leftarrow \sim x_m$ \\
 \code{ands xd, xn, xm}  & Bitwise AND with Flags & $x_d \leftarrow x_n \land x_m \to \text{NZCV}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.15cm}
+\vfill
 \begin{block}{Bit Clear (\texttt{bic}) Utility}
-\code{bic x0, x1, x2} clears every bit in $x_1$ where the corresponding bit in $x_2$ is set to \bits{1}.
+\code{bic x0, x1, x2} acts as a hardware mask, clearing every bit in $x_1$ where $x_2$ is \bits{1}.
 \end{block}
 \end{frame}
 
@@ -816,13 +843,14 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 \begin{frame}{Shift Operations: Barrel Shifter Integration}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item AArch64 hardware includes a dedicated \key{barrel shifter} on the second operand path.
-  \item Shift instructions exist as standalone operations or integrated directly into ALU instructions.
+  \item AArch64 hardware encompasses a dedicated \key{barrel shifter} integrated onto the second operand datapath.
+  \item Shift instructions execute as standalone mathematical operations or fold silently into primary ALU instructions.
 \end{itemize}
 
-\vspace{0.1cm}
+\vfill
 \begin{center}
 \small
+\renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{lll}
 \toprule
@@ -836,25 +864,26 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 \end{tabular}
 \end{center}
 
-\vspace{0.15cm}
+\vfill
 \begin{block}{Integrated Shifted Register Example}
-\code{add x0, x1, x2, lsl \#3} $\implies x_0 \leftarrow x_1 + (x_2 \times 8)$ encoded as a \key{single instruction with hardware-shifted operand support}.
+\code{add x0, x1, x2, lsl \#3} $\implies x_0 \leftarrow x_1 + (x_2 \times 8)$ encoded dynamically as a \key{single instruction with hardware-shifted operand support} without cycle penalty.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 22
+% Slide 22 (FIXED: Converted block itemize to run-on prose)
 % ============================================================
 
 \begin{frame}{Comparison and Testing Instructions}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Comparison instructions evaluate operands, update NZCV flags, and discard the computed value.
+  \item Comparison instructions exclusively evaluate operands, update NZCV status flags, and immediately discard the computed mathematical value.
 \end{itemize}
 
-\vspace{0.1cm}
+\vfill
 \begin{center}
-\small
+\footnotesize
+\renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{lll}
 \toprule
@@ -867,12 +896,9 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 \end{tabular}
 \end{center}
 
-\vspace{0.15cm}
-\begin{block}{Flag Interpretation Rule}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item If $x_n == x_m$, \code{cmp xn, xm} sets the \key{Z (Zero)} flag ($x_n - x_m = 0$).
-  \item If $x_n < x_m$ (signed), \code{cmp xn, xm} sets the condition flags such that $\text{N} \neq \text{V}$.
-\end{itemize}
+\vfill
+\begin{block}{Flag Interpretation Rules}
+If $x_n == x_m$, \code{cmp xn, xm} activates the \key{Z (Zero)} flag since $x_n - x_m = 0$. • If $x_n < x_m$ (signed), \code{cmp} aligns flags so that $\text{N} \neq \text{V}$ (Negative differs from Overflow).
 \end{block}
 \end{frame}
 
@@ -882,31 +908,32 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 
 \begin{frame}{Loading Immediate Constants: \texttt{movz}, \texttt{movk}, \texttt{movn}}
 
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item In a fixed 32-bit instruction, an arbitrary 64-bit constant cannot fit in a single instruction word.
-  \item AArch64 constructs large constants in 16-bit chunks using \key{wide-immediate instructions}:
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item A fixed 32-bit instruction cannot physically fit an arbitrary 64-bit constant.
+  \item AArch64 constructs massive constants iteratively in 16-bit chunks using \key{wide-immediate instructions}:
 \end{itemize}
 
-\vspace{0.05cm}
+\vfill
 \begin{center}
-\small
+\footnotesize
+\renewcommand{\arraystretch}{1.0}
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{llp{6.2cm}}
+\begin{tabular}{lll}
 \toprule
 \textbf{Instruction} & \textbf{Operation Name} & \textbf{Semantic Action} \\
 \midrule
-\code{movz xd, imm, lsl s} & Move Wide with Zero & Loads 16-bit constant at shift $s \in \{0,16,32,48\}$; clears rest \\
-\code{movk xd, imm, lsl s} & Move Wide with Keep & Overwrites 16 bits at shift $s$; \key{keeps} other bits \\
-\code{movn xd, imm, lsl s} & Move Wide with NOT  & Loads bitwise inverted 16-bit constant \\
+\code{movz xd, imm, lsl s} & Move Wide with Zero & Loads 16-bit constant at shift $s$; clears rest \\
+\code{movk xd, imm, lsl s} & Move Wide with Keep & Overwrites 16 bits at shift $s$; \key{keeps} other bits intact \\
+\code{movn xd, imm, lsl s} & Move Wide with NOT  & Loads bitwise inverted 16-bit constant directly \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.05cm}
+\vfill
 \begin{block}{Constructing a 32-bit Value (\hex{1234abcd})}
-\small
+\footnotesize
 \begin{tabular}{lll}
-\code{movz x0, \#0xabcd, lsl \#0}  & $\implies x_0 = \hex{000000000000abcd}$ & (Lower 16 bits loaded) \\
+\code{movz x0, \#0xabcd}           & $\implies x_0 = \hex{000000000000abcd}$ & (Lower 16 bits loaded) \\
 \code{movk x0, \#0x1234, lsl \#16} & $\implies x_0 = \hex{000000001234abcd}$ & (Bits 31:16 overwritten) \\
 \end{tabular}
 \end{block}
@@ -918,18 +945,19 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 
 \begin{frame}{Memory Access: Basic Load/Store Architecture}
 
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item Memory is accessed exclusively through explicit load (\code{ldr}) and store (\code{str}) instructions.
-  \item Register size specifier determines data transfer width:
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item Memory is accessed universally via explicit load (\code{ldr}) and store (\code{str}) mechanisms.
+  \item The register size specifier strictly dictates the physical data transfer width:
 \end{itemize}
 
-\vspace{0.1cm}
+\vfill
 \begin{center}
-\small
-\setlength{\tabcolsep}{6pt}
+\footnotesize
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{llll}
 \toprule
-\textbf{Instruction} & \textbf{Register Type} & \textbf{Transfer Width} & \textbf{Action} \\
+\textbf{Instruction} & \textbf{Register} & \textbf{Transfer Width} & \textbf{Action} \\
 \midrule
 \code{ldr  xt, [xn]} & 64-bit (\bits{xt}) & 8 Bytes (Doubleword) & $x_t \leftarrow \text{Mem}_8[x_n]$ \\
 \code{str  xt, [xn]} & 64-bit (\bits{xt}) & 8 Bytes (Doubleword) & $\text{Mem}_8[x_n] \leftarrow x_t$ \\
@@ -941,8 +969,10 @@ Unaligned memory accesses can cross cache-line boundaries, requiring multiple me
 \end{tabular}
 \end{center}
 
-\vspace{0.15cm}
-Base register ($x_n$) holds the 64-bit memory pointer enclosed in square brackets \code{[xn]}.
+\vfill
+\begin{block}{Pointer Referencing}
+The base register ($x_n$) holds the 64-bit memory pointer, explicitly enclosed in square brackets \code{[xn]} to signify architectural indirection.
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -950,13 +980,14 @@ Base register ($x_n$) holds the 64-bit memory pointer enclosed in square bracket
 % ============================================================
 
 \begin{frame}{Addressing Modes: Base with Immediate Offset}
+\vfill
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Mechanism ($\text{EA} = x_n + \text{offset}$)}
-\begin{itemize}\setlength{\itemsep}{2pt}
+\begin{itemize}\setlength{\itemsep}{3pt}
   \item Instruction: \code{ldr xt, [xn, \#offset]}
-  \item Accesses memory at $x_n + \text{offset}$.
-  \item \key{No side effects:} Base register $x_n$ remains unchanged.
+  \item Accesses memory physically at $x_n + \text{offset}$.
+  \item \key{No side effects:} Base register $x_n$ remains completely unchanged post-execution.
 \end{itemize}
 \end{block}
 \end{column}
@@ -973,9 +1004,9 @@ Base register ($x_n$) holds the 64-bit memory pointer enclosed in square bracket
 \end{column}
 \end{columns}
 
-\vspace{0.15cm}
+\vfill
 \begin{block}{Hardware Offset Range}
-\footnotesize Standard immediate offsets are unsigned 12-bit scaled values (for 64-bit doublewords, offsets up to $+32760$ bytes).
+Standard immediate offsets are structured as unsigned 12-bit scaled values. For 64-bit doublewords, the hardware scales this value up by 8, yielding a maximum effective offset of $+32760$ bytes.
 \end{block}
 \end{frame}
 
@@ -984,6 +1015,7 @@ Base register ($x_n$) holds the 64-bit memory pointer enclosed in square bracket
 % ============================================================
 
 \begin{frame}{Advanced Addressing: Pre- and Post-Indexed}
+\vfill
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Pre-Indexed (Update Before Access)}
@@ -1010,25 +1042,35 @@ Base update happens \emph{after} the load.
 \end{column}
 \end{columns}
 
-\vspace{0.25cm}
-\key{Efficiency Impact:} Eliminates separate \code{add} instructions when traversing arrays or pushing/popping stack elements.
+\vfill
+\begin{block}{Efficiency Impact}
+Pointer tracking naturally embeds into memory instructions, thereby eliminating standalone \code{add} overhead when rapidly traversing structural arrays or popping execution stack elements.
+\end{block}
 \end{frame}
 
 % ============================================================
 % Slide 27
 % ============================================================
 
-\begin{frame}{Loading and Storing Pairs (\texttt{ldp} and \texttt{stp})}
+\begin{frame}[fragile]{Loading and Storing Pairs (\texttt{ldp} and \texttt{stp})}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Core Purpose:} Transfer two adjacent 64-bit registers in a single instruction.
+  \item \key{Core Purpose:} Transfer two completely adjacent 64-bit registers in a single instruction pipeline.
   \item \key{Primary Use Case (Stack Management):}
   \begin{itemize}\setlength{\itemsep}{3pt}
-    \item Combines two register movements into one atomic operation.
-    \item Efficiently saves and restores function linkage (Frame Pointer $x_{29}$ and Link Register $x_{30}$) during function calls.
+    \item Combines two discrete register movements into one atomic 128-bit memory operation.
+    \item Efficiently saves and restores critical function linkage (Frame Pointer $x_{29}$ and Link Register $x_{30}$) securely during active function calls.
   \end{itemize}
-  \item \key{Performance Impact:} Issues a single 128-bit memory bus transaction, doubling data throughput compared to individual loads or stores.
+  \item \key{Performance Impact:} Issues a unified 128-bit memory bus transaction, fundamentally doubling data transfer throughput compared to split single operations.
 \end{itemize}
+
+\vfill
+\begin{block}{Stack Frame Construction Example}
+\begin{verbatim}
+// Push FP (x29) and LR (x30) to stack, pre-decrementing SP by 16 bytes
+stp x29, x30, [sp, #-16]! 
+\end{verbatim}
+\end{block}
 
 \end{frame}
 
@@ -1039,12 +1081,13 @@ Base update happens \emph{after} the load.
 \begin{frame}{Control Flow: Unconditional Branches}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Control flow instructions redirect program execution by modifying the Program Counter (\bits{pc}).
+  \item Control flow instructions structurally redirect program execution by coercing the Program Counter (\bits{pc}).
 \end{itemize}
 
-\vspace{0.1cm}
+\vfill
 \begin{center}
 \small
+\renewcommand{\arraystretch}{1.2}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{lll}
 \toprule
@@ -1056,13 +1099,12 @@ Base update happens \emph{after} the load.
 \code{blr xn}        & Indirect Call        & $x_{30} \leftarrow \text{pc} + 4$; $\text{pc} \leftarrow x_n$ (Function pointer call) \\
 \code{ret}           & Subroutine Return    & $\text{pc} \leftarrow x_{30}$ (Default return via Link Register) \\
 \bottomrule
-\tabularnewline
 \end{tabular}
 \end{center}
 
-\vspace{0.15cm}
+\vfill
 \begin{block}{PC-Relative Addressing}
-Direct branch offsets are encoded as signed displacements relative to the current \bits{pc}, making compiled code position-independent.
+Direct branch offsets natively encode as signed binary displacements relative to the current \bits{pc}. This structure mathematically guarantees compiled code executes perfectly completely irrespective of loaded memory position.
 \end{block}
 \end{frame}
 
@@ -1072,12 +1114,13 @@ Direct branch offsets are encoded as signed displacements relative to the curren
 
 \begin{frame}{Conditional Branches \& Condition Codes}
 \begin{block}{Syntax: \texttt{b.cond label}}
-Executes branch to \code{label} only if the specified NZCV condition test evaluates to true.
+Executes immediate branch execution jumping to \code{label} only if the specified NZCV condition configuration matches evaluating criteria to true.
 \end{block}
 
-\vspace{0.1cm}
+\vfill
 \begin{center}
 \small
+\renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{llll}
 \toprule
@@ -1094,6 +1137,11 @@ Executes branch to \code{label} only if the specified NZCV condition test evalua
 \bottomrule
 \end{tabular}
 \end{center}
+
+\vfill
+\begin{block}{Branch Prediction Context}
+Highly unpredictable conditional branches shatter superscalar execution throughput. Hardware mitigates this penalty dynamically utilizing dedicated branch target buffers spanning microarchitectural domains.
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -1101,6 +1149,7 @@ Executes branch to \code{label} only if the specified NZCV condition test evalua
 % ============================================================
 
 \begin{frame}[fragile]{Control Flow Idiom: If-Else Translation}
+\vfill
 \begin{columns}[T]
 \begin{column}{0.44\textwidth}
 \begin{block}{High-Level C Code}
@@ -1132,8 +1181,10 @@ if (a == b) {
 \end{column}
 \end{columns}
 
-\vspace{0.25cm}
-\key{Assembly Pattern:} High-level conditions invert their test in assembly to jump \emph{around} the then-body.
+\vfill
+\begin{block}{Assembly Inversion Pattern}
+High-level conditions frequently invert their evaluation test logically in compiled assembly code, executing the branch actively to jump completely \emph{around} the positive then-body.
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -1141,6 +1192,7 @@ if (a == b) {
 % ============================================================
 
 \begin{frame}[fragile]{Control Flow Idiom: While-Loop Translation}
+\vfill
 \begin{columns}[T]
 \begin{column}{0.44\textwidth}
 \begin{block}{High-Level C Loop}
@@ -1175,6 +1227,11 @@ while (i < n) {
 \end{block}
 \end{column}
 \end{columns}
+
+\vfill
+\begin{block}{Loop Unrolling Context}
+Executing two branching instructions per iteration severely bottlenecks simple evaluation loops. Standard compilers actively duplicate interior loop bodies (unrolling) to eliminate jumping cycle overhead entirely.
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -1184,13 +1241,14 @@ while (i < n) {
 \begin{frame}{Conditional Select Instructions: Eliminating Branches}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Branch instructions introduce pipeline branch misprediction risks.
-  \item AArch64 provides \key{conditional select instructions} that choose between operands without branching:
+  \item Branch instructions natively introduce deep pipeline branch misprediction risks.
+  \item AArch64 deliberately mitigates pipeline flushes by deploying \key{conditional select instructions} that strictly choose between loaded operands without branching:
 \end{itemize}
 
-\vspace{0.1cm}
+\vfill
 \begin{center}
 \small
+\renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{lll}
 \toprule
@@ -1203,7 +1261,7 @@ while (i < n) {
 \end{tabular}
 \end{center}
 
-\vspace{0.15cm}
+\vfill
 \begin{block}{Example: Finding Maximum of Two Values ($\max(x_1, x_2)$)}
 \small
 \begin{tabular}{lll}
@@ -1225,13 +1283,15 @@ while (i < n) {
 
 \begin{frame}{Topic 3: Comprehensive Summary}
 
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Architectural State:} Precise hardware-software contract defined by registers (\bits{x0}--\bits{x30}), flags (NZCV), stack pointer (\bits{sp}), program counter (\bits{pc}), system control registers, and byte-addressed memory.
-  \item \key{Register Structure:} 31 orthogonal 64-bit registers (\bits{x0}--\bits{x30}) with 32-bit aliases (\bits{w0}--\bits{w30}); writing to a \bits{w} register automatically clears the upper 32 bits.
-  \item \key{ABI Rules:} \bits{x0}--\bits{x7} handle arguments and returns (caller-saved); \bits{x19}--\bits{x28} hold local variables across calls (callee-saved).
-  \item \key{Load/Store Operations:} Arithmetic occurs exclusively in registers; memory is accessed via \code{ldr}/\code{str} using offset, pre-indexed, post-indexed, or paired (\code{ldp}/\code{stp}) modes.
-  \item \key{Control Flow:} Branching evaluates NZCV flags updated by \code{adds}/\code{subs}/\code{cmp}; conditional select (\code{csel}) eliminates branch penalties for small conditionals.
+\vfill
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item \key{Architectural State:} Precise hardware-software contract fundamentally defined by general registers (\bits{x0}--\bits{x30}), flags (NZCV), stack pointer (\bits{sp}), program counter (\bits{pc}), and byte-addressed memory allocations.
+  \item \key{Register Structure:} 31 orthogonal 64-bit registers (\bits{x0}--\bits{x30}) structurally alias 32-bit blocks (\bits{w0}--\bits{w30}); writing to a \bits{w} register safely and strictly clears the upper 32 bits natively.
+  \item \key{ABI Rules:} \bits{x0}--\bits{x7} handle execution arguments and returns (caller-saved); \bits{x19}--\bits{x28} securely hold local variables across calls (callee-saved).
+  \item \key{Load/Store Operations:} Arithmetic executes exclusively in registers; memory interactions operate strictly via \code{ldr}/\code{str} offset, indexed, or unified paired (\code{ldp}/\code{stp}) modes.
+  \item \key{Control Flow:} Branching explicitly evaluates logic via NZCV flags updated dynamically by \code{adds}/\code{subs}/\code{cmp}; utilizing conditional select (\code{csel}) mathematically eliminates branch penalty cycles.
 \end{itemize}
+\vfill
 
 \end{frame}
 
@@ -1241,15 +1301,17 @@ while (i < n) {
 
 \begin{frame}{Self-Test Questions: State \& Register Mechanics}
 
-\begin{enumerate}\setlength{\itemsep}{6pt}
-  \item \key{Architectural vs.\ Microarchitectural State:} Why are CPU branch prediction tables and physical register rename structures classified as microarchitectural state rather than architectural state?
+\vfill
+\begin{enumerate}\setlength{\itemsep}{7pt}
+  \item \key{Architectural vs.\ Microarchitectural State:} Why are internal CPU branch prediction tables and physical register rename structures classified uniquely as microarchitectural state rather than architectural state?
 
-  \item \key{32-bit Register Write Semantics:} Suppose register \bits{x5} initially contains \hex{ffffffff\_ffffffff}. If the instruction \code{mov w5, \#0x1234} is executed, what exact 64-bit value resides in \bits{x5}?
+  \item \key{32-bit Register Write Semantics:} Suppose physical register \bits{x5} initially contains hexadecimal \hex{ffffffff\_ffffffff}. If the target instruction \code{mov w5, \#0x1234} is successfully executed, what exact 64-bit value natively resides in \bits{x5} post-execution?
 
-  \item \key{Zero Register Application:} Why does AArch64 provide a dedicated zero register (\bits{xzr}/\bits{wzr}) instead of dedicating a general-purpose register (like \bits{x0}) to hold zero?
+  \item \key{Zero Register Application:} Why does the AArch64 specification provide a dedicated zero register (\bits{xzr}/\bits{wzr}) functionally instead of permanently dedicating a general-purpose register (like \bits{x0}) to continuously hold zero?
 
-  \item \key{Calling Convention Responsibility:} If function \code{foo()} calls function \code{bar()}, and \code{foo()} needs to preserve values across the call in registers \bits{x3} and \bits{x20}, which function is responsible for saving each register to the stack?
+  \item \key{Calling Convention Responsibility:} If user function \code{foo()} directly calls function \code{bar()}, and \code{foo()} actively needs to preserve computation values across the call in registers \bits{x3} and \bits{x20}, which function assumes technical responsibility for securing each register to the stack?
 \end{enumerate}
+\vfill
 
 \end{frame}
 
@@ -1259,33 +1321,44 @@ while (i < n) {
 
 \begin{frame}{Self-Test Questions: Memory \& Instruction Mechanics}
 
+\vfill
 \begin{enumerate}\setlength{\itemsep}{6pt}
-  \item \key{Memory Addressing Differences:} Explain the exact difference in execution behavior and final register state between:
+  \item \key{Memory Addressing Differences:} Explain the exact mechanical difference in physical execution behavior and final register state configurations between:
   \begin{itemize}\setlength{\itemsep}{1.5pt}
     \item \code{ldr x1, [x0, \#16]}
     \item \code{ldr x1, [x0, \#16]!}
     \item \code{ldr x1, [x0], \#16}
   \end{itemize}
 
-  \item \key{Endianness Evaluation:} The 32-bit word \hex{deadbeef} is stored at memory address \hex{2000} on a little-endian AArch64 system. What is the exact byte value stored at address \hex{2000}? At address \hex{2003}?
+  \item \key{Endianness Evaluation:} The 32-bit word \hex{deadbeef} is physically stored at memory address \hex{2000} on a little-endian AArch64 system. What is the exact mathematical byte value stored at address \hex{2000}? At address \hex{2003}?
 
-  \item \key{Branch Elimination via \texttt{csel}:} Convert the following C code snippet into an equivalent branchless AArch64 assembly sequence using \code{cmp} and \code{csel}:
+  \item \key{Branch Elimination via \texttt{csel}:} Convert the following C code snippet directly into an equivalent branchless AArch64 assembly sequence safely deploying \code{cmp} and \code{csel}:
   $$\code{int64\_t result = (val1 <= val2) ? (val1 + 10) : (val2 - 5);}$$
 
-  \item \key{Condition Flag Verification:} If \bits{x0} contains $5$ and \bits{x1} contains $10$, describe which NZCV condition flags are asserted after executing \code{cmp x0, x1}.
+  \item \key{Condition Flag Verification:} If \bits{x0} correctly contains integer $5$ and \bits{x1} contains $10$, meticulously evaluate and describe which NZCV condition flags are actively asserted following instruction \code{cmp x0, x1}.
 \end{enumerate}
+\vfill
 \end{frame}
+
+% ============================================================
+% Slide 36: Look Ahead
+% ============================================================
 
 \begin{frame}{Looking Ahead to Topic 4: Assembly Programming}
 
-  Topic 4 Preview (Arithmetic, Logic, \& Control Flow):
+\vfill
+\begin{block}{Topic 4 Preview (Arithmetic, Logic, \& Control Flow)}
+Moving from architectural structure to complex functional application.
+\end{block}
 
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item \textbf{ALU \& Barrel Shifting:} Mastering arithmetic operations and free zero-penalty second-operand shifts.
-  \item \textbf{Bitwise Logic \& Field Extraction:} Efficiently manipulating bits with masks, bit clears, and \code{ubfx}.
-  \item \textbf{Condition Flags \& Comparisons:} Leveraging NZCV bits and choosing between signed vs.\ unsigned branch conditions.
-  \item \textbf{Control Flow \& Branchless Selection:} Translating loops and \code{if-else} blocks, and using \code{csel} to eliminate branch penalties.
+\vfill
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \textbf{ALU \& Barrel Shifting:} Mastering intensive arithmetic operations natively coupled with zero-penalty second-operand hardware shifts.
+  \item \textbf{Bitwise Logic \& Field Extraction:} Efficiently manipulating interior bit arrays structurally utilizing masks, bit clears, and unrolled \code{ubfx} commands.
+  \item \textbf{Condition Flags \& Comparisons:} Leveraging native NZCV bits dynamically and choosing strategically between signed vs.\ unsigned branch conditions.
+  \item \textbf{Control Flow \& Branchless Selection:} Functionally translating loops and dense \code{if-else} programming blocks, utilizing \code{csel} structurally to eliminate costly branch penalties entirely.
 \end{itemize}
+\vfill
 
 \end{frame}
 
