@@ -3,6 +3,7 @@
 % ============================================================
 % Theme and typography
 % ============================================================
+
 \usetheme{Madrid}
 \usecolortheme{default}
 \usefonttheme{professionalfonts}
@@ -12,10 +13,21 @@
 
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
-  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
-    CSCI 2406 --- Computer Organization \& Architecture (ARM64 / AArch64 Reference)
+  \begin{beamercolorbox}[
+    wd=.82\paperwidth,
+    ht=2.5ex,
+    dp=1.0ex,
+    leftskip=.8em
+  ]{author in head/foot}
+    CSCI 2406 --- Computer Organization \& Architecture
+    (AArch64 Reference)
   \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+  \begin{beamercolorbox}[
+    wd=.18\paperwidth,
+    ht=2.5ex,
+    dp=1.0ex,
+    rightskip=.8em
+  ]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
@@ -25,21 +37,38 @@
   text margin right=0.65cm
 }
 
-\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
-\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamerfont{frametitle}{
+  size=\Large,
+  series=\bfseries
+}
+
+\setbeamerfont{block title}{
+  size=\normalsize,
+  series=\bfseries
+}
+
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
-% Block vertical padding adjustments
-\addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
-\addtobeamertemplate{block end}{}{\vspace{0.2em}}
+\addtobeamertemplate{block begin}
+  {\vspace{0.1em}}
+  {\vspace{0.1em}}
 
-% Base list item separation
-\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
-\setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
+\addtobeamertemplate{block end}
+  {}
+  {\vspace{0.2em}}
+
+\setbeamertemplate{itemize/enumerate body begin}{
+  \setlength{\itemsep}{4pt}
+}
+
+\setbeamertemplate{itemize/enumerate subbody begin}{
+  \setlength{\itemsep}{2pt}
+}
 
 % ============================================================
 % Packages
 % ============================================================
+
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amsmath}
@@ -59,28 +88,69 @@
 % ============================================================
 % Colors
 % ============================================================
+
 \definecolor{navy}{RGB}{24,43,68}
 \definecolor{deepblue}{RGB}{45,88,130}
-\definecolor{lightblue}{RGB}{235,242,250}
 \definecolor{softgray}{RGB}{245,247,250}
+\definecolor{mediumgray}{RGB}{232,235,239}
 \definecolor{darkgray}{RGB}{25,28,32}
 \definecolor{gold}{RGB}{200,145,35}
 
-\setbeamercolor{palette primary}{bg=navy,fg=white}
-\setbeamercolor{palette secondary}{bg=deepblue,fg=white}
-\setbeamercolor{frametitle}{bg=navy,fg=white}
-\setbeamercolor{title}{fg=white}
-\setbeamercolor{subtitle}{fg=white}
-\setbeamercolor{author}{fg=white}
-\setbeamercolor{date}{fg=white}
-\setbeamercolor{titlelike}{fg=white}
-\setbeamercolor{block title}{bg=deepblue,fg=white}
-\setbeamercolor{block body}{bg=lightblue,fg=darkgray}
-\setbeamercolor{normal text}{fg=darkgray,bg=white}
+\setbeamercolor{palette primary}{
+  bg=navy,
+  fg=white
+}
+
+\setbeamercolor{palette secondary}{
+  bg=deepblue,
+  fg=white
+}
+
+\setbeamercolor{frametitle}{
+  bg=navy,
+  fg=white
+}
+
+\setbeamercolor{title}{
+  fg=white
+}
+
+\setbeamercolor{subtitle}{
+  fg=white
+}
+
+\setbeamercolor{author}{
+  fg=white
+}
+
+\setbeamercolor{date}{
+  fg=white
+}
+
+\setbeamercolor{titlelike}{
+  fg=white
+}
+
+\setbeamercolor{block title}{
+  bg=deepblue,
+  fg=white
+}
+
+% No light-blue block bodies
+\setbeamercolor{block body}{
+  bg=softgray,
+  fg=darkgray
+}
+
+\setbeamercolor{normal text}{
+  fg=darkgray,
+  bg=white
+}
 
 % ============================================================
 % Formatting shortcuts
 % ============================================================
+
 \setlength{\parskip}{0pt}
 
 \newcommand{\key}[1]{\textbf{#1}}
@@ -88,432 +158,2073 @@
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 
-% Section divider macro
+% ============================================================
+% Section divider
+% ============================================================
+
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
-\fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+
+\fill[navy]
+  (current page.south west)
+  rectangle
+  (current page.north east);
+
+\fill[gold]
+  (current page.south west)
+  rectangle
+  ([yshift=.15cm]current page.south east);
+
 \end{tikzpicture}
+
 \vspace{1.5cm}
+
 \begin{minipage}{0.85\textwidth}
-{\color{gold}\large\bfseries #1\par}
+
+{\color{gold}
+ \large
+ \bfseries
+ #1
+ \par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}
+ \fontsize{22}{26}\selectfont
+ \bfseries
+ #2
+ \par}
+
 \end{minipage}
+
 \end{frame}
 }
 
 % ============================================================
 % Metadata
 % ============================================================
-\title[Topic 8]{ Procedures and the Stack }
-\subtitle{ Procedure calls, return linkage, stack organization,\\ parameter passing, and AAPCS64 calling conventions in AArch64 }
-\author{ Computer Organization \& Architecture }
-\date{Topic 8}
+
+\title[Topic 2]{
+  RISC Principles and ARM Architecture
+}
+
+\subtitle{
+  RISC Design Principles,
+  AArch64 Architectural Overview,\\
+  Registers and Programmer-Visible State,
+  and Instruction Classes
+}
+
+\author{
+  Computer Organization \& Architecture
+}
+
+\date{Topic 2}
 
 % ============================================================
-% Presentation Body
+% Presentation
 % ============================================================
+
 \begin{document}
 
-% --- Slide 1: Title Slide ---
+% ============================================================
+% Slide 1
+% ============================================================
+
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
-\fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
+
+\fill[navy]
+  (current page.south west)
+  rectangle
+  (current page.north east);
+
+\fill[gold]
+  (current page.south west)
+  rectangle
+  ([yshift=.18cm]current page.south east);
+
 \end{tikzpicture}
+
 \vspace{1.0cm}
+
 \begin{minipage}{0.9\textwidth}
-{\color{gold}\large\bfseries CSCI 2406: Topic 08\par}
+
+{\color{gold}
+ \large
+ \bfseries
+ CSCI 2406: Topic 02
+ \par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries Procedures and the Stack\par}
+
+{\color{white}
+ \fontsize{20}{24}\selectfont
+ \bfseries
+ RISC Principles and ARM Architecture
+ \par}
+
 \vspace{0.3cm}
-{\color{lightblue}\normalsize Procedure calls, return linkage, stack organization, parameter passing, and AAPCS64 calling conventions\par}
+
+{\color{softgray}
+ \normalsize
+ RISC Design Principles,
+ AArch64 Architectural Overview,\\
+ Registers and Programmer-Visible State,
+ and Instruction Classes
+ \par}
+
 \vspace{0.6cm}
-{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad Topic 8\par}
+
+{\color{softgray}
+ \small
+ Computer Organization \& Architecture
+ \quad\textbar\quad
+ AArch64 Reference
+ \par}
+
 \end{minipage}
+
 \end{frame}
 
-% --- Slide 2: Topic Outline ---
-\begin{frame}{Topic 8 Outline}
-    \begin{block}{Topic Objective}
-        Examine the architectural mechanisms and software conventions that allow programs to execute subroutines, pass arguments, isolate local variables, and return control securely.
-    \end{block}
-    \vspace{0.4em}
-    \begin{itemize}
-        \item \key{Section 1}: The Call and Return Mechanism (\code{BL}, \code{RET})
-        \item \key{Section 2}: The Hardware Stack and the Stack Pointer (\code{SP})
-        \item \key{Section 3}: The AAPCS64 Calling Convention
-        \item \key{Section 4}: Practical C to Assembly Translation
-        \item \key{Section 5}: Stack Frames and the Frame Pointer (\code{FP})
-        \item \key{Section 6}: Summary \& Interactive Self-Test
-    \end{itemize}
+% ============================================================
+% Slide 2
+% ============================================================
+
+\begin{frame}{Topic 2 Outline}
+
+\begin{block}{Topic Objective}
+
+Examine the design principles commonly associated with RISC
+architectures and show how those principles appear concretely
+in AArch64.
+
+\end{block}
+
+\vspace{0.35cm}
+
+\begin{itemize}
+
+  \item \key{Section 1}:
+        RISC Design Principles
+
+  \item \key{Section 2}:
+        AArch64 Architectural Overview
+
+  \item \key{Section 3}:
+        Registers and Programmer-Visible State
+
+  \item \key{Section 4}:
+        Core AArch64 Instruction Classes
+
+  \item \key{Section 5}:
+        Summary and Self-Test
+
+\end{itemize}
+
 \end{frame}
 
 % ============================================================
 % SECTION 1
 % ============================================================
-\sectiondivider{Section 01}{The Call and Return\\Mechanism}
 
-% --- Slide 4: The Need for Procedures ---
-\begin{frame}{The Need for Procedures}
-    Procedures (functions, subroutines, methods) are the primary abstraction for software modularity.
+\sectiondivider{Section 01}{
+  RISC Design Principles
+}
 
-    \vspace{0.3em}
-    To execute a procedure, the hardware must successfully manage:
-    \begin{itemize}
-        \item \key{Control Transfer}: Jump to the subroutine's memory address.
-        \item \key{State Preservation}: Ensure the caller's data is not destroyed by the callee.
-        \item \key{Argument Passing}: Transmit inputs to the subroutine.
-        \item \key{Value Return}: Transmit outputs back to the caller.
-        \item \key{Return Linkage}: Remember exactly where to resume the original execution.
-    \end{itemize}
+% ============================================================
+% Slide 4
+% ============================================================
+
+\begin{frame}{What Does RISC Mean?}
+
+\begin{block}{Reduced Instruction Set Computer}
+
+RISC is a design philosophy emphasizing
+\key{regularity},
+\key{simple instruction forms},
+and a clean separation between computation
+and memory access.
+
+\end{block}
+
+\vspace{0.25cm}
+
+\begin{itemize}
+
+  \item RISC does \key{not} simply mean
+        ``a processor with very few instructions.''
+
+  \item The important idea is
+        regular instruction structure.
+
+  \item Arithmetic and logical operations
+        are primarily register-based.
+
+  \item Load and store instructions
+        transfer data between registers and memory.
+
+\end{itemize}
+
 \end{frame}
 
-% --- Slide 5: Branch and Link (BL) ---
-\begin{frame}{Branch and Link (\code{BL})}
-    The \code{BL} instruction solves the control transfer and return linkage problems simultaneously.
+% ============================================================
+% Slide 5
+% ============================================================
 
-    \vspace{0.2em}
-    \begin{block}{Execution semantics of \code{BL label}}
-        \begin{enumerate}
-            \item Computes the return address: the address of the instruction immediately following the \code{BL}.
-            \item Stores this return address into the \key{Link Register (\code{x30})}.
-            \item Overwrites the Program Counter (\code{PC}) with the address of \code{label}.
-        \end{enumerate}
-    \end{block}
+\begin{frame}{Foundational RISC Design Principles}
 
-    \vspace{0.2em}
-    \key{Why not just use \code{B} (Branch)?}\\
-    A standard branch overwrites the \code{PC} but does \textit{not} save the return address. The processor would have no way to find its way back to the caller.
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{Instruction Regularity}
+
+\begin{itemize}
+
+  \item Regular instruction formats.
+
+  \item Consistent operand fields.
+
+  \item Predictable instruction alignment.
+
+\end{itemize}
+
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Register-Centered Computation}
+
+\begin{itemize}
+
+  \item Arithmetic uses registers.
+
+  \item Memory access uses loads and stores.
+
+  \item Regularity simplifies decoding.
+
+\end{itemize}
+
+\end{block}
+
+\end{columns}
+
+\vspace{0.35cm}
+
+\begin{block}{Implementation Benefit}
+
+These characteristics support regular
+instruction fetch,
+decode,
+and pipelined implementation.
+
+\end{block}
+
 \end{frame}
 
-% --- Slide 6: Return (RET) ---
-\begin{frame}{Return (\code{RET})}
-    The \code{RET} instruction completes the subroutine lifecycle by transferring control back to the caller.
+% ============================================================
+% Slide 6
+% ============================================================
 
-    \vspace{0.2em}
-    \begin{block}{Execution semantics of \code{RET}}
-        \begin{itemize}
-            \item Reads the memory address currently stored in \code{x30} (the Link Register).
-            \item Unconditionally branches to that address (\code{PC} $\leftarrow$ \code{x30}).
-        \end{itemize}
-    \end{block}
+\begin{frame}{The Load/Store Architectural Model}
 
-    \vspace{0.2em}
-    \begin{alertblock}{The Link Register Vulnerability}
-        If a subroutine calls \textit{another} subroutine (a nested call), the inner \code{BL} will overwrite \code{x30}. The original return address is lost forever unless it is backed up to memory before the nested call.
-    \end{alertblock}
+\begin{block}{Separation of Memory Access and Computation}
+
+In a load/store architecture such as AArch64,
+arithmetic and logical instructions operate on registers.
+Memory is accessed using dedicated
+\key{load}
+and
+\key{store}
+instructions.
+
+\end{block}
+
+\vspace{0.25cm}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{Data Processing}
+
+\begin{itemize}
+
+  \item Operands are registers.
+
+  \item Results are written to registers.
+
+\end{itemize}
+
+\begin{center}
+\Large
+\code{add x1, x2, x3}
+\end{center}
+
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Memory Access}
+
+\begin{itemize}
+
+  \item Loads read memory into registers.
+
+  \item Stores write registers to memory.
+
+\end{itemize}
+
+\begin{center}
+\Large
+\code{ldr x1, [x0]}
+\end{center}
+
+\end{block}
+
+\end{columns}
+
+\end{frame}
+
+% ============================================================
+% Slide 7
+% ============================================================
+
+\begin{frame}{Load--Compute--Store in AArch64}
+
+Suppose the address in \code{x0}
+identifies a 64-bit value in memory
+that must be increased by 5.
+
+\vspace{0.3cm}
+
+\begin{center}
+
+\begin{tikzpicture}[
+  node distance=0.55cm,
+  codebox/.style={
+    rectangle,
+    draw=navy,
+    fill=softgray,
+    text=darkgray,
+    font=\small\ttfamily,
+    text width=10.8cm,
+    align=left,
+    rounded corners=2pt,
+    minimum height=.62cm
+  }
+]
+
+\node[codebox] (a)
+{ldr x1, [x0] \hfill // load memory value into x1};
+
+\node[
+  codebox,
+  below=of a
+] (b)
+{add x1, x1, \#5 \hfill // compute using register operands};
+
+\node[
+  codebox,
+  below=of b
+] (c)
+{str x1, [x0] \hfill // store result back to memory};
+
+\end{tikzpicture}
+
+\end{center}
+
+\vspace{0.25cm}
+
+\begin{block}{Architectural Rule}
+
+The \code{add} instruction
+does not directly read
+or modify a memory operand.
+
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 8
+% ============================================================
+
+\begin{frame}{Visualizing Load/Store Separation}
+
+\begin{center}
+
+\begin{tikzpicture}[
+  scale=.82,
+  every node/.style={font=\footnotesize}
+]
+
+\draw[
+  thick,
+  fill=softgray
+]
+(0,.7)
+rectangle
+(2.5,3.3);
+
+\node[
+  font=\small\bfseries,
+  text=navy,
+  align=center
+]
+at (1.25,2.0)
+{Memory\\System};
+
+\draw[
+  thick,
+  fill=navy
+]
+(4.0,.7)
+rectangle
+(6.7,3.3);
+
+\node[
+  font=\small\bfseries,
+  text=white,
+  align=center
+]
+at (5.35,2.0)
+{Register\\File};
+
+\draw[
+  thick,
+  fill=deepblue
+]
+(8.8,1.25)
+--
+(10.5,1.9)
+--
+(10.5,2.3)
+--
+(8.8,3.0)
+--
+(8.8,2.4)
+--
+(9.2,2.1)
+--
+(8.8,1.8)
+--
+cycle;
+
+\node[
+  text=white,
+  font=\small\bfseries
+]
+at (9.65,2.1)
+{ALU};
+
+\draw[
+  thick,
+  Latex-Latex,
+  draw=deepblue
+]
+(2.5,2.0)
+--
+node[above]{\code{ldr / str}}
+(4.0,2.0);
+
+\draw[
+  thick,
+  -Latex,
+  draw=navy
+]
+(6.7,2.55)
+--
+node[above]{operands}
+(8.8,2.55);
+
+\draw[
+  thick,
+  -Latex,
+  draw=navy
+]
+(10.5,2.1)
+--
+(11.2,2.1)
+--
+(11.2,.35)
+--
+(5.35,.35)
+--
+node[left]{result}
+(5.35,.7);
+
+\end{tikzpicture}
+
+\end{center}
+
+\vspace{0.25cm}
+
+\begin{block}{Takeaway}
+
+Loads and stores connect memory to registers;
+arithmetic instructions operate on register operands.
+
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 9
+% ============================================================
+
+\begin{frame}{RISC and CISC: Different Design Traditions}
+
+\small
+
+\begin{center}
+
+\renewcommand{\arraystretch}{1.15}
+
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{3.0cm}
+  >{\raggedright\arraybackslash}m{4.2cm}
+  >{\raggedright\arraybackslash}m{4.2cm}
+}
+
+\rowcolor{navy}
+{\color{white}\bfseries Characteristic}
+&
+{\color{white}\bfseries CISC Tradition}
+&
+{\color{white}\bfseries RISC Tradition}
+\\
+
+\rowcolor{softgray}
+Instruction format
+&
+Often variable length
+&
+Typically more regular
+\\
+
+\rowcolor{white}
+Memory operands
+&
+Some instructions combine memory access and computation
+&
+Load/store separation
+\\
+
+\rowcolor{softgray}
+Addressing
+&
+Often many addressing forms
+&
+Comparatively regular forms
+\\
+
+\rowcolor{white}
+Decode
+&
+Can require more complex parsing
+&
+Regular fields simplify decode
+\\
+
+\rowcolor{softgray}
+Example
+&
+x86-64
+&
+AArch64, RISC-V
+\\
+
+\end{tabular}
+
+\end{center}
+
+\vspace{0.25cm}
+
+RISC and CISC are architectural traditions,
+not simple measures of modern processor complexity.
+
+\end{frame}
+
+% ============================================================
+% Slide 10
+% ============================================================
+
+\begin{frame}{Same Operation, Different ISA Style}
+
+Suppose a 64-bit memory value
+must be increased by 5.
+
+\vspace{0.25cm}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.46\textwidth}
+
+\begin{block}{x86-64 Style}
+
+Some x86-64 instructions permit
+memory operands directly:
+
+\begin{center}
+\Large
+\code{add qword ptr [rax], 5}
+\end{center}
+
+One instruction describes
+both memory access and arithmetic.
+
+\end{block}
+
+\column{0.50\textwidth}
+
+\begin{block}{AArch64 Load/Store Style}
+
+\begin{center}
+\Large
+\code{ldr x1, [x0]}\\[0.15cm]
+\code{add x1, x1, \#5}\\[0.15cm]
+\code{str x1, [x0]}
+\end{center}
+
+Memory transfer and arithmetic
+are represented by separate instructions.
+
+\end{block}
+
+\end{columns}
+
 \end{frame}
 
 % ============================================================
 % SECTION 2
 % ============================================================
-\sectiondivider{Section 02}{The Hardware Stack}
 
-% --- Slide 8: The Hardware Stack ---
-\begin{frame}{The Hardware Stack}
-    To solve the nested call problem and provide space for local variables, architectures utilize a \key{Stack} in Main Memory (RAM).
+\sectiondivider{Section 02}{
+  AArch64 Architectural Overview
+}
 
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \key{Structure}: A Last-In, First-Out (LIFO) memory queue.
-        \item \key{Direction}: The AArch64 stack is \textbf{Full Descending}. It grows from high memory addresses down toward lower memory addresses.
-        \item \key{Stack Pointer (\code{SP})}: A dedicated architectural register that holds the memory address of the last item pushed onto the stack.
-    \end{itemize}
+% ============================================================
+% Slide 12
+% ============================================================
 
-    \vspace{0.3em}
-    \textit{Note: Unlike x86, AArch64 does not have dedicated \code{PUSH} and \code{POP} assembly instructions. We construct stack operations manually using load/store instructions.}
+\begin{frame}{ARM and AArch64}
+
+\begin{block}{ARM Architecture}
+
+ARM defines a family
+of instruction set architectures
+used in embedded systems,
+mobile computing,
+desktop systems,
+and servers.
+
+\end{block}
+
+\vspace{0.25cm}
+
+\begin{itemize}
+
+  \item \key{AArch64}
+        is the 64-bit execution state
+        introduced with ARMv8-A.
+
+  \item It provides a modern
+        64-bit programmer-visible register model.
+
+  \item It follows a load/store design
+        with regular instruction formats.
+
+  \item Different processors can implement AArch64
+        using different microarchitectures.
+
+\end{itemize}
+
 \end{frame}
 
-% --- Slide 9: Stack Alignment Constraints ---
-\begin{frame}{Stack Pointer (\code{SP}) Alignment Constraints}
-    \begin{block}{The 16-Byte Rule}
-        In AArch64, the Stack Pointer (\code{SP}) must \textbf{always be 16-byte aligned} when used as a base register for memory access.
-    \end{block}
+% ============================================================
+% Slide 13
+% ============================================================
 
-    \vspace{0.3em}
-    \begin{itemize}
-        \item The memory address held in \code{SP} must end in \hex{0} (i.e., be a multiple of 16).
-        \item If you attempt a \code{LDR} or \code{STR} using an unaligned \code{SP}, the processor hardware generates an alignment fault (exception).
-        \item Consequence: You must allocate stack space in chunks of at least 16 bytes, even if you only need to save an 8-byte register.
-    \end{itemize}
+\begin{frame}{AArch64 and A64 Terminology}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{AArch64}
+
+\begin{itemize}
+
+  \item The architecture / execution state.
+
+  \item Defines programmer-visible state.
+
+  \item Includes registers,
+        memory behavior,
+        and instruction semantics.
+
+\end{itemize}
+
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{A64}
+
+\begin{itemize}
+
+  \item The instruction set encoding.
+
+  \item Used while executing
+        in AArch64 state.
+
+  \item A64 instructions
+        are fixed 32-bit words.
+
+\end{itemize}
+
+\end{block}
+
+\end{columns}
+
+\vspace{0.35cm}
+
+\begin{alertblock}{Course Terminology}
+
+Use \key{AArch64} by default.
+Use \key{A64}
+only when referring specifically
+to the instruction set encoding.
+
+\end{alertblock}
+
 \end{frame}
 
-% --- Slide 10: Pushing and Popping ---
-\begin{frame}{Simulating Push and Pop (\code{STP} / \code{LDP})}
-    We use \key{pre-indexed} and \key{post-indexed} addressing modes to manipulate the stack efficiently.
+% ============================================================
+% Slide 14
+% ============================================================
 
-    \vspace{0.2em}
-    \begin{columns}[T,onlytextwidth]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Pushing to the Stack}
-                \code{stp x29, x30, [sp, -16]!}
-                \begin{enumerate}
-                    \item Subtracts 16 from \code{SP} (growing the stack down).
-                    \item Stores \code{x29} and \code{x30} into the newly allocated 16-byte slot.
-                    \item The \code{!} updates \code{SP} to the new address permanently.
-                \end{enumerate}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Popping from the Stack}
-                \code{ldp x29, x30, [sp], 16}
-                \begin{enumerate}
-                    \item Loads \code{x29} and \code{x30} from the current \code{SP} address.
-                    \item Adds 16 to \code{SP} (shrinking the stack up).
-                    \item \code{SP} is updated automatically \textit{after} the load completes.
-                \end{enumerate}
-            \end{block}
-        \end{column}
-    \end{columns}
+\begin{frame}{Key Characteristics of AArch64}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{Instruction Model}
+
+\begin{itemize}
+
+  \item Load/store architecture.
+
+  \item A64 instructions are 32 bits wide.
+
+  \item Instructions are 4-byte aligned.
+
+  \item Register fields are regular.
+
+\end{itemize}
+
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Register Model}
+
+\begin{itemize}
+
+  \item 31 general-purpose registers.
+
+  \item 64-bit \code{x} register views.
+
+  \item 32-bit \code{w} register views.
+
+  \item Special roles for
+        \code{sp},
+        \code{xzr},
+        PC state,
+        and NZCV.
+
+\end{itemize}
+
+\end{block}
+
+\end{columns}
+
+\end{frame}
+
+% ============================================================
+% Slide 15
+% ============================================================
+
+\begin{frame}{A64 Instruction Format Characteristics}
+
+\begin{block}{Fixed-Width Encoding}
+
+Every instruction
+in the A64 instruction set
+occupies exactly \key{32 bits}.
+
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{center}
+
+\begin{tikzpicture}[
+  fld/.style={
+    draw=navy,
+    thick,
+    minimum height=.9cm,
+    align=center,
+    font=\small\bfseries
+  }
+]
+
+\node[
+  fld,
+  fill=navy,
+  text=white,
+  minimum width=3.0cm
+] (op)
+{Operation};
+
+\node[
+  fld,
+  fill=softgray,
+  text=navy,
+  minimum width=2.8cm,
+  right=0cm of op
+] (src)
+{Operands};
+
+\node[
+  fld,
+  fill=mediumgray,
+  text=navy,
+  minimum width=2.8cm,
+  right=0cm of src
+] (opt)
+{Options};
+
+\node[
+  fld,
+  fill=gold!35,
+  text=navy,
+  minimum width=2.8cm,
+  right=0cm of opt
+] (dst)
+{Destination};
+
+\end{tikzpicture}
+
+\end{center}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+
+  \item Fixed width simplifies
+        instruction alignment and initial decode.
+
+  \item Exact bit-field layouts
+        vary by instruction class.
+
+\end{itemize}
+
+\vspace{0.15cm}
+
+\small
+Detailed machine-code field layouts
+are covered later
+in the instruction-encoding topic.
+
+\end{frame}
+
+% ============================================================
+% Slide 16
+% ============================================================
+
+\begin{frame}{Dual Register Views: \code{X} and \code{W}}
+
+Each general-purpose register
+can be accessed using either
+a 64-bit or 32-bit architectural view.
+
+\vspace{0.25cm}
+
+\begin{center}
+
+\begin{tikzpicture}[
+  scale=.88,
+  every node/.style={font=\small}
+]
+
+\draw[
+  thick,
+  fill=navy
+]
+(0,1.25)
+rectangle
+(10,2.05);
+
+\node[
+  text=white,
+  font=\bfseries
+]
+at (5,1.65)
+{\code{xn}: bits [63:0]};
+
+\draw[
+  thick,
+  dashed,
+  fill=softgray
+]
+(0,0)
+rectangle
+(5,0.75);
+
+\node[
+  text=darkgray,
+  font=\scriptsize
+]
+at (2.5,.38)
+{upper 32 bits};
+
+\draw[
+  thick,
+  fill=gold!35
+]
+(5,0)
+rectangle
+(10,.75);
+
+\node[
+  text=navy,
+  font=\bfseries
+]
+at (7.5,.38)
+{\code{wn}: bits [31:0]};
+
+\end{tikzpicture}
+
+\end{center}
+
+\vspace{0.25cm}
+
+\begin{block}{32-Bit Write Rule}
+
+Writing to a \code{wn} destination
+automatically clears bits [63:32]
+of the corresponding \code{xn} register.
+
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 17
+% ============================================================
+
+\begin{frame}{Example: 32-Bit Write Clears Upper Bits}
+
+\begin{block}{Instruction}
+
+\begin{center}
+\Large
+\code{add w3, w1, w2}
+\end{center}
+
+\end{block}
+
+\vspace{0.25cm}
+
+\begin{itemize}
+
+  \item The operation uses
+        the lower 32-bit views:
+        \code{w1}
+        and
+        \code{w2}.
+
+  \item The 32-bit result
+        is written into
+        \code{w3}.
+
+  \item The upper half
+        of
+        \code{x3}
+        is cleared automatically.
+
+\end{itemize}
+
+\vspace{0.25cm}
+
+\begin{center}
+
+\code{x3[63:32] <- 0}
+
+\qquad
+
+\code{x3[31:0] <- result}
+
+\end{center}
+
 \end{frame}
 
 % ============================================================
 % SECTION 3
 % ============================================================
-\sectiondivider{Section 03}{The AAPCS64 Convention}
 
-% --- Slide 12: The AAPCS64 Standard ---
-\begin{frame}{The AAPCS64 Standard}
-    The \key{ARM Architecture Procedure Call Standard} (AAPCS64) is the software contract that compilers (like GCC and Clang) follow. It dictates exactly which registers are used for arguments, returns, and variables.
+\sectiondivider{Section 03}{
+  Registers and Programmer-Visible State
+}
 
-    \vspace{0.4em}
-    \begin{table}[]
-        \centering
-        \small
-        \renewcommand{\arraystretch}{1.4}
-        \begin{tabular}{@{} >{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{10cm} @{}}
-            \toprule
-            \rowcolor{navy}
-            \textcolor{white}{\textbf{Registers}} & \textcolor{white}{\textbf{Designated Purpose}} \\
-            \midrule
-            \rowcolor{lightblue}
-            \key{\code{x0}--\code{x7}} & Arguments 1 through 8 (also used to return values in \code{x0}--\code{x1}). \\
-            \rowcolor{softgray}
-            \key{\code{x8}} & Indirect result location register (struct returns). \\
-            \rowcolor{lightblue}
-            \key{\code{x9}--\code{x15}} & Temporary registers (Caller-saved / Volatile). \\
-            \rowcolor{softgray}
-            \key{\code{x19}--\code{x28}} & Callee-saved registers (Non-volatile). \\
-            \rowcolor{lightblue}
-            \key{\code{x29} (\code{FP})} & Frame Pointer (anchors the local stack frame). \\
-            \rowcolor{softgray}
-            \key{\code{x30} (\code{LR})} & Link Register (holds the return address). \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
+% ============================================================
+% Slide 19
+% ============================================================
+
+\begin{frame}{AArch64 General-Purpose Registers}
+
+\begin{block}{Register Set}
+AArch64 provides
+\key{31 general-purpose registers},
+named
+\code{x0}
+through
+\code{x30}.
+Each register is 64 bits wide.
+\end{block}
+
+\vspace{-0.5cm}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.47\textwidth}
+
+\begin{block}{64-Bit View}
+
+\begin{center}
+\Large
+\code{x0}--\code{x30}
+\end{center}
+
+\begin{itemize}
+
+  \item Each \code{xn}
+        holds 64 bits.
+
+  \item Used for integer values,
+        addresses,
+        and general computation.
+
+\end{itemize}
+
+\end{block}
+
+\column{0.47\textwidth}
+
+\begin{block}{32-Bit View}
+
+\begin{center}
+\Large
+\code{w0}--\code{w30}
+\end{center}
+
+\begin{itemize}
+
+  \item Each \code{wn}
+        refers to bits [31:0]
+        of \code{xn}.
+
+  \item Writing \code{wn}
+        clears bits [63:32].
+
+\end{itemize}
+
+\end{block}
+
+\end{columns}
+
+\begin{alertblock}{Important}
+
+The ISA treats
+\code{x0}--\code{x30}
+as general-purpose registers.
+Software conventions assign
+additional roles during procedure calls.
+
+\end{alertblock}
+
 \end{frame}
 
-% --- Slide 13: Caller-Saved vs. Callee-Saved ---
-\begin{frame}{Register Volatility: Caller-Saved vs. Callee-Saved}
-    \begin{columns}[T,onlytextwidth]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Caller-Saved (\code{x0-x18})}
-                \begin{itemize}
-                    \item These registers are \textbf{volatile}.
-                    \item A subroutine is free to overwrite them without backing them up.
-                    \item If the caller cares about the data in \code{x0-x18}, the \textit{caller} must push them to the stack before invoking \code{BL}.
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Callee-Saved (\code{x19-x28})}
-                \begin{itemize}
-                    \item These registers are \textbf{non-volatile}.
-                    \item If a subroutine wants to use them, the \textit{callee} must back them up to the stack first, and restore them before calling \code{RET}.
-                    \item The caller trusts these will not change across a function call.
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
+% ============================================================
+% Slide 20
+% ============================================================
+
+\begin{frame}{The Zero Register}
+
+\begin{block}{\code{xzr} / \code{wzr}}
+
+The zero register provides
+a constant zero operand
+and a discard destination.
+
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+
+  \item Reads always produce
+        the value \code{0}.
+
+  \item Writes are discarded.
+
+  \item Useful when an instruction
+        needs a zero operand.
+
+  \item Useful when an instruction result
+        should be ignored.
+
+\end{itemize}
+
+\vspace{0.3cm}
+
+\begin{center}
+
+\code{mov x0, xzr}
+\qquad
+\code{cmp x1, x2}
+
+\end{center}
+
+\end{frame}
+
+% ============================================================
+% Slide 21
+% ============================================================
+
+\begin{frame}{The Stack Pointer}
+
+\begin{block}{\code{sp}}
+
+The stack pointer identifies
+the current stack location
+and has dedicated architectural semantics.
+
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+
+  \item Used by stack-related
+        load/store and arithmetic forms.
+
+  \item Represents a memory address,
+        not a normal scratch register.
+
+  \item Software conventions impose
+        alignment and usage requirements.
+
+  \item Stack behavior is studied
+        more deeply with procedures
+        and function calls.
+
+\end{itemize}
+
+\vspace{0.25cm}
+
+\begin{center}
+\code{stp x29, x30, [sp, \#-16]!}
+\end{center}
+
+\end{frame}
+
+% ============================================================
+% Slide 22
+% ============================================================
+
+\begin{frame}{Encoding Note: Register Number 31}
+
+\begin{block}{Context-Dependent Meaning}
+
+In several A64 instruction formats,
+register encoding value 31
+has special meaning.
+
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{Often Means Zero Register}
+
+\begin{center}
+\Large
+\code{xzr} / \code{wzr}
+\end{center}
+
+Common in data-processing contexts.
+
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Sometimes Means Stack Pointer}
+
+\begin{center}
+\Large
+\code{sp} / \code{wsp}
+\end{center}
+
+Common in stack
+and memory-addressing contexts.
+
+\end{block}
+
+\end{columns}
+
+\vspace{0.25cm}
+
+\small
+The instruction definition
+determines the meaning.
+
+\end{frame}
+
+% ============================================================
+% Slide 23
+% ============================================================
+
+\begin{frame}{The Program Counter}
+
+\begin{block}{Program Counter State}
+
+The program counter identifies
+the instruction address
+associated with the current flow
+of execution.
+
+\end{block}
+
+\vspace{0.25cm}
+
+\begin{itemize}
+
+  \item Sequential execution advances
+        to the next instruction.
+
+  \item Branches and calls redirect execution
+        to another address.
+
+  \item Unlike AArch32 \code{r15},
+        the AArch64 program counter
+        is \key{not}
+        an ordinary general-purpose register.
+
+  \item AArch64 arithmetic instructions
+        cannot use \code{pc}
+        as a normal register operand.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 24
+% ============================================================
+
+\begin{frame}{Condition Flags: NZCV}
+
+Some AArch64 instructions update
+four condition flags
+used by later operations.
+
+\vspace{0.25cm}
+
+\begin{center}
+
+\begin{tikzpicture}[
+  fld/.style={
+    draw=navy,
+    thick,
+    minimum width=2.2cm,
+    minimum height=1.05cm,
+    align=center,
+    font=\bfseries
+  }
+]
+
+\node[
+  fld,
+  fill=navy,
+  text=white
+] (n)
+{N\\Negative};
+
+\node[
+  fld,
+  fill=deepblue,
+  text=white,
+  right=.15cm of n
+] (z)
+{Z\\Zero};
+
+\node[
+  fld,
+  fill=gold!35,
+  text=navy,
+  right=.15cm of z
+] (c)
+{C\\Carry};
+
+\node[
+  fld,
+  fill=softgray,
+  text=navy,
+  right=.15cm of c
+] (v)
+{V\\Overflow};
+
+\end{tikzpicture}
+
+\end{center}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+
+  \item \key{N}:
+        result has its sign bit set.
+
+  \item \key{Z}:
+        result is zero.
+
+  \item \key{C}:
+        carry-out for addition;
+        no-borrow for subtraction.
+
+  \item \key{V}:
+        signed arithmetic overflow.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 25
+% ============================================================
+
+\begin{frame}{Programmer-Visible State: Summary}
+
+\small
+
+\begin{center}
+
+\renewcommand{\arraystretch}{1.15}
+
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{3.2cm}
+  >{\raggedright\arraybackslash}m{8.0cm}
+}
+
+\rowcolor{navy}
+{\color{white}\bfseries State}
+&
+{\color{white}\bfseries Architectural Role}
+\\
+
+\rowcolor{softgray}
+\code{x0}--\code{x30}
+&
+31 general-purpose 64-bit registers
+\\
+
+\rowcolor{white}
+\code{w0}--\code{w30}
+&
+Lower 32-bit views
+of corresponding \code{x} registers
+\\
+
+\rowcolor{softgray}
+\code{xzr}/\code{wzr}
+&
+Zero operand;
+writes are discarded
+\\
+
+\rowcolor{white}
+\code{sp}
+&
+Stack pointer with dedicated semantics
+\\
+
+\rowcolor{softgray}
+Program Counter
+&
+Identifies control-flow position;
+not an ordinary GPR
+\\
+
+\rowcolor{white}
+NZCV
+&
+Condition flags used
+by flag-setting and conditional operations
+\\
+
+\end{tabular}
+
+\end{center}
+
 \end{frame}
 
 % ============================================================
 % SECTION 4
 % ============================================================
-\sectiondivider{Section 04}{Practical C to Assembly}
 
-% --- Slide 15: C to Assembly Translation ---
-\begin{frame}[fragile]{C to Assembly Translation: Procedure Calls}
-    \begin{columns}[T,onlytextwidth]
-        \begin{column}{0.42\textwidth}
-            \begin{block}{C Source Code}
-\begin{verbatim}
-long sum(long a, long b) {
-    return a + b;
+\sectiondivider{Section 04}{
+  Core AArch64 Instruction Classes
 }
 
-long main() {
-    return sum(5, 10);
-}
-\end{verbatim}
-            \end{block}
-            \vspace{0.5em}
-            \small
-            \textbf{Compiler behavior}:
-            \begin{itemize}
-                \item Maps \code{a} to \code{x0}, \code{b} to \code{x1}.
-                \item Expects return value in \code{x0}.
-                \item Must preserve \code{x30} in \code{main} because \code{main} makes a nested call to \code{sum}.
-            \end{itemize}
-        \end{column}
+% ============================================================
+% Slide 27
+% ============================================================
 
-        \begin{column}{0.55\textwidth}
-            \begin{block}{AArch64 Assembly (GCC -O1)}
-\begin{verbatim}
-sum:
-    add     x0, x0, x1
-    ret
+\begin{frame}{Three Core Instruction Classes}
 
-main:
-    // 1. Prologue: Save FP and LR
-    stp     x29, x30, [sp, -16]!
-    mov     x29, sp
+For this course,
+core integer instructions
+are grouped into three broad functional classes.
 
-    // 2. Setup Arguments
-    mov     x1, 10
-    mov     x0, 5
+\vspace{0.25cm}
 
-    // 3. Call Function
-    bl      sum
+\begin{columns}[T,onlytextwidth]
 
-    // 4. Epilogue: Restore FP and LR
-    ldp     x29, x30, [sp], 16
-    ret
-\end{verbatim}
-            \end{block}
-        \end{column}
-    \end{columns}
+\column{0.32\textwidth}
+
+\begin{block}{Data Processing}
+
+\begin{itemize}
+
+  \item arithmetic
+  \item logic
+  \item comparison
+
+\end{itemize}
+
+\centering
+
+\code{add}, \code{sub}\\
+\code{and}, \code{cmp}
+
+\end{block}
+
+\column{0.32\textwidth}
+
+\begin{block}{Memory Access}
+
+\begin{itemize}
+
+  \item loads
+  \item stores
+  \item transfer widths
+
+\end{itemize}
+
+\centering
+
+\code{ldr}, \code{str}\\
+\code{ldp}, \code{stp}
+
+\end{block}
+
+\column{0.32\textwidth}
+
+\begin{block}{Control Flow}
+
+\begin{itemize}
+
+  \item branches
+  \item calls
+  \item returns
+
+\end{itemize}
+
+\centering
+
+\code{b}, \code{b.eq}\\
+\code{bl}, \code{ret}
+
+\end{block}
+
+\end{columns}
+
 \end{frame}
 
-% --- Slide 16: Deconstructing the C Example ---
-\begin{frame}{Deconstructing the Compilation Strategy}
-    \begin{itemize}
-        \item \key{The Leaf Function (\code{sum})}: Because \code{sum} does not call any other function, it is a "leaf." It does not overwrite \code{x30}, so it does not need to allocate stack space. It simply performs math and returns immediately.
-        \item \key{The Nested Function (\code{main})}: \code{main} is called by the OS loader (meaning \code{x30} contains the OS return address). Because \code{main} calls \code{sum}, the \code{bl sum} instruction will destroy the OS return address.
-        \item \key{The Solution}: \code{main} pushes \code{x30} (and \code{x29}) to the stack in its \textbf{Prologue}, executes the program, and pops them back in its \textbf{Epilogue} before returning.
-    \end{itemize}
+% ============================================================
+% Slide 28
+% ============================================================
+
+\begin{frame}{Class 1: Data Processing}
+
+Data-processing instructions
+perform computation on register values.
+
+\vspace{0.25cm}
+
+\begin{center}
+
+\small
+\renewcommand{\arraystretch}{1.15}
+
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{3.5cm}
+  >{\raggedright\arraybackslash}m{3.0cm}
+  >{\raggedright\arraybackslash}m{4.2cm}
+}
+
+\rowcolor{navy}
+{\color{white}\bfseries Instruction}
+&
+{\color{white}\bfseries Operation}
+&
+{\color{white}\bfseries Effect}
+\\
+
+\rowcolor{softgray}
+\code{add x3, x1, x2}
+&
+Addition
+&
+\code{x3 <- x1 + x2}
+\\
+
+\rowcolor{white}
+\code{sub x3, x1, x2}
+&
+Subtraction
+&
+\code{x3 <- x1 - x2}
+\\
+
+\rowcolor{softgray}
+\code{and x0, x1, x2}
+&
+Bitwise AND
+&
+\code{x0 <- x1 \& x2}
+\\
+
+\rowcolor{white}
+\code{orr x0, x1, x2}
+&
+Bitwise OR
+&
+\code{x0 <- x1 | x2}
+\\
+
+\end{tabular}
+
+\end{center}
+
+\vspace{0.25cm}
+
+\begin{block}{Key Characteristic}
+
+The operands are registers;
+these instructions do not directly
+read or write a memory operand.
+
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 29
+% ============================================================
+
+\begin{frame}{Class 2: Memory Access}
+
+Memory instructions transfer data
+between registers and memory.
+
+\vspace{0.25cm}
+
+\begin{center}
+
+\begin{tikzpicture}[
+  node distance=.5cm,
+  membox/.style={
+    rectangle,
+    draw=navy,
+    fill=softgray,
+    font=\small\ttfamily,
+    text width=10.8cm,
+    align=left,
+    rounded corners=2pt,
+    minimum height=.62cm
+  }
+]
+
+\node[membox] (a)
+{ldr x1, [x2] \hfill // load 64 bits from memory into x1};
+
+\node[
+  membox,
+  below=of a
+] (b)
+{str x5, [x3] \hfill // store 64 bits from x5 to memory};
+
+\node[
+  membox,
+  below=of b
+] (c)
+{ldr x1, [x2, \#8] \hfill // base address x2 plus byte offset 8};
+
+\end{tikzpicture}
+
+\end{center}
+
+\vspace{0.25cm}
+
+\begin{block}{Bracket Notation}
+
+\code{[x2]}
+means:
+access memory using
+the address contained in
+\code{x2}.
+
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 30
+% ============================================================
+
+\begin{frame}{Class 3: Control Flow}
+
+Control-flow instructions
+change which instruction executes next.
+
+\vspace{0.25cm}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{Unconditional}
+
+\begin{itemize}
+
+  \item \code{b target}:
+        branch
+
+  \item \code{bl function}:
+        call
+
+  \item \code{ret}:
+        return
+
+\end{itemize}
+
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Conditional}
+
+\begin{itemize}
+
+  \item \code{b.eq target}:
+        branch if equal
+
+  \item \code{b.ne target}:
+        branch if not equal
+
+  \item Conditional branches
+        may test NZCV flags.
+
+\end{itemize}
+
+\end{block}
+
+\end{columns}
+
+\end{frame}
+
+% ============================================================
+% Slide 31
+% ============================================================
+
+\begin{frame}{Comparison and Branching}
+
+\begin{block}{Common Pattern}
+
+\begin{center}
+\Large
+
+\code{cmp x0, x1}\\[0.15cm]
+
+\code{b.eq equal}
+
+\end{center}
+
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+
+  \item \code{cmp}
+        compares two register values.
+
+  \item It updates condition flags
+        rather than storing a data result.
+
+  \item \code{b.eq}
+        uses those flags
+        to decide whether to branch.
+
+\end{itemize}
+
+\end{frame}
+
+% ============================================================
+% Slide 32
+% ============================================================
+
+\begin{frame}{How the Instruction Classes Work Together}
+
+Consider:
+
+\[
+\code{*p = *p + 5}
+\]
+
+where \code{x0}
+contains the address
+represented by \code{p}.
+
+\vspace{0.25cm}
+
+\begin{center}
+
+\small
+\renewcommand{\arraystretch}{1.15}
+
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{3.3cm}
+  >{\raggedright\arraybackslash}m{3.0cm}
+  >{\raggedright\arraybackslash}m{5.0cm}
+}
+
+\rowcolor{navy}
+{\color{white}\bfseries Instruction}
+&
+{\color{white}\bfseries Class}
+&
+{\color{white}\bfseries Purpose}
+\\
+
+\rowcolor{softgray}
+\code{ldr x1, [x0]}
+&
+Memory Access
+&
+Move the value
+from memory into a register
+\\
+
+\rowcolor{white}
+\code{add x1, x1, \#5}
+&
+Data Processing
+&
+Compute the new value
+\\
+
+\rowcolor{softgray}
+\code{str x1, [x0]}
+&
+Memory Access
+&
+Write the result
+back to memory
+\\
+
+\end{tabular}
+
+\end{center}
+
+\vspace{0.25cm}
+
+\begin{block}{RISC Connection}
+
+The sequence separates
+memory transfer
+from register computation.
+
+\end{block}
+
+\end{frame}
+
+% ============================================================
+% Slide 33
+% ============================================================
+
+\begin{frame}{Instruction Classification Exercise}
+
+Classify each instruction as
+\key{Data Processing},
+\key{Memory Access},
+or
+\key{Control Flow}.
+
+\vspace{0.25cm}
+
+\begin{center}
+
+\renewcommand{\arraystretch}{1.15}
+
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{5.0cm}
+  >{\raggedright\arraybackslash}m{5.4cm}
+}
+
+\rowcolor{navy}
+{\color{white}\bfseries Instruction}
+&
+{\color{white}\bfseries Your Classification}
+\\
+
+\rowcolor{softgray}
+\code{add x3, x1, x2}
+&
+\\
+
+\rowcolor{white}
+\code{ldr x0, [x4]}
+&
+\\
+
+\rowcolor{softgray}
+\code{str w5, [x6]}
+&
+\\
+
+\rowcolor{white}
+\code{cmp x1, x2}
+&
+\\
+
+\rowcolor{softgray}
+\code{b.eq target}
+&
+\\
+
+\rowcolor{white}
+\code{bl function}
+&
+\\
+
+\end{tabular}
+
+\end{center}
+
 \end{frame}
 
 % ============================================================
 % SECTION 5
 % ============================================================
-\sectiondivider{Section 05}{Stack Frames}
 
-% --- Slide 18: Stack Frames ---
-\begin{frame}{Stack Frames (Activation Records)}
-    A \key{Stack Frame} is the block of memory allocated on the stack for a single execution of a subroutine.
+\sectiondivider{Section 05}{
+  Summary \& Self-Test
+}
 
-    \vspace{0.2em}
-    \begin{block}{What goes in a Stack Frame?}
-        \begin{itemize}
-            \item Saved registers (like \code{x30} LR and \code{x29} FP).
-            \item Saved Callee-saved registers (\code{x19-x28}) if the function modifies them.
-            \item Local variables (arrays, structs, or variables that do not fit in registers).
-            \item Spilled arguments (if a function takes more than 8 parameters, arguments 9+ are passed on the stack).
-        \end{itemize}
-    \end{block}
-\end{frame}
+% ============================================================
+% Slide 35
+% ============================================================
 
-% --- Slide 19: The Frame Pointer (x29) ---
-\begin{frame}{The Frame Pointer (\code{x29})}
-    As functions push and pop variables, the Stack Pointer (\code{SP}) moves continuously. This makes addressing local variables via \code{[sp, \#offset]} difficult, as the offset changes dynamically.
+\begin{frame}{Topic 2 Summary}
 
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \key{The Frame Pointer (\code{x29} / \code{FP})}: Serves as a fixed reference anchor for the current stack frame.
-        \item Standard practice immediately after pushing \code{x29}/\code{x30} is to copy the stack pointer: \code{mov x29, sp}.
-        \item Compilers map local variables relative to \code{x29} (e.g., \code{[x29, \#16]}). This address remains completely stable regardless of how much additional data is pushed to \code{SP}.
-        \item \code{FP} also forms a linked list of frames, allowing debuggers to trace the call stack in the event of a crash.
-    \end{itemize}
+\begin{itemize}
+
+  \item \key{RISC Design}:
+        regular formats,
+        register-based computation,
+        and explicit load/store memory access.
+
+  \item \key{AArch64}:
+        ARM's 64-bit architectural execution state.
+
+  \item \key{A64}:
+        fixed-width 32-bit instruction encoding
+        used in AArch64 state.
+
+  \item \key{Programmer-Visible State}:
+        \code{x0}--\code{x30},
+        \code{sp},
+        \code{xzr}/\code{wzr},
+        PC state,
+        and NZCV.
+
+  \item \key{Instruction Classes}:
+        Data Processing,
+        Memory Access,
+        and Control Flow.
+
+\end{itemize}
+
 \end{frame}
 
 % ============================================================
-% SECTION 6
+% Slide 36
 % ============================================================
-\sectiondivider{Section 06}{Summary \& Self-Test}
 
-% --- Slide 21: Module Summary ---
-\begin{frame}{Topic 8 Summary}
-    \begin{table}[]
-        \centering
-        \small
-        \renewcommand{\arraystretch}{1.4}
-        \begin{tabular}{@{} >{\raggedright\arraybackslash}p{3.5cm} >{\raggedright\arraybackslash}p{10cm} @{}}
-            \toprule
-            \rowcolor{navy}
-            \textcolor{white}{\textbf{Concept}} & \textcolor{white}{\textbf{Architectural Takeaway}} \\
-            \midrule
-            \rowcolor{lightblue}
-            \key{\code{BL} and \code{RET}} & \code{BL} sets \code{PC} and saves the return address to \code{x30}. \code{RET} jumps back to \code{x30}. \\
-            \rowcolor{softgray}
-            \key{The Hardware Stack} & Full descending queue in RAM. \code{SP} must always remain strictly 16-byte aligned. \\
-            \rowcolor{lightblue}
-            \key{AAPCS64 Standard} & \code{x0-x7} for args. \code{x9-x15} are volatile. \code{x19-x28} are non-volatile (callee-saved). \\
-            \rowcolor{softgray}
-            \key{Prologue / Epilogue} & Functions calling other functions must back up \code{x30} and \code{x29} to the stack immediately. \\
-            \rowcolor{lightblue}
-            \key{Frame Pointer} & \code{x29} provides a stable memory anchor for addressing local variables dynamically. \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
+\begin{frame}{Self-Test 1/3}
+
+\begin{enumerate}
+
+  \item What architectural characteristics
+        are commonly associated
+        with RISC designs?
+
+  \item What does it mean
+        to say that AArch64
+        is a load/store architecture?
+
+  \item Why must a value normally
+        be loaded into a register
+        before an AArch64 arithmetic instruction
+        can operate on it?
+
+  \item What is the distinction
+        between \key{AArch64}
+        and \key{A64}?
+
+\end{enumerate}
+
 \end{frame}
 
-% --- Slide 22: Concept Check 1 ---
-\begin{frame}{Self-Test: Concept Check 1}
-    \key{Question 1: Subroutine Calls}
+% ============================================================
+% Slide 37
+% ============================================================
 
-    You are analyzing AArch64 assembly and notice a subroutine that does \textbf{not} push the Link Register (\code{x30}) to the stack, yet the program executes and returns successfully.
-    \vspace{0.4em}
+\begin{frame}{Self-Test 2/3}
 
-    \key{Why is this possible?}
-    \begin{enumerate}[A)]
-        \item The subroutine is a "leaf" function that makes no inner \code{BL} calls.
-        \item The hardware automatically backs up \code{x30} to the stack.
-        \item The compiler used a caller-saved register to store the return address instead.
-        \item The code violates AAPCS64 but gets lucky at runtime.
-    \end{enumerate}
-    \vspace{0.2em}
-    \pause
-    \begin{block}{Answer: A}
-        If a function never executes a \code{BL} instruction, \code{x30} is never overwritten, so it does not need to be backed up to the stack.
-    \end{block}
+\begin{enumerate}
+\setcounter{enumi}{4}
+
+  \item What happens to bits [63:32]
+        of \code{x5}
+        after an instruction writes to \code{w5}?
+
+  \item How many general-purpose registers
+        are visible in AArch64?
+
+  \item What are the roles of
+        \code{xzr},
+        \code{sp},
+        and the program counter?
+
+  \item What do the
+        \code{N},
+        \code{Z},
+        \code{C},
+        and
+        \code{V}
+        condition flags represent?
+
+\end{enumerate}
+
 \end{frame}
 
-% --- Slide 23: Concept Check 2 ---
-\begin{frame}{Self-Test: Concept Check 2}
-    \key{Question 2: Stack Management}
+% ============================================================
+% Slide 38
+% ============================================================
 
-    An AArch64 developer writes the following instruction to back up the \code{x19} register before modifying it:
-    \code{str x19, [sp, -8]!}
-    \vspace{0.4em}
+\begin{frame}{Self-Test 3/3}
 
-    \key{What will happen when this code runs on physical hardware?}
-    \begin{enumerate}[A)]
-        \item \code{x19} is successfully pushed to the stack.
-        \item The assembler will convert it to a 16-byte push automatically.
-        \item The processor will trigger a hardware alignment fault and crash.
-        \item The data is stored, but \code{SP} is not updated.
-    \end{enumerate}
-    \vspace{0.2em}
-    \pause
-    \begin{block}{Answer: C}
-        The AArch64 Stack Pointer (\code{SP}) must be strictly 16-byte aligned. Subtracting 8 from \code{SP} breaks alignment and causes an immediate hardware exception on memory access.
-    \end{block}
+\begin{enumerate}
+\setcounter{enumi}{8}
+
+  \item What are the three core
+        instruction classes
+        used in this course?
+
+  \item Classify each instruction:
+        \code{add},
+        \code{ldr},
+        \code{str},
+        \code{cmp},
+        and
+        \code{b.eq}.
+
+\end{enumerate}
+
+\vspace{0.35cm}
+
+\begin{block}{Challenge}
+
+Explain how the sequence
+\code{ldr},
+\code{add},
+\code{str}
+demonstrates
+the RISC load/store model.
+
+\end{block}
+
 \end{frame}
 
-% --- Slide 24: Wrap Up ---
-\begin{frame}{Wrap-Up \& Next Steps}
-    \begin{block}{What We Achieved}
-        We successfully bridged the gap between high-level C functions and hardware-level procedure mechanics. You can now trace execution flow across modular program architectures, manage the stack securely, and respect AAPCS64 software contracts.
-    \end{block}
+% ============================================================
+% Slide 39
+% ============================================================
 
-    \vspace{0.4em}
-    \begin{block}{Looking Ahead to Topic 9}
-        With control flow and data representation mastered, we will turn our attention to \key{Machine Instruction Encoding}. We will examine the raw binary fields that make up 32-bit AArch64 instructions to understand exactly how the hardware decodes the assembly syntax we have been writing.
-    \end{block}
+\begin{frame}{Wrap-Up and Next Steps}
+
+\begin{block}{Topic 3: Machine-Level Data Representation}
+
+The next lecture examines
+how bit patterns manipulated
+by AArch64 instructions
+represent numerical values
+in registers and memory.
+
+\begin{itemize}
+
+  \item Binary and hexadecimal representation
+
+  \item Signed and unsigned integers
+
+  \item Two's-complement representation
+
+  \item Endianness and data alignment
+
+\end{itemize}
+
+\end{block}
+
+\vspace{0.2cm}
+
+Topic 2 established
+\key{what the AArch64 programmer can see};
+Topic 3 examines
+\key{how data inside that visible state is represented}.
+
 \end{frame}
 
 \end{document}
