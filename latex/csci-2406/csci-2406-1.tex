@@ -3,7 +3,6 @@
 % ============================================================
 % Theme and typography
 % ============================================================
-
 \usetheme{Madrid}
 \usecolortheme{default}
 \usefonttheme{professionalfonts}
@@ -14,26 +13,41 @@
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
-    CSCI 6461 --- Computer Systems Architecture
+    CSCI 2406 --- Computer Organization \& Architecture (ARM64 / AArch64 Reference)
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
 
-\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
-\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
-\setbeamerfont{block title}{size=\normalsize,series=\bfseries}
+\setbeamersize{
+  text margin left=0.65cm,
+  text margin right=0.65cm
+}
+
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
+
+% Block vertical padding adjustments
+\addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
+\addtobeamertemplate{block end}{}{\vspace{0.2em}}
+
+% Base list item separation
 \setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
 \setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
 
+% ============================================================
+% Packages
+% ============================================================
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{colortbl}
 \usepackage{tikz}
+
 \usetikzlibrary{
   arrows.meta,
   positioning,
@@ -42,6 +56,9 @@
   decorations.pathreplacing
 }
 
+% ============================================================
+% Colors
+% ============================================================
 \definecolor{navy}{RGB}{24,43,68}
 \definecolor{deepblue}{RGB}{45,88,130}
 \definecolor{lightblue}{RGB}{235,242,250}
@@ -61,6 +78,9 @@
 \setbeamercolor{block body}{bg=lightblue,fg=darkgray}
 \setbeamercolor{normal text}{fg=darkgray,bg=white}
 
+% ============================================================
+% Formatting shortcuts
+% ============================================================
 \setlength{\parskip}{0pt}
 
 \newcommand{\key}[1]{\textbf{#1}}
@@ -68,6 +88,7 @@
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 
+% Section divider macro
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
@@ -83,107 +104,133 @@
 \end{frame}
 }
 
-\title[Topic 1]{Introduction to Computing Systems\\\& Binary Foundations}
-\subtitle{Abstraction, stored-program organization, data representation, and processor performance}
-\author{Computer Systems Architecture}
-\date{}
+% ============================================================
+% Metadata
+% ============================================================
+\title[Topic 1]{
+  Computer Architecture \& Organization Fundamentals
+}
+\subtitle{
+  Architecture vs.\ Organization, ISA vs.\ Microarchitecture,\\
+  the Stored-Program Concept, and Memory Models in AArch64
+}
+\author{
+  Computer Organization \& Architecture
+}
+\date{Topic 1}
 
+% ============================================================
+% Presentation Body
+% ============================================================
 \begin{document}
 
-% ============================================================
-% Slide 1
-% ============================================================
-
+% --- Slide 1: Title Slide ---
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
 \end{tikzpicture}
-
-\vspace{0.9cm}
-
-\begin{minipage}{0.88\textwidth}
-{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 1\par}
-
-\vspace{0.25cm}
-
-{\color{white}\fontsize{24}{28}\selectfont\bfseries
-Introduction to Computing Systems\\[0.08cm]
-\& Binary Foundations
-\par}
-
-\vspace{0.35cm}
-
-{\color{white!80}\large
-Abstraction, stored-program organization, data representation, and processor performance
-\par}
+\vspace{1.0cm}
+\begin{minipage}{0.9\textwidth}
+{\color{gold}\large\bfseries CSCI 2406: Topic 01\par}
+\vspace{0.3cm}
+{\color{white}\fontsize{20}{24}\selectfont\bfseries Computer Architecture \& Organization Fundamentals\par}
+\vspace{0.3cm}
+{\color{lightblue}\normalsize Abstraction Layers, Architecture vs.\ Organization, Stored-Program Concept, and Memory Models in AArch64\par}
+\vspace{0.6cm}
+{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad Topic 1\par}
 \end{minipage}
+\end{frame}
 
-\vfill
+% --- Slide 2: Course Information & Logistics ---
+\begin{frame}{Course Information \& Administration}
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Instructor Contact}
+                \begin{itemize}
+                    \item \key{Email}: \code{jburns@ada.edu.az}
+                    \item \key{Office}: B317
+                    \item \key{Office Hours}: Thursdays 11:00--15:00\\(or by appointment)
+                    \item \textit{Note}: Avoid Blackboard messages for urgent matters.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Classroom Expectations}
+                \begin{itemize}
+                    \item \key{The Golden Rule}: Once class commences and the instructor speaks, no outside conversations are permitted.
+                    \item \key{Authentic Work}: Emphasize the \textit{why} alongside the \textit{what} and \textit{how}. Do not pass off AI-generated output as your own.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
 
-{\color{white}\normalsize Dr. J. Burns\par}
-{\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
+% --- Slide 3: Laboratory Tools & Simulation Environment ---
+\begin{frame}{Tools, Emulation, and Assessments}
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Software \& Emulation Stack}
+                \begin{itemize}
+                    \item \key{C \& ARM64 Assembly}: Core languages utilized for architecture programming.
+                    \item \key{QEMU}: Full-system and user-space emulator for AArch64 virtual execution.
+                    \item \key{Compiler Explorer}: Live ARM64 assembly inspection from C source.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Online Programming Resources}
+                \begin{itemize}
+                    \item \key{WebAssembliss}: Browser-based ARM64 Linux assembly environment:\\\url{https://web.assembliss.app/editor/arm64_linux/}
+                    \item \key{CPUlator}: Interactive web-based ARM32 / ARMv7 system simulator:\\\url{https://cpulator.01xz.net/?sys=arm}
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
 
-\vspace{0.35cm}
+% --- Slide 4: Lecture Outline ---
+\begin{frame}{Topic 1 Outline}
+    \begin{block}{Foundational Focus}
+        Understanding the bridge connecting high-level algorithms to the physical silicon execution substrate in modern 64-bit ARM systems.
+    \end{block}
+    \vspace{0.4em}
+    \begin{itemize}
+        \item \key{Section 1}: The Full Stack of Abstraction Layers
+        \item \key{Section 2}: Computer Architecture versus Computer Organization
+        \item \key{Section 3}: Instruction Set Architecture (ISA) versus Microarchitecture
+        \item \key{Section 4}: The Stored-Program Concept \& Execution Cycle
+        \item \key{Section 5}: Memory Models: von Neumann, Harvard, and Modified Harvard
+        \item \key{Section 6}: Summary and Interactive Self-Test Review
+    \end{itemize}
 \end{frame}
 
 % ============================================================
-% PART 1
+% SECTION 1
 % ============================================================
+\sectiondivider{Section 01}{The Full Stack of\\Abstraction Layers}
 
-\sectiondivider{PART 1}{Architecture Foundations \& Abstraction}
-
-% ============================================================
-% Slide 2
-% ============================================================
-
-\begin{frame}{What Is Computer Architecture?}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Computer architecture connects \key{software-visible behavior} with \key{hardware implementation}.
-  \item Hardware provides an interface that software can rely on.
-  \item The implementation of that interface determines performance and efficiency.
-  \item Architectural design involves correctness, performance, power, area, and cost.
-\end{itemize}
-
-\vspace{0.35cm}
-
-\begin{block}{Course Approach}
-\key{Design approach:} RISC principles.\\
-\key{Reference ISA:} AArch64.
-\end{block}
-
-\end{frame}
-
-% ============================================================
-% Slide 3: The Full Abstraction Stack
-% ============================================================
-
+% --- Slide 6: The Full Abstraction Stack ---
 \begin{frame}{The 9 Levels of Computer Abstraction}
     Computers manage immense complexity by enforcing clean hierarchical interfaces:
     \vspace{0.2em}
     \begin{center}
         \begin{tikzpicture}[xscale=0.85, yscale=0.48, every node/.style={font=\footnotesize\bfseries}]
-            % Layers with clear individual separation so no borders get covered
             \node[fill=navy, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,8.2) {Application Software};
             \node[fill=navy!90, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,7.1) {Operating Systems};
             
-            % Highlighted layers with explicit spacing so all four dashed borders are fully visible
             \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt, draw=navy, thick, dashed] at (0,6.0) {Architecture (AArch64 ISA)};
             \node[fill=gold, text=navy, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt, draw=navy, thick, dashed] at (0,4.9) {Organization (Microarchitecture)};
             
-            % Lower layers
             \node[fill=deepblue!80, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,3.75) {Logic Design};
             \node[fill=deepblue!60, text=white, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,2.7) {Digital Circuits};
             \node[fill=lightblue, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,1.6) {Analog Circuits};
             \node[fill=lightblue!70, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,0.5) {Electronic Devices};
             \node[fill=softgray, text=darkgray, minimum width=6cm, minimum height=0.45cm, rounded corners=1pt] at (0,-0.6) {Solid-State Physics};
 
-            % Right side descriptions
             \node[anchor=west, text=navy] at (3.5,8.2) {C Programs, Algorithms, Apps};
             \node[anchor=west, text=navy] at (3.5,7.1) {Device Drivers, Schedulers, Virtual Memory};
             
-            % Highlighted text boxes on the right with dashed borders
             \node[anchor=west, text=navy, draw=navy, thick, dashed, inner sep=3pt, rounded corners=1pt] at (3.5,6.0) {\textbf{64-Bit Instructions, X Registers}};
             \node[anchor=west, text=navy, draw=navy, thick, dashed, inner sep=3pt, rounded corners=1pt] at (3.5,4.9) {\textbf{Datapaths, Controllers, Pipelines, Caches}};
             
@@ -196,1510 +243,581 @@ Abstraction, stored-program organization, data representation, and processor per
     \end{center}
 \end{frame}
 
-% ============================================================
-% Slide 4
-% ============================================================
-
-\begin{frame}{When Abstractions Leak}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{Software View}
-\begin{itemize}
-  \item Variables
-  \item Arrays
-  \item Branches
-  \item Function calls
-  \item Data types
-\end{itemize}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Architectural Effect}
-\begin{itemize}
-  \item Register allocation
-  \item Cache misses
-  \item Branch prediction
-  \item Stack frames
-  \item Overflow and sign extension
-\end{itemize}
-\end{block}
-
-\end{columns}
-
-\vspace{0.35cm}
-
-Performance-sensitive software often exposes lower-level machine behavior.
-
+% --- Slide 7: The Central Divide ---
+\begin{frame}{Where Software Meets Hardware}
+    \begin{block}{CSCI 2406 Focus}
+        Our course focuses on the critical boundary that translates logical intent into physical electrical actions: computer architecture and organization.
+    \end{block}
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Above the Boundary (Architecture / Software)}
+                \begin{itemize}
+                    \item Applications compiled into machine binaries.
+                    \item Operating systems managing hardware through architectural exception levels.
+                    \item Completely portable across any hardware implementing the identical AArch64 ISA.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Below the Boundary (Organization / Hardware)}
+                \begin{itemize}
+                    \item Organization and microarchitecture (datapaths and state controllers).
+                    \item Digital circuits and gate-level logic.
+                    \item Silicon fabrication nodes and thermal design power (TDP) constraints.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % ============================================================
-% Slide 5
+% SECTION 2
 % ============================================================
+\sectiondivider{Section 02}{Computer Architecture vs.\\Computer Organization}
 
-\begin{frame}{From Source Code to Execution}
+% --- Slide 9: Architecture Defined ---
+\begin{frame}{What is Computer Architecture?}
+    \key{Computer Architecture} defines the \key{externally visible capabilities and behavior} of the machine---the \key{\textit{what}}.
+    \vspace{0.2em}
+    \begin{itemize}
+        \item The programmer-visible specification of the computer system.
+        \item Establishes what the software is allowed to execute and what state changes occur.
+        \item Determines the binary interface targeted by compilers and assembly programmers.
+    \end{itemize}
+    \vspace{0.3em}
+    \begin{block}{Architectural Specifications Include:}
+        \begin{itemize}
+            \item The complete \key{Instruction Set Architecture (ISA)} vocabulary (AArch64).
+            \item Programmer-visible registers (\code{x0}--\code{x30}, stack pointer \code{sp}, program counter \code{pc}, status flags).
+            \item Instruction encodings, data formats (byte, halfword, word, doubleword), and addressing modes.
+        \end{itemize}
+    \end{block}
+\end{frame}
 
-\centering
+% --- Slide 10: Organization Defined ---
+\begin{frame}{What is Computer Organization?}
+    \key{Computer Organization} describes the \key{internal hardware implementation} of the architecture---the \key{\textit{how}}.
+    \vspace{0.2em}
+    \begin{itemize}
+        \item The physical arrangement of operational units and their logical interconnections.
+        \item Defines how the machine physically performs the architectural operation.
+        \item Completely transparent (invisible) to the programmer and machine software.
+    \end{itemize}
+    \vspace{0.3em}
+    \begin{block}{Organizational Structures Include:}
+        \begin{itemize}
+            \item Datapaths, control units, ALUs, and multiplexer routing.
+            \item Pipeline staging, branch prediction logic, and cache hierarchies (L1/L2/L3).
+            \item Internal bus interfaces, clocking frequencies, and memory controller arbitration.
+        \end{itemize}
+    \end{block}
+\end{frame}
 
-\begin{tikzpicture}[
-  node distance=0.28cm,
-  box/.style={
-    rounded corners=3pt,
-    draw=navy,
-    fill=lightblue,
-    align=center,
-    font=\small,
-    minimum width=8.2cm,
-    minimum height=0.45cm
-  }
-]
+% --- Slide 11: Direct Comparison Table ---
+\begin{frame}{Architecture vs.\ Organization: Direct Contrast}
+    \begin{table}[]
+        \centering
+        \small
+        \begin{tabular}{p{5.5cm} p{6.5cm}}
+            \toprule
+            \textbf{Computer Architecture (\textit{What})} & \textbf{Computer Organization (\textit{How})} \\
+            \midrule
+            Programmer / Compiler view & Hardware engineer / Silicon designer view \\
+            Functional contract and behavior & Physical implementation and datapath \\
+            Changes slowly across generations & Evolves rapidly with silicon manufacturing nodes \\
+            Example: Does a 64-bit multiply exist? & Example: Is multiplication implemented via a hardware multiplier array or Booth recoder? \\
+            Specifies visible registers \& flags & Specifies pipeline stages, ALU internal circuits \\
+            Software target (C, ARM64 assembly) & Hardware target (Verilog, VHDL, RTL) \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
 
-\node[box] (c) {High-level source: \code{c = a + b;}};
-\node[box, below=of c] (asm) {Assembly: \code{add x0, x1, x2}};
-\node[box, below=of asm] (obj) {Object / executable representation};
-\node[box, below=of obj] (inst) {Fetched instruction word: \code{0x8b020020}};
-\node[box, below=of inst] (uarch) {Microarchitecture: fetch, decode, execute, retire};
-\node[box, below=of uarch] (logic) {Hardware: datapaths, storage, and control logic};
-
-\draw[-{Latex[length=2mm]}, thick, navy] (c) -- (asm)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Compiler};
-
-\draw[-{Latex[length=2mm]}, thick, navy] (asm) -- (obj)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Assembler / linker};
-
-\draw[-{Latex[length=2mm]}, thick, navy] (obj) -- (inst)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Load / fetch};
-
-\draw[-{Latex[length=2mm]}, thick, navy] (inst) -- (uarch)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Decode};
-
-\draw[-{Latex[length=2mm]}, thick, navy] (uarch) -- (logic)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Implementation};
-
-\end{tikzpicture}
-
-\vspace{0.15cm}
-
-\small
-The ISA is the boundary between program representation and processor execution.
-
+% --- Slide 12: Architectural Stability and Hardware Evolution ---
+\begin{frame}{Architectural Stability and Hardware Evolution}
+    \begin{block}{The Benefit of a Stable Architecture}
+        Preserving the instruction set architecture allows software investments to persist indefinitely while hardware design is continuously overhauled to boost performance.
+    \end{block}
+    \vspace{0.3em}
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Architectural Invariance}
+                \begin{itemize}
+                    \item The \key{AArch64 ISA} defines standard instructions like \code{add}, \code{ldr}, and \code{cbz}.
+                    \item An ARM64 binary compiled for early AArch64 systems executes seamlessly on modern Apple M-series or AWS Graviton CPUs.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Organizational Evolution}
+                \begin{itemize}
+                    \item \textbf{Early Cores}: In-order or narrower out-of-order execution pipelines.
+                    \item \textbf{Modern Cores}: Wide-issue out-of-order engines, deep multi-level caches, and advanced execution units.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % ============================================================
-% Slide 6
+% SECTION 3
 % ============================================================
+\sectiondivider{Section 03}{ISA versus Microarchitecture}
 
-\begin{frame}{ISA and Microarchitecture}
+% --- Slide 14: ISA as the Interface Language ---
+\begin{frame}{The Instruction Set Architecture (ISA)}
+    The \key{ISA} is the complete vocabulary of machine instructions supported by the hardware.
+    \begin{itemize}
+        \item All software running on a given processor must be expressed using its specific ISA.
+        \item Different programs use different subsets, but all conform to the common ISA dictionary.
+    \end{itemize}
+    \vspace{0.3em}
+    \begin{block}{The Architectural Contract: \code{add x1, x2, x3}}
+        The ISA guarantees a single semantic state change:
+        $$\text{Register } x_1 \leftarrow \text{Register } x_2 + \text{Register } x_3$$
+        \begin{itemize}
+            \item The architecture defines \textit{what} state update occurs upon completion.
+            \item It does not state \textit{how} data moves across physical buses or wires inside the CPU.
+        \end{itemize}
+    \end{block}
+\end{frame}
 
-\begin{columns}[T,onlytextwidth]
+% --- Slide 15: Microarchitecture Execution Steps (No TikZ) ---
+\begin{frame}{Microarchitecture: Executing \code{add x1, x2, x3}}
+    \begin{block}{Register Transfer Steps for \code{add x1, x2, x3}}
+        \begin{enumerate}
+            \item \code{ra1 <- x2; ra2 <- x3} \hfill \textit{(Assert register read addresses)}
+            \item \code{rd1 <- RegisterFile[ra1]; rd2 <- RegisterFile[ra2]} \hfill \textit{(Read 64-bit operand values)}
+            \item \code{alu\_control <- add} \hfill \textit{(Configure ALU operation multiplexers)}
+            \item \code{alu\_result <- rd1 + rd2} \hfill \textit{(Execute 64-bit addition)}
+            \item \code{reg\_write <- 1} \hfill \textit{(Assert register file write enable)}
+            \item \code{RegisterFile[x1] <- alu\_result} \hfill \textit{(Commit result to destination register)}
+        \end{enumerate}
+    \end{block}
+    \vspace{0.3em}
+    \begin{itemize}
+        \item \key{ISA View}: Add 64-bit values in \code{x2} and \code{x3}; store sum into \code{x1}.
+        \item \key{Microarchitecture View}: Sequence control signals, bus transfers, and ALU operations.
+    \end{itemize}
+\end{frame}
 
-\column{0.48\textwidth}
-\begin{block}{Instruction Set Architecture}
-\begin{itemize}
-  \item Instruction encodings
-  \item Instruction behavior
-  \item Registers \bits{x0}--\bits{x30}
-  \item \bits{sp}, PSTATE, NZCV
-  \item Memory and exception behavior
-\end{itemize}
-\end{block}
+% --- Slide 16: Datapath Microarchitecture Diagram ---
+\begin{frame}{Visualizing the Microarchitectural Datapath}
+    \begin{center}
+        \begin{tikzpicture}[scale=0.9, every node/.style={font=\footnotesize}]
+            % Register File
+            \draw[thick, fill=navy, text=white] (0,-0.2) rectangle (3.5,3.6);
+            \node[text=white, font=\small\bfseries, align=center] at (1.75,1.5) {64-Bit Register\\File};
+            \node[text=gold, anchor=west] at (0.2,3.1) {\code{ra1} (\code{x2})};
+            \node[text=gold, anchor=west] at (0.2,2.3) {\code{ra2} (\code{x3})};
+            \node[text=gold, anchor=west] at (0.2,0.4) {\code{wa} (\code{x1})};
+            
+            % ALU
+            \draw[thick, fill=deepblue, text=white] (6.2,1.2) -- (7.8,1.8) -- (7.8,2.8) -- (6.2,3.4) -- (6.2,2.5) -- (6.6,2.3) -- (6.2,2.1) -- cycle;
+            \node[text=white, font=\tiny\bfseries, align=center] at (7.0,2.3) {64-Bit \\ ALU};
+            
+            % Routing Lines
+            \draw[thick, -Latex, draw=navy] (3.5,2.7) -- node[above]{\code{rd1 (x2)}} (6.2,2.7);
+            \draw[thick, -Latex, draw=navy] (3.5,1.9) -- node[below]{\code{rd2 (x3)}} (6.2,1.9);
+            \draw[thick, -Latex, draw=navy] (7.8,2.3) -- (8.8,2.3) -- (8.8,-0.6) -- (1.75,-0.6) -- node[left]{\code{alu\_result}} (1.75,-0.2);
+            
+            % Control signals
+            \node[draw=gold, fill=lightblue, rounded corners=2pt, font=\scriptsize] at (7.0,4.0) {\code{alu\_control = add}};
+            \draw[dashed, -Latex, draw=gold!70!black] (7.0,3.7) -- (7.0,3.1);
+        \end{tikzpicture}
+    \end{center}
+    \begin{itemize}
+        \item Microarchitectures differ by doing this sequentially in multiple cycles or parallelized within single/pipelined cycles.
+    \end{itemize}
+\end{frame}
 
-\column{0.48\textwidth}
-\begin{block}{Microarchitecture}
-\begin{itemize}
-  \item Pipeline organization
-  \item In-order or out-of-order execution
-  \item Branch prediction
-  \item Execution units
-  \item Cache structures
-\end{itemize}
-\end{block}
-
-\end{columns}
-
-\vspace{0.25cm}
-
-\small
-Different processors can implement the same ISA using different microarchitectures.
-
+% --- Slide 17: One ISA, Many Microarchitectures ---
+\begin{frame}{One ISA --- Multiple Hardware Realizations}
+    \begin{table}[]
+        \centering
+        \small
+        \begin{tabular}{p{3.2cm} p{4.0cm} p{4.2cm}}
+            \toprule
+            \textbf{Microarchitecture} & \textbf{Datapath Style} & \textbf{Design Objective} \\
+            \midrule
+            \key{Single-Cycle} & Every instruction takes 1 long clock cycle & Simple control; slow clock rate \\
+            \key{Multi-Cycle} & Instructions take variable number of short cycles & Low hardware cost; reuse functional units \\
+            \key{Pipelined (Classic 5-Stage)} & Overlap fetch, decode, execute, memory, writeback & Higher instruction throughput (1 inst/cycle ideal) \\
+            \key{Superscalar Out-of-Order} & Multiple pipelines, dynamic instruction scheduling & Maximum performance for desktops/servers \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    \vspace{0.2em}
+    \begin{block}{Key Principle}
+        All four microarchitectures execute the identical compiled AArch64 binary accurately.
+    \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 7
+% SECTION 4
 % ============================================================
+\sectiondivider{Section 04}{The Stored-Program Concept}
 
-\begin{frame}{RISC Design}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item RISC designs emphasize regular instruction formats and efficient implementation.
-  \item A64 instructions are fixed-width \key{32-bit} instructions.
-  \item Integer arithmetic uses register operands.
-  \item Loads and stores transfer data between registers and memory.
-  \item AArch64 includes addressing modes for memory-access instructions.
-\end{itemize}
-
-\vspace{0.25cm}
-
-Modern processors do not fall into a simple RISC-versus-CISC division.
-The distinction is most useful as a design comparison.
-
-\end{frame}
-
-% ============================================================
-% Slide 8
-% ============================================================
-
-\begin{frame}{AArch64 Example Instruction}
-
-\begin{block}{Assembly and Encoding}
-\centering
-\code{add x0, x1, x2}
-\[
-\Downarrow
-\]
-\code{0x8b020020}
-\end{block}
-
-\vspace{0.2cm}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Adds the contents of \bits{x1} and \bits{x2}.
-  \item Writes the architectural result to \bits{x0}.
-  \item Occupies one 32-bit A64 instruction word.
-  \item Execution latency depends on the processor implementation.
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 9
-% ============================================================
-
-\begin{frame}{ADD Instruction Encoding}
-
-\centering
-
-\begin{tikzpicture}[
-  x=0.47cm,
-  y=0.8cm,
-  field/.style={draw=navy, thick, align=center, font=\scriptsize\bfseries}
-]
-
-\draw[field, fill=navy!18] (0,0) rectangle (1,1) node[midway]{sf};
-\draw[field, fill=deepblue!18] (1,0) rectangle (2,1) node[midway]{op};
-\draw[field, fill=gold!25] (2,0) rectangle (3,1) node[midway]{S};
-\draw[field, fill=lightblue] (3,0) rectangle (8,1) node[midway]{01011};
-\draw[field, fill=softgray] (8,0) rectangle (10,1) node[midway]{shift};
-\draw[field, fill=softgray] (10,0) rectangle (11,1) node[midway]{0};
-\draw[field, fill=gold!30] (11,0) rectangle (16,1) node[midway]{Rm};
-\draw[field, fill=softgray] (16,0) rectangle (22,1) node[midway]{imm6};
-\draw[field, fill=lightblue] (22,0) rectangle (27,1) node[midway]{Rn};
-\draw[field, fill=gold!40] (27,0) rectangle (32,1) node[midway]{Rd};
-
-\node[font=\tiny] at (0.5,-0.35) {31};
-\node[font=\tiny] at (1.5,-0.35) {30};
-\node[font=\tiny] at (2.5,-0.35) {29};
-\node[font=\tiny] at (5.5,-0.35) {28--24};
-\node[font=\tiny] at (9,-0.35) {23--22};
-\node[font=\tiny] at (10.5,-0.35) {21};
-\node[font=\tiny] at (13.5,-0.35) {20--16};
-\node[font=\tiny] at (19,-0.35) {15--10};
-\node[font=\tiny] at (24.5,-0.35) {9--5};
-\node[font=\tiny] at (29.5,-0.35) {4--0};
-
-\end{tikzpicture}
-
-\vspace{0.45cm}
-
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item \bits{Rm=00010} selects \bits{x2}.
-  \item \bits{Rn=00001} selects \bits{x1}.
-  \item \bits{Rd=00000} selects \bits{x0}.
-  \item \bits{imm6=000000} specifies no shift.
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 10
-% ============================================================
-
-\begin{frame}{Register Field Encoding}
-
-A64 register operand fields such as \bits{Rd}, \bits{Rn}, and \bits{Rm}
-are five bits wide.
-
-\vspace{0.25cm}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{Common Case}
-\begin{itemize}
-  \item \bits{00000} selects \bits{x0}.
-  \item \bits{00001} selects \bits{x1}.
-  \item \bits{11110} selects \bits{x30}.
-\end{itemize}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Special Case}
-\begin{itemize}
-  \item \bits{11111} is context-dependent.
-  \item It may denote \bits{xzr}.
-  \item It may denote \bits{sp}.
-\end{itemize}
-\end{block}
-
-\end{columns}
-
-\vspace{0.25cm}
-
-\small
-The instruction definition determines whether register encoding \bits{11111}
-means \bits{xzr} or \bits{sp}.
-
-\end{frame}
-
-% ============================================================
-% PART 2
-% ============================================================
-
-\sectiondivider{PART 2}{Stored-Program Organization \& Memory}
-
-% ============================================================
-% Slide 11
-% ============================================================
-
+% --- Slide 19: The Stored-Program Principle ---
 \begin{frame}{The Stored-Program Concept}
+    \begin{block}{Foundational Definition}
+        Program instructions are encoded as binary numbers and stored in the exact same addressable memory subsystem alongside standard runtime data.
+    \end{block}
+    \vspace{0.4em}
+    \key{Capabilities of a General-Purpose Computer}:
+    \begin{itemize}
+        \item \key{Store Information}: Holds data values and program sequences electronically.
+        \item \key{Manipulate Information}: Performs mathematical and logical transformations via the ALU.
+        \item \key{Make Decisions}: Alters control flow dynamically based on evaluated conditions (e.g., conditional branches).
+    \end{itemize}
+    \vspace{0.2em}
+    \begin{block}{Core Advantage}
+        Reprogramming does not require physical rewiring; it simply requires loading new numbers into memory.
+    \end{block}
+\end{frame}
 
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Machine instructions are stored in memory and fetched for execution.
-  \item In the classical von Neumann model, instructions and data share a memory system.
-  \item The processor maintains state identifying the next instruction to execute.
-  \item Conceptually, this includes a program counter.
-\end{itemize}
+% --- Slide 20: CPU and Memory Interface ---
+\begin{frame}{The CPU--Memory Interface: Three Fundamental Buses}
+    \begin{center}
+        \begin{tikzpicture}[scale=0.9, every node/.style={font=\small}]
+            % CPU Box
+            \draw[thick, fill=navy, text=white] (-1.0,0) rectangle (2.2,3.6);
+            \node[text=white, font=\normalsize\bfseries, align=center] at (0.6,1.8) {Central\\Processing\\Unit (CPU)};
+            
+            % Memory Box
+            \draw[thick, fill=lightblue, text=darkgray] (8.8,0) rectangle (12,3.6);
+            \node[text=navy, font=\normalsize\bfseries, align=center] at (10.4,1.8) {Memory\\System\\(RAM)};
+            
+            % Buses
+            \draw[thick, -Latex, draw=navy] (2.2,2.8) -- node[above, font=\tiny]{\textbf{Address Bus} (64-Bit Pointer Space)} (8.8,2.8);
+            \draw[thick, Latex-Latex, draw=deepblue] (2.2,1.8) -- node[above, font=\tiny]{\textbf{Data Bus} (Bidirectional: Read / Write)} (8.8,1.8);
+            \draw[thick, Latex-Latex, draw=gold!70!black] (2.2,0.8) -- node[above, font=\tiny]{\textbf{Control Bus} (Read/Write Enable, Clock, Status)} (8.8,0.8);
+        \end{tikzpicture}
+    \end{center}
+    \begin{itemize}
+        \item \key{Address Bus}: Selects the specific memory cell location using 64-bit addresses.
+        \item \key{Data Bus}: Transfers the numerical word to or from the selected cell.
+        \item \key{Control Bus}: Dictates the direction of transfer (read vs. write) and timing signals.
+    \end{itemize}
+\end{frame}
 
-\vspace{0.25cm}
+% --- Slide 21: Memory Cell Indexing ---
+\begin{frame}{Memory as an Array of Numbered Cells}
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.55\textwidth}
+            \key{How Memory is Structured}:
+            \begin{itemize}
+                \item Memory is viewed logically as a contiguous 1-D array of cells.
+                \item Each cell has a unique numerical \key{Address} and stores a \key{Value}.
+                \item Address 4 holds value \code{3}.
+                \item An address is simply an index; the data is the payload.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.42\textwidth}
+            \begin{center}
+                \small
+                \begin{tabular}{c|c|}
+                    \toprule
+                    \textbf{Address} & \textbf{Stored Value} \\
+                    \midrule
+                    0 & 7 \\
+                    1 & 3 \\
+                    2 & 15 \\
+                    3 & 20 \\
+                    \rowcolor{gold!20} 4 & \textbf{3} $\leftarrow$ Cell content \\
+                    5 & 7 \\
+                    6 & 3 \\
+                    \bottomrule
+                \end{tabular}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
 
-\begin{block}{AArch64}
-The program counter is architectural state,
-but it is not an ordinary general-purpose register.
-\end{block}
+% --- Slide 22: Dual Nature of Bits ---
+\begin{frame}{Context Determines Meaning}
+    \begin{block}{Bit Invariance Principle}
+        A pattern of bits residing in a memory cell possesses no intrinsic, permanent identity. Its meaning is determined entirely by \key{how the CPU accesses and interprets it}.
+    \end{block}
+    \vspace{0.4em}
+    Consider a 32-bit word stored in memory at location \hex{0x0000000000400000}:
+    \vspace{0.2em}
+    \begin{itemize}
+        \item If the \key{program counter (\code{pc})} points here $\rightarrow$ the CPU fetches and decodes it as an \key{AArch64 instruction}.
+        \item If an \key{arithmetic load instruction} reads this address $\rightarrow$ the CPU treats it as a \key{signed / unsigned integer}.
+        \item If a \key{pointer variable} holds this address $\rightarrow$ it is treated as a \key{64-bit memory reference}.
+        \item If passed to a \key{display routine} $\rightarrow$ it is rendered as \key{ASCII/UTF-8 text characters}.
+    \end{itemize}
+\end{frame}
 
+% --- Slide 23: The Machine Instruction Cycle ---
+\begin{frame}{The Classical Machine Instruction Lifecycle}
+    The processor continuously steps through code using the \key{program counter (\code{pc})}:
+    \vspace{0.3em}
+    \begin{center}
+        \begin{tikzpicture}[node distance=0.4cm, auto,
+            stage/.style={rectangle, draw=navy, fill=lightblue, text=darkgray, font=\small\bfseries, text width=1.9cm, minimum width=2.1cm, minimum height=1.0cm, align=center, rounded corners=2pt},
+            arr/.style={draw=navy, -Latex, thick}]
+            
+            \node [stage] (fetch) {1. Fetch\\at [\code{pc}]};
+            \node [stage, right=0.4cm of fetch] (decode) {2. Decode\\Opcode};
+            \node [stage, right=0.4cm of decode] (exec) {3. Execute\\in ALU};
+            \node [stage, right=0.4cm of exec] (mem) {4. Memory\\Access};
+            \node [stage, right=0.4cm of mem] (wb) {5. Write\\Back};
+            
+            \node [rectangle, draw=navy, fill=gold, text=navy, font=\small\bfseries, text width=4.2cm, minimum height=1.0cm, align=center, rounded corners=2pt, below=0.8cm of exec] (pc) {Increment \code{pc}\\($\code{pc} \leftarrow \code{pc} + 4$ or Target)};
+            
+            \path [arr] (fetch) -- (decode);
+            \path [arr] (decode) -- (exec);
+            \path [arr] (exec) -- (mem);
+            \path [arr] (mem) -- (wb);
+            
+            \path [arr] (wb.east) -- ++(0.3,0) |- (pc.east);
+            \path [arr] (pc.west) -| (fetch.south);
+        \end{tikzpicture}
+    \end{center}
+    \vspace{0.1em}
+    \begin{itemize}
+        \item Because code is in memory, programs can be loaded, copied, relocated, or modified dynamically.
+    \end{itemize}
 \end{frame}
 
 % ============================================================
-% Slide 12
+% SECTION 5
 % ============================================================
+\sectiondivider{Section 05}{von Neumann vs. Harvard\\Architectures}
 
-\begin{frame}{Fetch, Decode, and Execute}
+% --- Slide 25: von Neumann Architecture ---
+\begin{frame}{The von Neumann Architecture}
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.55\textwidth}
+            \key{Core Characteristics}:
+            \begin{itemize}
+                \item \key{Unified Memory}: A single address space containing both instructions and data.
+                \item \key{Shared Bus System}: A single set of address, data, and control lines is shared.
+                \item \key{Operation}: The CPU fetches an instruction, then subsequently accesses data using the same bus.
+                \item Directly realizes the stored-program concept in its purest form.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.42\textwidth}
+            \begin{center}
+                \begin{tikzpicture}[scale=0.8, every node/.style={font=\footnotesize}]
+                    \draw[thick, fill=navy, text=white] (0,0) rectangle (2.2,3.5);
+                    \node[text=white, font=\small\bfseries, align=center] at (1.1,1.75) {CPU\\Core};
+                    
+                    \draw[thick, fill=lightblue, text=darkgray] (4.0,0) rectangle (6.2,3.5);
+                    \node[text=navy, font=\small\bfseries] at (5.1,3.1) {Memory};
+                    \draw[fill=softgray] (4.2,1.8) rectangle (6.0,2.7);
+                    \node at (5.1,2.25) {Program};
+                    \draw[fill=softgray] (4.2,0.4) rectangle (6.0,1.3);
+                    \node at (5.1,0.85) {Data};
+                    
+                    \draw[thick, -Latex, draw=navy] (2.2,2.5) -- node[above]{\tiny Address} (4.0,2.5);
+                    \draw[thick, Latex-Latex, draw=deepblue] (2.2,1.75) -- node[above]{\tiny Data} (4.0,1.75);
+                    \draw[thick, Latex-Latex, draw=gold!70!black] (2.2,1.0) -- node[above]{\tiny Control} (4.0,1.0);
+                \end{tikzpicture}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
 
-\centering
+% --- Slide 26: Harvard Architecture ---
+\begin{frame}{The Harvard Architecture}
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.55\textwidth}
+            \key{Core Characteristics}:
+            \begin{itemize}
+                \item \key{Separated Memories}: Physically independent instruction and data memory modules.
+                \item \key{Independent Buses}: Dedicated address, data, and control lines for each memory bank.
+                \item \key{Parallel Operation}: CPU can fetch an instruction and read/write data operands \key{simultaneously}.
+                \item Instruction and data words can have differing bit-widths and storage technologies.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.42\textwidth}
+            \begin{center}
+                \begin{tikzpicture}[scale=0.72, every node/.style={font=\tiny}]
+                    \draw[thick, fill=navy, text=white] (2.2,0) rectangle (4.0,4.0);
+                    \node[text=white, font=\small\bfseries, align=center] at (3.1,2.0) {CPU};
+                    
+                    % Data Mem Left
+                    \draw[thick, fill=lightblue] (-1.2,0.5) rectangle (0.8,3.5);
+                    \node[font=\bfseries, align=center] at (-0.2,2.0) {Data\\Memory};
+                    
+                    % Program Mem Right
+                    \draw[thick, fill=lightblue] (5.4,0.5) rectangle (7.4,3.5);
+                    \node[font=\bfseries, align=center] at (6.4,2.0) {Program\\Memory};
+                    
+                    % Data Bus Left
+                    \draw[thick, -Latex] (2.2,3.0) -- (0.8,3.0);
+                    \draw[thick, Latex-Latex] (2.2,2.0) -- (0.8,2.0);
+                    \draw[thick, Latex-Latex] (2.2,1.0) -- (0.8,1.0);
+                    
+                    % Inst Bus Right
+                    \draw[thick, -Latex] (4.0,3.0) -- (5.4,3.0);
+                    \draw[thick, Latex-Latex] (4.0,2.0) -- (5.4,2.0);
+                    \draw[thick, Latex-Latex] (4.0,1.0) -- (5.4,1.0);
+                \end{tikzpicture}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
 
-\begin{tikzpicture}[node distance=0.65cm]
+% --- Slide 27: Structural Separation vs Storage Location ---
+\begin{frame}{Structural Separation: The Key Distinction}
+    \begin{block}{The Fundamental Question}
+        The decisive architectural issue is not simply where bytes are stored. It is \key{whether instruction access and data access are structurally separated}.
+    \end{block}
+    \vspace{0.4em}
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Single Shared Bus (vN)}
+                \begin{itemize}
+                    \item Sequential access creates bus contention (\key{von Neumann bottleneck}).
+                    \item Lower hardware routing cost and flexible memory budgeting.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Dedicated Dual Buses (Harvard)}
+                \begin{itemize}
+                    \item Concurrent instruction fetch and operand read/write eliminates structural stalls.
+                    \item Higher pin counts and rigid memory partition limits.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
 
-\node[
-draw=navy,
-fill=lightblue,
-rounded corners=2pt,
-minimum width=2.1cm,
-minimum height=0.7cm,
-font=\bfseries
-] (f) {Fetch};
+% --- Slide 28: Modified Harvard Architecture ---
+\begin{frame}{The Modern Standard: Modified Harvard Architecture}
+    Modern RISC systems (e.g., Apple M-series, ARM Cortex-A64) merge both concepts:
+    \vspace{0.2em}
+    \begin{center}
+        \begin{tikzpicture}[scale=0.8, every node/.style={font=\footnotesize}]
+            % Main memory
+            \draw[thick, fill=softgray, text=navy] (0.2,4.0) rectangle (9.8,5.0);
+            \node[font=\small\bfseries, align=center] at (5,4.5) {Unified Main Memory (Program + Data)};
+            
+            % Split caches
+            \draw[thick, fill=lightblue, text=darkgray] (0.2,2.2) rectangle (4.6,3.0);
+            \node[font=\scriptsize\bfseries, align=center] at (2.4,2.6) {L1 Data Cache};
+            \draw[thick, fill=lightblue, text=darkgray] (5.4,2.2) rectangle (9.8,3.0);
+            \node[font=\scriptsize\bfseries, align=center] at (7.6,2.6) {L1 Instruction Cache};
+            
+            % CPU Box
+            \draw[thick, fill=navy, text=white] (1.5,0.0) rectangle (8.5,1.2);
+            \node[font=\normalsize\bfseries, text=white, align=center] at (5,0.6) {Central Processing Unit (CPU)};
+            
+            % Connectors
+            \draw[thick, Latex-Latex, draw=deepblue] (2.4,1.2) -- node[left]{\code{data path}} (2.4,2.2);
+            \draw[thick, Latex-Latex, draw=deepblue] (7.6,1.2) -- node[right]{\code{instruction path}} (7.6,2.2);
+            \draw[thick, Latex-Latex, draw=navy] (2.4,3.0) -- (4.2,4.0);
+            \draw[thick, Latex-Latex, draw=navy] (7.6,3.0) -- (5.8,4.0);
+        \end{tikzpicture}
+    \end{center}
+    \vspace{-0.2em}
+    \begin{itemize}
+        \item \key{Internally}: Separate L1 caches yield Harvard pipeline throughput.
+        \item \key{Externally}: Unified RAM preserves von Neumann software simplicity.
+    \end{itemize}
+\end{frame}
 
-\node[
-draw=navy,
-fill=lightblue,
-rounded corners=2pt,
-right=of f,
-minimum width=2.1cm,
-minimum height=0.7cm,
-font=\bfseries
-] (d) {Decode};
-
-\node[
-draw=navy,
-fill=lightblue,
-rounded corners=2pt,
-right=of d,
-minimum width=2.1cm,
-minimum height=0.7cm,
-font=\bfseries
-] (e) {Execute};
-
-\node[
-draw=navy,
-fill=deepblue,
-text=white,
-rounded corners=2pt,
-right=of e,
-minimum width=2.1cm,
-minimum height=0.7cm,
-font=\bfseries
-] (w) {Complete};
-
-\draw[-{Latex},thick,navy] (f)--(d);
-\draw[-{Latex},thick,navy] (d)--(e);
-\draw[-{Latex},thick,navy] (e)--(w);
-
-\end{tikzpicture}
-
-\vspace{0.55cm}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Real processors overlap many instructions.
-  \item Branches and exceptions alter the normal sequence.
-  \item Instruction delivery depends on the memory system.
-\end{itemize}
-
+% --- Slide 29: Architecture Comparison Table ---
+\begin{frame}{Comparison Summary: Memory Topologies}
+    \begin{table}[]
+        \centering
+        \small
+        \begin{tabular}{p{3.0cm} p{3.8cm} p{4.5cm}}
+            \toprule
+            \textbf{Model} & \textbf{Bus \& Memory Structure} & \textbf{Primary Modern Use Case} \\
+            \midrule
+            \key{von Neumann} & Single shared memory and bus for instructions and data & Low-cost microcontrollers, simple embedded state controllers \\
+            \key{Harvard} & Physically separate memories and buses for code vs.\ data & Digital Signal Processors (DSPs), ATmega/AVR Arduino boards \\
+            \key{Modified Harvard} & Split L1 caches inside CPU; unified main memory outside & Modern high-performance RISC / CISC (ARM Cortex, Apple Silicon, x86-64) \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
 \end{frame}
 
 % ============================================================
-% Slide 13
+% SECTION 6
 % ============================================================
+\sectiondivider{Section 06}{Summary \& Self-Test}
 
-\begin{frame}{von Neumann and Harvard Organizations}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{von Neumann}
-\centering
-\begin{tikzpicture}[scale=0.8, every node/.style={transform shape}]
-\node[draw=navy,fill=lightblue,rounded corners,minimum width=2.2cm,minimum height=.65cm] (cpu) {CPU};
-\node[draw=navy,fill=softgray,rounded corners,below=0.9cm of cpu,minimum width=3.2cm,minimum height=.75cm] (mem) {Code + Data};
-\draw[-{Latex},thick,navy] (cpu) -- (mem);
-\draw[-{Latex},thick,navy] (mem) -- (cpu);
-\end{tikzpicture}
-\vspace{0.15cm}
-\begin{itemize}
-  \item Shared memory
-  \item Shared access path
-  \item Instruction and data access can compete
-\end{itemize}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Harvard}
-\centering
-\begin{tikzpicture}[scale=0.8, every node/.style={transform shape}]
-\node[draw=navy,fill=lightblue,rounded corners,minimum width=2.2cm,minimum height=.65cm] (cpu) {CPU};
-\node[draw=navy,fill=softgray,rounded corners,below left=0.9cm and 0.15cm of cpu,minimum width=1.65cm,minimum height=.75cm] (imem) {Code};
-\node[draw=navy,fill=softgray,rounded corners,below right=0.9cm and 0.15cm of cpu,minimum width=1.65cm,minimum height=.75cm] (dmem) {Data};
-\draw[-{Latex},thick,navy] (cpu) -- (imem);
-\draw[-{Latex},thick,navy] (cpu) -- (dmem);
-\draw[-{Latex},thick,navy] (imem) -- (cpu);
-\draw[-{Latex},thick,navy] (dmem) -- (cpu);
-\end{tikzpicture}
-\vspace{0.15cm}
-\begin{itemize}
-  \item Separate code and data
-  \item Separate access paths
-  \item Parallel access is natural
-\end{itemize}
-\end{block}
-
-\end{columns}
-
+% --- Slide 31: Comprehensive Lecture Summary ---
+\begin{frame}{Topic Summary}
+    \begin{itemize}
+        \item \key{Architecture vs.\ Organization}: Architecture is the programmer-visible specification (the \textit{what}); Organization is the internal hardware implementation (the \textit{how}).
+        \item \key{ISA vs.\ Microarchitecture}: ISA is the instruction vocabulary contract; Microarchitecture specifies the datapath and control sequencing.
+        \item \key{Stored-Program Concept}: Instructions are stored as binary numbers in memory alongside data; meaning is determined by how the CPU accesses them.
+        \item \key{von Neumann Architecture}: Shares a single memory and bus system for both instructions and data.
+        \item \key{Harvard Architecture}: Uses separate memory modules and dedicated buses for concurrent instruction and data access.
+        \item \key{Modified Harvard}: Blends separate L1 caches near the CPU core with unified main memory.
+    \end{itemize}
 \end{frame}
 
-% ============================================================
-% Slide 14
-% ============================================================
-
-\begin{frame}{Modified Harvard Organization}
-
-\centering
-
-\begin{tikzpicture}[
-  node distance=0.4cm,
-  box/.style={draw=navy,fill=lightblue,rounded corners,align=center,font=\small,minimum width=2.4cm,minimum height=.65cm},
-  cache/.style={draw=navy,fill=gold!25,rounded corners,align=center,font=\small,minimum width=2.2cm,minimum height=.65cm}
-]
-
-\node[box] (core) {Processor Core};
-\node[cache,below left=0.7cm and 0.55cm of core] (ic) {L1 I-cache};
-\node[cache,below right=0.7cm and 0.55cm of core] (dc) {L1 D-cache};
-\node[box,below=1.55cm of core,minimum width=5.4cm] (lower) {Unified Lower Memory System};
-
-\draw[-{Latex},thick,navy] (core) -- (ic);
-\draw[-{Latex},thick,navy] (core) -- (dc);
-\draw[-{Latex},thick,navy] (ic) -- (lower);
-\draw[-{Latex},thick,navy] (dc) -- (lower);
-
-\end{tikzpicture}
-
-\vspace{0.45cm}
-
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item Software sees a unified address space.
-  \item The core can fetch instructions and access data through separate L1 paths.
-  \item This is common in modern high-performance processors.
-\end{itemize}
-
+% --- Slide 32: Self-Test: Questions 1 & 2 ---
+\begin{frame}{Self-Test: Questions 1 \& 2}
+    \begin{block}{Question 1: Architecture vs.\ Organization}
+        What is the difference between computer architecture and computer organization? Provide two specific features belonging to each domain.
+    \end{block}
+    \vspace{0.4em}
+    \begin{block}{Question 2: ISA vs.\ Microarchitecture}
+        For the AArch64 instruction \code{add x1, x2, x3}, what does the ISA specify, and what internal actions belong to the microarchitecture?
+    \end{block}
+    \vspace{0.4em}
+    \begin{block}{Question 3: The Stored-Program Concept}
+        What is the stored-program concept, and why was it essential for creating general-purpose computing machines?
+    \end{block}
 \end{frame}
 
-% ============================================================
-% Slide 15
-% ============================================================
-
-\begin{frame}{Generated Code and Instruction Caches}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.50\textwidth}
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item A JIT compiler writes new instructions as data.
-  \item Those bytes are later fetched as instructions.
-  \item Some AArch64 systems require explicit synchronization.
-\end{itemize}
-
-\column{0.46\textwidth}
-\centering
-\begin{tikzpicture}[
-  node distance=0.35cm,
-  box/.style={draw=navy,fill=lightblue,rounded corners,align=center,font=\small,minimum width=2.6cm,minimum height=.55cm}
-]
-\node[box] (write) {Store bytes};
-\node[box,below=of write] (dc) {D-cache};
-\node[box,below=of dc] (clean) {Clean / barrier};
-\node[box,below=of clean] (ic) {I-cache invalidate};
-\node[box,below=of ic] (fetch) {Fetch new code};
-\draw[-{Latex},thick,navy] (write)--(dc);
-\draw[-{Latex},thick,navy] (dc)--(clean);
-\draw[-{Latex},thick,navy] (clean)--(ic);
-\draw[-{Latex},thick,navy] (ic)--(fetch);
-\end{tikzpicture}
-
-\end{columns}
-
+% --- Slide 33: Self-Test: Solutions 1 & 2 ---
+\begin{frame}{Self-Test: Solutions 1 \& 2}
+    \begin{block}{Solution 1}
+        \key{Architecture} is the software-visible specification (e.g., 64-bit register count, ISA opcodes). \key{Organization} is the hardware implementation (e.g., pipeline depth, cache associativity).
+    \end{block}
+    \vspace{0.3em}
+    \begin{block}{Solution 2}
+        \begin{itemize}
+            \item \key{ISA Specifies}: Add contents of \code{x2} to \code{x3} and place the 64-bit result in \code{x1}.
+            \item \key{Microarchitecture Executes}: Read registers \code{x2} and \code{x3} via port addresses \code{ra1}/\code{ra2}, configure ALU control to \code{add}, assert write-enable (\code{reg\_write=1}), and commit to \code{x1}.
+        \end{itemize}
+    \end{block}
 \end{frame}
 
-% ============================================================
-% Slide 16
-% ============================================================
-
-\begin{frame}{AArch64 Cache Synchronization Example}
-
-\small
-
-\begin{center}
-\begin{tabular}{ll}
-\toprule
-\textbf{Instruction} & \textbf{Operation} \\
-\midrule
-\code{dc cvau, x0} & Clean data-cache line \\
-\code{dsb ish} & Complete preceding data-cache maintenance \\
-\code{ic ivau, x0} & Invalidate instruction-cache line \\
-\code{dsb ish} & Complete instruction-cache maintenance \\
-\code{isb} & Synchronize subsequent instruction execution \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.35cm}
-
-The sequence must be applied to the affected cache lines.
-Requirements depend on the cache-coherency environment.
-
+% --- Slide 34: Self-Test: Questions 4 & 5 ---
+\begin{frame}{Self-Test: Questions 4 \& 5}
+    \begin{block}{Question 4: Memory Model Topologies}
+        What is the primary structural difference between von Neumann and Harvard architectures, and why can Harvard machines achieve higher cycle efficiency?
+    \end{block}
+    \vspace{0.4em}
+    \begin{block}{Topic 1 Self-Test Question 5: Modified Harvard Design}
+        Explain what a Modified Harvard architecture is. How does Apple Silicon or ARM implement this concept in hardware?
+    \end{block}
 \end{frame}
 
-% ============================================================
-% Slide 17
-% ============================================================
-
-\begin{frame}{Memory Hierarchy}
-
-\centering
-
-\begin{tikzpicture}[
-  level/.style={draw=navy,thick,align=center,font=\small\bfseries},
-  note/.style={font=\small}
-]
-
-\draw[level,fill=gold!30] (2.2,3.0) -- (5.8,3.0) -- (5.35,3.55) -- (2.65,3.55) -- cycle;
-\node at (4.0,3.27) {Registers};
-
-\draw[level,fill=lightblue] (1.6,2.35) -- (6.4,2.35) -- (5.8,3.0) -- (2.2,3.0) -- cycle;
-\node at (4.0,2.68) {L1 cache};
-
-\draw[level,fill=lightblue!80] (1.0,1.7) -- (7.0,1.7) -- (6.4,2.35) -- (1.6,2.35) -- cycle;
-\node at (4.0,2.03) {L2 / last-level cache};
-
-\draw[level,fill=softgray] (0.4,1.05) -- (7.6,1.05) -- (7.0,1.7) -- (1.0,1.7) -- cycle;
-\node at (4.0,1.38) {DRAM};
-
-\draw[level,fill=softgray!70] (-0.2,0.4) -- (8.2,0.4) -- (7.6,1.05) -- (0.4,1.05) -- cycle;
-\node at (4.0,0.72) {Persistent storage};
-
-\node[note,anchor=west] at (8.45,3.25) {fast, small};
-\node[note,anchor=west] at (8.45,0.72) {slow, large};
-
-\draw[-{Latex},thick,navy] (8.65,3.05) -- (8.65,1.0);
-
-\end{tikzpicture}
-
-\vspace{0.35cm}
-
-\small
-Sizes and latencies are implementation-specific, not ISA properties.
-
+% --- Slide 35: Self-Test: Solutions 4 & 5 ---
+\begin{frame}{Self-Test: Solutions 4 \& 5}
+    \begin{block}{Solution 4}
+        von Neumann uses a single unified bus and memory, causing serial access contention. Harvard uses independent buses and memories, allowing simultaneous instruction fetch and data operand load/store in the same clock cycle.
+    \end{block}
+    \vspace{0.3em}
+    \begin{block}{Solution 5}
+        A Modified Harvard architecture provides separate L1 instruction and data caches directly adjacent to the CPU core to eliminate pipeline stalls, while utilizing a unified L2/L3 cache and main memory system to maintain a unified address space.
+    \end{block}
 \end{frame}
 
-% ============================================================
-% Slide 18
-% ============================================================
-
-\begin{frame}{The Memory Wall}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Processor execution can proceed much faster than DRAM access.
-  \item A main-memory access may cost tens or hundreds of cycles.
-  \item Cache misses increase effective CPI.
-  \item Cache systems rely on \key{temporal locality} and \key{spatial locality}.
-\end{itemize}
-
-\vspace{0.3cm}
-
-\begin{block}{Later Topics}
-Cache organization, AMAT, virtual memory, and multicore coherence.
-\end{block}
-
-\end{frame}
-
-% ============================================================
-% PART 3
-% ============================================================
-
-\sectiondivider{PART 3}{Binary Representation \& Arithmetic}
-
-% ============================================================
-% Slide 19
-% ============================================================
-
-\begin{frame}{Bits and Interpretation}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Hardware stores finite-width bit patterns.
-  \item An $n$-bit field has $2^n$ possible bit combinations.
-  \item The same bit pattern can represent different information.
-  \item Interpretation depends on how the bits are used.
-\end{itemize}
-
-\vspace{0.3cm}
-
-\begin{block}{Example}
-\code{0x8b020020} can represent an AArch64 instruction,
-an integer, or a floating-point bit pattern.
-\end{block}
-
-\end{frame}
-
-% ============================================================
-% Slide 20
-% ============================================================
-
-\begin{frame}{Same Bits, Different Interpretations}
-
-\small
-
-\begin{center}
-\begin{tabular}{ll}
-\toprule
-\textbf{Interpretation} & \textbf{Value of \hex{8b020020}} \\
-\midrule
-AArch64 instruction & \code{add x0, x1, x2} \\
-Unsigned 32-bit integer & $2{,}332{,}164{,}128$ \\
-Signed 32-bit integer & $-1{,}962{,}803{,}168$ \\
-IEEE 754 single precision & approximately $-2.504\times10^{-32}$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.35cm}
-
-Hardware stores the bit pattern; the operation determines its interpretation.
-
-\end{frame}
-
-% ============================================================
-% Slide 21
-% ============================================================
-
-\begin{frame}{Binary and Hexadecimal}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Unsigned binary uses powers of two:
-  \[
-  \text{value}
-  =
-  \sum_{i=0}^{n-1} b_i 2^i
-  \]
-
-  \item Example:
-  \[
-  \bits{101101}_2
-  =
-  32+8+4+1
-  =
-  45_{10}
-  \]
-
-  \item One hexadecimal digit represents four bits.
-  \item Hexadecimal is common for addresses, registers, masks, and instruction words.
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 22
-% ============================================================
-
-\begin{frame}{Byte Ordering}
-
-How is \hex{0a0b0c0d} stored at addresses \hex{1000}--\hex{1003}?
-
-\vspace{0.15cm}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{Little-Endian}
-\small
-\begin{center}
-\begin{tabular}{cc}
-\toprule
-Address & Byte \\
-\midrule
-\hex{1000} & \hex{0d} \\
-\hex{1001} & \hex{0c} \\
-\hex{1002} & \hex{0b} \\
-\hex{1003} & \hex{0a} \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Big-Endian}
-\small
-\begin{center}
-\begin{tabular}{cc}
-\toprule
-Address & Byte \\
-\midrule
-\hex{1000} & \hex{0a} \\
-\hex{1001} & \hex{0b} \\
-\hex{1002} & \hex{0c} \\
-\hex{1003} & \hex{0d} \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{block}
-
-\end{columns}
-
-\vspace{0.15cm}
-
-\small
-AArch64 supports configurable data endianness.
-Current mainstream systems generally use little-endian execution.
-
-\end{frame}
-
-% ============================================================
-% Slide 23
-% ============================================================
-
-\begin{frame}{Two's-Complement Representation}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Two's complement represents signed integers.
-  \item The most-significant bit has negative weight:
-  \[
-  \text{value}
-  =
-  -b_{n-1}2^{n-1}
-  +
-  \sum_{i=0}^{n-2}b_i2^i
-  \]
-
-  \item Negation within a fixed width is:
-  \[
-  -x=\sim x+1
-  \]
-\end{itemize}
-
-\vspace{0.2cm}
-
-\[
-\bits{00000101}
-\rightarrow
-\bits{11111010}
-\rightarrow
-\bits{11111011}
-=
--5
-\]
-
-\end{frame}
-
-% ============================================================
-% Slide 24
-% ============================================================
-
-\begin{frame}{Fixed-Width Integer Ranges}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{Unsigned}
-\[
-0\le x\le2^n-1
-\]
-\begin{itemize}
-  \item 8-bit: $0$ to $255$
-  \item 16-bit: $0$ to $65{,}535$
-  \item 32-bit: $0$ to $2^{32}-1$
-  \item 64-bit: $0$ to $2^{64}-1$
-\end{itemize}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Two's Complement}
-\[
--2^{n-1}\le x\le2^{n-1}-1
-\]
-\begin{itemize}
-  \item 8-bit: $-128$ to $127$
-  \item 16-bit: $-32{,}768$ to $32{,}767$
-  \item 32-bit: $-2^{31}$ to $2^{31}-1$
-  \item 64-bit: $-2^{63}$ to $2^{63}-1$
-\end{itemize}
-\end{block}
-
-\end{columns}
-
-\end{frame}
-
-% ============================================================
-% Slide 25
-% ============================================================
-
-\begin{frame}{Addition and Subtraction}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.45\textwidth}
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item The same adder can support signed and unsigned addition.
-  \item Two's-complement subtraction uses:
-  \[
-  A-B=A+(\sim B)+1
-  \]
-  \item Carry and signed overflow describe different properties.
-\end{itemize}
-
-\column{0.52\textwidth}
-\centering
-\begin{tikzpicture}[
-  node distance=0.45cm,
-  box/.style={draw=navy,fill=lightblue,rounded corners,align=center,font=\small,minimum width=1.9cm,minimum height=.55cm}
-]
-
-\node[box] (a) {A};
-\node[box,right=0.8cm of a] (b) {B};
-\node[box,below=of b,fill=gold!25] (inv) {$B \oplus sub$};
-\node[
-draw=navy,
-fill=deepblue,
-text=white,
-shape=trapezium,
-trapezium angle=60,
-shape border rotate=270,
-minimum width=2.4cm,
-minimum height=1.1cm,
-below=0.9cm of $(a)!0.5!(b)$,
-font=\bfseries
-] (add) {Adder};
-
-\draw[-{Latex},thick,navy] (a) |- (add.north west);
-\draw[-{Latex},thick,navy] (b) -- (inv);
-\draw[-{Latex},thick,navy] (inv) |- (add.north east);
-\draw[-{Latex},thick,navy] (add.south) -- ++(0,-0.55) node[below,font=\small]{Result};
-
-\node[font=\scriptsize] at ($(add.north)+(1.0,0.35)$) {carry-in = sub};
-
-\end{tikzpicture}
-
-\end{columns}
-
-\end{frame}
-
-% ============================================================
-% Slide 26
-% ============================================================
-
-\begin{frame}{Sign Extension and Zero Extension}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{Sign Extension}
-\centering
-\[
-\bits{11111111}_2=-1
-\]
-\[
-\Downarrow
-\]
-\[
-\hex{ffffffffffffffff}=-1
-\]
-\small Examples: \code{ldrsb}, \code{sxtb}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Zero Extension}
-\centering
-\[
-\bits{11111111}_2=255
-\]
-\[
-\Downarrow
-\]
-\[
-\hex{00000000000000ff}=255
-\]
-\small Examples: \code{ldrb}, \code{uxtb}
-\end{block}
-
-\end{columns}
-
-\vspace{0.2cm}
-
-Using the wrong extension operation changes the numerical value.
-
-\end{frame}
-
-% ============================================================
-% Slide 27
-% ============================================================
-
-\begin{frame}{AArch64 NZCV Flags}
-
-Flag-setting instructions update condition flags in PSTATE.
-
-\vspace{0.2cm}
-
-\small
-
-\begin{center}
-\begin{tabular}{cll}
-\toprule
-Flag & Name & Meaning \\
-\midrule
-N & Negative & Result MSB is 1 \\
-Z & Zero & Result is zero \\
-C & Carry & Carry-out / no-borrow \\
-V & Overflow & Signed arithmetic overflow \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.3cm}
-
-The carry flag is used in unsigned arithmetic;
-the overflow flag indicates signed overflow.
-
-\end{frame}
-
-% ============================================================
-% Slide 28
-% ============================================================
-
-\begin{frame}{Flag-Setting Instructions}
-
-\begin{itemize}\setlength{\itemsep}{8pt}
-  \item \code{add x0, x1, x2} does not update NZCV.
-  \item \code{adds x0, x1, x2} updates NZCV.
-  \item \code{sub x0, x1, x2} does not update NZCV.
-  \item \code{subs x0, x1, x2} updates NZCV.
-  \item \code{cmp x0, x1} is an alias for \code{subs xzr, x0, x1}.
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 29
-% ============================================================
-
-\begin{frame}{Signed and Unsigned Branches}
-
-After:
-
-\[
-\code{cmp x0, x1}
-\]
-
-conditional branches test different combinations of NZCV flags.
-
-\vspace{0.15cm}
-
-\small
-
-\begin{center}
-\begin{tabular}{lll}
-\toprule
-Branch & Interpretation & Condition \\
-\midrule
-\code{b.eq} & equal & $Z=1$ \\
-\code{b.ne} & not equal & $Z=0$ \\
-\code{b.lt} & signed less than & $N\ne V$ \\
-\code{b.ge} & signed greater/equal & $N=V$ \\
-\code{b.lo} & unsigned lower & $C=0$ \\
-\code{b.hs} & unsigned higher/equal & $C=1$ \\
-\code{b.hi} & unsigned higher & $C=1\land Z=0$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\end{frame}
-
-% ============================================================
-% PART 4
-% ============================================================
-
-\sectiondivider{PART 4}{Processor Performance}
-
-% ============================================================
-% Slide 30
-% ============================================================
-
-\begin{frame}{Execution Time and Performance}
-
-For a fixed workload:
-
-\[
-\text{Performance}
-=
-\frac{1}{\text{Execution Time}}
-\]
-
-\vspace{0.25cm}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item \key{Elapsed time} measures total observed response time.
-  \item \key{CPU time} measures processor time spent on the workload.
-  \item Clock period and clock frequency are reciprocals:
-  \[
-  T_{\text{clk}}
-  =
-  \frac{1}{f_{\text{clk}}}
-  \]
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 31
-% ============================================================
-
-\begin{frame}{Latency and Throughput}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{Latency}
-\begin{itemize}
-  \item Time required for one task
-  \item Measured in cycles or seconds
-  \item Important for response time and dependencies
-\end{itemize}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Throughput}
-\begin{itemize}
-  \item Work completed per unit time
-  \item Examples: IPC, requests/s, GB/s
-  \item Important for pipelines and parallel workloads
-\end{itemize}
-\end{block}
-
-\end{columns}
-
-\vspace{0.25cm}
-
-Pipelining increases throughput by overlapping operations.
-
-\end{frame}
-
-% ============================================================
-% Slide 32
-% ============================================================
-
-\begin{frame}{Dynamic Instruction Count}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item \key{Static instruction count} is the number of instructions in a code region.
-  \item An executable file also contains data and metadata.
-  \item \key{Dynamic instruction count (IC)} is the number of instructions actually executed.
-  \item Dynamic IC depends on loops, branches, calls, recursion, and input values.
-\end{itemize}
-
-\vspace{0.25cm}
-
-If a three-instruction loop body executes $N$ times,
-it contributes approximately $3N$ dynamic instructions.
-
-\end{frame}
-
-% ============================================================
-% Slide 33
-% ============================================================
-
-\begin{frame}{Cycles Per Instruction}
-
-Average cycles per instruction:
-
-\[
-\text{CPI}
-=
-\frac{\text{Total Clock Cycles}}
-     {\text{Dynamic Instruction Count}}
-\]
-
-\vspace{0.15cm}
-
-Instructions per cycle:
-
-\[
-\text{IPC}
-=
-\frac{1}{\text{CPI}}
-\]
-
-\vspace{0.2cm}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item A pedagogical single-cycle processor has CPI $=1$.
-  \item A superscalar processor can have CPI $<1$ when more than one instruction completes per cycle on average.
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 34
-% ============================================================
-
-\begin{frame}{Sources of CPI Variation}
-
-\begin{itemize}\setlength{\itemsep}{8pt}
-  \item Data dependencies can stall execution.
-  \item Branch mispredictions discard speculative work.
-  \item Cache misses delay instruction or data access.
-  \item Out-of-order execution can hide some latency.
-  \item Observed CPI depends strongly on workload behavior.
-\end{itemize}
-
-\vspace{0.25cm}
-
-A simple model is:
-
-\[
-\text{CPI}
-=
-\text{Base CPI}
-+
-\text{Stall Cycles per Instruction}
-\]
-
-\end{frame}
-
-% ============================================================
-% Slide 35
-% ============================================================
-
-\begin{frame}{Processor Performance Equation}
-
-\centering
-
-\begin{tikzpicture}[
-  box/.style={
-    draw=navy,
-    fill=lightblue,
-    rounded corners,
-    align=center,
-    font=\small\bfseries,
-    minimum width=2.2cm,
-    minimum height=.7cm
-  }
-]
-
-\node[box] (ic) {Instruction\\Count};
-\node[box,right=0.65cm of ic] (cpi) {CPI};
-\node[box,right=0.65cm of cpi] (clk) {Clock\\Period};
-\node[box,below=1.0cm of cpi,fill=gold!25,minimum width=4.2cm] (time) {CPU Execution Time};
-
-\draw[-{Latex},thick,navy] (ic) -- (cpi) node[midway,above,font=\small] {$\times$};
-\draw[-{Latex},thick,navy] (cpi) -- (clk) node[midway,above,font=\small] {$\times$};
-\draw[-{Latex},thick,navy] (cpi) -- (time);
-
-\end{tikzpicture}
-
-\vspace{0.35cm}
-
-\[
-T_{\text{CPU}}
-=
-\text{IC}\times\text{CPI}\times T_{\text{clk}}
-=
-\frac{\text{IC}\times\text{CPI}}{f_{\text{clk}}}
-\]
-
-\end{frame}
-
-% ============================================================
-% Slide 36
-% ============================================================
-
-\begin{frame}{What Influences Each Term?}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.32\textwidth}
-\begin{block}{IC}
-\begin{itemize}
-  \item Algorithm
-  \item Compiler
-  \item ISA
-\end{itemize}
-\end{block}
-
-\column{0.32\textwidth}
-\begin{block}{CPI}
-\begin{itemize}
-  \item Pipeline
-  \item Memory behavior
-  \item Branch behavior
-\end{itemize}
-\end{block}
-
-\column{0.32\textwidth}
-\begin{block}{Clock Period}
-\begin{itemize}
-  \item Pipeline depth
-  \item Circuit design
-  \item Technology
-\end{itemize}
-\end{block}
-
-\end{columns}
-
-\vspace{0.3cm}
-
-The terms are coupled; improving one can worsen another.
-
-\end{frame}
-
-% ============================================================
-% Slide 37
-% ============================================================
-
-\begin{frame}{Processor Performance Example}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{Machine A}
-\begin{itemize}
-  \item IC $=1.0\times10^9$
-  \item CPI $=2.0$
-  \item $f=4.0$ GHz
-\end{itemize}
-
-\[
-T_A
-=
-\frac{1.0\times10^9\times2.0}
-     {4.0\times10^9}
-=
-0.50\text{ s}
-\]
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Machine B}
-\begin{itemize}
-  \item IC $=1.2\times10^9$
-  \item CPI $=0.8$
-  \item $f=2.5$ GHz
-\end{itemize}
-
-\[
-T_B
-=
-\frac{1.2\times10^9\times0.8}
-     {2.5\times10^9}
-=
-0.384\text{ s}
-\]
-\end{block}
-
-\end{columns}
-
-\vspace{0.15cm}
-
-\[
-\text{Speedup}
-=
-\frac{0.50}{0.384}
-\approx
-1.30\times
-\]
-
-\end{frame}
-
-% ============================================================
-% Slide 38
-% ============================================================
-
-\begin{frame}{Clock Frequency Is Not Performance}
-
-\small
-
-\begin{center}
-\begin{tabular}{lccc}
-\toprule
-Processor & Frequency & CPI & Time / Instruction \\
-\midrule
-A & 4.0 GHz & 2.0 & $0.50$ ns \\
-B & 3.0 GHz & 1.0 & $0.333$ ns \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.4cm}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Both processors execute the same instruction count.
-  \item Processor B has a lower clock frequency.
-  \item Its lower CPI gives a shorter average time per instruction.
-  \item Processor B is about $1.5\times$ faster for this workload.
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 39
-% ============================================================
-
-\begin{frame}{Speedup}
-
-\[
-\text{Speedup}
-=
-\frac{T_{\text{old}}}
-     {T_{\text{new}}}
-\]
-
-\vspace{0.25cm}
-
-If runtime changes from $10$ seconds to $4$ seconds:
-
-\[
-\text{Speedup}
-=
-\frac{10}{4}
-=
-2.5\times
-\]
-
-\vspace{0.25cm}
-
-The runtime reduction is:
-
-\[
-\frac{10-4}{10}
-\times100\%
-=
-60\%
-\]
-
-\end{frame}
-
-% ============================================================
-% Slide 40
-% ============================================================
-
-\begin{frame}{Amdahl's Law}
-
-\centering
-
-\begin{tikzpicture}[
-  part/.style={draw=navy,thick,minimum height=.65cm,align=center,font=\small\bfseries}
-]
-
-\draw[part,fill=gold!30] (0,0) rectangle (4.2,.65) node[midway]{Enhanced fraction $f$};
-\draw[part,fill=lightblue] (4.2,0) rectangle (7.2,.65) node[midway]{Unaffected};
-
-\draw[decorate,decoration={brace,amplitude=4pt},thick,navy]
-(0,.85) -- (4.2,.85) node[midway,above=4pt,font=\small] {speeded up};
-
-\draw[decorate,decoration={brace,amplitude=4pt},thick,navy]
-(4.2,.85) -- (7.2,.85) node[midway,above=4pt,font=\small] {limits speedup};
-
-\end{tikzpicture}
-
-\vspace{0.45cm}
-
-\[
-S_{\text{overall}}
-=
-\frac{1}
-{(1-f)+\frac{f}{S}}
-\]
-
-\vspace{0.2cm}
-
-Only the enhanced part becomes faster.
-
-\end{frame}
-
-% ============================================================
-% Slide 41
-% ============================================================
-
-\begin{frame}{Amdahl's Law Example}
-
-Suppose $60\%$ of execution time is accelerated by $10\times$.
-
-\[
-S_{\text{overall}}
-=
-\frac{1}
-{0.40+\frac{0.60}{10}}
-=
-\frac{1}{0.46}
-\approx
-2.17\times
-\]
-
-\vspace{0.3cm}
-
-If the accelerated part became infinitely fast:
-
-\[
-S_{\max}
-=
-\frac{1}{0.40}
-=
-2.5\times
-\]
-
-\end{frame}
-
-% ============================================================
-% Slide 42
-% ============================================================
-
-\begin{frame}{Benchmarking}
-
-\begin{itemize}\setlength{\itemsep}{8pt}
-  \item MIPS is not reliable for comparing different architectures.
-  \item Different ISAs may execute different instruction counts.
-  \item Compiler options can significantly affect performance.
-  \item Benchmark results should report workload and configuration.
-  \item Suites such as SPEC CPU use several applications rather than one program.
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 43
-% ============================================================
-
-\begin{frame}{Architectural Trade-Offs}
-
-\small
-
-\begin{center}
-\begin{tabular}{lll}
-\toprule
-Design choice & Possible benefit & Possible cost \\
-\midrule
-Deeper pipeline & Shorter clock period & Higher branch penalty \\
-Wider issue & Higher possible IPC & Power and complexity \\
-Larger cache & Lower miss rate & Area and access latency \\
-Fixed-width ISA & Regular decoding & Lower code density in some cases \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.4cm}
-
-Architectural choices involve trade-offs.
-Their value depends on workload and implementation constraints.
-
-\end{frame}
-
-% ============================================================
-% SUMMARY
-% ============================================================
-
-\sectiondivider{SUMMARY}{Topic 1 Review}
-
-% ============================================================
-% Slide 44
-% ============================================================
-
-\begin{frame}{Topic 1 Summary}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item The ISA defines software-visible processor behavior.
-  \item Microarchitecture implements the ISA.
-  \item AArch64 provides the RISC-based reference ISA used in the course.
-  \item Modern processors commonly use modified Harvard organization.
-  \item Binary values require explicit interpretation.
-  \item Processor performance depends on instruction count, CPI, and clock period.
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 45
-% ============================================================
-
-\begin{frame}{Review Questions: Architecture and Representation}
-
-\begin{enumerate}\setlength{\itemsep}{7pt}
-  \item Which of the following are ISA properties:
-        visible registers, L1 cache size, instruction encoding, branch predictor?
-  \item Why are many modern processors described as modified Harvard?
-  \item Interpret \hex{a5} as an unsigned 8-bit integer and as an 8-bit two's-complement integer.
-  \item What is the difference between sign extension and zero extension?
-  \item What is the difference between carry and signed overflow?
-\end{enumerate}
-
-\end{frame}
-
-% ============================================================
-% Slide 46
-% ============================================================
-
-\begin{frame}{Review Questions: Performance}
-
-\begin{enumerate}\setlength{\itemsep}{7pt}
-  \item A compiler reduces IC by $20\%$ but increases CPI by $15\%$.
-        What is the resulting speedup?
-  \item An improvement accelerates $70\%$ of execution time by $4\times$.
-        What is the overall speedup?
-  \item Why can two $O(n)$ programs have different execution times because of locality?
-  \item Why can a lower-frequency processor outperform a higher-frequency processor?
-  \item Why may generated AArch64 code require cache synchronization before execution?
+% --- Slide 36: Wrap-Up & Transition to Topic 2 ---
+\begin{frame}{Wrap-Up and Next Steps}
+    \begin{block}{Transition to Topic 2: RISC Principles and ARM64 Architecture}
+        Building upon the foundational abstraction layers, system organization, and memory models, the next module examines:
+        \begin{itemize}
+            \item \key{RISC vs. CISC Design}: Contrasting fixed-width RISC execution models against variable-length instruction architectures.
+            \item \key{The Load/Store Paradigm}: Examining how AArch64 strictly isolates memory access from register-based computation.
+            \item \key{AArch64 Architectural Foundations}: Analyzing the modern 64-bit ARM instruction encoding model and dual register views (\code{W} vs. \code{X}).
+            \item \key{Programmer-Visible State}: Surveying general-purpose registers (\code{x0}--\code{x30}), stack pointers, link registers, and \code{PSTATE} condition flags.
+        \end{itemize}
+    \end{block}
 \end{frame}
 
 \end{document}
