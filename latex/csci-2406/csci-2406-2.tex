@@ -50,15 +50,15 @@
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
 \addtobeamertemplate{block begin}
-  {\vspace{0.1em}}
-  {\vspace{0.1em}}
+  {\vspace{0.05em}}
+  {\vspace{0.05em}}
 
 \addtobeamertemplate{block end}
   {}
-  {\vspace{0.2em}}
+  {\vspace{0.1em}}
 
 \setbeamertemplate{itemize/enumerate body begin}{
-  \setlength{\itemsep}{4pt}
+  \setlength{\itemsep}{3pt}
 }
 
 \setbeamertemplate{itemize/enumerate subbody begin}{
@@ -136,8 +136,18 @@
   fg=white
 }
 
-% No light-blue block bodies
 \setbeamercolor{block body}{
+  bg=softgray,
+  fg=darkgray
+}
+
+% Correct Beamer color keys for alert blocks using Navy theme
+\setbeamercolor{block title alerted}{
+  bg=navy,
+  fg=white
+}
+
+\setbeamercolor{block body alerted}{
   bg=softgray,
   fg=darkgray
 }
@@ -304,7 +314,7 @@ in AArch64.
 
 \end{block}
 
-\vspace{0.35cm}
+\vspace{0.25cm}
 
 \begin{itemize}
 
@@ -351,7 +361,7 @@ and memory access.
 
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{itemize}
 
@@ -413,7 +423,7 @@ and memory access.
 
 \end{columns}
 
-\vspace{0.35cm}
+\vspace{0.25cm}
 
 \begin{block}{Implementation Benefit}
 
@@ -444,7 +454,7 @@ instructions.
 
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{columns}[T,onlytextwidth]
 
@@ -500,12 +510,12 @@ Suppose the address in \code{x0}
 identifies a 64-bit value in memory
 that must be increased by 5.
 
-\vspace{0.3cm}
+\vspace{0.2cm}
 
 \begin{center}
 
 \begin{tikzpicture}[
-  node distance=0.55cm,
+  node distance=0.45cm,
   codebox/.style={
     rectangle,
     draw=navy,
@@ -515,7 +525,7 @@ that must be increased by 5.
     text width=10.8cm,
     align=left,
     rounded corners=2pt,
-    minimum height=.62cm
+    minimum height=.55cm
   }
 ]
 
@@ -538,7 +548,7 @@ that must be increased by 5.
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{Architectural Rule}
 
@@ -559,7 +569,7 @@ or modify a memory operand.
 \begin{center}
 
 \begin{tikzpicture}[
-  scale=.82,
+  scale=.78,
   every node/.style={font=\footnotesize}
 ]
 
@@ -662,7 +672,7 @@ node[left]{result}
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{Takeaway}
 
@@ -683,7 +693,7 @@ arithmetic instructions operate on register operands.
 
 \begin{center}
 
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{3.0cm}
@@ -743,7 +753,7 @@ AArch64, RISC-V
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 RISC and CISC are architectural traditions,
 not simple measures of modern processor complexity.
@@ -759,7 +769,7 @@ not simple measures of modern processor complexity.
 Suppose a 64-bit memory value
 must be increased by 5.
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{columns}[T,onlytextwidth]
 
@@ -825,7 +835,7 @@ and servers.
 
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{itemize}
 
@@ -892,7 +902,7 @@ and servers.
 
 \end{columns}
 
-\vspace{0.35cm}
+\vspace{0.25cm}
 
 \begin{alertblock}{Course Terminology}
 
@@ -971,7 +981,7 @@ occupies exactly \key{32 bits}.
 
 \end{block}
 
-\vspace{0.3cm}
+\vspace{0.2cm}
 
 \begin{center}
 
@@ -979,7 +989,7 @@ occupies exactly \key{32 bits}.
   fld/.style={
     draw=navy,
     thick,
-    minimum height=.9cm,
+    minimum height=.8cm,
     align=center,
     font=\small\bfseries
   }
@@ -1024,7 +1034,7 @@ occupies exactly \key{32 bits}.
 
 \end{center}
 
-\vspace{0.3cm}
+\vspace{0.2cm}
 
 \begin{itemize}
 
@@ -1036,7 +1046,7 @@ occupies exactly \key{32 bits}.
 
 \end{itemize}
 
-\vspace{0.15cm}
+\vspace{0.1cm}
 
 \small
 Detailed machine-code field layouts
@@ -1055,12 +1065,12 @@ Each general-purpose register
 can be accessed using either
 a 64-bit or 32-bit architectural view.
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{center}
 
 \begin{tikzpicture}[
-  scale=.88,
+  scale=.82,
   every node/.style={font=\small}
 ]
 
@@ -1114,7 +1124,7 @@ at (7.5,.38)
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{block}{32-Bit Write Rule}
 
@@ -1141,7 +1151,7 @@ of the corresponding \code{xn} register.
 
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{itemize}
 
@@ -1162,7 +1172,7 @@ of the corresponding \code{xn} register.
 
 \end{itemize}
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{center}
 
@@ -1209,7 +1219,7 @@ Each register is 64 bits wide.
 \begin{block}{64-Bit View}
 
 \begin{center}
-\Large
+\large
 \code{x0}--\code{x30}
 \end{center}
 
@@ -1231,7 +1241,7 @@ Each register is 64 bits wide.
 \begin{block}{32-Bit View}
 
 \begin{center}
-\Large
+\large
 \code{w0}--\code{w30}
 \end{center}
 
@@ -1249,6 +1259,8 @@ Each register is 64 bits wide.
 \end{block}
 
 \end{columns}
+
+\vspace{0.1cm}
 
 \begin{alertblock}{Important}
 
@@ -1270,38 +1282,71 @@ additional roles during procedure calls.
 
 \begin{block}{\code{xzr} / \code{wzr}}
 
-The zero register provides
-a constant zero operand
-and a discard destination.
+The zero register has two special behaviors:
+\key{reads return zero}
+and
+\key{writes are discarded}.
 
 \end{block}
 
-\vspace{0.3cm}
+\vspace{-0.5cm}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{Use as a Zero Operand}
+
+\begin{center}
+\Large
+\code{mov x0, xzr}
+\end{center}
 
 \begin{itemize}
 
-  \item Reads always produce
-        the value \code{0}.
+  \item Reading \code{xzr}
+        produces the value \code{0}.
 
-  \item Writes are discarded.
-
-  \item Useful when an instruction
-        needs a zero operand.
-
-  \item Useful when an instruction result
-        should be ignored.
+  \item Therefore,
+        \code{x0} receives zero.
 
 \end{itemize}
 
-\vspace{0.3cm}
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Use as a Discard Destination}
 
 \begin{center}
-
-\code{mov x0, xzr}
-\qquad
+\Large
 \code{cmp x1, x2}
-
 \end{center}
+
+\begin{itemize}
+
+  \item \code{cmp} is an alias for
+        \code{subs xzr, x1, x2}.
+
+  \item The subtraction result is discarded,
+        while NZCV flags are updated.
+
+\end{itemize}
+
+\end{block}
+
+\end{columns}
+
+\vspace{0.15cm}
+
+\begin{alertblock}{Key Idea}
+
+\code{xzr} behaves like a permanent zero value
+when read,
+and like a ``trash destination''
+when written.
+
+\end{alertblock}
 
 \end{frame}
 
@@ -1319,7 +1364,7 @@ and has dedicated architectural semantics.
 
 \end{block}
 
-\vspace{0.3cm}
+\vspace{0.2cm}
 
 \begin{itemize}
 
@@ -1338,7 +1383,7 @@ and has dedicated architectural semantics.
 
 \end{itemize}
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{center}
 \code{stp x29, x30, [sp, \#-16]!}
@@ -1360,7 +1405,7 @@ has special meaning.
 
 \end{block}
 
-\vspace{0.3cm}
+\vspace{0.2cm}
 
 \begin{columns}[T,onlytextwidth]
 
@@ -1393,7 +1438,7 @@ and memory-addressing contexts.
 
 \end{columns}
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \small
 The instruction definition
@@ -1416,7 +1461,7 @@ of execution.
 
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{itemize}
 
@@ -1449,7 +1494,7 @@ Some AArch64 instructions update
 four condition flags
 used by later operations.
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{center}
 
@@ -1458,7 +1503,7 @@ used by later operations.
     draw=navy,
     thick,
     minimum width=2.2cm,
-    minimum height=1.05cm,
+    minimum height=0.95cm,
     align=center,
     font=\bfseries
   }
@@ -1499,7 +1544,7 @@ used by later operations.
 
 \end{center}
 
-\vspace{0.3cm}
+\vspace{0.2cm}
 
 \begin{itemize}
 
@@ -1530,7 +1575,7 @@ used by later operations.
 
 \begin{center}
 
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{3.2cm}
@@ -1607,11 +1652,11 @@ For this course,
 core integer instructions
 are grouped into three broad functional classes.
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{columns}[T,onlytextwidth]
 
-\column{0.32\textwidth}
+\column{0.3\textwidth}
 
 \begin{block}{Data Processing}
 
@@ -1681,12 +1726,12 @@ are grouped into three broad functional classes.
 Data-processing instructions
 perform computation on register values.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
 \small
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{3.5cm}
@@ -1738,7 +1783,7 @@ Bitwise OR
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{Key Characteristic}
 
@@ -1759,12 +1804,12 @@ read or write a memory operand.
 Memory instructions transfer data
 between registers and memory.
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{center}
 
 \begin{tikzpicture}[
-  node distance=.5cm,
+  node distance=.45cm,
   membox/.style={
     rectangle,
     draw=navy,
@@ -1773,7 +1818,7 @@ between registers and memory.
     text width=10.8cm,
     align=left,
     rounded corners=2pt,
-    minimum height=.62cm
+    minimum height=.55cm
   }
 ]
 
@@ -1796,7 +1841,7 @@ between registers and memory.
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{Bracket Notation}
 
@@ -1819,7 +1864,7 @@ the address contained in
 Control-flow instructions
 change which instruction executes next.
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 
 \begin{columns}[T,onlytextwidth]
 
@@ -1884,7 +1929,7 @@ change which instruction executes next.
 
 \end{block}
 
-\vspace{0.3cm}
+\vspace{0.2cm}
 
 \begin{itemize}
 
@@ -1918,12 +1963,12 @@ where \code{x0}
 contains the address
 represented by \code{p}.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
 \small
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{3.3cm}
@@ -1969,7 +2014,7 @@ back to memory
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{RISC Connection}
 
@@ -1993,11 +2038,11 @@ Classify each instruction as
 or
 \key{Control Flow}.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{5.0cm}
@@ -2132,7 +2177,7 @@ or
         of \code{x5}
         after an instruction writes to \code{w5}?
 
-  \item How many general-purpose registers
+  \item How general-purpose registers
         are visible in AArch64?
 
   \item What are the roles of
@@ -2175,7 +2220,7 @@ or
 
 \end{enumerate}
 
-\vspace{0.35cm}
+\vspace{0.25cm}
 
 \begin{block}{Challenge}
 
@@ -2218,7 +2263,7 @@ in registers and memory.
 
 \end{block}
 
-\vspace{0.2cm}
+\vspace{0.15cm}
 
 Topic 2 established
 \key{what the AArch64 programmer can see};
