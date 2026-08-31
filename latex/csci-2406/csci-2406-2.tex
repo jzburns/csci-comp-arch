@@ -50,15 +50,15 @@
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
 \addtobeamertemplate{block begin}
-  {\vspace{0.1em}}
-  {\vspace{0.1em}}
+  {\vspace{0.05em}}
+  {\vspace{0.05em}}
 
 \addtobeamertemplate{block end}
   {}
-  {\vspace{0.2em}}
+  {\vspace{0.1em}}
 
 \setbeamertemplate{itemize/enumerate body begin}{
-  \setlength{\itemsep}{4pt}
+  \setlength{\itemsep}{3pt}
 }
 
 \setbeamertemplate{itemize/enumerate subbody begin}{
@@ -137,6 +137,17 @@
 }
 
 \setbeamercolor{block body}{
+  bg=softgray,
+  fg=darkgray
+}
+
+% Correct Beamer color keys for alert blocks using Navy theme
+\setbeamercolor{block title alerted}{
+  bg=navy,
+  fg=white
+}
+
+\setbeamercolor{block body alerted}{
   bg=softgray,
   fg=darkgray
 }
@@ -229,9 +240,8 @@
 \begin{document}
 
 % ============================================================
-% Slide 1
+% Slide: Title Slide
 % ============================================================
-
 \begin{frame}[plain]
 
 \begin{tikzpicture}[remember picture,overlay]
@@ -290,38 +300,29 @@
 \end{frame}
 
 % ============================================================
-% Slide 2
+% Slide: Topic 2 Outline
 % ============================================================
-
 \begin{frame}{Topic 2 Outline}
 
 \begin{block}{Topic Objective}
-
 Examine the design principles commonly associated with RISC
 architectures and show how those principles appear concretely
 in AArch64.
-
 \end{block}
 
-\vspace{0.35cm}
+\vspace{0.15cm}
 
 \begin{itemize}
-
   \item \key{Section 1}:
         RISC Design Principles
-
   \item \key{Section 2}:
         AArch64 Architectural Overview
-
   \item \key{Section 3}:
         Registers and Programmer-Visible State
-
   \item \key{Section 4}:
         Core AArch64 Instruction Classes
-
   \item \key{Section 5}:
         Summary and Self-Test
-
 \end{itemize}
 
 \end{frame}
@@ -335,45 +336,36 @@ in AArch64.
 }
 
 % ============================================================
-% What Does RISC Mean?
+% Slide: What Does RISC Mean?
 % ============================================================
-
 \begin{frame}{What Does RISC Mean?}
 
 \begin{block}{Reduced Instruction Set Computer}
-
 RISC is a design philosophy emphasizing
 \key{regularity},
 \key{simple instruction forms},
 and a clean separation between computation
 and memory access.
-
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{itemize}
-
   \item RISC does \key{not} simply mean
         ``a processor with very few instructions.''
-
   \item ``Reduced'' is better understood as
         \key{reduced instruction complexity and irregularity}.
-
   \item Arithmetic and logical operations
         are primarily register-based.
-
   \item Load and store instructions
         transfer data between registers and memory.
-
 \end{itemize}
 
 \end{frame}
 
 % ============================================================
-% Foundational RISC Principles
+% Slide: Foundational RISC Design Principles
 % ============================================================
-
 \begin{frame}{Foundational RISC Design Principles}
 
 \begin{columns}[T,onlytextwidth]
@@ -381,58 +373,42 @@ and memory access.
 \column{0.48\textwidth}
 
 \begin{block}{Instruction Regularity}
-
 \begin{itemize}
-
   \item Regular instruction formats.
-
   \item Consistent operand fields.
-
   \item Predictable instruction alignment.
-
 \end{itemize}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{Register-Centered Computation}
-
 \begin{itemize}
-
   \item Arithmetic uses registers.
-
   \item Memory access uses loads and stores.
-
   \item Regularity simplifies decoding.
-
 \end{itemize}
-
 \end{block}
 
 \end{columns}
 
-\vspace{0.35cm}
+\vspace{0.15cm}
 
 \begin{block}{Implementation Benefit}
-
 These characteristics support regular
 instruction fetch,
 decode,
 and pipelined implementation.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Load/Store Model
+% Slide: The Load/Store Architectural Model
 % ============================================================
-
 \begin{frame}{The Load/Store Architectural Model}
 
 \begin{block}{Separation of Memory Access and Computation}
-
 In a load/store architecture such as AArch64,
 arithmetic and logical instructions operate on registers.
 Memory is accessed using dedicated
@@ -440,49 +416,38 @@ Memory is accessed using dedicated
 and
 \key{store}
 instructions.
-
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
 
 \begin{block}{Data Processing}
-
 \begin{itemize}
-
   \item Operands are registers.
-
   \item Results are written to registers.
-
 \end{itemize}
 
 \begin{center}
 \Large
 \code{add x1, x2, x3}
 \end{center}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{Memory Access}
-
 \begin{itemize}
-
   \item Loads read memory into registers.
-
   \item Stores write registers to memory.
-
 \end{itemize}
 
 \begin{center}
 \Large
 \code{ldr x1, [x0]}
 \end{center}
-
 \end{block}
 
 \end{columns}
@@ -490,21 +455,20 @@ instructions.
 \end{frame}
 
 % ============================================================
-% Load-Compute-Store
+% Slide: Load--Compute--Store in AArch64
 % ============================================================
-
 \begin{frame}{Load--Compute--Store in AArch64}
 
 Suppose the address in \code{x0}
 identifies a 64-bit value in memory
 that must be increased by 5.
 
-\vspace{0.3cm}
+\vspace{0.15cm}
 
 \begin{center}
 
 \begin{tikzpicture}[
-  node distance=0.55cm,
+  node distance=0.35cm,
   codebox/.style={
     rectangle,
     draw=navy,
@@ -514,7 +478,7 @@ that must be increased by 5.
     text width=10.8cm,
     align=left,
     rounded corners=2pt,
-    minimum height=.62cm
+    minimum height=.5cm
   }
 ]
 
@@ -537,28 +501,25 @@ that must be increased by 5.
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.1cm}
 
 \begin{block}{Architectural Rule}
-
 The \code{add} instruction
 does not directly read
 or modify a memory operand.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Load/Store Diagram
+% Slide: Visualizing Load/Store Separation
 % ============================================================
-
 \begin{frame}{Visualizing Load/Store Separation}
 
 \begin{center}
 
 \begin{tikzpicture}[
-  scale=.82,
+  scale=.75,
   every node/.style={font=\footnotesize}
 ]
 
@@ -661,28 +622,25 @@ node[left]{result}
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.1cm}
 
 \begin{block}{Takeaway}
-
 Loads and stores connect memory to registers;
 arithmetic instructions operate on register operands.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% RISC vs CISC
+% Slide: RISC and CISC: Different Design Traditions
 % ============================================================
-
 \begin{frame}{RISC and CISC: Different Design Traditions}
 
 \small
 
 \begin{center}
 
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.05}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{3.0cm}
@@ -742,7 +700,7 @@ AArch64, RISC-V
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.1cm}
 
 RISC and CISC are architectural traditions,
 not simple measures of modern processor complexity.
@@ -750,19 +708,15 @@ not simple measures of modern processor complexity.
 \end{frame}
 
 % ============================================================
-% NEW SLIDE: FIXED VS VARIABLE WIDTH
+% Slide: AArch64 vs. x86-64: Instruction Length
 % ============================================================
-
 \begin{frame}{AArch64 vs. x86-64: Instruction Length}
 
 \begin{columns}[T,onlytextwidth]
 
-\vspace{-0.5cm}
-
 \column{0.48\textwidth}
 
 \begin{block}{AArch64 / A64}
-
 \begin{center}
 \Large
 \key{32 bits = 4 bytes}
@@ -773,13 +727,11 @@ not simple measures of modern processor complexity.
   \item Instructions are 4-byte aligned.
   \item Boundaries are known immediately.
 \end{itemize}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{x86-64}
-
 \begin{center}
 \Large
 \key{1 to 15 bytes}
@@ -790,32 +742,26 @@ not simple measures of modern processor complexity.
   \item Length depends on the encoding.
   \item Boundaries must be discovered.
 \end{itemize}
-
 \end{block}
 
 \end{columns}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{What a 16-Byte Fetch Might Contain}
-
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
-
 \centering
 \textbf{A64}
 
-\vspace{0.1cm}
-
+\vspace{0.05cm}
 \code{4B | 4B | 4B | 4B}
 
-\vspace{0.1cm}
-
+\vspace{0.05cm}
 Exactly four instructions.
 
 \column{0.48\textwidth}
-
 \centering
 \textbf{x86-64}
 
@@ -824,9 +770,9 @@ Exactly four instructions.
 Five instructions of different lengths.
 
 \end{columns}
-
 \end{block}
 
+\vspace{0.05cm}
 \begin{center}
 \key{A64 starts with known boundaries; x86-64 must determine them.}
 \end{center}
@@ -834,15 +780,14 @@ Five instructions of different lengths.
 \end{frame}
 
 % ============================================================
-% NEW SLIDE: IRREGULAR X86 DECODE
+% Slide: Why x86 Instruction Decode Is More Irregular
 % ============================================================
-
 \begin{frame}{Why x86 Instruction Decode Is More Irregular}
 
 An x86-64 instruction may contain
 several optional or variable-size components.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
@@ -850,7 +795,7 @@ several optional or variable-size components.
   every node/.style={
     draw=navy,
     thick,
-    minimum height=.95cm,
+    minimum height=.8cm,
     align=center,
     font=\scriptsize\bfseries
   }
@@ -907,7 +852,7 @@ several optional or variable-size components.
 
 \end{center}
 
-\vspace{0.2cm}
+\vspace{0.1cm}
 
 \begin{center}
 \small
@@ -916,50 +861,42 @@ some fields vary in size;
 the total instruction may be 1--15 bytes.
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
 
 \begin{block}{x86 Front-End Work}
-
 \begin{itemize}
   \item Find instruction boundaries.
   \item Interpret prefixes and opcode bytes.
   \item Decode optional addressing fields.
   \item Handle displacement and immediate lengths.
 \end{itemize}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{A64 Front-End Starting Point}
-
 \begin{center}
-
 \begin{tikzpicture}
-
 \node[
   draw=navy,
   thick,
   fill=softgray,
   minimum width=4.2cm,
-  minimum height=1.0cm,
+  minimum height=0.8cm,
   align=center,
   font=\small\bfseries
 ]
 {Exactly 32 bits\\One A64 Instruction};
-
 \end{tikzpicture}
-
 \end{center}
 
 The decoder already knows
 where the instruction begins
 and ends.
-
 \end{block}
 
 \end{columns}
@@ -967,64 +904,48 @@ and ends.
 \end{frame}
 
 % ============================================================
-% MODERN CONTEXT
+% Slide: What Does ``Reduced'' Buy the Hardware?
 % ============================================================
-
 \begin{frame}{What Does ``Reduced'' Buy the Hardware?}
 
 \begin{block}{Reduced Front-End Irregularity}
-
 A regular ISA can reduce some of the circuitry
 required to \key{find}, \key{align}, and \key{decode}
 instructions.
-
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
 
 \begin{block}{Potential Hardware Benefits}
-
 \begin{itemize}
-
   \item Simpler instruction-boundary detection.
-
   \item More regular decode paths.
-
   \item Less handling of legacy encoding cases.
-
   \item Potentially lower front-end area
         and switching activity.
-
 \end{itemize}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{But Not a Simple CPU}
-
 Modern AArch64 cores may still contain:
-
 \begin{itemize}
-
   \item out-of-order execution
   \item register renaming
   \item branch predictors
   \item large caches
   \item SIMD/vector units
-
 \end{itemize}
-
 \end{block}
 
 \end{columns}
 
-\vspace{0.2cm}
-
+\vspace{0.1cm}
 \begin{center}
 \key{RISC reduces ISA irregularity, not necessarily total CPU complexity.}
 \end{center}
@@ -1032,131 +953,99 @@ Modern AArch64 cores may still contain:
 \end{frame}
 
 % ============================================================
-% MODERN MOBILE CONTEXT
+% Slide: Why AArch64 Fits Mobile and Energy-Constrained Systems
 % ============================================================
-
 \begin{frame}{Why AArch64 Fits Mobile and Energy-Constrained Systems}
 
 AArch64 provides a regular architectural foundation
 that works well under tight power and thermal budgets.
 
-\vspace{-0.3cm}
+\vspace{-0.2cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
 
 \begin{block}{Architectural Characteristics}
-
 \begin{itemize}
-
   \item Fixed 32-bit A64 instructions.
-
   \item Regular instruction alignment.
-
   \item Explicit load/store memory access.
-
   \item Large register set.
-
   \item Comparatively regular decoding.
-
 \end{itemize}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{System-Level Advantages}
-
 \begin{itemize}
-
   \item Efficient processor front ends.
-
   \item Strong performance-per-watt designs.
-
   \item Highly integrated ARM-based SoCs.
-
   \item Long-established mobile ecosystem.
-
   \item Hardware can be specialized
         for a tight energy budget.
-
 \end{itemize}
-
 \end{block}
 
 \end{columns}
 
-
+\vspace{-0.1cm}
 \begin{block}{Important Qualification}
-
 AArch64 does not guarantee lower power.
 Energy consumption depends on the complete
 microarchitecture, semiconductor process,
 clock frequency, voltage, caches, and workload.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Same operation
+% Slide: Same Operation, Different ISA Style
 % ============================================================
-
 \begin{frame}{Same Operation, Different ISA Style}
 
 Suppose a 64-bit memory value
 must be increased by 5.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.46\textwidth}
 
 \begin{block}{x86-64 Style}
-
 Some x86-64 instructions permit
 memory operands directly:
 
 \begin{center}
-
 \begin{minipage}{0.72\textwidth}
 \raggedright
 \Large
-
 \code{add qword ptr [rax], 5}
-
 \end{minipage}
-
 \end{center}
 
 One instruction describes
 both memory access and arithmetic.
-
 \end{block}
 
 \column{0.50\textwidth}
 
 \begin{block}{AArch64 Load/Store Style}
-
 \begin{center}
-
 \begin{minipage}{0.62\textwidth}
 \raggedright
 \Large
-
 \code{ldr x1, [x0]}\\[0.15cm]
 \code{add x1, x1, \#5}\\[0.15cm]
 \code{str x1, [x0]}
-
 \end{minipage}
-
 \end{center}
 
 Memory transfer and arithmetic
 are represented by separate instructions.
-
 \end{block}
 
 \end{columns}
@@ -1172,47 +1061,38 @@ are represented by separate instructions.
 }
 
 % ============================================================
-% ARM and AArch64
+% Slide: ARM and AArch64
 % ============================================================
-
 \begin{frame}{ARM and AArch64}
 
 \begin{block}{ARM Architecture}
-
 ARM defines a family
 of instruction set architectures
 used in embedded systems,
 mobile computing,
 desktop systems,
 and servers.
-
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{itemize}
-
   \item \key{AArch64}
         is the 64-bit execution state
         introduced with ARMv8-A.
-
   \item It provides a modern
         64-bit programmer-visible register model.
-
   \item It follows a load/store design
         with regular instruction formats.
-
   \item Different processors can implement AArch64
         using different microarchitectures.
-
 \end{itemize}
 
 \end{frame}
 
 % ============================================================
-% AArch64 vs A64
+% Slide: AArch64 and A64 Terminology
 % ============================================================
-
 \begin{frame}{AArch64 and A64 Terminology}
 
 \begin{columns}[T,onlytextwidth]
@@ -1220,58 +1100,43 @@ and servers.
 \column{0.48\textwidth}
 
 \begin{block}{AArch64}
-
 \begin{itemize}
-
   \item The architecture / execution state.
-
   \item Defines programmer-visible state.
-
   \item Includes registers,
         memory behavior,
         and instruction semantics.
-
 \end{itemize}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{A64}
-
 \begin{itemize}
-
   \item The instruction set encoding.
-
   \item Used while executing
         in AArch64 state.
-
   \item A64 instructions
         are fixed 32-bit words.
-
 \end{itemize}
-
 \end{block}
 
 \end{columns}
 
-\vspace{0.35cm}
+\vspace{0.15cm}
 
 \begin{block}{Course Terminology}
-
 Use \key{AArch64} by default.
 Use \key{A64}
 only when referring specifically
 to the instruction set encoding.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Key characteristics
+% Slide: Key Characteristics of AArch64
 % ============================================================
-
 \begin{frame}{Key Characteristics of AArch64}
 
 \begin{columns}[T,onlytextwidth]
@@ -1279,41 +1144,27 @@ to the instruction set encoding.
 \column{0.48\textwidth}
 
 \begin{block}{Instruction Model}
-
 \begin{itemize}
-
   \item Load/store architecture.
-
   \item A64 instructions are 32 bits wide.
-
   \item Instructions are 4-byte aligned.
-
   \item Register fields are regular.
-
 \end{itemize}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{Register Model}
-
 \begin{itemize}
-
   \item 31 general-purpose registers.
-
   \item 64-bit \code{x} register views.
-
   \item 32-bit \code{w} register views.
-
   \item Special roles for
         \code{sp},
         \code{xzr},
         PC state,
         and NZCV.
-
 \end{itemize}
-
 \end{block}
 
 \end{columns}
@@ -1321,20 +1172,17 @@ to the instruction set encoding.
 \end{frame}
 
 % ============================================================
-% A64 format
+% Slide: A64 Instruction Format Characteristics
 % ============================================================
-
 \begin{frame}{A64 Instruction Format Characteristics}
 
 \begin{block}{Fixed-Width Encoding}
-
 Every instruction
 in the A64 instruction set
 occupies exactly \key{32 bits}.
-
 \end{block}
 
-\vspace{0.3cm}
+\vspace{0.2cm}
 
 \begin{center}
 
@@ -1342,7 +1190,7 @@ occupies exactly \key{32 bits}.
   fld/.style={
     draw=navy,
     thick,
-    minimum height=.9cm,
+    minimum height=.8cm,
     align=center,
     font=\small\bfseries
   }
@@ -1387,19 +1235,16 @@ occupies exactly \key{32 bits}.
 
 \end{center}
 
-\vspace{0.3cm}
+\vspace{0.2cm}
 
 \begin{itemize}
-
   \item Fixed width simplifies
         instruction alignment and initial decode.
-
   \item Exact bit-field layouts
         vary by instruction class.
-
 \end{itemize}
 
-\vspace{0.15cm}
+\vspace{0.1cm}
 
 \small
 Detailed machine-code field layouts
@@ -1409,21 +1254,20 @@ in the instruction-encoding topic.
 \end{frame}
 
 % ============================================================
-% X / W views
+% Slide: Dual Register Views: X and W
 % ============================================================
-
 \begin{frame}{Dual Register Views: \code{X} and \code{W}}
 
 Each general-purpose register
 can be accessed using either
 a 64-bit or 32-bit architectural view.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
 \begin{tikzpicture}[
-  scale=.88,
+  scale=.82,
   every node/.style={font=\small}
 ]
 
@@ -1477,66 +1321,53 @@ at (7.5,.38)
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{32-Bit Write Rule}
-
 Writing to a \code{wn} destination
 automatically clears bits [63:32]
 of the corresponding \code{xn} register.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Example 32-bit write
+% Slide: Example: 32-Bit Write Clears Upper Bits
 % ============================================================
-
 \begin{frame}{Example: 32-Bit Write Clears Upper Bits}
 
 \begin{block}{Instruction}
-
 \begin{center}
 \Large
 \code{add w3, w1, w2}
 \end{center}
-
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{itemize}
-
   \item The operation uses
         the lower 32-bit views:
         \code{w1}
         and
         \code{w2}.
-
   \item The 32-bit result
         is written into
         \code{w3}.
-
   \item The upper half
         of
         \code{x3}
         is cleared automatically.
-
 \end{itemize}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
-
 \begin{minipage}{0.40\textwidth}
 \raggedright
-
 \code{x3[63:32] <- 0}\\[0.15cm]
 \code{x3[31:0] <- result}
-
 \end{minipage}
-
 \end{center}
 
 \end{frame}
@@ -1550,13 +1381,11 @@ of the corresponding \code{xn} register.
 }
 
 % ============================================================
-% GPRs
+% Slide: AArch64 General-Purpose Registers
 % ============================================================
-
 \begin{frame}{AArch64 General-Purpose Registers}
 
 \begin{block}{Register Set}
-
 AArch64 provides
 \key{31 general-purpose registers},
 named
@@ -1564,182 +1393,146 @@ named
 through
 \code{x30}.
 Each register is 64 bits wide.
-
 \end{block}
 
-\vspace{0.25cm}
+\vspace{-0.1cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.47\textwidth}
 
 \begin{block}{64-Bit View}
-
 \begin{center}
-\Large
+\large
 \code{x0}--\code{x30}
 \end{center}
 
 \begin{itemize}
-
   \item Each \code{xn}
         holds 64 bits.
-
   \item Used for integer values,
         addresses,
         and general computation.
-
 \end{itemize}
-
 \end{block}
 
 \column{0.47\textwidth}
 
 \begin{block}{32-Bit View}
-
 \begin{center}
-\Large
+\large
 \code{w0}--\code{w30}
 \end{center}
 
 \begin{itemize}
-
   \item Each \code{wn}
         refers to bits [31:0]
         of \code{xn}.
-
   \item Writing \code{wn}
         clears bits [63:32].
-
 \end{itemize}
-
 \end{block}
 
 \end{columns}
 
-\vspace{0.2cm}
+\vspace{-0.1cm}
 
 \begin{block}{Important}
-
 The ISA treats
 \code{x0}--\code{x30}
 as general-purpose registers.
 Software conventions assign
 additional roles during procedure calls.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Zero register
+% Slide: The Zero Register
 % ============================================================
-
 \begin{frame}{The Zero Register}
 
 \begin{block}{\code{xzr} / \code{wzr}}
-
 The zero register has two special behaviors:
 \key{reads return zero}
 and
 \key{writes are discarded}.
-
 \end{block}
 
-\vspace{0.35cm}
+\vspace{0.15cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
 
 \begin{block}{Use as a Zero Operand}
-
 \begin{center}
 \Large
 \code{mov x0, xzr}
 \end{center}
 
 \begin{itemize}
-
   \item Reading \code{xzr}
         produces the value \code{0}.
-
   \item Therefore,
         \code{x0} receives zero.
-
 \end{itemize}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{Use as a Discard Destination}
-
 \begin{center}
 \Large
 \code{cmp x1, x2}
 \end{center}
 
 \begin{itemize}
-
   \item \code{cmp} is an alias for
         \code{subs xzr, x1, x2}.
-
   \item The subtraction result is discarded,
         while NZCV flags are updated.
-
 \end{itemize}
-
 \end{block}
 
 \end{columns}
 
-\vspace{0.3cm}
+\vspace{0.1cm}
 
 \begin{block}{Key Idea}
-
 \code{xzr} behaves like a permanent zero value
 when read,
 and like a discard destination when written.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Stack pointer
+% Slide: The Stack Pointer
 % ============================================================
-
 \begin{frame}{The Stack Pointer}
 
 \begin{block}{\code{sp}}
-
 The stack pointer identifies
 the current stack location
 and has dedicated architectural semantics.
-
 \end{block}
 
-\vspace{0.3cm}
+\vspace{0.15cm}
 
 \begin{itemize}
-
   \item Used by stack-related
         load/store and arithmetic forms.
-
   \item Represents a memory address,
         not a normal scratch register.
-
   \item Software conventions impose
         alignment and usage requirements.
-
   \item Stack behavior is studied
         more deeply with procedures
         and function calls.
-
 \end{itemize}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 \code{stp x29, x30, [sp, \#-16]!}
@@ -1748,53 +1541,44 @@ and has dedicated architectural semantics.
 \end{frame}
 
 % ============================================================
-% Reg 31
+% Slide: Encoding Note: Register Number 31
 % ============================================================
-
 \begin{frame}{Encoding Note: Register Number 31}
 
 \begin{block}{Context-Dependent Meaning}
-
 In several A64 instruction formats,
 register encoding value 31
 has special meaning.
-
 \end{block}
 
-\vspace{0.3cm}
+\vspace{0.15cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
 
 \begin{block}{Often Means Zero Register}
-
 \begin{center}
 \Large
 \code{xzr} / \code{wzr}
 \end{center}
-
 Common in data-processing contexts.
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{Sometimes Means Stack Pointer}
-
 \begin{center}
 \Large
 \code{sp} / \code{wsp}
 \end{center}
-
 Common in stack
 and memory-addressing contexts.
-
 \end{block}
 
 \end{columns}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \small
 The instruction definition
@@ -1803,54 +1587,45 @@ determines the meaning.
 \end{frame}
 
 % ============================================================
-% PC
+% Slide: The Program Counter
 % ============================================================
-
 \begin{frame}{The Program Counter}
 
 \begin{block}{Program Counter State}
-
 The program counter identifies
 the instruction address
 associated with the current flow
 of execution.
-
 \end{block}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{itemize}
-
   \item Sequential execution advances
         to the next instruction.
-
   \item Branches and calls redirect execution
         to another address.
-
   \item Unlike AArch32 \code{r15},
         the AArch64 program counter
         is \key{not}
         an ordinary general-purpose register.
-
   \item AArch64 arithmetic instructions
         cannot use \code{pc}
         as a normal register operand.
-
 \end{itemize}
 
 \end{frame}
 
 % ============================================================
-% NZCV
+% Slide: Condition Flags: NZCV
 % ============================================================
-
 \begin{frame}{Condition Flags: NZCV}
 
 Some AArch64 instructions update
 four condition flags
 used by later operations.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
@@ -1859,7 +1634,7 @@ used by later operations.
     draw=navy,
     thick,
     minimum width=2.2cm,
-    minimum height=1.05cm,
+    minimum height=0.9cm,
     align=center,
     font=\bfseries
   }
@@ -1900,38 +1675,32 @@ used by later operations.
 
 \end{center}
 
-\vspace{0.3cm}
+\vspace{0.15cm}
 
 \begin{itemize}
-
   \item \key{N}:
         result has its sign bit set.
-
   \item \key{Z}:
         result is zero.
-
   \item \key{C}:
         carry-out for addition;
         no-borrow for subtraction.
-
   \item \key{V}:
         signed arithmetic overflow.
-
 \end{itemize}
 
 \end{frame}
 
 % ============================================================
-% State summary
+% Slide: Programmer-Visible State: Summary
 % ============================================================
-
 \begin{frame}{Programmer-Visible State: Summary}
 
 \small
 
 \begin{center}
 
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.05}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{3.2cm}
@@ -1999,23 +1768,21 @@ by flag-setting and conditional operations
 }
 
 % ============================================================
-% Three classes
+% Slide: Three Core Instruction Classes
 % ============================================================
-
 \begin{frame}{Three Core Instruction Classes}
 
 For this course,
 core integer instructions
 are grouped into three broad functional classes.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.32\textwidth}
 
 \begin{block}{Data Processing}
-
 \begin{itemize}
   \item arithmetic
   \item logic
@@ -2023,16 +1790,13 @@ are grouped into three broad functional classes.
 \end{itemize}
 
 \centering
-
 \code{add}, \code{sub}\\
 \code{and}, \code{cmp}
-
 \end{block}
 
 \column{0.32\textwidth}
 
 \begin{block}{Memory Access}
-
 \begin{itemize}
   \item loads
   \item stores
@@ -2040,16 +1804,13 @@ are grouped into three broad functional classes.
 \end{itemize}
 
 \centering
-
 \code{ldr}, \code{str}\\
 \code{ldp}, \code{stp}
-
 \end{block}
 
 \column{0.32\textwidth}
 
 \begin{block}{Control Flow}
-
 \begin{itemize}
   \item branches
   \item calls
@@ -2057,10 +1818,8 @@ are grouped into three broad functional classes.
 \end{itemize}
 
 \centering
-
 \code{b}, \code{b.eq}\\
 \code{bl}, \code{ret}
-
 \end{block}
 
 \end{columns}
@@ -2068,20 +1827,19 @@ are grouped into three broad functional classes.
 \end{frame}
 
 % ============================================================
-% Data Processing
+% Slide: Class 1: Data Processing
 % ============================================================
-
 \begin{frame}{Class 1: Data Processing}
 
 Data-processing instructions
 perform computation on register values.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
 \small
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.05}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{3.5cm}
@@ -2133,33 +1891,30 @@ Bitwise OR
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{Key Characteristic}
-
 The operands are registers;
 these instructions do not directly
 read or write a memory operand.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Memory Access
+% Slide: Class 2: Memory Access
 % ============================================================
-
 \begin{frame}{Class 2: Memory Access}
 
 Memory instructions transfer data
 between registers and memory.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
 \begin{tikzpicture}[
-  node distance=.5cm,
+  node distance=.4cm,
   membox/.style={
     rectangle,
     draw=navy,
@@ -2168,7 +1923,7 @@ between registers and memory.
     text width=10.8cm,
     align=left,
     rounded corners=2pt,
-    minimum height=.62cm
+    minimum height=.5cm
   }
 ]
 
@@ -2191,69 +1946,54 @@ between registers and memory.
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{Bracket Notation}
-
 \code{[x2]}
 means:
 access memory using
 the address contained in
 \code{x2}.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Control Flow
+% Slide: Class 3: Control Flow
 % ============================================================
-
 \begin{frame}{Class 3: Control Flow}
 
 Control-flow instructions
 change which instruction executes next.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
 
 \begin{block}{Unconditional}
-
 \begin{itemize}
-
   \item \code{b target}:
         branch
-
   \item \code{bl function}:
         call
-
   \item \code{ret}:
         return
-
 \end{itemize}
-
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{Conditional}
-
 \begin{itemize}
-
   \item \code{b.eq target}:
         branch if equal
-
   \item \code{b.ne target}:
         branch if not equal
-
   \item Conditional branches
         may test NZCV flags.
-
 \end{itemize}
-
 \end{block}
 
 \end{columns}
@@ -2261,46 +2001,35 @@ change which instruction executes next.
 \end{frame}
 
 % ============================================================
-% Comparison
+% Slide: Comparison and Branching
 % ============================================================
-
 \begin{frame}{Comparison and Branching}
 
 \begin{block}{Common Pattern}
-
 \begin{center}
 \Large
-
 \code{cmp x0, x1}\\[0.15cm]
-
 \code{b.eq equal}
-
 \end{center}
-
 \end{block}
 
-\vspace{0.3cm}
+\vspace{0.15cm}
 
 \begin{itemize}
-
   \item \code{cmp}
         compares two register values.
-
   \item It updates condition flags
         rather than storing a data result.
-
   \item \code{b.eq}
         uses those flags
         to decide whether to branch.
-
 \end{itemize}
 
 \end{frame}
 
 % ============================================================
-% Classes together
+% Slide: How the Instruction Classes Work Together
 % ============================================================
-
 \begin{frame}{How the Instruction Classes Work Together}
 
 Consider:
@@ -2313,12 +2042,12 @@ where \code{x0}
 contains the address
 represented by \code{p}.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
 \small
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.05}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{3.3cm}
@@ -2364,22 +2093,19 @@ back to memory
 
 \end{center}
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{block}{RISC Connection}
-
 The sequence separates
 memory transfer
 from register computation.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Exercise
+% Slide: Instruction Classification Exercise
 % ============================================================
-
 \begin{frame}{Instruction Classification Exercise}
 
 Classify each instruction as
@@ -2388,11 +2114,11 @@ Classify each instruction as
 or
 \key{Control Flow}.
 
-\vspace{0.25cm}
+\vspace{0.15cm}
 
 \begin{center}
 
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.05}
 
 \begin{tabular}{
   >{\raggedright\arraybackslash}m{5.0cm}
@@ -2450,90 +2176,72 @@ or
 }
 
 % ============================================================
-% Summary
+% Slide: Topic 2 Summary
 % ============================================================
-
 \begin{frame}{Topic 2 Summary}
 
 \begin{itemize}
-
   \item \key{RISC Design}:
         emphasizes reduced instruction complexity,
         regular formats,
         register-based computation,
         and explicit load/store memory access.
-
   \item \key{Instruction Regularity}:
         every A64 instruction is 32 bits,
         while x86-64 instructions may range from
         1 to 15 bytes.
-
   \item \key{AArch64}:
         ARM's 64-bit architectural execution state.
-
   \item \key{Programmer-Visible State}:
         \code{x0}--\code{x30},
         \code{sp},
         \code{xzr}/\code{wzr},
         PC state,
         and NZCV.
-
   \item \key{Instruction Classes}:
         Data Processing,
         Memory Access,
         and Control Flow.
-
 \end{itemize}
 
 \end{frame}
 
 % ============================================================
-% Self-Test 1
+% Slide: Self-Test 1/3
 % ============================================================
-
 \begin{frame}{Self-Test 1/3}
 
 \begin{enumerate}
-
   \item Why does ``reduced''
         in RISC not simply mean
         fewer instructions?
-
   \item What does it mean
         to say that AArch64
         is a load/store architecture?
-
   \item Why does fixed-width instruction encoding
         simplify instruction fetch and decode?
-
   \item How does A64 instruction length
         differ from x86-64 instruction length?
-
 \end{enumerate}
 
 \end{frame}
 
 % ============================================================
-% Self-Test 2
+% Slide: Self-Test 2/3
 % ============================================================
-
 \begin{frame}{Self-Test 2/3}
 
 \begin{enumerate}
 \setcounter{enumi}{4}
-
   \item What happens to bits [63:32]
         of \code{x5}
         after an instruction writes to \code{w5}?
-
   \item How many general-purpose registers
-        are visible in AArch64?
-
+        visible in AArch64?
   \item What are the roles of
         \code{xzr},
         \code{sp},
         and the program counter?
-
   \item What do the
         \code{N},
         \code{Z},
@@ -2541,24 +2249,20 @@ or
         and
         \code{V}
         condition flags represent?
-
 \end{enumerate}
 
 \end{frame}
 
 % ============================================================
-% Self-Test 3
+% Slide: Self-Test 3/3
 % ============================================================
-
 \begin{frame}{Self-Test 3/3}
 
 \begin{enumerate}
 \setcounter{enumi}{8}
-
   \item What are the three core
         instruction classes
         used in this course?
-
   \item Classify each instruction:
         \code{add},
         \code{ldr},
@@ -2566,29 +2270,24 @@ or
         \code{cmp},
         and
         \code{b.eq}.
-
 \end{enumerate}
 
-\vspace{0.35cm}
+\vspace{0.15cm}
 
 \begin{block}{Challenge}
-
 Explain why fixed 32-bit A64 instructions
 can require less instruction-boundary logic
 than variable-length x86-64 instructions.
-
 \end{block}
 
 \end{frame}
 
 % ============================================================
-% Wrap-Up
+% Slide: Wrap-Up and Next Steps
 % ============================================================
-
 \begin{frame}{Wrap-Up and Next Steps}
 
 \begin{block}{Topic 3: Machine-Level Data Representation}
-
 The next lecture examines
 how bit patterns manipulated
 by AArch64 instructions
@@ -2596,20 +2295,14 @@ represent numerical values
 in registers and memory.
 
 \begin{itemize}
-
   \item Binary and hexadecimal representation
-
   \item Signed and unsigned integers
-
   \item Two's-complement representation
-
   \item Endianness and data alignment
-
 \end{itemize}
-
 \end{block}
 
-\vspace{0.2cm}
+\vspace{0.1cm}
 
 Topic 2 established
 \key{what the AArch64 programmer can see};
