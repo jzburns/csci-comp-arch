@@ -3,72 +3,51 @@
 % ============================================================
 % Theme and typography
 % ============================================================
-
 \usetheme{Madrid}
 \usecolortheme{default}
 \usefonttheme{professionalfonts}
-
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
-
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
-    CSCI 2406 --- Computer Organization \& Architecture (ARM64 / AArch64 Reference)
+    CSCI 2406 --- Computer Organization \& Architecture (AArch64 Reference)
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
-
-\setbeamersize{
-  text margin left=0.65cm,
-  text margin right=0.65cm
-}
-
-\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
-\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
-
-% Block vertical padding adjustments
-\addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
-\addtobeamertemplate{block end}{}{\vspace{0.2em}}
-
-% Base list item separation
-\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
+\addtobeamertemplate{block begin}{\vspace{0.05em}}{\vspace{0.05em}}
+\addtobeamertemplate{block end}{}{\vspace{0.10em}}
+\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{3pt}}
 \setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
 
 % ============================================================
 % Packages
 % ============================================================
-
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage[scale=0.92]{sourcecodepro}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{colortbl}
 \usepackage{tikz}
-
-\usetikzlibrary{
-  arrows.meta,
-  positioning,
-  shapes.geometric,
-  calc,
-  decorations.pathreplacing
-}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
 
 % ============================================================
 % Colors
 % ============================================================
-
 \definecolor{navy}{RGB}{24,43,68}
 \definecolor{deepblue}{RGB}{45,88,130}
-\definecolor{lightblue}{RGB}{235,242,250}
 \definecolor{softgray}{RGB}{245,247,250}
+\definecolor{mediumgray}{RGB}{232,235,239}
 \definecolor{darkgray}{RGB}{25,28,32}
 \definecolor{gold}{RGB}{200,145,35}
-
 \setbeamercolor{palette primary}{bg=navy,fg=white}
 \setbeamercolor{palette secondary}{bg=deepblue,fg=white}
 \setbeamercolor{frametitle}{bg=navy,fg=white}
@@ -78,21 +57,21 @@
 \setbeamercolor{date}{fg=white}
 \setbeamercolor{titlelike}{fg=white}
 \setbeamercolor{block title}{bg=deepblue,fg=white}
-\setbeamercolor{block body}{bg=lightblue,fg=darkgray}
+\setbeamercolor{block body}{bg=softgray,fg=darkgray}
 \setbeamercolor{normal text}{fg=darkgray,bg=white}
 
 % ============================================================
 % Formatting shortcuts
 % ============================================================
-
 \setlength{\parskip}{0pt}
-
 \newcommand{\key}[1]{\textbf{#1}}
 \newcommand{\bits}[1]{\texttt{#1}}
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 
-% Section divider macro
+% ============================================================
+% Section divider
+% ============================================================
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
@@ -111,29 +90,17 @@
 % ============================================================
 % Metadata
 % ============================================================
-
-\title[Topic 5]{
-  AArch64 Arithmetic and Logical Instructions
-}
-
-\subtitle{
-  Arithmetic instructions, logical and bitwise instructions,\\
-  shift instructions, and immediate values and constants
-}
-
-\author{
-  Computer Organization \& Architecture
-}
-
+\title[Topic 5]{AArch64 Arithmetic, Logic, Shifts, and Flags}
+\subtitle{Fixed-width arithmetic, NZCV flags, bit operations, shifts, aliases, and instruction-level interpretation}
+\author{Computer Organization \& Architecture}
 \date{Topic 5}
-
-% ============================================================
-% Presentation Body (35 Frames Total)
-% ============================================================
 
 \begin{document}
 
-% --- Slide 1: Title Slide ---
+% ============================================================
+% Slide 1
+% Slide Header: AArch64 Arithmetic, Logic, Shifts, and Flags
+% ============================================================
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
@@ -143,468 +110,731 @@
 \begin{minipage}{0.9\textwidth}
 {\color{gold}\large\bfseries CSCI 2406: Topic 05\par}
 \vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries AArch64 Arithmetic and Logical Instructions\par}
+{\color{white}\fontsize{20}{24}\selectfont\bfseries AArch64 Arithmetic, Logic, Shifts, and Flags\par}
 \vspace{0.3cm}
-{\color{lightblue}\normalsize Arithmetic instructions, logical and bitwise instructions, shift instructions, and immediate values and constants\par}
+{\color{softgray}\normalsize Integer arithmetic, logical operations, shifts, aliases, condition flags, and machine-level interpretation\par}
 \vspace{0.6cm}
-{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad Topic 5\par}
+{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad AArch64 Reference\par}
 \end{minipage}
 \end{frame}
 
-% --- Slide 2: Topic Outline ---
+% ============================================================
+% Slide 2
+% Slide Header: Topic 5 Outline
+% ============================================================
 \begin{frame}{Topic 5 Outline}
-    \begin{block}{Topic Objective}
-        Analysis of AArch64 Instruction Set Architecture specifications for arithmetic computation, bitwise logic manipulation, shift operations, and immediate constant handling.
-    \end{block}
-    \vspace{0.4em}
-    \begin{itemize}
-        \item \key{Section 1}: Arithmetic Instructions and Operand Sizing
-        \item \key{Section 2}: Logical and Bitwise Instructions
-        \item \key{Section 3}: Shift Instructions and Barrel Shifting
-        \item \key{Section 4}: Immediate Values and Constants
-        \item \key{Section 5}: Summary and Worked Self-Test Exercises
-    \end{itemize}
-\end{frame}
-
-% --- Slide 3: Introductory Concepts ---
-\begin{frame}{Foundations of Data Processing}
-    \begin{block}{Role of Data-Processing Instructions}
-        Data-processing instructions form the core computational mechanism of the CPU, transforming data held in general-purpose registers without direct memory access.
-    \end{block}
-    \vspace{0.4em}
-    \begin{itemize}
-        \item Executes entirely within the CPU core datapath.
-        \item Separates compute instructions from memory load and store operations.
-        \item Provides uniform instruction execution speed and pipeline predictability.
-    \end{itemize}
+\begin{block}{Topic Objective}
+Understand how AArch64 data-processing instructions operate on fixed-width bit patterns and how NZCV flags support signed and unsigned interpretation.
+\end{block}
+\vspace{0.25cm}
+\begin{itemize}
+  \item \key{Section 1}: Fixed-width arithmetic and interpretation
+  \item \key{Section 2}: Flag-setting arithmetic and comparisons
+  \item \key{Section 3}: Logical operations and bit masks
+  \item \key{Section 4}: Shifts, rotates, immediates, and aliases
+  \item \key{Section 5}: Summary and self-test
+\end{itemize}
 \end{frame}
 
 % ============================================================
-% SECTION 1
+% Slide 3
+% Slide Header: Section 01 — Fixed-Width Arithmetic
 % ============================================================
-\sectiondivider{Section 01}{Arithmetic Instructions}
+\sectiondivider{Section 01}{Fixed-Width Arithmetic and Interpretation}
 
-% --- Slide 5: Overview of AArch64 Arithmetic ---
-\begin{frame}{Arithmetic Instructions in AArch64}
-    AArch64 utilizes a three-operand assembly syntax for computation:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \key{Syntax Format}: \code{mnemonic destination, source1, source2}
-        \item Operands target 32-bit registers (\code{w0}--\code{w30}) or 64-bit registers (\code{x0}--\code{x30}).
-        \item Arithmetic instructions execute within the CPU datapath using general-purpose registers.
-    \end{itemize}
-    \vspace{0.3em}
-    \begin{block}{Core Arithmetic Opcodes}
-        \begin{itemize}
-            \item \code{add} / \code{adds}: Addition (with optional flag setting).
-            \item \code{sub} / \code{subs}: Subtraction (with optional flag setting).
-            \item \code{neg}: Negation ($0 - \text{operand}$).
-        \end{itemize}
-    \end{block}
-\end{frame}
-
-% --- Slide 6: Register Widths: W vs X ---
-\begin{frame}{Operand Sizing: W versus X Registers}
-    The register prefix determines whether an operation processes 32-bit or 64-bit data:
-    \vspace{0.3em}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{32-Bit Operations (\code{W} registers)}
-                \begin{itemize}
-                    \item Utilizes registers \code{w0} through \code{w30}.
-                    \item Computes 32-bit results.
-                    \item \key{Zero-Extension}: Automatically clears the upper 32 bits of the parent 64-bit \code{X} register.
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{64-Bit Operations (\code{X} registers)}
-                \begin{itemize}
-                    \item Utilizes registers \code{x0} through \code{x30}.
-                    \item Computes full 64-bit doubleword results.
-                    \item Native size for memory addresses and 64-bit integer variables.
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% --- Slide 7: Addition and Subtraction Syntax ---
-\begin{frame}{Executing Basic Addition and Subtraction}
-    Representative examples of arithmetic manipulation in AArch64 assembly:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \code{add x0, x1, x2} \hfill $\rightarrow \code{x0} \leftarrow \code{x1} + \code{x2}$ (64-bit addition)
-        \item \code{sub x3, x4, x5} \hfill $\rightarrow \code{x3} \leftarrow \code{x4} - \code{x5}$ (64-bit subtraction)
-        \item \code{add w0, w1, w2} \hfill $\rightarrow \code{w0} \leftarrow \code{w1} + \code{w2}$ (32-bit addition, upper 32 bits cleared)
-    \end{itemize}
-    \vspace{0.4em}
-    \begin{block}{Design Principle}
-        Registers serve as primary operands for all arithmetic transformations; memory contents cannot be modified directly by \code{add} or \code{sub} instructions.
-    \end{block}
-\end{frame}
-
-% --- Slide 8: The Zero Register (XZR / WZR) ---
-\begin{frame}{The Hardwired Zero Register}
-    AArch64 provides a dedicated register that constantly reads as zero and discards write operations:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \key{\code{xzr}}: 64-bit zero register.
-        \item \key{\code{wzr}}: 32-bit zero register.
-    \end{itemize}
-    \vspace{0.3em}
-    \begin{block}{Common Idioms Using Zero}
-        \begin{itemize}
-            \item \key{Register Copy}: \code{add x0, x1, xzr} computes $\code{x0} \leftarrow \code{x1} + 0$, copying \code{x1} into \code{x0}.
-            \item \key{Register Negation}: \code{sub x0, xzr, x1} computes $\code{x0} \leftarrow 0 - \code{x1}$, negating the value.
-            \item \key{Comparison Alias}: Comparing a register against zero uses \code{subs xzr, x0, \#0}.
-        \end{itemize}
-    \end{block}
+% ============================================================
+% Slide 4
+% Slide Header: Arithmetic Operates on Bit Patterns
+% ============================================================
+\begin{frame}{Arithmetic Operates on Bit Patterns}
+\begin{block}{Architectural View}
+AArch64 integer arithmetic operates on fixed-width register contents. The instruction computes a bit-pattern result; signedness is an interpretation applied by software and branch conditions.
+\end{block}
+\vspace{0.2cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Same Operation}
+\begin{center}
+\large
+\code{add x0, x1, x2}
+\end{center}
+\begin{itemize}
+  \item Adds two 64-bit register values.
+  \item Produces one 64-bit result.
+  \item Does not by itself mean signed or unsigned.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Different Interpretations}
+\begin{itemize}
+  \item Unsigned: range is $0$ to $2^{64}-1$.
+  \item Signed: two's complement range is $-2^{63}$ to $2^{63}-1$.
+  \item Flags help interpret exceptional cases.
+\end{itemize}
+\end{block}
+\end{columns}
 \end{frame}
 
 % ============================================================
-% SECTION 2
+% Slide 5
+% Slide Header: Add and Subtract
 % ============================================================
-\sectiondivider{Section 02}{Logical and Bitwise Instructions}
-
-% --- Slide 10: Logical and Bitwise Operations ---
-\begin{frame}{Logical and Bitwise Instructions}
-    Bitwise instructions perform parallel boolean logic across individual bits of a register:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \key{\code{and}}: Bitwise AND (applied for bit masking and bit clearing).
-        \item \key{\code{orr}}: Bitwise OR (applied for bit setting).
-        \item \key{\code{eor}}: Bitwise Exclusive-OR (applied for bit toggling or register zeroing via \code{eor x0, x0, x0}).
-        \item \key{\code{bic}}: Bitwise Bit Clear (AND NOT: clears bits in destination specified by mask).
-        \item \key{\code{mvn}}: Bitwise NOT (moves negated source into destination).
-    \end{itemize}
-\end{frame}
-
-% --- Slide 11: Practical Uses of Bitwise Instructions ---
-\begin{frame}{Practical Uses of Bitwise Logic}
-    Bitwise instructions provide foundational support for low-level system programming and hardware control:
-    \vspace{0.3em}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Bit Masking (\code{and})}
-                Extracts specific bit fields by clearing unwanted bits.
-                \begin{itemize}
-                    \item \code{and x0, x1, 0x0F} isolates the lower nibble of \code{x1}.
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Bit Setting (\code{orr})}
-                Forces specific bits to $1$ without altering other bit positions.
-                \begin{itemize}
-                    \item \code{orr x0, x1, 0x80} sets bit 7.
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% --- Slide 12: Bitwise Clear (BIC) and MVN ---
-\begin{frame}{Advanced Bitwise Opcodes: \code{bic} and \code{mvn}}
-    \begin{block}{Bitwise Clear (\code{bic})}
-        The \code{bic} instruction executes an AND operation between the first source and the bitwise NOT of the second source:
-        $$\text{destination} \leftarrow \text{source1} \text{ AND } (\text{NOT } \text{source2})$$
-        \begin{itemize}
-            \item Used for clearing specific flag bits or status masks.
-        \end{itemize}
-    \end{block}
-    \vspace{0.3em}
-    \begin{block}{Bitwise NOT (\code{mvn})}
-        The \code{mvn} (Move Not) instruction inverts all bits of the source operand prior to placement in the destination:
-        $$\text{destination} \leftarrow \text{NOT } \text{source}$$
-    \end{block}
-\end{frame}
-
-% --- Slide 13: Register Zeroing via EOR ---
-\begin{frame}{Register Zeroing Idioms}
-    Clearing registers is a frequent operation in compiled machine code:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item While \code{mov x0, \#0} is valid, compilers frequently emit exclusive-or idioms:
-        $$\code{eor x0, x0, x0}$$
-        \item \key{Rationale for EOR}:
-        \begin{itemize}
-            \item XORing any value with itself evaluates to zero ($X \oplus X = 0$).
-            \item Avoids dependency on constant generation pools, executing efficiently in hardware datapath pipelines.
-        \end{itemize}
-    \end{itemize}
+\begin{frame}{Add and Subtract}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Addition}
+\begin{center}
+\large
+\code{add x0, x1, x2}
+\end{center}
+\begin{itemize}
+  \item Computes \code{x1 + x2}.
+  \item Writes the result to \code{x0}.
+  \item Does not update NZCV flags.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Subtraction}
+\begin{center}
+\large
+\code{sub x0, x1, x2}
+\end{center}
+\begin{itemize}
+  \item Computes \code{x1 - x2}.
+  \item Uses fixed-width modular arithmetic.
+  \item Does not update NZCV flags.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{Key Point}
+The same binary datapath can support signed and unsigned arithmetic. Interpretation comes from how the result and flags are used.
+\end{block}
 \end{frame}
 
 % ============================================================
-% SECTION 3
+% Slide 6
+% Slide Header: Subtraction Uses Two's Complement
 % ============================================================
-\sectiondivider{Section 03}{Shift Instructions}
-
-% --- Slide 15: Shift Instructions ---
-\begin{frame}{Shift Instructions in AArch64}
-    AArch64 includes dedicated shift instructions for positional bit movement:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \key{\code{lsl}} (Logical Shift Left): Shifts bits left, filling low-order bits with zeros (multiplies by $2^n$).
-        \item \key{\code{lsr}} (Logical Shift Right): Shifts bits right, filling high-order bits with zeros (unsigned division by $2^n$).
-        \item \key{\code{asr}} (Arithmetic Shift Right): Shifts bits right while preserving the sign bit (signed division by $2^n$).
-        \item \key{\code{ror}} (Rotate Right): Shifts bits right, wrapping shifted-out bits into high-order positions.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 16: The Built-in Barrel Shifter ---
-\begin{frame}{The AArch64 Barrel Shifter}
-    \begin{block}{Hardware Integration}
-        AArch64 incorporates a hardware \key{barrel shifter} attached to the second operand input of data-processing instructions, allowing a shift operation to occur within the same clock cycle as computation.
-    \end{block}
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \key{Example Syntax}: \code{add x0, x1, x2, lsl \#3}
-        \item \key{Semantic Evaluation}: Computes $\code{x0} \leftarrow \code{x1} + (\code{x2} \times 8)$ in a single cycle.
-        \item Removes the requirement for standalone shift instructions during array indexing and scaling operations.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 17: Barrel Shifter Variations ---
-\begin{frame}{Barrel Shifter Scale Variations}
-    The barrel shifter supports multiple modifier types on the final register operand:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \code{lsl \#imm} (Logical Shift Left by immediate)
-        \item \code{lsr \#imm} (Logical Shift Right by immediate)
-        \item \code{asr \#imm} (Arithmetic Shift Right by immediate)
-    \end{itemize}
-    \vspace{0.4em}
-    \begin{block}{Compiler Optimization Pattern}
-        When source code multiplies a variable by a constant power of two (e.g., \code{val * 16}), compilers emit a shifted add or move rather than a multiplication instruction:
-        $$\code{lsl x0, x1, \#4}$$
-    \end{block}
-\end{frame}
-
-% --- Slide 18: Shift Amounts and Width Limits ---
-\begin{frame}{Shift Amount Constraints and Boundaries}
-    Shift operations in AArch64 adhere to strict architectural limits:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item For 32-bit (\code{W}) register operations, shift amounts must range strictly from $0$ to $31$.
-        \item For 64-bit (\code{X}) register operations, shift amounts must range strictly from $0$ to $63$.
-        \item \key{Architectural Violation}: Shifting by an amount equal to or exceeding the register width ($32$ for W, $64$ for X) is illegal and triggers assembler errors or undefined behavior.
-    \end{itemize}
-    \vspace{0.2em}
-    \begin{block}{Sign Maintenance}
-        Logical shifts pad with zeros, whereas arithmetic right shift (\code{asr}) replicates the MSB to maintain two's complement sign validity.
-    \end{block}
+\begin{frame}{Subtraction Uses Two's Complement}
+\begin{block}{Hardware Idea}
+Subtraction can be implemented as addition of the two's-complement negation.
+\end{block}
+\vspace{0.15cm}
+\begin{center}
+\large
+$A - B = A + (\sim B) + 1$
+\end{center}
+\vspace{0.1cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Architectural Example}
+\begin{center}
+\large
+\code{sub x0, x1, x2}
+\end{center}
+\begin{itemize}
+  \item Reads \code{x1} and \code{x2}.
+  \item Produces \code{x1 - x2}.
+  \item Result is fixed-width.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Pedagogical Warning}
+\begin{itemize}
+  \item Negative results wrap modulo $2^n$.
+  \item The same bits can be read as signed or unsigned.
+  \item Flags are needed to reason about overflow and borrow.
+\end{itemize}
+\end{block}
+\end{columns}
 \end{frame}
 
 % ============================================================
-% SECTION 4
+% Slide 7
+% Slide Header: Section 02 — Flags and Comparisons
 % ============================================================
-\sectiondivider{Section 04}{Immediate Values and Constants}
+\sectiondivider{Section 02}{Flag-Setting Arithmetic and Comparisons}
 
-% --- Slide 20: Handling Constants in Instructions ---
-\begin{frame}{Handling Constants (Immediates)}
-    Arithmetic and logical instructions frequently combine registers with constant values:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \key{Immediate Operand}: A constant numeric value embedded directly within the instruction word.
-        \item In fixed-width 32-bit architectures like AArch64, instructions cannot contain arbitrary 64-bit constants due to space constraints in the instruction word.
-        \item Hardware mechanisms manage constant generation without requiring full 64-bit memory loads.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 21: Immediate Arithmetic Constraints ---
-\begin{frame}{Immediate Limits in Arithmetic Instructions}
-    \begin{block}{Arithmetic Immediates (\code{add}, \code{sub})}
-        Standard add and subtract immediate values are restricted to:
-        \begin{itemize}
-            \item Unsigned 12-bit integers ranging from $0$ to $4095$ (\hex{0xFFF}).
-            \item Optional hardware bit-shift modifier of $12$ bits (multiplying the immediate by $4096$), enabling addition of larger aligned constants.
-        \end{itemize}
-    \end{block}
-    \vspace{0.2em}
-    \begin{itemize}
-        \item Example: \code{add x0, x1, \#1024} is valid.
-        \item Arbitrary 64-bit constants require loading into a temporary register first.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 22: Logical Immediate Bitmask Generation ---
-\begin{frame}{Logical Immediates and Bitmask Encoding}
-    Logical instructions (\code{and}, \code{orr}, \code{eor}) handle constants via a bitmask encoding system:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item Logical immediates are not arbitrary numbers; they are encoded as a replicated bit pattern across element sizes of $2, 4, 8, 16, 32,$ or $64$ bits.
-        \item \key{Assembler Restriction}: If a constant cannot be expressed as a repeating bitmask pattern, the assembler rejects it with an error (e.g., ``immediate cannot be encoded'').
-        \item Enables common bitmasks and flag selectors to be embedded directly within single-cycle logical instruction words.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 23: Loading Large Constants: MOVZ and MOVK ---
-\begin{frame}{Loading Large Constants: \code{movz} and \code{movk}}
-    When constants exceed immediate limits, AArch64 utilizes explicit move instructions:
-    \vspace{0.3em}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{\code{movz} (Move Wide with Zero)}
-                \begin{itemize}
-                    \item Moves a 16-bit immediate into a specific 16-bit chunk of the register.
-                    \item Clears all other bits in the register to zero.
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{\code{movk} (Move Wide with Keep)}
-                \begin{itemize}
-                    \item Moves a 16-bit immediate into a specific chunk.
-                    \item \key{Keeps} all other register bits untouched, enabling multi-step constant construction.
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% --- Slide 24: Combining Arithmetic, Logic, and Shifts ---
-\begin{frame}{Synthesizing Complex Expressions}
-    Compilers combine arithmetic, logical instructions, and barrel shifts to evaluate expressions:
-    \vspace{0.3em}
-    \begin{block}{C Statement: \code{x = (a + (b << 2)) \& 0xFF;}}
-        Assembly translation sequence:
-        \begin{enumerate}
-            \item Scale $b$ and add to $a$: \code{add x0, x1, x2, lsl \#2}
-            \item Mask lower byte: \code{and x0, x0, \#0xFF}
-        \end{enumerate}
-    \end{block}
-    \vspace{0.2em}
-    \begin{itemize}
-        \item The barrel shifter merges the shift and add into a single hardware operation, reducing cycle count and instruction footprint.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 25: Condition Flag Integration ---
-\begin{frame}{Connecting Instructions to Condition Flags}
-    Arithmetic and logical operations can update or test condition flags for control flow:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \key{Arithmetic Flag Updates}: Using \code{adds} or \code{subs} updates PSTATE NZCV flags based on results.
-        \item \key{Logical Flag Updates}: Logical instructions like \code{ands} update flags (setting $Z=1$ if the result is zero, and $N$ based on the MSB).
-        \item Applied for checking bit masks or testing register zero status without requiring a separate comparison instruction.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 26: Performance Implications ---
-\begin{frame}{Performance Implications in Datapaths}
-    Instruction complexity directly impacts CPI (Cycles Per Instruction):
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \key{Single-Cycle Instructions}: Basic arithmetic (\code{add}), bitwise logic (\code{and}), and barrel-shifted operations execute in a single pipeline cycle.
-        \item \key{Multi-Step Sequences}: Loading large 64-bit constants requires multiple instructions (\code{movz} followed by \code{movk}), increasing instruction count.
-        \item ISA design maps frequent operations to single-cycle hardware pathways.
-    \end{itemize}
+% ============================================================
+% Slide 8
+% Slide Header: NZCV Flags
+% ============================================================
+\begin{frame}{NZCV Flags}
+\begin{center}
+\begin{tikzpicture}[
+  fld/.style={draw=navy,thick,minimum width=2.2cm,minimum height=1.0cm,align=center,font=\bfseries}
+]
+\node[fld,fill=navy,text=white] (n) {N\\Negative};
+\node[fld,fill=deepblue,text=white,right=.15cm of n] (z) {Z\\Zero};
+\node[fld,fill=gold!35,text=navy,right=.15cm of z] (c) {C\\Carry};
+\node[fld,fill=softgray,text=navy,right=.15cm of c] (v) {V\\Overflow};
+\end{tikzpicture}
+\end{center}
+\vspace{0.25cm}
+\begin{itemize}
+  \item \key{N}: result sign bit is 1.
+  \item \key{Z}: result is exactly zero.
+  \item \key{C}: unsigned carry-out for addition; no-borrow for subtraction.
+  \item \key{V}: signed two's-complement overflow.
+\end{itemize}
+\vspace{0.1cm}
+\begin{block}{Interpretation Rule}
+\code{C} is mainly useful for unsigned reasoning; \code{V} is mainly useful for signed reasoning.
+\end{block}
 \end{frame}
 
 % ============================================================
-% SECTION 5
+% Slide 9
+% Slide Header: Flag-Setting Arithmetic
 % ============================================================
-\sectiondivider{Section 05}{Summary \& Self-Test}
-
-% --- Slide 28: Topic Summary ---
-\begin{frame}{Topic 5 Comprehensive Summary}
-    \begin{itemize}
-        \item \key{Arithmetic Instructions}: Execute addition, subtraction, and negation across 32-bit (\code{W}) and 64-bit (\code{X}) registers.
-        \item \key{Logical Instructions}: Execute parallel bitwise boolean operations (\code{and}, \code{orr}, \code{eor}, \code{bic}, \code{mvn}) for masking and setting bits.
-        \item \key{Shift Operations}: Support scaling via \code{lsl}, \code{lsr}, \code{asr}, and \code{ror}, with strict width boundaries and hardware barrel-shifter integration.
-        \item \key{Constant Generation}: Managed through 12-bit arithmetic immediates, bitmask encoding rules, and wide moves (\code{movz}/\code{movk}).
-    \end{itemize}
+\begin{frame}{Flag-Setting Arithmetic}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{No Flag Update}
+\begin{center}
+\large
+\code{add x0, x1, x2}\\[0.12cm]
+\code{sub x0, x1, x2}
+\end{center}
+\begin{itemize}
+  \item Write a register result.
+  \item Leave NZCV unchanged.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Flag Update}
+\begin{center}
+\large
+\code{adds x0, x1, x2}\\[0.12cm]
+\code{subs x0, x1, x2}
+\end{center}
+\begin{itemize}
+  \item Write a register result.
+  \item Update NZCV from that result.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{Important Limitation}
+Do not overgeneralize this as “add \code{s} to every mnemonic.” AArch64 has specific flag-setting instruction forms and aliases.
+\end{block}
 \end{frame}
 
-% --- Slide 29: Self-Test: Questions 1 & 2 ---
-\begin{frame}{Self-Test: Questions 1 \& 2}
-    \begin{block}{Question 1: Operand Sizing}
-        What is the structural difference between operating on 32-bit \code{W} registers versus 64-bit \code{X} registers in AArch64, and what happens to the upper bits of a register when a 32-bit instruction executes?
-    \end{block}
-    \vspace{0.4em}
-    \begin{block}{Question 2: Bitwise Logic}
-        How would you use AArch64 logical instructions to clear bit 4 of register \code{x0} while leaving all other bits completely unaffected?
-    \end{block}
+% ============================================================
+% Slide 10
+% Slide Header: Carry and Overflow Are Different
+% ============================================================
+\begin{frame}{Carry and Overflow Are Different}
+\begin{block}{One Operation, Two Interpretations}
+The same addition can be valid in one interpretation and overflow in another.
+\end{block}
+\vspace{0.15cm}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{>{\raggedright\arraybackslash}m{3.4cm}>{\raggedright\arraybackslash}m{3.6cm}>{\raggedright\arraybackslash}m{4.2cm}}
+\rowcolor{navy}
+{\color{white}\bfseries View} & {\color{white}\bfseries Example} & {\color{white}\bfseries Meaning} \\
+\rowcolor{softgray}
+Unsigned & $255 + 1 = 0$ in 8 bits & Carry-out indicates unsigned wraparound. \\
+\rowcolor{white}
+Signed & $127 + 1 = -128$ in 8 bits & Overflow indicates signed range exceeded. \\
+\end{tabular}
+\end{center}
+\vspace{0.25cm}
+\begin{block}{AArch64 Consequence}
+Unsigned branches inspect \code{C}; signed branches inspect combinations involving \code{N} and \code{V}.
+\end{block}
 \end{frame}
 
-% --- Slide 30: Self-Test: Solutions 1 & 2 ---
-\begin{frame}{Self-Test: Solutions 1 \& 2}
-    \begin{block}{Solution 1}
-        \code{W} registers access the lower 32 bits of the 64-bit \code{X} registers. When a 32-bit instruction executes, AArch64 automatically zero-extends the result by clearing the upper 32 bits of the parent register to zero.
-    \end{block}
-    \vspace{0.3em}
-    \begin{block}{Solution 2}
-        Bit 4 can be cleared using a bit clear instruction with a mask containing a 1 at bit 4: \code{bic x0, x0, \#(1 << 4)} (or an explicit immediate mask).
-    \end{block}
+% ============================================================
+% Slide 11
+% Slide Header: Carry Means No-Borrow After Subtraction
+% ============================================================
+\begin{frame}{Carry Means No-Borrow After Subtraction}
+\begin{block}{AArch64 Subtraction Rule}
+After \code{subs} or \code{cmp}, \code{C=1} means the subtraction did \key{not} require an unsigned borrow.
+\end{block}
+\vspace{0.15cm}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{>{\raggedright\arraybackslash}m{3.4cm}>{\raggedright\arraybackslash}m{3.4cm}>{\raggedright\arraybackslash}m{4.5cm}}
+\rowcolor{navy}
+{\color{white}\bfseries Operation} & {\color{white}\bfseries Unsigned Relation} & {\color{white}\bfseries Carry Flag} \\
+\rowcolor{softgray}
+\code{5 - 3} & $5 \ge 3$ & \code{C=1}: no borrow \\
+\rowcolor{white}
+\code{3 - 5} & $3 < 5$ & \code{C=0}: borrow needed \\
+\end{tabular}
+\end{center}
+\vspace{0.2cm}
+\begin{block}{Common Mistake}
+Do not read \code{C=1} after subtraction as “borrow occurred.” In AArch64, it means the opposite: \key{no borrow}.
+\end{block}
 \end{frame}
 
-% --- Slide 31: Self-Test: Questions 3 & 4 ---
-\begin{frame}{Self-Test: Questions 3 \& 4}
-    \begin{block}{Question 3: Shift Limits and the Barrel Shifter}
-        What are the architectural shift limits for 32-bit and 64-bit registers in AArch64, and what is the primary advantage of the built-in barrel shifter?
-    \end{block}
-    \vspace{0.4em}
-    \begin{block}{Question 4: Constant Loading and Bitmasks}
-        Why might the assembler reject a logical immediate constant with an error, and how do compilers load wide 64-bit constants?
-    \end{block}
+% ============================================================
+% Slide 12
+% Slide Header: cmp Is an Alias
+% ============================================================
+\begin{frame}{\code{cmp} Is an Alias}
+\begin{block}{Comparison Without Keeping the Difference}
+\code{cmp} performs a subtraction for flags, but discards the subtraction result.
+\end{block}
+\vspace{0.25cm}
+\begin{center}
+\begin{minipage}{0.42\textwidth}
+\raggedright
+\large
+\code{cmp x0, x1}\\[0.15cm]
+\code{subs xzr, x0, x1}
+\end{minipage}
+\end{center}
+\vspace{0.25cm}
+\begin{itemize}
+  \item The two lines express the same underlying operation.
+  \item \code{x0 - x1} is used to update NZCV.
+  \item The result is written to \code{xzr}, so it is discarded.
+\end{itemize}
 \end{frame}
 
-% --- Slide 32: Self-Test: Solutions 3 & 4 ---
-\begin{frame}{Self-Test: Solutions 3 \& 4}
-    \begin{block}{Solution 3}
-        Shift amounts must range from $0$ to $31$ for W registers and $0$ to $63$ for X registers; shifting by or above the register width is illegal. The barrel shifter allows a source operand to be shifted as part of a datapath instruction in a single cycle.
-    \end{block}
-    \vspace{0.3em}
-    \begin{block}{Solution 4}
-        The assembler rejects constants that cannot be expressed as repeating bitmask patterns. Compilers construct wide 64-bit constants using wide move sequences like \code{movz} followed by one or more \code{movk} instructions.
-    \end{block}
+% ============================================================
+% Slide 13
+% Slide Header: Signed and Unsigned Branches
+% ============================================================
+\begin{frame}{Signed and Unsigned Branches}
+\begin{block}{After a Compare}
+The same \code{cmp} can support signed or unsigned comparisons depending on which conditional branch is used.
+\end{block}
+\vspace{0.15cm}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{>{\raggedright\arraybackslash}m{3.0cm}>{\raggedright\arraybackslash}m{4.0cm}>{\raggedright\arraybackslash}m{4.0cm}}
+\rowcolor{navy}
+{\color{white}\bfseries Branch} & {\color{white}\bfseries Interpretation} & {\color{white}\bfseries Condition} \\
+\rowcolor{softgray}
+\code{b.lt label} & signed less than & $N \ne V$ \\
+\rowcolor{white}
+\code{b.ge label} & signed greater/equal & $N = V$ \\
+\rowcolor{softgray}
+\code{b.lo label} & unsigned lower & $C=0$ \\
+\rowcolor{white}
+\code{b.hs label} & unsigned higher/same & $C=1$ \\
+\end{tabular}
+\end{center}
+\vspace{0.15cm}
+\begin{center}
+\large
+\code{cmp x0, x1}\qquad \code{b.lt signed\_less}\qquad \code{b.lo unsigned\_lower}
+\end{center}
 \end{frame}
 
-% --- Slide 33: Review & Concept Verification ---
-\begin{frame}{Review: Instruction Summary Table}
-    \begin{table}[]
-        \centering
-        \small
-        \begin{tabular}{p{3.2cm} p{3.8cm} p{4.5cm}}
-            \toprule
-            \textbf{Instruction Category} & \textbf{Common Opcodes} & \textbf{Primary Architectural Purpose} \\
-            \midrule
-            \key{Arithmetic} & \code{add}, \code{sub}, \code{neg} & Integer computation across W/X registers \\
-            \key{Logical / Bitwise} & \code{and}, \code{orr}, \code{eor}, \code{bic} & Masking, setting, clearing, and toggling bits \\
-            \key{Shifts} & \code{lsl}, \code{lsr}, \code{asr}, \code{ror} & Multiplying/dividing by powers of two \\
-            \key{Constants} & \code{movz}, \code{movk} & Constructing wide constants across register chunks \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
+% ============================================================
+% Slide 14
+% Slide Header: Worked Comparison Example
+% ============================================================
+\begin{frame}{Worked Comparison Example}
+\begin{block}{Same Bits, Different Ordering}
+Consider 8-bit values for intuition: \code{0xff} and \code{0x01}.
+\end{block}
+\vspace{0.15cm}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{>{\raggedright\arraybackslash}m{3.2cm}>{\raggedright\arraybackslash}m{3.6cm}>{\raggedright\arraybackslash}m{4.2cm}}
+\rowcolor{navy}
+{\color{white}\bfseries Interpretation} & {\color{white}\bfseries Values} & {\color{white}\bfseries Result} \\
+\rowcolor{softgray}
+Unsigned & $255$ and $1$ & $255 > 1$ \\
+\rowcolor{white}
+Signed two's complement & $-1$ and $1$ & $-1 < 1$ \\
+\end{tabular}
+\end{center}
+\vspace{0.25cm}
+\begin{block}{Teaching Point}
+The bit patterns are unchanged. The branch mnemonic determines whether the flags are interpreted as signed or unsigned evidence.
+\end{block}
 \end{frame}
 
-% --- Slide 34: Additional Review & Practice ---
-\begin{frame}{Review Exercises \& Practice Problems}
-    \begin{block}{Self-Directed Practice}
-        Lab exercises for Topic 5 concept reinforcement:
-        \begin{itemize}
-            \item Write an AArch64 assembly snippet to extract bits 12 through 15 from register \code{x1} into \code{x0}.
-            \item Apply a barrel-shifted add instruction to compute $\code{x5} = \code{x6} + (\code{x7} \times 32)$ in a single cycle.
-            \item Explain why \code{eor x1, x1, x1} is preferred by compilers over \code{mov x1, \#0}.
-        \end{itemize}
-    \end{block}
+% ============================================================
+% Slide 15
+% Slide Header: Section 03 — Logical Operations
+% ============================================================
+\sectiondivider{Section 03}{Logical Operations and Bit Masks}
+
+% ============================================================
+% Slide 16
+% Slide Header: Logical Instructions Operate Bit-by-Bit
+% ============================================================
+\begin{frame}{Logical Instructions Operate Bit-by-Bit}
+\begin{block}{Bitwise Meaning}
+Logical instructions operate independently on corresponding bit positions. They do not treat the register as a signed or unsigned number.
+\end{block}
+\vspace{0.2cm}
+\begin{center}
+\large
+\code{and x0, x1, x2}\qquad
+\code{orr x0, x1, x2}\qquad
+\code{eor x0, x1, x2}
+\end{center}
+\vspace{0.2cm}
+\begin{itemize}
+  \item \code{and}: keeps bits set in both operands.
+  \item \code{orr}: sets bits present in either operand.
+  \item \code{eor}: sets bits that differ between operands.
+\end{itemize}
 \end{frame}
 
-% --- Slide 35: Wrap-Up & Transition to Topic 6 ---
-\begin{frame}{Wrap-Up and Next Steps}
-    \begin{block}{Transition to Topic 6}
-        Building upon arithmetic and logical instruction execution, the next module examines:
-        \begin{itemize}
-            \item \key{Data Transfer and Addressing}: Advanced memory management and data movement mechanics.
-            \item \key{Load and Store Instructions}: Transferring data efficiently between memory and the register file.
-            \item \key{Addressing Modes}: Exploring base-register, offset, pre-index, and post-index pointer calculations.
-            \item \key{Memory Access and Alignment}: Handling byte/word sizing and natural alignment requirements.
-            \item \key{Arrays and Pointers}: Managing contiguous data structures and pointer arithmetic in AArch64.
-        \end{itemize}
-    \end{block}
+% ============================================================
+% Slide 17
+% Slide Header: Bitwise AND Example
+% ============================================================
+\begin{frame}{Bitwise AND Example}
+\begin{block}{Masking}
+A mask selects which bit positions should survive an operation.
+\end{block}
+\vspace{0.15cm}
+\begin{center}
+\large
+\begin{minipage}{0.33\textwidth}
+\raggedright
+\code{  11001010}\\[0.08cm]
+\code{\& 10110100}\\[0.08cm]
+\code{----------}\\[0.08cm]
+\code{  10000000}
+\end{minipage}
+\end{center}
+\vspace{0.15cm}
+\begin{block}{AArch64 Example}
+\begin{center}
+\large
+\code{and x0, x1, x2}
+\end{center}
+The result contains only the bit positions that were set in both source registers.
+\end{block}
 \end{frame}
 
-\end{document}
+% ============================================================
+% Slide 18
+% Slide Header: tst Is an Alias
+% ============================================================
+\begin{frame}{\code{tst} Is an Alias}
+\begin{block}{Testing Bits Without Keeping the Result}
+\code{tst} computes a bitwise AND for flags, but discards the AND result.
+\end{block}
+\vspace{0.25cm}
+\begin{center}
+\begin{minipage}{0.42\textwidth}
+\raggedright
+\large
+\code{tst x0, x1}\\[0.15cm]
+\code{ands xzr, x0, x1}
+\end{minipage}
+\end{center}
+\vspace{0.25cm}
+\begin{itemize}
+  \item The AND result updates NZCV.
+  \item The result is written to \code{xzr}, so it is discarded.
+  \item This is useful for asking whether selected bits are zero or nonzero.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 19
+% Slide Header: Logical Operations and Flags
+% ============================================================
+% ============================================================
+% Slide 19
+% Slide Header: Logical Operations and Flags
+% ============================================================
+\begin{frame}{Logical Operations and Flags}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.4\textwidth}
+
+\begin{block}{Plain Logical Operations}
+
+\begin{minipage}{0.7\textwidth}
+\raggedright
+\large
+\code{and x0, x1, x2}\\[0.12cm]
+\code{orr x0, x1, x2}\\[0.12cm]
+\code{eor x0, x1, x2}
+\end{minipage}
+
+\begin{itemize}
+  \item Write a register result.
+  \item Do not update NZCV.
+\end{itemize}
+
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Flag-Setting Form}
+
+\begin{minipage}{0.5\textwidth}
+\raggedright
+\large
+\code{ands x0, x1, x2}\\[0.12cm]
+\code{tst x1, x2}
+\end{minipage}
+\vspace{0.2cm}
+
+\begin{itemize}
+  \item Updates flags from the logical result.
+  \item \code{tst} discards the result.
+\end{itemize}
+
+\end{block}
+
+\end{columns}
+
+\vspace{0.2cm}
+
+\begin{block}{Avoid Overgeneralization}
+There is no universal ``add \code{s} to every logical mnemonic'' rule.
+Teach the actual AArch64 forms students will use.
+\end{block}
+
+\end{frame}
+% ============================================================
+% Slide 20
+% Slide Header: Section 04 — Shifts, Rotates, Immediates, and Aliases
+% ============================================================
+\sectiondivider{Section 04}{Shifts, Rotates, Immediates, and Aliases}
+
+% ============================================================
+% Slide 21
+% Slide Header: Shift Operations
+% ============================================================
+\begin{frame}{Shift Operations}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{>{\raggedright\arraybackslash}m{2.5cm}>{\raggedright\arraybackslash}m{4.0cm}>{\raggedright\arraybackslash}m{5.0cm}}
+\rowcolor{navy}
+{\color{white}\bfseries Shift} & {\color{white}\bfseries Meaning} & {\color{white}\bfseries Typical Interpretation} \\
+\rowcolor{softgray}
+\code{lsl \#n} & shift left, zeros enter right & multiply by $2^n$ if overflow is ignored \\
+\rowcolor{white}
+\code{lsr \#n} & logical right, zeros enter left & unsigned division by powers of two \\
+\rowcolor{softgray}
+\code{asr \#n} & arithmetic right, sign bit is replicated & preserves signed negative values \\
+\rowcolor{white}
+\code{ror \#n} & rotate right, bits wrap around & bit manipulation, not division \\
+\end{tabular}
+\end{center}
+\vspace{0.2cm}
+\begin{block}{Key Distinction}
+\code{lsr} and \code{asr} differ when the top bit is set. That difference matters for unsigned versus signed interpretation.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 22
+% Slide Header: Shift Example
+% ============================================================
+\begin{frame}{Shift Example}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Logical Shift Right}
+\begin{center}
+\large
+\code{lsr x0, x1, \#1}
+\end{center}
+\begin{itemize}
+  \item Zero enters the top bit.
+  \item Good for unsigned bit patterns.
+  \item Does not preserve a negative sign.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Arithmetic Shift Right}
+\begin{center}
+\large
+\code{asr x0, x1, \#1}
+\end{center}
+\begin{itemize}
+  \item Original sign bit is copied.
+  \item Preserves signed interpretation.
+  \item Useful for signed right shifts.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{Qualification}
+Shifts can resemble multiplication or division by powers of two, but finite width, overflow, and signed rounding behavior must be considered.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 23
+% Slide Header: Immediate Operands Are Encoded in the Instruction
+% ============================================================
+\begin{frame}{Immediate Operands Are Encoded in the Instruction}
+\begin{block}{Immediate Operand}
+An immediate is a constant stored directly inside the instruction encoding.
+\end{block}
+\vspace{0.2cm}
+\large
+\hspace{3cm}\code{add x0, x1, \#5}\\[0.15cm]
+\hspace{3cm}\code{and x2, x3, \#0xff}
+\vspace{0.2cm}
+\begin{itemize}
+  \item Immediate operands avoid loading a separate constant from memory.
+  \item They are limited by the available instruction bits.
+  \item AArch64 immediate forms are constrained by instruction class.
+\end{itemize}
+\vspace{0.1cm}
+\begin{block}{Preparation for Encoding}
+Do not assume \code{add x0, x1, \#anything} can encode any 64-bit constant. The exact rules are covered later with instruction encoding.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 24
+% Slide Header: mov Is Often an Alias
+% ============================================================
+\begin{frame}{\code{mov} Is Often an Alias}
+\begin{block}{Assembler Convenience}
+In AArch64, \code{mov} is frequently assembler syntax that maps to different underlying A64 instructions depending on the operands.
+\end{block}
+\vspace{0.25cm}
+\large
+\hspace{3cm}\code{mov x0, x1}\\[0.15cm]
+\hspace{3cm}\code{mov x0, \#5}\\[0.15cm]
+\hspace{3cm}\code{mov x0, xzr}
+\vspace{0.25cm}
+\begin{itemize}
+  \item Students should read \code{mov} as “put this value there.”
+  \item The assembler chooses an appropriate encoding.
+  \item The exact expansion is an encoding topic, not a semantic mystery.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 25
+% Slide Header: Multiplication Is Data Processing, Not Necessarily Same Latency
+% ============================================================
+\begin{frame}{Multiplication Is Data Processing, Not Necessarily Same Latency}
+\begin{block}{Architectural Category}
+Multiplication is a data-processing operation: it reads registers and writes a register result.
+\end{block}
+\vspace{0.25cm}
+\begin{center}
+\large
+\code{mul x0, x1, x2}
+\end{center}
+\vspace{0.25cm}
+\begin{itemize}
+  \item Architecturally, it belongs with register-based computation.
+  \item Microarchitecturally, it may use a separate multiply unit.
+  \item Its latency can differ from simple add/sub/logic instructions.
+\end{itemize}
+\vspace{0.1cm}
+\begin{block}{No Fixed Cycle Claim}
+AArch64 specifies the instruction's architectural effect, not a universal number of cycles.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 26
+% Slide Header: Short Worked Program
+% ============================================================
+\begin{frame}{Short Worked Program}
+\begin{block}{Goal}
+Load a value, test whether it is zero, and add 1 only if it is nonzero.
+\end{block}
+\vspace{0.2cm}
+\begin{center}
+\begin{minipage}{0.45\textwidth}
+\raggedright
+\large
+\code{ldr x1, [x0]}\\[0.10cm]
+\code{cmp x1, xzr}\\[0.10cm]
+\code{b.eq done}\\[0.10cm]
+\code{add x1, x1, \#1}\\[0.10cm]
+\code{str x1, [x0]}\\[0.10cm]
+\code{done:}
+\end{minipage}
+\end{center}
+\vspace{0.15cm}
+\begin{block}{Mechanism}
+\code{cmp} updates flags using a discarded subtraction. \code{b.eq} branches if the zero flag is set.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 27
+% Slide Header: Section 05 — Summary and Self-Test
+% ============================================================
+\sectiondivider{Section 05}{Summary and Self-Test}
+
+% ============================================================
+% Slide 28
+% Slide Header: Topic 5 Summary
+% ============================================================
+\begin{frame}{Topic 5 Summary}
+\begin{itemize}
+  \item AArch64 integer arithmetic operates on fixed-width bit patterns.
+  \item \code{add} and \code{sub} do not inherently mean signed or unsigned arithmetic.
+  \item \code{C} supports unsigned reasoning; \code{V} supports signed overflow reasoning.
+  \item After subtraction, \code{C=1} means no unsigned borrow occurred.
+  \item \code{cmp} and \code{tst} are aliases that update flags and discard the computed result.
+  \item Shifts are useful arithmetic tools, but overflow and signed interpretation matter.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 29
+% Slide Header: Self-Test 1/2
+% ============================================================
+\begin{frame}{Self-Test 1/2}
+\begin{enumerate}
+  \item Why do \code{add} and \code{sub} not by themselves determine signedness?
+  \item What is the difference between the \code{C} and \code{V} flags?
+  \item After \code{cmp x0, x1}, what does \code{C=1} mean for unsigned comparison?
+  \item Explain why \code{cmp x0, x1} can be understood as \code{subs xzr, x0, x1}.
+  \item Which branch should be used for signed less-than: \code{b.lt} or \code{b.lo}?
+\end{enumerate}
+\end{frame}
+
+% ============================================================
+% Slide 30
+% Slide Header: Self-Test 2/2
+% ============================================================
+\begin{frame}{Self-Test 2/2}
+\begin{enumerate}
+\setcounter{enumi}{5}
+  \item What does \code{tst x0, x1} test, and why is the result discarded?
+  \item Why is \code{asr} different from \code{lsr} when the sign bit is set?
+  \item Why can immediate operands not represent every possible 64-bit constant?
+  \item Why should \code{mov} be treated as an assembler convenience rather than one single universal hardware operation?
+  \item Why is it unsafe to claim that every AArch64 instruction has a fixed cycle count?
+\end{enumerate}
+\end{frame}
+
+% ============================================================
+% Slide 31
+% Slide Header: Wrap-Up and Next Steps
+% ============================================================
+\begin{frame}{Topic 5 Takeaways}
+\begin{block}{Core Message}
+AArch64 arithmetic and logical instructions operate on fixed-width bit patterns; interpretation depends on the instruction form, the flags, and the surrounding program context.
+\end{block}
+\vspace{0.15cm}
+\begin{itemize}
+  \item Arithmetic instructions define architectural state changes.
+  \item Flag-setting forms connect arithmetic results to conditional control flow.
+  \item Aliases simplify assembly syntax without changing the underlying operation.
+  \item Shifts and logical operations manipulate bit patterns directly.
+  \item Microarchitectural performance depends on implementation, not only the ISA.
+\end{itemize}
+\end{frame}
 
 \end{document}
