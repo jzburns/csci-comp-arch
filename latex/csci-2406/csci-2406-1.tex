@@ -38,7 +38,7 @@
 }
 
 \setbeamerfont{frametitle}{
-  size=\Large,
+  size=\large,
   series=\bfseries
 }
 
@@ -71,6 +71,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage[scale=0.92]{sourcecodepro}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -298,21 +299,16 @@
 \begin{block}{Instructor Contact}
 
 \begin{itemize}
-
   \item \key{Email}:
         \code{jburns@ada.edu.az}
-
   \item \key{Office}:
         B317
-
   \item \key{Office Hours}:
         Thursdays 11:00--15:00\\
         (or by appointment)
-
   \item \textit{Note}:
         Avoid Blackboard messages
         for urgent matters.
-
 \end{itemize}
 
 \end{block}
@@ -322,17 +318,14 @@
 \begin{block}{Classroom Expectations}
 
 \begin{itemize}
-
   \item \key{The Golden Rule}:
         Once class commences and the instructor speaks,
         no outside conversations are permitted.
-
   \item \key{Authentic Work}:
         Emphasize the \textit{why}
         alongside the \textit{what}
         and \textit{how}.
         Do not pass off AI-generated output as your own.
-
 \end{itemize}
 
 \end{block}
@@ -354,18 +347,14 @@
 \begin{block}{Software \& Emulation Stack}
 
 \begin{itemize}
-
   \item \key{C \& ARM64 Assembly}:
         Core languages used for architecture programming.
-
   \item \key{QEMU}:
         Full-system and user-space emulator
         for AArch64 execution.
-
   \item \key{Compiler Explorer}:
         Live ARM64 assembly inspection
         from C source.
-
 \end{itemize}
 
 \end{block}
@@ -375,15 +364,12 @@
 \begin{block}{Online Programming Resources}
 
 \begin{itemize}
-
   \item \key{WebAssembliss}:
         Browser-based ARM64 Linux
         assembly environment.
-
   \item \key{CPUlator}:
         Interactive ARM32 / ARMv7 simulator
         used where appropriate for comparison.
-
 \end{itemize}
 
 \end{block}
@@ -393,11 +379,9 @@
 \vspace{0.25cm}
 
 \begin{block}{Reference Platform}
-
 The conceptual examples in this lecture use AArch64,
 while later exercises may compare AArch32 encodings
 and behavior when useful.
-
 \end{block}
 
 \end{frame}
@@ -409,42 +393,33 @@ and behavior when useful.
 \begin{frame}{Topic 1 Outline}
 
 \begin{block}{Foundational Focus}
-
 Establish the distinction between
 what software can observe
 and how hardware implements it,
 then connect that distinction
 to stored programs
 and instruction/data memory organization.
-
 \end{block}
 
 \vspace{0.35em}
 
 \begin{itemize}
-
   \item \key{Section 1}:
         Key Abstraction Layers
-
   \item \key{Section 2}:
         Computer Architecture
         versus Computer Organization
-
   \item \key{Section 3}:
         Instruction Set Architecture (ISA)
         versus Microarchitecture
-
   \item \key{Section 4}:
         The Stored-Program Concept
         and Basic Execution
-
   \item \key{Section 5}:
         von Neumann, Harvard,
         and Modified Harvard Organization
-
   \item \key{Section 6}:
         Summary and Self-Test
-
 \end{itemize}
 
 \end{frame}
@@ -580,12 +555,10 @@ at (3.7,-.2)
 \vspace{0.05cm}
 
 \begin{block}{Today's Focus}
-
 The central distinction is between
 \key{Architecture / ISA}
 and
 \key{Organization / Microarchitecture}.
-
 \end{block}
 
 \end{frame}
@@ -597,16 +570,16 @@ and
 \begin{frame}{Where Software Meets Hardware}
 
 \begin{columns}[T,onlytextwidth]
+
 \column{0.25\textwidth}
+
 \begin{block}{Software Side}
 
 \begin{itemize}
-
   \item Applications
   \item Compilers
   \item Operating systems
   \item Assembly programs
-
 \end{itemize}
 
 \end{block}
@@ -619,12 +592,10 @@ Defines the machine behavior
 software may rely on:
 
 \begin{itemize}
-
   \item instructions
   \item visible registers
   \item state changes
   \item memory behavior
-
 \end{itemize}
 
 \end{alertblock}
@@ -634,13 +605,11 @@ software may rely on:
 \begin{block}{Hardware Side}
 
 \begin{itemize}
-
   \item Datapaths
   \item Control logic
   \item Pipelines
   \item Caches
   \item Execution units
-
 \end{itemize}
 
 \end{block}
@@ -679,18 +648,14 @@ of the machine---the \key{what}.
 \vspace{0.2em}
 
 \begin{itemize}
-
   \item The programmer-visible specification
         of the computer system.
-
   \item Establishes what software may request
         and what architectural state changes occur.
-
   \item Provides the stable target
         used by compilers,
         operating systems,
         and assembly programmers.
-
 \end{itemize}
 
 \vspace{0.25em}
@@ -698,23 +663,19 @@ of the machine---the \key{what}.
 \begin{block}{Architectural Specifications Include}
 
 \begin{itemize}
-
   \item The \key{ISA}:
         instruction encodings,
         operations,
         and semantics.
-
   \item Programmer-visible state:
         registers,
         stack pointer,
         program counter state,
         and status information.
-
   \item Data types,
         addressing behavior,
         memory model,
         and exception behavior.
-
 \end{itemize}
 
 \end{block}
@@ -735,17 +696,13 @@ of the architecture---the \key{how}.
 \vspace{0.2em}
 
 \begin{itemize}
-
   \item The arrangement of operational units
         and their interconnections.
-
   \item Defines how the machine physically realizes
         each architectural operation.
-
   \item Internal details are generally
         \key{not part of the programmer-visible
         architectural contract}.
-
 \end{itemize}
 
 \vspace{0.25em}
@@ -753,22 +710,18 @@ of the architecture---the \key{how}.
 \begin{block}{Organizational Structures Include}
 
 \begin{itemize}
-
   \item Datapaths,
         control units,
         ALUs,
         register files,
         and multiplexer routing.
-
   \item Pipeline organization,
         branch prediction,
         and cache hierarchies.
-
   \item Internal interconnects,
         clocking,
         memory controllers,
         and implementation-specific timing.
-
 \end{itemize}
 
 \end{block}
@@ -872,14 +825,12 @@ timing, physical implementation
 \small
 
 \begin{block}{Why a Stable Architecture Matters}
-
 A stable ISA allows software
 to retain the same machine-level meaning
 while processor implementations evolve
 for performance,
 power,
 and cost.
-
 \end{block}
 
 \vspace{0.12cm}
@@ -891,22 +842,18 @@ and cost.
 \begin{block}{Architectural Stability}
 
 \begin{itemize}
-
   \item AArch64 defines instructions
         such as
         \code{add},
         \code{ldr},
         and \code{cbz}.
-
   \item Their architectural meaning
         remains stable
         across compliant implementations.
-
   \item Binary compatibility also depends on
         the operating environment,
         ABI,
         and supported extensions.
-
 \end{itemize}
 
 \end{block}
@@ -916,18 +863,14 @@ and cost.
 \begin{block}{Organizational Evolution}
 
 \begin{itemize}
-
   \item One core may use
         a modest in-order pipeline.
-
   \item Another may use
         wide out-of-order execution
         and larger cache hierarchies.
-
   \item Both can preserve
         the same architectural
         instruction semantics.
-
 \end{itemize}
 
 \end{block}
@@ -955,19 +898,14 @@ defines the processor interface
 visible to machine-language software.
 
 \begin{itemize}
-
   \item Instructions and their semantics.
-
   \item Programmer-visible registers
         and status state.
-
   \item Instruction encodings
         and operand forms.
-
   \item Memory-access
         and exception behavior
         exposed to software.
-
 \end{itemize}
 
 \vspace{0.25cm}
@@ -1002,25 +940,18 @@ or timing used to produce it.
 \begin{block}{Illustrative Register-Transfer Steps}
 
 \begin{enumerate}
-
   \item Present \code{x2} and \code{x3}
         as register-file read addresses.
-
   \item Read the two 64-bit operand values
         from the register file.
-
   \item Configure the ALU
         to perform addition.
-
   \item Compute:
         \code{alu\_result <- x2 + x3}.
-
   \item Enable a write
         to destination register \code{x1}.
-
   \item Commit the result
         to the architectural register file.
-
 \end{enumerate}
 
 \end{block}
@@ -1028,18 +959,14 @@ or timing used to produce it.
 \vspace{0.15cm}
 
 \begin{itemize}
-
   \item \key{ISA view}:
         required state change.
-
   \item \key{Microarchitecture view}:
         control signals,
         data movement,
         and execution resources.
-
   \item Signal names here are teaching abstractions,
         not AArch64 architectural state.
-
 \end{itemize}
 
 \end{frame}
@@ -1262,12 +1189,10 @@ at greater complexity
 \vspace{0.2cm}
 
 \begin{block}{Key Principle}
-
 All can implement
 the same AArch64 instruction semantics
 while using very different
 internal organizations.
-
 \end{block}
 
 \end{frame}
@@ -1287,48 +1212,39 @@ internal organizations.
 \begin{frame}{The Stored-Program Concept}
 
 \begin{block}{Foundational Definition}
-
 Program instructions are represented
 as binary information
 and stored in memory,
 allowing the computer
 to execute different programs
 without changing the hardware.
-
 \end{block}
 
 \vspace{0.12cm}
 
 \begin{itemize}
-
   \item The processor stores and retrieves
         program information
         and runtime data electronically.
-
   \item A program counter identifies
         the next instruction to be fetched.
-
   \item Reprogramming means loading
         a different instruction sequence
         rather than rewiring the machine.
-
   \item The stored-program idea does
         \key{not} require instruction
         and data accesses
         to use the same physical memory path.
-
 \end{itemize}
 
 \vspace{0.05cm}
 
 \begin{alertblock}{Important Distinction}
-
 Von Neumann and Harvard
 are different ways
 to organize instruction
 and data access
 in a stored-program computer.
-
 \end{alertblock}
 
 \end{frame}
@@ -1344,34 +1260,27 @@ in a stored-program computer.
 \column{0.56\textwidth}
 
 \begin{itemize}
-
   \item Memory is viewed logically
         as a sequence
         of storage locations.
-
   \item AArch64 systems are typically
         \key{byte-addressed}:
         each address identifies one byte.
-
   \item Larger values span
         consecutive byte addresses.
-
   \item The address identifies
         \textit{where};
         the stored bits
         are the \textit{payload}.
-
 \end{itemize}
 
 \vspace{0.05cm}
 
 \begin{block}{Example}
-
 A 32-bit value beginning
 at \hex{1000}
 occupies addresses
 \hex{1000}--\hex{1003}.
-
 \end{block}
 
 \column{0.40\textwidth}
@@ -1413,13 +1322,11 @@ occupies addresses
 \begin{frame}{The CPU--Memory Interface: A Conceptual Model}
 
 \begin{block}{How the CPU Communicates with Memory}
-
 At the conceptual level,
 a memory access requires three kinds of information:
 \key{where} to access,
 \key{what data} to transfer,
 and \key{what operation} to perform.
-
 \end{block}
 
 \vspace{0.2cm}
@@ -1519,19 +1426,15 @@ node[
 \vspace{0.12cm}
 
 \begin{itemize}
-
   \item \key{Address information}:
         identifies the memory location.
-
   \item \key{Data}:
         carries the value
         being read or written.
-
   \item \key{Control signals}:
         indicate operations such as
         read or write
         and coordinate the transfer.
-
 \end{itemize}
 
 \vspace{0.05cm}
@@ -1607,12 +1510,10 @@ Four individual 8-bit quantities
 \vspace{0.25cm}
 
 \begin{block}{Connection to Stored Programs}
-
 Instructions can reside in memory
 because machine instructions
 are encoded as bit patterns,
 just like data.
-
 \end{block}
 
 \end{frame}
@@ -1680,27 +1581,22 @@ just like data.
 \vspace{0.55cm}
 
 \begin{itemize}
-
   \item \key{Fetch}:
         obtain the instruction
         identified by
         the current program counter.
-
   \item \key{Decode}:
         determine the requested operation
         and its operands.
-
   \item \key{Execute}:
         perform the operation,
         update architectural state,
         and determine the next PC.
-
   \item Real processors may pipeline
         and overlap these activities;
         this diagram shows
         the conceptual instruction cycle,
         not a particular pipeline.
-
 \end{itemize}
 
 \end{frame}
@@ -1727,24 +1623,19 @@ just like data.
 \key{Core Characteristics}:
 
 \begin{itemize}
-
   \item \key{Unified Memory}:
         instructions and data
         share one memory/address space.
-
   \item \key{Shared Access Path}:
         instruction fetches
         and data accesses
         use the same memory path.
-
   \item These accesses can therefore
         \key{contend for the same resource}.
-
   \item This organization
         is the classical model
         associated with
         the von Neumann bottleneck.
-
 \end{itemize}
 
 \column{0.42\textwidth}
@@ -1842,24 +1733,19 @@ node[above]{\tiny Shared path}
 \key{Core Characteristics}:
 
 \begin{itemize}
-
   \item \key{Separated Memories}:
         instruction and data storage
         are distinct.
-
   \item \key{Independent Access Paths}:
         each side has its own path
         to the processor.
-
   \item \key{Parallel Operation}:
         instruction fetch
         and a data read/write
         can proceed concurrently.
-
   \item Instruction and data memories
         may use different widths
         or storage technologies.
-
 \end{itemize}
 
 \column{0.42\textwidth}
@@ -1951,13 +1837,11 @@ node[above]{\tiny instruction path}
 \begin{frame}{Structural Separation: The Key Distinction}
 
 \begin{block}{The Fundamental Question}
-
 The important distinction
 is whether instruction access
 and data access
 share the same memory path
 or use structurally separate paths.
-
 \end{block}
 
 \vspace{0.35cm}
@@ -1969,16 +1853,13 @@ or use structurally separate paths.
 \begin{block}{Shared Path: von Neumann}
 
 \begin{itemize}
-
   \item Instruction fetch
         and data access
         can compete for
         the same resource.
-
   \item Simpler memory organization
         and flexible sharing
         of storage capacity.
-
 \end{itemize}
 
 \end{block}
@@ -1988,13 +1869,10 @@ or use structurally separate paths.
 \begin{block}{Separate Paths: Harvard}
 
 \begin{itemize}
-
   \item Removes instruction/data
         memory-path contention.
-
   \item Requires separate storage interfaces
         and additional hardware resources.
-
 \end{itemize}
 
 \end{block}
@@ -2137,21 +2015,17 @@ node[right]{\code{instructions}}
 \vspace{-0.1cm}
 
 \begin{itemize}
-
   \item \key{Near the core}:
         separate L1 instruction/data paths
         permit concurrent fetch
         and data access.
-
   \item \key{Lower levels}:
         instructions and data share
         a unified memory system
         and address space.
-
   \item Examples include
         Apple M-series
         and many ARM Cortex-A processors.
-
 \end{itemize}
 
 \end{frame}
@@ -2221,7 +2095,6 @@ with shared lower hierarchy
 \vspace{0.35cm}
 
 \begin{block}{Key Takeaway}
-
 The ISA does not,
 by itself,
 require a processor
@@ -2230,7 +2103,6 @@ von Neumann,
 Harvard,
 or modified-Harvard
 internal organization.
-
 \end{block}
 
 \end{frame}
@@ -2250,40 +2122,33 @@ internal organization.
 \begin{frame}{Topic Summary}
 
 \begin{itemize}
-
   \item \key{Architecture vs. Organization}:
         architecture defines
         software-visible behavior;
         organization implements it
         in hardware.
-
   \item \key{ISA vs. Microarchitecture}:
         the ISA specifies instructions
         and architectural state;
         microarchitecture realizes
         those semantics
         with datapaths and control.
-
   \item \key{Stored-Program Concept}:
         instructions are represented
         as binary information
         stored in memory,
         allowing programs to change
         without rewiring hardware.
-
   \item \key{von Neumann}:
         instruction and data accesses
         share memory resources.
-
   \item \key{Harvard}:
         instruction and data accesses
         use separate memories and paths.
-
   \item \key{Modified Harvard}:
         separate instruction/data structures
         near the core
         with a unified lower memory system.
-
 \end{itemize}
 
 \end{frame}
@@ -2295,34 +2160,28 @@ internal organization.
 \begin{frame}{Self-Test: Questions 1--3}
 
 \begin{block}{Question 1: Architecture vs. Organization}
-
 What is the difference
 between computer architecture
 and computer organization?
 
 Give two examples of each.
-
 \end{block}
 
 \vspace{0.25cm}
 
 \begin{block}{Question 2: ISA vs. Microarchitecture}
-
 For \code{add x1, x2, x3},
 what does the ISA specify,
 and what kinds of internal actions
 belong to the microarchitecture?
-
 \end{block}
 
 \vspace{0.25cm}
 
 \begin{block}{Question 3: Stored Program}
-
 What is the stored-program concept,
 and why does it allow one computer
 to execute many different programs?
-
 \end{block}
 
 \end{frame}
@@ -2334,7 +2193,6 @@ to execute many different programs?
 \begin{frame}{Self-Test: Solutions 1--3}
 
 \begin{block}{Solution 1}
-
 \key{Architecture}:
 software-visible specification,
 such as instruction semantics
@@ -2344,11 +2202,9 @@ and visible registers.
 internal implementation,
 such as pipeline structure
 and cache organization.
-
 \end{block}
 
 \begin{block}{Solution 2}
-
 \key{ISA}:
 add the values in
 \code{x2} and \code{x3}
@@ -2360,18 +2216,15 @@ read operands,
 control the ALU,
 move the result,
 and write the destination register.
-
 \end{block}
 
 \begin{block}{Solution 3}
-
 Instructions are stored
 as binary information in memory.
 
 Loading a different instruction sequence
 changes the program
 without changing the physical hardware.
-
 \end{block}
 
 \end{frame}
@@ -2383,7 +2236,6 @@ without changing the physical hardware.
 \begin{frame}{Self-Test: Questions 4--5}
 
 \begin{block}{Question 4: von Neumann vs. Harvard}
-
 What is the primary structural difference
 between von Neumann
 and Harvard organizations?
@@ -2391,18 +2243,15 @@ and Harvard organizations?
 Why can a Harvard organization support
 simultaneous instruction fetch
 and data access?
-
 \end{block}
 
 \vspace{0.35cm}
 
 \begin{block}{Question 5: Modified Harvard}
-
 How does a typical modified-Harvard processor
 combine separate instruction/data paths
 near the CPU
 with a unified lower memory system?
-
 \end{block}
 
 \end{frame}
@@ -2414,7 +2263,6 @@ with a unified lower memory system?
 \begin{frame}{Self-Test: Solutions 4--5}
 
 \begin{block}{Solution 4}
-
 Von Neumann uses
 a shared instruction/data memory path,
 so the two access types can contend.
@@ -2423,20 +2271,17 @@ Harvard provides
 separate instruction and data memories/paths,
 allowing both accesses
 to proceed concurrently.
-
 \end{block}
 
 \vspace{0.3cm}
 
 \begin{block}{Solution 5}
-
 A modified-Harvard processor commonly uses
 separate L1 instruction
 and data caches near the core
 while sharing lower-level caches
 and main memory
 within one unified address space.
-
 \end{block}
 
 \end{frame}
@@ -2450,15 +2295,10 @@ within one unified address space.
 \begin{block}{Next Topic: RISC Principles and ARM Architecture}
 
 \begin{itemize}
-
   \item \key{RISC design principles}
-
   \item \key{AArch64 architectural overview}
-
   \item \key{Programmer-visible registers and state}
-
   \item \key{Major instruction classes}
-
 \end{itemize}
 
 \end{block}
