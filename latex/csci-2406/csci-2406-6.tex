@@ -31,7 +31,11 @@
 % ============================================================
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[scale=0.92]{sourcecodepro}
+\IfFileExists{sourcecodepro.sty}{%
+  \usepackage[scale=0.92]{sourcecodepro}%
+}{%
+  \usepackage{courier}%
+}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -131,8 +135,8 @@ Explain how AArch64 transfers values between registers and memory and how an ins
 \item \key{Section 1}: Memory addresses and load/store semantics
 \item \key{Section 2}: Transfer width and extension
 \item \key{Section 3}: AArch64 addressing modes
-\item \key{Section 4}: Arrays, pointers, and strings
-\item \key{Section 5}: Alignment, pair transfers, and program-memory context
+\item \key{Section 4}: Arrays, pointers, and byte data
+\item \key{Section 5}: Memory alignment and pair transfers
 \item \key{Section 6}: Summary and self-test
 \end{itemize}
 \end{frame}
@@ -459,7 +463,7 @@ If \code{x1} represents pointer \code{p}, then the memory operand \code{[x1]} co
 \begin{itemize}
 \item Effective address $= \code{x1} + 16$.
 \item The base register \code{x1} is unchanged.
-\item Useful for structure fields, stack-frame locations, and fixed-position array elements.
+\item Useful for structure fields and fixed-position array elements.
 \end{itemize}
 \vspace{0.15cm}
 \begin{block}{Encoding Detail}
@@ -608,9 +612,9 @@ Offset addressing computes an access address without changing the base register;
 
 % ============================================================
 % Slide 22
-% Slide Header: Arrays, Pointers, and Strings
+% Slide Header: Arrays, Pointers, and Byte Data
 % ============================================================
-\sectiondivider{Section 04}{Arrays, Pointers, and Strings}
+\sectiondivider{Section 04}{Arrays, Pointers, and Byte Data}
 
 % ============================================================
 % Slide 23
@@ -656,65 +660,41 @@ Assume \code{x0} points to the current 64-bit array element.
 \end{itemize}
 \vspace{0.15cm}
 \begin{block}{Pointer Traversal}
-Post-index addressing is useful when each iteration processes the current element and then advances to the next one.
+Post-index addressing combines the current access with advancement to the next element. Topic 7 will place this operation inside a loop.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 25
-% Slide Header: Traversing a String
+% Slide Header: Byte Arrays and Pointer Advancement
 % ============================================================
-\begin{frame}{Traversing a Null-Terminated String}
-A C-style string is a byte array ending with a zero byte.
-\vspace{0.2cm}
-\small
-\hspace{3.2cm}\code{loop:}\\[0.08cm]
-\hspace{3.2cm}\code{ldrb w1, [x0], \#1}\\[0.08cm]
-\hspace{3.2cm}\code{cbz w1, done}\\[0.08cm]
-\hspace{3.2cm}\code{// process character in w1}\\[0.08cm]
-\hspace{3.2cm}\code{b loop}\\[0.08cm]
-\hspace{3.2cm}\code{done:}
+\begin{frame}{Byte Arrays and Pointer Advancement}
+A C-style string is a byte array, so one character occupies one byte.
+\vspace{0.25cm}
+\large
+\hspace{3.3cm}\code{ldrb w1, [x0], \#1}
 \normalsize
-\vspace{0.15cm}
+\vspace{0.25cm}
 \begin{itemize}
-\item \code{ldrb} reads one byte.
-\item Post-indexing advances the pointer by one byte.
-\item \code{cbz} ends the loop when the null terminator is loaded.
+\item \code{ldrb} reads the current byte and zero-extends it into \code{w1}.
+\item The access uses the original address in \code{x0}.
+\item Post-index writeback advances \code{x0} by one byte.
+\item Testing for the null terminator and repeating the access are Topic 7 control-flow operations.
 \end{itemize}
+\vspace{0.15cm}
+\begin{block}{Scope Boundary}
+This instruction demonstrates byte access and pointer movement only; the complete string-traversal loop belongs in the next topic.
+\end{block}
 \end{frame}
 
 % ============================================================
 % Slide 26
-% Slide Header: Address of a Static Object
+% Slide Header: Alignment and Pair Transfers
 % ============================================================
-\begin{frame}{Obtaining the Address of a Static Object}
-\begin{block}{Teaching Convenience}
-Assemblers commonly accept pseudo-instructions such as:
-\vspace{0.08cm}
-\large
-\hspace{4.0cm}\code{ldr x0, =array}
-\normalsize
-\end{block}
-\vspace{0.15cm}
-\begin{itemize}
-\item This asks the assembler/linker toolchain to arrange for the address of \code{array} to be placed in \code{x0}.
-\item It is not one universal A64 machine encoding called ``load address.''
-\item The assembler may use a literal load or another instruction sequence depending on the target and relocation model.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Later Detail}
-Position-independent code often forms addresses using instructions such as \code{adrp} plus \code{add}; exact sequences are discussed when relocation and linking are introduced.
-\end{block}
-\end{frame}
+\sectiondivider{Section 05}{Alignment and Pair Transfers}
 
 % ============================================================
 % Slide 27
-% Slide Header: Alignment, Pair Transfers, and Program-Memory Context
-% ============================================================
-\sectiondivider{Section 05}{Alignment, Pair Transfers, and Program-Memory Context}
-
-% ============================================================
-% Slide 28
 % Slide Header: Natural Alignment
 % ============================================================
 \begin{frame}{Natural Alignment}
@@ -729,12 +709,12 @@ An $n$-byte object is naturally aligned when its starting address is a multiple 
 \end{itemize}
 \vspace{0.15cm}
 \begin{block}{AArch64 Qualification}
-Many ordinary AArch64 loads and stores to normal memory permit unaligned addresses, but alignment can affect performance and some access classes have stricter requirements. Device, atomic, and exclusive accesses require additional care.
+Many ordinary AArch64 loads and stores to normal memory permit unaligned addresses, but natural alignment is preferred. Misaligned accesses may be slower or cross memory-system boundaries, and some access classes have stricter requirements.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 29
+% Slide 28
 % Slide Header: Load and Store Pair
 % ============================================================
 \begin{frame}{Load and Store Pair: \code{ldp} and \code{stp}}
@@ -746,7 +726,7 @@ Many ordinary AArch64 loads and stores to normal memory permit unaligned address
 \normalsize
 \begin{itemize}
 \item Stores two register values.
-\item Addresses are adjacent according to operand width.
+\item The memory locations are adjacent.
 \end{itemize}
 \end{block}
 \column{0.48\textwidth}
@@ -756,130 +736,24 @@ Many ordinary AArch64 loads and stores to normal memory permit unaligned address
 \normalsize
 \begin{itemize}
 \item Loads two register values.
-\item Common in stack-frame save/restore code.
+\item The memory locations are adjacent.
 \end{itemize}
 \end{block}
 \end{columns}
 \vspace{0.2cm}
 \begin{block}{Important Qualification}
-A pair transfer is one architectural instruction, but it should not be assumed to be atomic or to have a universal timing advantage on every processor.
+A pair transfer is one architectural instruction, but it is not guaranteed to be atomic or to execute as one physical memory-bus transaction.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 30
-% Slide Header: Pair Transfers and the Stack
-% ============================================================
-\begin{frame}{Pair Transfers and the Stack}
-\begin{block}{Function Entry Pattern}
-\large
-\hspace{2.7cm}\code{stp x29, x30, [sp, \#-16]!}
-\normalsize
-\end{block}
-\vspace{0.15cm}
-\begin{itemize}
-\item Pre-indexing first subtracts 16 from \code{sp}.
-\item The two 64-bit values are then stored at the new stack location.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Function Exit Pattern}
-\large
-\hspace{2.9cm}\code{ldp x29, x30, [sp], \#16}
-\normalsize
-\end{block}
-\vspace{0.1cm}
-Post-indexing loads the pair and then restores \code{sp} by adding 16. Procedure conventions are developed fully in Topic 8.
-\end{frame}
-
-% ============================================================
-% Slide 31
-% Slide Header: Program Memory Layout Is OS and Toolchain Context
-% ============================================================
-\begin{frame}{Program Memory Layout Is OS and Toolchain Context}
-\begin{block}{ISA vs. Process Layout}
-AArch64 defines load/store instruction behavior. The operating system, executable format, linker, and ABI determine how a particular process is arranged in virtual memory.
-\end{block}
-\vspace{0.2cm}
-\begin{itemize}
-\item ELF is a common executable/object format on Unix-like AArch64 systems.
-\item ELF \key{sections} such as \code{.text}, \code{.data}, and \code{.bss} organize linker/object-file content.
-\item ELF \key{program segments} describe what the loader maps into a process address space.
-\item These ideas provide context for where instructions and data come from, but they are not A64 addressing modes.
-\end{itemize}
-\end{frame}
-
-% ============================================================
-% Slide 32
-% Slide Header: Typical Linux User-Space Layout
-% ============================================================
-\begin{frame}{Typical Linux User-Space Layout}
-\begin{columns}[T,onlytextwidth]
-\column{0.54\textwidth}
-\begin{itemize}
-\item Executable code and static data are mapped from the program image.
-\item The heap is used for dynamic allocation.
-\item Shared libraries and other mappings occupy memory-mapped regions.
-\item The user stack holds stack frames and local process state.
-\item ASLR and other OS choices mean exact addresses and ordering are not fixed by AArch64.
-\end{itemize}
-\column{0.40\textwidth}
-\begin{center}
-\begin{tikzpicture}[
-  region/.style={draw=navy,minimum width=4.7cm,minimum height=.62cm,align=center,font=\small},
-  static/.style={region,fill=softgray},
-  dyn/.style={region,fill=white}
-]
-\node[dyn] (stack) {User stack};
-\node[dyn,below=0pt of stack,minimum height=.9cm] (map) {Memory-mapped region};
-\node[dyn,below=0pt of map] (heap) {Heap};
-\node[static,below=0pt of heap] (bss) {Zero-initialized data};
-\node[static,below=0pt of bss] (data) {Initialized data};
-\node[static,below=0pt of data] (text) {Executable code};
-\node[font=\scriptsize,above=.05cm of stack] {higher virtual addresses};
-\node[font=\scriptsize,below=.05cm of text] {lower virtual addresses};
-\end{tikzpicture}
-\end{center}
-\end{columns}
-\end{frame}
-
-% ============================================================
-% Slide 33
-% Slide Header: ELF Sections and Loadable Segments
-% ============================================================
-\begin{frame}{ELF Sections and Loadable Segments}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Sections: Linker View}
-\begin{itemize}
-\item \code{.text}: executable instructions
-\item \code{.rodata}: read-only constants
-\item \code{.data}: initialized writable data
-\item \code{.bss}: zero-initialized storage
-\end{itemize}
-\end{block}
-\column{0.48\textwidth}
-\begin{block}{Segments: Loader View}
-\begin{itemize}
-\item Program headers describe loadable regions.
-\item A segment may contain several sections.
-\item Permissions can distinguish executable, read-only, and writable mappings.
-\end{itemize}
-\end{block}
-\end{columns}
-\vspace{0.2cm}
-\begin{block}{Important Detail}
-\code{.bss} usually contributes memory size without storing an equivalent block of zero bytes in the executable file; the loader arranges zero-initialized memory.
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 34
+% Slide 29
 % Slide Header: Summary and Self-Test
 % ============================================================
 \sectiondivider{Section 06}{Summary and Self-Test}
 
 % ============================================================
-% Slide 35
+% Slide 30
 % Slide Header: Topic 6 Summary
 % ============================================================
 \begin{frame}{Topic 6 Summary}
@@ -888,13 +762,13 @@ AArch64 defines load/store instruction behavior. The operating system, executabl
 \item The instruction determines transfer width and whether a narrow loaded value is zero-extended or sign-extended.
 \item Effective addresses can use a base register, immediate offset, register offset, or pre/post-indexed immediate writeback.
 \item Scaled register offsets map naturally to array indexing; post-indexing maps naturally to pointer traversal.
-\item Natural alignment is preferred, although ordinary unaligned accesses may be permitted depending on the access type and memory attributes.
-\item ELF/process layout is operating-system and toolchain context, not part of the A64 addressing-mode definition.
+\item Natural alignment is preferred, although many ordinary unaligned accesses to normal memory are permitted.
+\item \code{ldp} and \code{stp} transfer adjacent register pairs without implying atomicity or a particular physical bus transaction.
 \end{itemize}
 \end{frame}
 
 % ============================================================
-% Slide 36
+% Slide 31
 % Slide Header: Self-Test 1/2
 % ============================================================
 \begin{frame}{Self-Test 1/2}
@@ -908,7 +782,7 @@ AArch64 defines load/store instruction behavior. The operating system, executabl
 \end{frame}
 
 % ============================================================
-% Slide 37
+% Slide 32
 % Slide Header: Self-Test 2/2
 % ============================================================
 \begin{frame}{Self-Test 2/2}
@@ -918,25 +792,24 @@ AArch64 defines load/store instruction behavior. The operating system, executabl
 \item What changes in \code{x1} after \code{ldr x0, [x1], \#8}?
 \item Why is \code{ldr x0, [x1, x2]!} not a valid example of A64 pre-indexed register addressing?
 \item What does natural alignment mean for an 8-byte object?
-\item Why should ELF sections such as \code{.text} and \code{.data} not be described as A64 addressing modes?
+\item Why does \code{ldrb w1, [x0], \#1} advance a byte-array pointer by one rather than by eight?
 \end{enumerate}
 \end{frame}
 
 % ============================================================
-% Slide 38
+% Slide 33
 % Slide Header: Next Topic
 % ============================================================
 \begin{frame}{Next Topic}
 \begin{block}{Branching and Iteration}
-Topic 7 uses the register and memory operations developed so far to build control-flow structures.
+Topic 7 develops the comparison, branching, and control-flow instructions used to implement decisions and repetition.
 \end{block}
 \vspace{0.25cm}
 \begin{itemize}
-\item Comparisons and NZCV condition flags
+\item Comparison instructions
 \item Conditional and unconditional branches
-\item Translation of \code{if} and \code{if}-\code{else}
-\item \code{while} and counted loops
-\item Array and string traversal with branches
+\item Loops and selection structures
+\item Translation of high-level control flow
 \end{itemize}
 \end{frame}
 
