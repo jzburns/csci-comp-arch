@@ -8,6 +8,7 @@
 \usefonttheme{professionalfonts}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
+
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
@@ -17,6 +18,7 @@
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
+
 \setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize,series=\bfseries}
@@ -37,7 +39,7 @@
 \usepackage{array}
 \usepackage{colortbl}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
+\usetikzlibrary{arrows.meta,positioning,calc}
 
 % ============================================================
 % Colors
@@ -45,7 +47,6 @@
 \definecolor{navy}{RGB}{24,43,68}
 \definecolor{deepblue}{RGB}{45,88,130}
 \definecolor{softgray}{RGB}{245,247,250}
-\definecolor{mediumgray}{RGB}{232,235,239}
 \definecolor{darkgray}{RGB}{25,28,32}
 \definecolor{gold}{RGB}{200,145,35}
 
@@ -65,6 +66,7 @@
 % Formatting shortcuts
 % ============================================================
 \setlength{\parskip}{0pt}
+
 \newcommand{\key}[1]{\textbf{#1}}
 \newcommand{\bits}[1]{\texttt{#1}}
 \newcommand{\hex}[1]{\texttt{0x#1}}
@@ -107,32 +109,15 @@
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
 \end{tikzpicture}
-
 \vspace{1.0cm}
-
 \begin{minipage}{0.9\textwidth}
 {\color{gold}\large\bfseries CSCI 2406: Topic 04\par}
-
 \vspace{0.3cm}
-
-{\color{white}\fontsize{20}{24}\selectfont\bfseries
-Integer Arithmetic\\[0.08cm]
-\& Performance Basics
-\par}
-
+{\color{white}\fontsize{20}{24}\selectfont\bfseries Integer Arithmetic and Performance Basics\par}
 \vspace{0.3cm}
-
-{\color{softgray}\normalsize
-Fixed-width arithmetic, condition flags, shifts, and CPU execution-time analysis
-\par}
-
+{\color{softgray}\normalsize Fixed-width arithmetic, condition flags, shifts, and CPU execution-time analysis\par}
 \vspace{0.6cm}
-
-{\color{softgray}\small
-Computer Organization \& Architecture
-\quad\textbar\quad
-AArch64 Reference
-\par}
+{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad AArch64 Reference\par}
 \end{minipage}
 \end{frame}
 
@@ -144,21 +129,19 @@ AArch64 Reference
 \begin{block}{Topic Objective}
 Understand how fixed-width integer arithmetic works at the machine level, how condition flags support later control flow, and how instruction count, CPI, and clock rate determine execution time.
 \end{block}
-
 \vspace{0.25cm}
-
 \begin{itemize}
-  \item \key{Section 1}: Fixed-width addition, subtraction, and interpretation
-  \item \key{Section 2}: Condition flags and AArch64 comparison behavior
-  \item \key{Section 3}: Multiplication, division, and shifts
-  \item \key{Section 4}: Clock rate, CPI, and execution time
-  \item \key{Section 5}: Summary and self-test
+\item \key{Section 1}: Fixed-width addition, subtraction, and interpretation
+\item \key{Section 2}: Condition flags and AArch64 comparison behavior
+\item \key{Section 3}: Multiplication, division, and shifts
+\item \key{Section 4}: Clock rate, CPI, and execution time
+\item \key{Section 5}: Summary and self-test
 \end{itemize}
 \end{frame}
 
 % ============================================================
 % Slide 3
-% Slide Header: Section 01 - Fixed-Width Integer Arithmetic
+% Slide Header: Fixed-Width Integer Arithmetic
 % ============================================================
 \sectiondivider{Section 01}{Fixed-Width Integer Arithmetic}
 
@@ -170,27 +153,24 @@ Understand how fixed-width integer arithmetic works at the machine level, how co
 \begin{block}{Integer Operations Are Everywhere}
 Integer arithmetic is not limited to explicit calculator-like expressions. It appears constantly in address calculation, loop control, array indexing, comparisons, and resource accounting.
 \end{block}
-
 \vspace{0.25cm}
-
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
 \begin{block}{Program-Level Examples}
 \begin{itemize}
-  \item Increment loop counters.
-  \item Compute array offsets.
-  \item Compare bounds and indices.
-  \item Update pointer values.
+\item Increment loop counters.
+\item Compute array offsets.
+\item Compare bounds and indices.
+\item Update pointer values.
 \end{itemize}
 \end{block}
-
 \column{0.48\textwidth}
 \begin{block}{Hardware-Level Consequence}
 \begin{itemize}
-  \item Arithmetic uses fixed-width registers.
-  \item Results can wrap around.
-  \item Flags record selected facts about results.
-  \item Interpretation is supplied by software.
+\item Arithmetic uses fixed-width registers.
+\item Only the destination-width result bits are retained.
+\item Flags record selected facts about results.
+\item Interpretation is supplied by software.
 \end{itemize}
 \end{block}
 \end{columns}
@@ -204,29 +184,25 @@ Integer arithmetic is not limited to explicit calculator-like expressions. It ap
 \begin{block}{Core Principle}
 The ALU operates on finite-width bit patterns. Signedness is not a property of the adder itself; it is a property of how software interprets the bits and which branch conditions it later uses.
 \end{block}
-
 \vspace{0.25cm}
-
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
 \begin{block}{Same Instruction}
 \large
-\hspace{1.5cm}\code{add x0, x1, x2}
+\hspace{1.6cm}\code{add x0, x1, x2}
 \normalsize
-
 \begin{itemize}
-  \item Adds two 64-bit values.
-  \item Produces one 64-bit result.
-  \item Does not by itself say signed or unsigned.
+\item Adds two 64-bit values.
+\item Produces one 64-bit result.
+\item Does not by itself say signed or unsigned.
 \end{itemize}
 \end{block}
-
 \column{0.48\textwidth}
 \begin{block}{Different Readings}
 \begin{itemize}
-  \item Unsigned: magnitude from $0$ to $2^{64}-1$.
-  \item Signed: two's-complement range from $-2^{63}$ to $2^{63}-1$.
-  \item Flags help evaluate special cases.
+\item Unsigned: magnitude from $0$ to $2^{64}-1$.
+\item Signed: two's-complement range from $-2^{63}$ to $2^{63}-1$.
+\item Flags help evaluate special cases.
 \end{itemize}
 \end{block}
 \end{columns}
@@ -238,36 +214,27 @@ The ALU operates on finite-width bit patterns. Signedness is not a property of t
 % ============================================================
 \begin{frame}{Binary Addition and Carry}
 \begin{columns}[T,onlytextwidth]
-
-\column{0.46\textwidth}
+\column{0.48\textwidth}
 \begin{block}{Column Addition}
 Binary addition proceeds bit by bit, carrying into the next higher column when needed.
-
 \vspace{0.15cm}
-
-\begin{center}
 \large
-\begin{tabular}{@{}r@{\;}r@{}}
-& \code{1111} \\
-\code{+} & \code{0001} \\[0.03cm]
-\multicolumn{2}{c}{\rule{1.65cm}{0.5pt}} \\[0.03cm]
-& \code{1 0000}
-\end{tabular}
-\end{center}
+\hspace{1.8cm}\code{1111}\\[-0.02cm]
+\hspace{1.5cm}\code{+ 0001}\\[-0.02cm]
+\hspace{1.5cm}\code{------}\\[-0.02cm]
+\hspace{1.5cm}\code{1 0000}
+\normalsize
 \end{block}
-
-\column{0.50\textwidth}
+\column{0.48\textwidth}
 \begin{block}{Unsigned Meaning}
 \begin{itemize}
-  \item In 4 bits, only the lower \,\code{0000}\, remains.
-  \item The extra leading bit is carry-out.
-  \item For unsigned arithmetic, carry-out means the mathematical result exceeded the available range.
+\item In 4 bits, only the lower \code{0000} remains.
+\item The extra leading bit is carry-out.
+\item For unsigned arithmetic, carry-out means the mathematical result exceeded the available range.
 \end{itemize}
 \end{block}
 \end{columns}
-
 \vspace{0.15cm}
-
 \begin{block}{Fixed-Width Result}
 An $n$-bit register keeps only $n$ result bits. Extra information may be reflected in condition flags.
 \end{block}
@@ -279,36 +246,32 @@ An $n$-bit register keeps only $n$ result bits. Extra information may be reflect
 % ============================================================
 \begin{frame}{Unsigned Ranges}
 \begin{block}{Range Formula}
-An $n$-bit unsigned integer represents values from $0$ to $2^n - 1$.
+An $n$-bit unsigned integer represents values from $0$ to $2^n-1$.
 \end{block}
-
-\vspace{0.25cm}
-
+\vspace{0.15cm}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.18}
+\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{
-  >{\raggedright\arraybackslash}m{3.0cm}
-  >{\raggedright\arraybackslash}m{4.0cm}
-  >{\raggedright\arraybackslash}m{4.0cm}
+>{\raggedright\arraybackslash}m{3.2cm}
+>{\raggedright\arraybackslash}m{3.2cm}
+>{\raggedright\arraybackslash}m{3.6cm}
 }
 \rowcolor{navy}
 {\color{white}\bfseries Width} &
 {\color{white}\bfseries Smallest} &
 {\color{white}\bfseries Largest} \\
 \rowcolor{softgray}
-8 bits & $0$ & $255$ \\
+8 bits & 0 & 255 \\
 \rowcolor{white}
-32 bits & $0$ & $2^{32}-1$ \\
+32 bits & 0 & $2^{32}-1$ \\
 \rowcolor{softgray}
-64 bits & $0$ & $2^{64}-1$ \\
+64 bits & 0 & $2^{64}-1$ \\
 \end{tabular}
 \end{center}
-
-\vspace{0.25cm}
-
-\begin{block}{Teaching Point}
-Unsigned overflow is not mysterious. The mathematical result is too large for the fixed-width container, so the stored result wraps modulo $2^n$.
+\vspace{0.2cm}
+\begin{block}{Fixed-Width Result}
+If unsigned addition produces a carry out of the most-significant bit, the destination stores only the low $n$ bits of the result.
 \end{block}
 \end{frame}
 
@@ -318,37 +281,30 @@ Unsigned overflow is not mysterious. The mathematical result is too large for th
 % ============================================================
 \begin{frame}{Two's-Complement Subtraction}
 \begin{block}{Hardware Idea}
-Subtraction can reuse the same adder by adding the two's-complement negation.
+Subtraction can reuse the same adder by adding the two's-complement negation of the second operand.
+\[
+A-B=A+(\sim B)+1
+\]
 \end{block}
-
 \vspace{0.05cm}
-
-\begin{center}
-$A - B = A + (\sim B) + 1$
-\end{center}
-
-\vspace{-0.05cm}
-
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
 \begin{block}{AArch64 Example}
 \large
-\hspace{1.5cm}\code{sub x0, x1, x2}
+\hspace{1.6cm}\code{sub x0, x1, x2}
 \normalsize
-
 \begin{itemize}
-  \item Computes \code{x1 - x2}.
-  \item Writes the fixed-width result to \code{x0}.
-  \item Does not update NZCV flags.
+\item Computes \code{x1 - x2}.
+\item Writes the fixed-width result to \code{x0}.
+\item Does not update NZCV flags.
 \end{itemize}
 \end{block}
-
 \column{0.48\textwidth}
 \begin{block}{Important Interpretation}
 \begin{itemize}
-  \item Negative values are encoded using two's complement.
-  \item The same adder can serve add and subtract.
-  \item Flags are needed to reason about borrow and overflow.
+\item Negative values use two's-complement representation.
+\item The same adder can perform addition and subtraction.
+\item NZCV records facts needed for later signed and unsigned reasoning.
 \end{itemize}
 \end{block}
 \end{columns}
@@ -362,32 +318,28 @@ $A - B = A + (\sim B) + 1$
 \begin{block}{Same Bits, Different Values}
 The same bit pattern can have different numeric meanings depending on whether software treats it as unsigned or signed two's complement.
 \end{block}
-
-\vspace{0.2cm}
-
+\vspace{0.15cm}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.18}
+\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{
-  >{\raggedright\arraybackslash}m{3.2cm}
-  >{\raggedright\arraybackslash}m{3.8cm}
-  >{\raggedright\arraybackslash}m{4.2cm}
+>{\raggedright\arraybackslash}m{3.0cm}
+>{\raggedright\arraybackslash}m{3.0cm}
+>{\raggedright\arraybackslash}m{4.3cm}
 }
 \rowcolor{navy}
 {\color{white}\bfseries 8-bit pattern} &
 {\color{white}\bfseries Unsigned} &
 {\color{white}\bfseries Signed two's complement} \\
 \rowcolor{softgray}
-\code{01111111} & $127$ & $127$ \\
+\code{01111111} & 127 & 127 \\
 \rowcolor{white}
-\code{10000000} & $128$ & $-128$ \\
+\code{10000000} & 128 & $-128$ \\
 \rowcolor{softgray}
-\code{11111111} & $255$ & $-1$ \\
+\code{11111111} & 255 & $-1$ \\
 \end{tabular}
 \end{center}
-
 \vspace{0.2cm}
-
 \begin{block}{Connection to AArch64}
 The instruction result is a bit pattern. The choice of signed or unsigned branch determines how flags are interpreted later.
 \end{block}
@@ -395,327 +347,449 @@ The instruction result is a bit pattern. The choice of signed or unsigned branch
 
 % ============================================================
 % Slide 10
-% Slide Header: Signed Overflow
+% Slide Header: Condition Flags and Comparisons
 % ============================================================
-\begin{frame}{Signed Overflow}
-\begin{block}{Definition}
-Signed overflow occurs when the true mathematical result of a two's-complement operation falls outside the signed range representable in the destination width.
-\end{block}
-
-\vspace{0.2cm}
-
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Positive Overflow}
-\large
-\hspace{1.1cm}\code{0111 + 0001 = 1000}
-\normalsize
-
-\vspace{0.15cm}
-
-In 4-bit signed arithmetic, $7+1$ cannot be represented. The stored pattern looks like $-8$.
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{Rule of Thumb}
-\begin{itemize}
-  \item Add two positives and get a negative: overflow.
-  \item Add two negatives and get a positive: overflow.
-  \item Add opposite signs: no signed overflow.
-\end{itemize}
-\end{block}
-\end{columns}
-\end{frame}
+\sectiondivider{Section 02}{Condition Flags and Comparisons}
 
 % ============================================================
 % Slide 11
-% Slide Header: Carry and Overflow Are Different
+% Slide Header: Why Condition Flags?
 % ============================================================
-\begin{frame}{Carry and Overflow Are Different}
-\begin{block}{Do Not Treat Them as Synonyms}
-Carry describes unsigned range behavior. Overflow describes signed two's-complement range behavior.
+\begin{frame}{Why Condition Flags?}
+\begin{block}{Arithmetic Produces More Than a Result}
+A fixed-width arithmetic operation produces a register result, but later instructions may also need to know whether that result was zero, negative, produced a carry-out, or caused signed overflow.
 \end{block}
-
 \vspace{0.2cm}
-
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.18}
-\begin{tabular}{
-  >{\raggedright\arraybackslash}m{3.2cm}
-  >{\raggedright\arraybackslash}m{4.2cm}
-  >{\raggedright\arraybackslash}m{4.0cm}
-}
-\rowcolor{navy}
-{\color{white}\bfseries Flag} &
-{\color{white}\bfseries Main use} &
-{\color{white}\bfseries Example idea} \\
-\rowcolor{softgray}
-\code{C} & unsigned carry or no-borrow & Did unsigned arithmetic exceed range? \\
-\rowcolor{white}
-\code{V} & signed overflow & Did signed result exceed two's-complement range? \\
-\end{tabular}
-\end{center}
-
-\vspace{0.25cm}
-
-\begin{block}{Course Connection}
-Later branch instructions use different flag combinations for signed and unsigned comparisons.
+\begin{itemize}
+\item These properties are recorded in four condition flags: \code{N}, \code{Z}, \code{C}, and \code{V}.
+\item Flag-setting arithmetic updates NZCV while also computing the normal register result.
+\item Comparison instructions update NZCV without keeping the arithmetic result.
+\item Conditional branches then test these flags to make control-flow decisions.
+\end{itemize}
+\vspace{0.15cm}
+\begin{block}{Why This Matters}
+NZCV connects arithmetic to decisions such as equality, signed ordering, and unsigned ordering.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 12
-% Slide Header: Section 02 - Flags and Comparisons
+% Slide Header: NZCV Condition Flags
 % ============================================================
-\sectiondivider{Section 02}{Condition Flags and Comparisons}
-
-% ============================================================
-% Slide 13
-% Slide Header: AArch64 NZCV Flags
-% ============================================================
-\begin{frame}{AArch64 NZCV Flags}
+\begin{frame}{NZCV Condition Flags}
+\vspace{-0.25cm}
+\begin{block}{Processor Status}
+AArch64 maintains architectural processor state in \key{PSTATE}. Four condition-code bits within that state record selected properties of arithmetic and logical results and are collectively called \key{NZCV}.
+\end{block}
 \begin{center}
 \begin{tikzpicture}[
   fld/.style={
     draw=navy,
     thick,
-    minimum width=2.2cm,
+    minimum width=2.25cm,
     minimum height=1.0cm,
     align=center,
     font=\bfseries
   }
 ]
-\node[fld,fill=navy,text=white] (n) {N\\Negative};
-\node[fld,fill=deepblue,text=white,right=.15cm of n] (z) {Z\\Zero};
-\node[fld,fill=gold!35,text=navy,right=.15cm of z] (c) {C\\Carry};
-\node[fld,fill=softgray,text=navy,right=.15cm of c] (v) {V\\Overflow};
+\node[fld,fill=navy,text=white] (n) {N\\bit 31};
+\node[fld,fill=deepblue,text=white,right=.15cm of n] (z) {Z\\bit 30};
+\node[fld,fill=gold!35,text=navy,right=.15cm of z] (c) {C\\bit 29};
+\node[fld,fill=softgray,text=navy,right=.15cm of c] (v) {V\\bit 28};
 \end{tikzpicture}
 \end{center}
-
-\vspace{0.25cm}
-
+\vspace{-0.15cm}
 \begin{itemize}
-  \item \key{N}: result sign bit is 1.
-  \item \key{Z}: result is exactly zero.
-  \item \key{C}: carry-out for addition; no-borrow for subtraction.
-  \item \key{V}: signed two's-complement overflow.
+\item \key{N}: most-significant bit of the result is 1.
+\item \key{Z}: result is exactly zero.
+\item \key{C}: records carry-out for addition and supports unsigned comparison after subtraction.
+\item \key{V}: indicates signed two's-complement overflow.
 \end{itemize}
+\vspace{0.05cm}
+\begin{block}{NZCV Representation}
+When NZCV is accessed as a system-register value, the four flags occupy bits 31--28 in the order \code{N Z C V}.
+\end{block}
+\end{frame}
 
-\vspace{0.1cm}
-
-\begin{block}{Interpretation Rule}
-\code{C} is mainly used for unsigned reasoning; \code{V} is mainly used for signed overflow reasoning.
+% ============================================================
+% Slide 13
+% Slide Header: Flag-Setting Arithmetic
+% ============================================================
+\begin{frame}{Flag-Setting Arithmetic}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{No Flag Update}
+\large
+\hspace{1.4cm}\code{add x0, x1, x2}\\[0.12cm]
+\hspace{1.4cm}\code{sub x0, x1, x2}
+\normalsize
+\begin{itemize}
+\item Write a register result.
+\item Leave NZCV unchanged.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Flag Update}
+\large
+\hspace{1.4cm}\code{adds x0, x1, x2}\\[0.12cm]
+\hspace{1.4cm}\code{subs x0, x1, x2}
+\normalsize
+\begin{itemize}
+\item Write a register result.
+\item Update NZCV from that operation.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{AArch64 Detail}
+Flag updates are provided by specific instruction forms such as \code{adds} and \code{subs}; this is not a general rule of simply adding an \code{s} to every mnemonic.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 14
-% Slide Header: Flag-Setting Instructions
+% Slide Header: N: Negative Flag
 % ============================================================
-\begin{frame}{Flag-Setting Instructions}
+\begin{frame}{N: Negative Flag}
+\begin{block}{When N Is Set}
+For a flag-setting arithmetic operation, \code{N=1} when the most-significant bit of the destination-width result is 1.
+\end{block}
+\vspace{0.2cm}
 \begin{columns}[T,onlytextwidth]
-
 \column{0.48\textwidth}
-\begin{block}{No Flag Update}
+\begin{block}{Example}
 \large
-\hspace{2cm}\code{add x0, x1, x2}\\[0.12cm]
-\hspace{2cm}\code{sub x0, x1, x2}
+\hspace{1.2cm}\code{3 - 5 = 1110}
 \normalsize
-
 \begin{itemize}
-  \item Write a register result.
-  \item Leave NZCV unchanged.
+\item In 4-bit two's complement, \code{1110} represents $-2$.
+\item The sign bit is 1, so \code{N=1}.
 \end{itemize}
 \end{block}
-
 \column{0.48\textwidth}
-\begin{block}{Flag Update}
+\begin{block}{AArch64 Context}
 \large
-\hspace{2cm}\code{adds x0, x1, x2}\\[0.12cm]
-\hspace{2cm}\code{subs x0, x1, x2}
+\hspace{1.1cm}\code{subs x0, x1, x2}
 \normalsize
-
 \begin{itemize}
-  \item Write a register result.
-  \item Update NZCV from that result.
+\item Writes the subtraction result to \code{x0}.
+\item Updates NZCV from that result.
+\item Ordinary \code{sub} leaves NZCV unchanged.
 \end{itemize}
 \end{block}
 \end{columns}
-
-\vspace{0.2cm}
-
+\vspace{-0.05cm}
 \begin{block}{Important Limitation}
-The \code{s} suffix is useful here, but do not teach it as a universal rule that applies to every AArch64 mnemonic.
+Signed less-than uses \code{N} together with \code{V}; \code{N} alone is not sufficient.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 15
-% Slide Header: Compare as Flag-Setting Subtraction
+% Slide Header: Z: Zero Flag
 % ============================================================
-\begin{frame}{\code{cmp} as Flag-Setting Subtraction}
-\begin{block}{Comparison Without Keeping the Difference}
-\code{cmp} subtracts for flags and discards the numeric result.
+\begin{frame}{Z: Zero Flag}
+\begin{block}{When Z Is Set}
+\code{Z=1} when every bit of the destination-width result is zero.
 \end{block}
-
-\vspace{0.25cm}
-
+\vspace{0.2cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Arithmetic Example}
 \large
-\hspace{4.3cm}\code{cmp x0, x1}\\[0.15cm]
-\hspace{4.3cm}\code{subs xzr, x0, x1}
+\hspace{1.3cm}\code{0101 - 0101 = 0000}
 \normalsize
-
-\vspace{0.25cm}
-
 \begin{itemize}
-  \item Both lines express the same underlying comparison mechanism.
-  \item \code{x0 - x1} updates NZCV.
-  \item The result is written to \code{xzr}, so it is discarded.
+\item The result is exactly zero.
+\item Therefore \code{Z=1}.
 \end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Comparison Example}
+\large
+\hspace{1.5cm}\code{cmp x0, x1}
+\normalsize
+\begin{itemize}
+\item \code{cmp} evaluates \code{x0 - x1} for flags.
+\item If \code{x0 == x1}, the difference is zero.
+\item Therefore \code{Z=1}.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.15cm}
+\begin{block}{Branch Connection}
+After a comparison, \code{b.eq} tests \code{Z=1}; \code{b.ne} tests \code{Z=0}.
+\end{block}
 \end{frame}
 
 % ============================================================
 % Slide 16
-% Slide Header: Carry Means No-Borrow After Subtraction
+% Slide Header: C: Carry Flag
 % ============================================================
-\begin{frame}{Carry Means No-Borrow After Subtraction}
-\begin{block}{AArch64 Subtraction Rule}
-After \code{subs} or \code{cmp}, \code{C=1} means the subtraction did \key{not} require an unsigned borrow.
+\begin{frame}{C: Carry Flag}
+\begin{block}{Addition}
+For addition, \code{C=1} when the fixed-width addition produces a carry out of the most-significant bit. Only the low $n$ result bits are stored in an $n$-bit destination.
 \end{block}
-
-\vspace{0.2cm}
-
-\begin{center}
+\vspace{0.12cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.46\textwidth}
+\begin{block}{4-Bit Addition}
+\large
+\hspace{1.2cm}\code{1111 + 0001}\\[0.08cm]
+\hspace{1.2cm}\code{= 1 0000}
+\normalsize
+\begin{itemize}
+\item Stored result: \code{0000}.
+\item Carry out: 1.
+\item Therefore \code{C=1}.
+\end{itemize}
+\end{block}
+\column{0.50\textwidth}
+\begin{block}{Subtraction Uses the Same Adder}
+\[
+A-B=A+(\sim B)+1
+\]
 \small
-\renewcommand{\arraystretch}{1.18}
-\begin{tabular}{
-  >{\raggedright\arraybackslash}m{3.2cm}
-  >{\raggedright\arraybackslash}m{3.8cm}
-  >{\raggedright\arraybackslash}m{4.2cm}
-}
-\rowcolor{navy}
-{\color{white}\bfseries Operation} &
-{\color{white}\bfseries Unsigned relation} &
-{\color{white}\bfseries Carry flag} \\
-\rowcolor{softgray}
-\code{5 - 3} & $5 \ge 3$ & \code{C=1}: no borrow \\
-\rowcolor{white}
-\code{3 - 5} & $3 < 5$ & \code{C=0}: borrow needed \\
-\end{tabular}
-\end{center}
-
-\vspace{0.2cm}
-
-\begin{block}{Common Mistake}
-Do not read \code{C=1} after subtraction as ``borrow occurred.'' In AArch64, it means \key{no borrow}.
+\hspace{0.15cm}\code{5 - 3: 0101 + 1101 = 1 0010}\\[0.08cm]
+\hspace{0.15cm}\code{3 - 5: 0011 + 1011 = 1110}
+\normalsize
+\begin{itemize}
+\item Carry out $\Rightarrow$ \code{C=1} and $5\ge3$.
+\item No carry out $\Rightarrow$ \code{C=0} and $3<5$.
+\end{itemize}
 \end{block}
+\end{columns}
 \end{frame}
 
 % ============================================================
 % Slide 17
-% Slide Header: Signed and Unsigned Branches
+% Slide Header: C After Subtraction
 % ============================================================
-\begin{frame}{Signed and Unsigned Branches}
-\begin{block}{After a Compare}
-The same \code{cmp} can support signed or unsigned comparisons. The branch mnemonic determines how the flags are interpreted.
+\begin{frame}{C After Subtraction}
+\begin{block}{Unsigned Interpretation}
+For the subtraction $A-B$, the carry flag provides information about the unsigned relationship between the two operands.
 \end{block}
-
-\vspace{0.15cm}
-
+\vspace{0.18cm}
 \begin{center}
 \small
 \renewcommand{\arraystretch}{1.18}
 \begin{tabular}{
-  >{\raggedright\arraybackslash}m{3.0cm}
-  >{\raggedright\arraybackslash}m{4.0cm}
-  >{\raggedright\arraybackslash}m{4.0cm}
+>{\raggedright\arraybackslash}m{2.4cm}
+>{\raggedright\arraybackslash}m{3.2cm}
+>{\raggedright\arraybackslash}m{4.8cm}
 }
 \rowcolor{navy}
-{\color{white}\bfseries Branch} &
-{\color{white}\bfseries Interpretation} &
-{\color{white}\bfseries Condition} \\
+{\color{white}\bfseries Condition} &
+{\color{white}\bfseries Carry flag} &
+{\color{white}\bfseries Unsigned interpretation} \\
 \rowcolor{softgray}
-\code{b.lt label} & signed less than & $N \ne V$ \\
+$A\ge B$ &
+\code{C=1} &
+The fixed-width subtraction produces a carry out. \\
 \rowcolor{white}
-\code{b.ge label} & signed greater/equal & $N = V$ \\
-\rowcolor{softgray}
-\code{b.lo label} & unsigned lower & $C=0$ \\
-\rowcolor{white}
-\code{b.hs label} & unsigned higher/same & $C=1$ \\
+$A<B$ &
+\code{C=0} &
+The fixed-width subtraction produces no carry out. \\
 \end{tabular}
 \end{center}
-
-\vspace{0.15cm}
-
-\large
-\hspace{2cm}\code{cmp x0, x1}
-\quad
-\code{b.lt signed\_less}
-\quad
-\code{b.lo unsigned\_lower}
-\normalsize
+\vspace{0.2cm}
+\begin{block}{AArch64 Comparison Use}
+After \code{cmp x0, x1}, \code{C=1} corresponds to \code{x0 >= x1} for unsigned values, while \code{C=0} corresponds to \code{x0 < x1}.
+\end{block}
 \end{frame}
 
 % ============================================================
 % Slide 18
-% Slide Header: Section 03 - Multiplication, Division, and Shifts
+% Slide Header: V: Signed Overflow Flag
+% ============================================================
+\begin{frame}{V: Signed Overflow Flag}
+\begin{block}{Signed Addition Rule}
+For signed addition, overflow occurs when two operands with the same sign produce a result with the opposite sign.
+\end{block}
+\vspace{0.12cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Positive + Positive}
+\large
+\hspace{1.0cm}\code{0111 + 0001 = 1000}
+\normalsize
+\begin{itemize}
+\item $7+1=8$ cannot be represented in 4-bit signed arithmetic.
+\item Two positive operands produced a negative result pattern.
+\item Therefore \code{V=1}.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Negative + Negative}
+\large
+\hspace{1.0cm}\code{1000 + 1111 = 0111}
+\normalsize
+\begin{itemize}
+\item $-8+(-1)=-9$ cannot be represented in 4 bits.
+\item Two negative operands produced a positive result pattern.
+\item Therefore \code{V=1}.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{-0.03cm}
+\small
+Adding operands with opposite signs does not produce signed overflow in addition.
+\normalsize
+\end{frame}
+
+% ============================================================
+% Slide 19
+% Slide Header: Signed Overflow in Subtraction
+% ============================================================
+\begin{frame}{Signed Overflow in Subtraction}
+\begin{block}{Subtraction Rule}
+For signed subtraction \code{A - B}, overflow can occur only when \code{A} and \code{B} have opposite signs and the result sign differs from the sign of \code{A}.
+\end{block}
+\vspace{0.18cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Positive Minus Negative}
+A positive value minus a negative value should become more positive. If the fixed-width result becomes negative, signed overflow occurred.
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Negative Minus Positive}
+A negative value minus a positive value should become more negative. If the fixed-width result becomes positive, signed overflow occurred.
+\end{block}
+\end{columns}
+\vspace{0.2cm}
+\begin{block}{Different Roles}
+\code{C} supports unsigned reasoning after subtraction; \code{V} records whether the signed subtraction exceeded the representable signed range.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 20
+% Slide Header: Comparison with CMP
+% ============================================================
+\begin{frame}{Comparison with \code{cmp}}
+\begin{block}{\code{cmp} Is Flag-Setting Subtraction}
+\large
+\hspace{3.4cm}\code{cmp x0, x1}\\[0.10cm]
+\hspace{3.4cm}\code{subs xzr, x0, x1}
+\normalsize
+\end{block}
+\vspace{0.2cm}
+\begin{itemize}
+\item The processor evaluates the same arithmetic needed for \code{x0 - x1}.
+\item The numerical subtraction result is discarded by writing it to \code{xzr}.
+\item NZCV records properties of the subtraction.
+\item A later conditional branch interprets those flags as equality, signed ordering, or unsigned ordering.
+\end{itemize}
+\vspace{0.15cm}
+\begin{block}{Important Point}
+\code{cmp} does not itself mean ``signed compare'' or ``unsigned compare.'' The later condition code determines how NZCV is interpreted.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 21
+% Slide Header: Comparisons and Branch Interpretation
+% ============================================================
+\begin{frame}{Comparisons and Branch Interpretation}
+\vspace{-0.08cm}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.13}
+\begin{tabular}{
+>{\raggedright\arraybackslash}m{2.7cm}
+>{\raggedright\arraybackslash}m{3.2cm}
+>{\raggedright\arraybackslash}m{4.4cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Branch} &
+{\color{white}\bfseries Interpretation} &
+{\color{white}\bfseries Condition after \code{cmp x0, x1}} \\
+\rowcolor{softgray}
+\code{b.eq} &
+equal &
+\code{Z=1} \\
+\rowcolor{white}
+\code{b.ne} &
+not equal &
+\code{Z=0} \\
+\rowcolor{softgray}
+\code{b.lt} &
+signed $<$ &
+\code{N != V} \\
+\rowcolor{white}
+\code{b.ge} &
+signed $\ge$ &
+\code{N == V} \\
+\rowcolor{softgray}
+\code{b.lo} &
+unsigned $<$ &
+\code{C=0} \\
+\rowcolor{white}
+\code{b.hs} &
+unsigned $\ge$ &
+\code{C=1} \\
+\end{tabular}
+\end{center}
+\vspace{0.15cm}
+\begin{block}{Logical Flow}
+\code{Z} answers equality, \code{C} supports unsigned ordering, and the combination of \code{N} and \code{V} supports signed ordering.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 22
+% Slide Header: Multiplication, Division, and Shifts
 % ============================================================
 \sectiondivider{Section 03}{Multiplication, Division, and Shifts}
 
 % ============================================================
-% Slide 19
+% Slide 23
 % Slide Header: Multiplication and Division Basics
 % ============================================================
 \begin{frame}{Multiplication and Division Basics}
 \begin{block}{Architectural Category}
 Multiply and divide read registers and write register results; latency is implementation-dependent.
 \end{block}
-
-\vspace{0.25cm}
-
+\vspace{0.2cm}
 \begin{columns}[T,onlytextwidth]
-
 \column{0.48\textwidth}
 \begin{block}{Multiply}
 \large
 \hspace{1.5cm}\code{mul x0, x1, x2}
 \normalsize
-
 \begin{itemize}
-  \item Computes a register product.
-  \item May use a distinct multiply unit internally.
+\item Computes a register product.
+\item May use a distinct multiply unit internally.
+\item Latency is implementation-dependent.
 \end{itemize}
 \end{block}
-
 \column{0.48\textwidth}
 \begin{block}{Divide}
 \large
-\hspace{1.25cm}\code{udiv x0, x1, x2}\\[0.12cm]
-\hspace{1.25cm}\code{sdiv x0, x1, x2}
+\hspace{1.5cm}\code{udiv x0, x1, x2}\\[0.10cm]
+\hspace{1.5cm}\code{sdiv x0, x1, x2}
 \normalsize
-
 \begin{itemize}
-  \item \code{udiv}: unsigned division.
-  \item \code{sdiv}: signed division.
+\item \code{udiv}: unsigned division.
+\item \code{sdiv}: signed division.
+\item Often more expensive than add/sub.
 \end{itemize}
 \end{block}
-
 \end{columns}
 \end{frame}
 
 % ============================================================
-% Slide 20
+% Slide 24
 % Slide Header: Shifts and Powers of Two
 % ============================================================
 \begin{frame}{Shifts and Powers of Two}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.18}
+\renewcommand{\arraystretch}{1.14}
 \begin{tabular}{
-  >{\raggedright\arraybackslash}m{2.5cm}
-  >{\raggedright\arraybackslash}m{4.0cm}
-  >{\raggedright\arraybackslash}m{5.0cm}
+>{\raggedright\arraybackslash}m{2.3cm}
+>{\raggedright\arraybackslash}m{4.0cm}
+>{\raggedright\arraybackslash}m{5.0cm}
 }
 \rowcolor{navy}
 {\color{white}\bfseries Shift} &
@@ -731,140 +805,115 @@ logical right, zeros enter left &
 unsigned division by powers of two \\
 \rowcolor{softgray}
 \code{asr \#n} &
-arithmetic right, sign bit is replicated &
+arithmetic right, sign bit replicated &
 preserves signed negative values \\
 \rowcolor{white}
 \code{ror \#n} &
-rotate right, bits wrap around &
+rotate right, bits move around ends &
 bit manipulation, not division \\
 \end{tabular}
 \end{center}
-
 \vspace{0.2cm}
-
 \begin{block}{Key Distinction}
 \code{lsr} and \code{asr} differ when the top bit is set. That difference matters for unsigned versus signed interpretation.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 21
+% Slide 25
 % Slide Header: Shift Example
 % ============================================================
 \begin{frame}{Shift Example}
 \begin{columns}[T,onlytextwidth]
-
 \column{0.48\textwidth}
 \begin{block}{Logical Shift Right}
 \large
-\hspace{1.4cm}\code{lsr x0, x1, \#1}
+\hspace{1.5cm}\code{lsr x0, x1, \#1}
 \normalsize
-
 \begin{itemize}
-  \item Zero enters the top bit.
-  \item Good for unsigned bit patterns.
-  \item Does not preserve a negative sign.
+\item Zero enters the top bit.
+\item Good for unsigned bit patterns.
+\item Does not preserve a negative sign.
 \end{itemize}
 \end{block}
-
 \column{0.48\textwidth}
 \begin{block}{Arithmetic Shift Right}
 \large
-\hspace{1.4cm}\code{asr x0, x1, \#1}
+\hspace{1.5cm}\code{asr x0, x1, \#1}
 \normalsize
-
 \begin{itemize}
-  \item Original sign bit is copied.
-  \item Preserves signed interpretation.
-  \item Useful for signed right shifts.
+\item Original sign bit is copied.
+\item Preserves signed interpretation.
+\item Useful for signed right shifts.
 \end{itemize}
 \end{block}
-
 \end{columns}
-
-\vspace{0.25cm}
-
+\vspace{0.2cm}
 \begin{block}{Qualification}
 Shifts can resemble multiplication or division by powers of two, but finite width, overflow, and signed rounding behavior must be considered.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 22
-% Slide Header: Section 04 - Processor Performance Basics
+% Slide 26
+% Slide Header: Processor Performance Basics
 % ============================================================
 \sectiondivider{Section 04}{Processor Performance Basics}
 
 % ============================================================
-% Slide 23
+% Slide 27
 % Slide Header: Execution Time and Performance
 % ============================================================
 \begin{frame}{Execution Time and Performance}
 \begin{block}{Primary Metric}
 For a fixed workload, performance is the inverse of execution time.
+\[
+\text{Performance}=\frac{1}{\text{Execution Time}}
+\]
 \end{block}
-
-\vspace{0.2cm}
-
-\begin{center}
-\large
-$\text{Performance} = \dfrac{1}{\text{Execution Time}}$
-\end{center}
-
-\vspace{0.2cm}
-
+\vspace{0.05cm}
 \begin{columns}[T,onlytextwidth]
-
 \column{0.48\textwidth}
 \begin{block}{Latency}
 \begin{itemize}
-  \item Time to complete one task.
-  \item Important for response time.
-  \item Example: seconds per program run.
+\item Time to complete one task.
+\item Important for response time.
+\item Example: seconds per program run.
 \end{itemize}
 \end{block}
-
 \column{0.48\textwidth}
 \begin{block}{Throughput}
 \begin{itemize}
-  \item Work completed per unit time.
-  \item Important for pipelines and servers.
-  \item Example: instructions per cycle.
+\item Work completed per unit time.
+\item Important for pipelines and servers.
+\item Example: completed instructions per cycle.
 \end{itemize}
 \end{block}
-
 \end{columns}
 \end{frame}
 
 % ============================================================
-% Slide 24
+% Slide 28
 % Slide Header: The Iron Law of Processor Performance
 % ============================================================
 \begin{frame}{The Iron Law of Processor Performance}
 \begin{block}{CPU Execution-Time Equation}
-\begin{center}
-\large
-$T_{\text{CPU}}
+\[
+T_{\text{CPU}}
 =
-\text{IC}
-\times
-\text{CPI}
-\times
-T_{\text{clk}}
+\text{IC}\times\text{CPI}\times T_{\text{clk}}
 =
-\dfrac{\text{IC}\times\text{CPI}}{f_{\text{clk}}}$
-\end{center}
+\frac{\text{IC}\times\text{CPI}}{f_{\text{clk}}}
+\]
 \end{block}
-
-\vspace{0.15cm}
-
+\vspace{0.1cm}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.18}
+\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{
-  >{\raggedright\arraybackslash}m{2.7cm}
-  >{\raggedright\arraybackslash}m{4.2cm}
-  >{\raggedright\arraybackslash}m{4.5cm}
+>{\raggedright\arraybackslash}m{2.2cm}
+>{\raggedright\arraybackslash}m{3.6cm}
+>{\raggedright\arraybackslash}m{5.4cm}
 }
 \rowcolor{navy}
 {\color{white}\bfseries Term} &
@@ -887,107 +936,92 @@ circuit timing, clock frequency \\
 \end{frame}
 
 % ============================================================
-% Slide 25
+% Slide 29
 % Slide Header: Instruction Count Is Dynamic
 % ============================================================
 \begin{frame}{Instruction Count Is Dynamic}
 \begin{block}{Dynamic Instruction Count}
 Dynamic instruction count is the number of instructions actually executed, not merely the number of instructions visible in a source or assembly listing.
 \end{block}
-
-\vspace{0.25cm}
-
-\begin{itemize}
-  \item Loops multiply the effect of a small instruction sequence.
-  \item Branches choose which instructions execute.
-  \item Function calls, recursion, and input data can change the count.
-  \item Optimizing one program region may not matter if it rarely executes.
-\end{itemize}
-
 \vspace{0.2cm}
-
+\begin{itemize}
+\item Loops multiply the effect of a small instruction sequence.
+\item Branches choose which instructions execute.
+\item Function calls, recursion, and input data can change the count.
+\item Optimizing one program region may not matter if it rarely executes.
+\end{itemize}
+\vspace{0.15cm}
 \begin{block}{Simple Example}
 A three-instruction loop body executed $N$ times contributes approximately $3N$ dynamic instructions, before considering branch and loop-control instructions.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 26
+% Slide 30
 % Slide Header: CPI and IPC
 % ============================================================
 \begin{frame}{CPI and IPC}
 \begin{columns}[T,onlytextwidth]
-
 \column{0.48\textwidth}
 \begin{block}{Cycles Per Instruction}
-\begin{center}
-\large
-$\text{CPI}=\dfrac{\text{cycles}}{\text{instructions}}$
-\end{center}
-
+\[
+\text{CPI}=
+\frac{\text{cycles}}
+     {\text{instructions}}
+\]
 \begin{itemize}
-  \item Average over a workload.
-  \item Can include stalls and cache misses.
-  \item Lower is usually better.
+\item Average over a workload.
+\item Can include stalls and cache misses.
+\item Lower is usually better.
 \end{itemize}
 \end{block}
-
 \column{0.48\textwidth}
 \begin{block}{Instructions Per Cycle}
-\begin{center}
-\large
-$\text{IPC}=\dfrac{1}{\text{CPI}}$
-\end{center}
-
+\[
+\text{IPC}=
+\frac{\text{instructions}}
+     {\text{cycles}}
+\]
 \begin{itemize}
-  \item Average completed instructions per cycle.
-  \item Can exceed 1 on superscalar cores.
-  \item Higher is usually better.
+\item Average completed instructions per cycle.
+\item Can exceed 1 on superscalar cores.
+\item Higher is usually better.
 \end{itemize}
 \end{block}
-
 \end{columns}
-
-\vspace{0.2cm}
-
+\vspace{0.15cm}
 \begin{block}{No Universal Cycle Count}
 Instruction latency and throughput are microarchitecture-dependent, not fixed by the AArch64 ISA alone.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 27
+% Slide 31
 % Slide Header: Average CPI from an Instruction Mix
 % ============================================================
 \begin{frame}{Average CPI from an Instruction Mix}
 \begin{block}{Weighted Average}
 When instruction classes have different average costs, overall CPI depends on the dynamic instruction mix.
-\end{block}
-
-\vspace{0.15cm}
-
-\begin{center}
-\large
-$\text{Average CPI}
+\[
+\text{Average CPI}
 =
 \sum_i
 \left(
 \text{fraction}_i
 \times
 \text{CPI}_i
-\right)$
-\end{center}
-
-\vspace{0.15cm}
-
+\right)
+\]
+\end{block}
+\vspace{0.05cm}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.18}
+\renewcommand{\arraystretch}{1.12}
 \begin{tabular}{
-  >{\raggedright\arraybackslash}m{2.6cm}
-  >{\raggedright\arraybackslash}m{3.4cm}
-  >{\raggedright\arraybackslash}m{3.4cm}
-  >{\raggedright\arraybackslash}m{2.2cm}
+>{\raggedright\arraybackslash}m{2.5cm}
+>{\raggedright\arraybackslash}m{2.4cm}
+>{\raggedright\arraybackslash}m{2.4cm}
+>{\raggedright\arraybackslash}m{2.8cm}
 }
 \rowcolor{navy}
 {\color{white}\bfseries Class} &
@@ -995,41 +1029,37 @@ $\text{Average CPI}
 {\color{white}\bfseries CPI} &
 {\color{white}\bfseries Contribution} \\
 \rowcolor{softgray}
-A & $50\%$ & $1$ & $0.50$ \\
+A & 50\% & 1 & 0.50 \\
 \rowcolor{white}
-B & $30\%$ & $2$ & $0.60$ \\
+B & 30\% & 2 & 0.60 \\
 \rowcolor{softgray}
-C & $20\%$ & $4$ & $0.80$ \\
+C & 20\% & 4 & 0.80 \\
 \end{tabular}
 \end{center}
-
-\vspace{0.1cm}
-
-\begin{center}
-\large
-$\text{Average CPI}=1.90$
-\end{center}
+\vspace{0.15cm}
+\begin{block}{Result}
+\centering
+\large Average CPI $=1.90$
+\end{block}
 \end{frame}
 
 % ============================================================
-% Slide 28
+% Slide 32
 % Slide Header: Clock Frequency Is Not Performance
 % ============================================================
 \begin{frame}{Clock Frequency Is Not Performance}
 \begin{block}{Common Mistake}
 A higher clock rate does not automatically mean a shorter runtime. Instruction count and CPI matter just as much.
 \end{block}
-
-\vspace{0.2cm}
-
+\vspace{0.15cm}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.18}
+\renewcommand{\arraystretch}{1.14}
 \begin{tabular}{
-  >{\raggedright\arraybackslash}m{2.6cm}
-  >{\raggedright\arraybackslash}m{3.4cm}
-  >{\raggedright\arraybackslash}m{3.0cm}
-  >{\raggedright\arraybackslash}m{3.1cm}
+>{\raggedright\arraybackslash}m{3.0cm}
+>{\raggedright\arraybackslash}m{2.6cm}
+>{\raggedright\arraybackslash}m{2.2cm}
+>{\raggedright\arraybackslash}m{3.2cm}
 }
 \rowcolor{navy}
 {\color{white}\bfseries Processor} &
@@ -1037,144 +1067,137 @@ A higher clock rate does not automatically mean a shorter runtime. Instruction c
 {\color{white}\bfseries CPI} &
 {\color{white}\bfseries Time / instruction} \\
 \rowcolor{softgray}
-A & $4.0$ GHz & $2.0$ & $0.50$ ns \\
+A & 4.0 GHz & 2.0 & 0.50 ns \\
 \rowcolor{white}
-B & $3.0$ GHz & $1.0$ & $0.333$ ns \\
+B & 3.0 GHz & 1.0 & 0.333 ns \\
 \end{tabular}
 \end{center}
-
-\vspace{0.25cm}
-
+\vspace{0.2cm}
 \begin{block}{Interpretation}
 Processor B has a lower frequency, but each instruction takes fewer cycles on average, so its average time per instruction is lower for this workload.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 29
+% Slide 33
 % Slide Header: Worked Performance Example
 % ============================================================
 \begin{frame}{Worked Performance Example}
 \begin{columns}[T,onlytextwidth]
-
 \column{0.48\textwidth}
 \begin{block}{Machine A}
 \begin{itemize}
-  \item IC $=1.0\times10^9$
-  \item CPI $=2.0$
-  \item $f=4.0$ GHz
+\item IC $=1.0\times10^9$
+\item CPI $=2.0$
+\item $f=4.0$ GHz
 \end{itemize}
-
-\begin{center}
-\small
-$T_A
+\[
+T_A
 =
-\dfrac{1.0\times10^9\times2.0}
-{4.0\times10^9}
+\frac{1.0\times10^9\times2.0}
+     {4.0\times10^9}
 =
-0.50\text{ s}$
-\end{center}
+0.50\text{ s}
+\]
 \end{block}
-
 \column{0.48\textwidth}
 \begin{block}{Machine B}
 \begin{itemize}
-  \item IC $=1.2\times10^9$
-  \item CPI $=0.8$
-  \item $f=2.5$ GHz
+\item IC $=1.2\times10^9$
+\item CPI $=0.8$
+\item $f=2.5$ GHz
 \end{itemize}
-
-\begin{center}
-\small
-$T_B
+\[
+T_B
 =
-\dfrac{1.2\times10^9\times0.8}
-{2.5\times10^9}
+\frac{1.2\times10^9\times0.8}
+     {2.5\times10^9}
 =
-0.384\text{ s}$
-\end{center}
+0.384\text{ s}
+\]
 \end{block}
-
 \end{columns}
-
-\vspace{0.15cm}
-
-\begin{center}
-\large
-$\text{Speedup}
+\vspace{0.1cm}
+\begin{block}{Speedup}
+\[
+\text{Speedup}
 =
-\dfrac{0.50}{0.384}
+\frac{0.50}{0.384}
 \approx
-1.30\times$
-\end{center}
-\end{frame}
-
-% ============================================================
-% Slide 30
-% Slide Header: Section 05 - Summary and Self-Test
-% ============================================================
-\sectiondivider{Section 05}{Summary and Self-Test}
-
-% ============================================================
-% Slide 31
-% Slide Header: Topic 4 Takeaways
-% ============================================================
-\begin{frame}{Topic 4 Takeaways}
-\begin{itemize}
-  \item Integer arithmetic operates on fixed-width bit patterns.
-  \item Signedness comes from interpretation, not from the adder itself.
-  \item \code{C} supports unsigned reasoning; \code{V} supports signed overflow reasoning.
-  \item After subtraction, \code{C=1} means no unsigned borrow occurred.
-  \item Shifts can support power-of-two scaling, but overflow and signed behavior matter.
-  \item Execution time depends jointly on instruction count, CPI, and clock period.
-\end{itemize}
-\end{frame}
-
-% ============================================================
-% Slide 32
-% Slide Header: Self-Test 1/2
-% ============================================================
-\begin{frame}{Self-Test 1/2}
-\begin{enumerate}
-  \item Why do \code{add} and \code{sub} not by themselves determine signedness?
-  \item What does an unsigned carry-out mean in fixed-width addition?
-  \item How can subtraction be implemented using addition and two's complement?
-  \item What is the difference between \code{C} and \code{V}?
-  \item After \code{cmp x0, x1}, what does \code{C=1} mean for unsigned comparison?
-\end{enumerate}
-\end{frame}
-
-% ============================================================
-% Slide 33
-% Slide Header: Self-Test 2/2
-% ============================================================
-\begin{frame}{Self-Test 2/2}
-\begin{enumerate}
-\setcounter{enumi}{5}
-  \item What is the difference between \code{add} and \code{adds}?
-  \item Explain why \code{cmp x0, x1} can be understood as \code{subs xzr, x0, x1}.
-  \item Why is \code{asr} different from \code{lsr} when the sign bit is set?
-  \item What three terms appear in the CPU execution-time equation?
-  \item Why can a lower-frequency processor outperform a higher-frequency processor?
-\end{enumerate}
+1.30\times
+\]
+\end{block}
 \end{frame}
 
 % ============================================================
 % Slide 34
+% Slide Header: Summary and Self-Test
+% ============================================================
+\sectiondivider{Section 05}{Summary and Self-Test}
+
+% ============================================================
+% Slide 35
+% Slide Header: Topic 4 Summary
+% ============================================================
+\begin{frame}{Topic 4 Summary}
+\begin{itemize}
+\item Integer arithmetic operates on fixed-width bit patterns.
+\item Signedness comes from interpretation, not from the adder itself.
+\item AArch64 records selected arithmetic properties in the NZCV condition flags within PSTATE.
+\item \code{N} records the most-significant result bit; \code{Z} records whether the result is zero.
+\item \code{C} records carry-out for addition and supports unsigned ordering after subtraction.
+\item \code{V} records signed two's-complement overflow.
+\item \code{cmp} updates NZCV without retaining the subtraction result.
+\item Signed and unsigned conditional branches interpret the same NZCV flags differently.
+\item Execution time depends jointly on instruction count, CPI, and clock period.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 36
+% Slide Header: Self-Test 1/2
+% ============================================================
+\begin{frame}{Self-Test 1/2}
+\begin{enumerate}
+\item Why do \code{add} and \code{sub} not by themselves determine signedness?
+\item How can subtraction be implemented using addition and two's complement?
+\item What does the \code{N} flag record?
+\item Under what condition is \code{Z=1}?
+\item What does carry-out mean for fixed-width unsigned addition?
+\item After \code{cmp x0, x1}, what does \code{C=1} mean for unsigned comparison?
+\end{enumerate}
+\end{frame}
+
+% ============================================================
+% Slide 37
+% Slide Header: Self-Test 2/2
+% ============================================================
+\begin{frame}{Self-Test 2/2}
+\begin{enumerate}
+\setcounter{enumi}{6}
+\item For signed addition, when is \code{V=1}?
+\item What is the difference between \code{add} and \code{adds}?
+\item Why can \code{cmp x0, x1} be understood as \code{subs xzr, x0, x1}?
+\item Which flags are used for signed less-than?
+\item Which flag is used for unsigned less-than after \code{cmp}?
+\item Why can a lower-frequency processor outperform a higher-frequency processor?
+\end{enumerate}
+\end{frame}
+
+% ============================================================
+% Slide 38
 % Slide Header: Wrap-Up and Next Steps
 % ============================================================
 \begin{frame}{Wrap-Up and Next Steps}
 \begin{block}{Next Topic: AArch64 Arithmetic, Logic, Shifts, and Flags}
 The next lecture moves from arithmetic foundations to concrete AArch64 instruction forms and bit-level manipulation patterns.
 \end{block}
-
-\vspace{0.2cm}
-
+\vspace{0.25cm}
 \begin{itemize}
-  \item Arithmetic and logical instruction families
-  \item Aliases such as \code{cmp} and \code{tst}
-  \item Logical masks and shifts
-  \item Immediate operands and assembler conveniences
+\item Arithmetic and logical instruction families
+\item Aliases such as \code{cmp} and \code{tst}
+\item Logical masks and shifts
+\item Immediate operands and assembler conveniences
 \end{itemize}
 \end{frame}
 
