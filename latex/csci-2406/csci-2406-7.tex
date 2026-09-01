@@ -3,69 +3,49 @@
 % ============================================================
 % Theme and typography
 % ============================================================
-
 \usetheme{Madrid}
 \usecolortheme{default}
 \usefonttheme{professionalfonts}
-
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
-
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
-    CSCI 2406 --- Computer Organization \& Architecture (ARM64 / AArch64 Reference)
+    CSCI 2406 --- Computer Organization \& Architecture (AArch64 Reference)
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
-
-\setbeamersize{
-  text margin left=0.65cm,
-  text margin right=0.65cm
-}
-
-\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
-\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
-
-% Block vertical padding adjustments
-\addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
-\addtobeamertemplate{block end}{}{\vspace{0.2em}}
-
-% Base list item separation
-\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
+\addtobeamertemplate{block begin}{\vspace{0.05em}}{\vspace{0.05em}}
+\addtobeamertemplate{block end}{}{\vspace{0.10em}}
+\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{3pt}}
 \setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
 
 % ============================================================
 % Packages
 % ============================================================
-
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage[scale=0.92]{sourcecodepro}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{colortbl}
 \usepackage{tikz}
-
-\usetikzlibrary{
-  arrows.meta,
-  positioning,
-  shapes.geometric,
-  calc,
-  decorations.pathreplacing
-}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
 
 % ============================================================
 % Colors
 % ============================================================
-
 \definecolor{navy}{RGB}{24,43,68}
 \definecolor{deepblue}{RGB}{45,88,130}
-\definecolor{lightblue}{RGB}{235,242,250}
 \definecolor{softgray}{RGB}{245,247,250}
+\definecolor{mediumgray}{RGB}{232,235,239}
 \definecolor{darkgray}{RGB}{25,28,32}
 \definecolor{gold}{RGB}{200,145,35}
 
@@ -78,21 +58,23 @@
 \setbeamercolor{date}{fg=white}
 \setbeamercolor{titlelike}{fg=white}
 \setbeamercolor{block title}{bg=deepblue,fg=white}
-\setbeamercolor{block body}{bg=lightblue,fg=darkgray}
+\setbeamercolor{block body}{bg=softgray,fg=darkgray}
 \setbeamercolor{normal text}{fg=darkgray,bg=white}
 
 % ============================================================
 % Formatting shortcuts
 % ============================================================
-
 \setlength{\parskip}{0pt}
 
 \newcommand{\key}[1]{\textbf{#1}}
 \newcommand{\bits}[1]{\texttt{#1}}
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\codeline}[1]{\hspace{0.7cm}\code{#1}}
 
-% Section divider macro
+% ============================================================
+% Section divider
+% ============================================================
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
@@ -111,29 +93,17 @@
 % ============================================================
 % Metadata
 % ============================================================
-
-\title[Topic 7]{
-  Branching and Iteration
-}
-
-\subtitle{
-  Comparison instructions, conditional and unconditional branches,\\
-  loops, selection structures, and control flow translation in AArch64
-}
-
-\author{
-  Computer Organization \& Architecture
-}
-
+\title[Topic 7]{Branching, Iteration, and Control Flow}
+\subtitle{Comparisons, condition flags, conditional branches, loops, and translation of high-level control structures}
+\author{Computer Organization \& Architecture}
 \date{Topic 7}
-
-% ============================================================
-% Presentation Body (35 Frames Total)
-% ============================================================
 
 \begin{document}
 
-% --- Slide 1: Title Slide ---
+% ============================================================
+% Slide 1
+% Slide Header: Branching, Iteration, and Control Flow
+% ============================================================
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
@@ -143,513 +113,925 @@
 \begin{minipage}{0.9\textwidth}
 {\color{gold}\large\bfseries CSCI 2406: Topic 07\par}
 \vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries Branching and Iteration\par}
+{\color{white}\fontsize{20}{24}\selectfont\bfseries Branching, Iteration, and Control Flow\par}
 \vspace{0.3cm}
-{\color{lightblue}\normalsize Comparison instructions, condition flags, conditional/unconditional branches, and control flow translation in AArch64\par}
+{\color{softgray}\normalsize Comparisons, condition flags, conditional branches, loops, and translation of high-level control structures\par}
 \vspace{0.6cm}
-{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad Topic 7\par}
+{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad AArch64 Reference\par}
 \end{minipage}
 \end{frame}
 
-% --- Slide 2: Topic Outline ---
+% ============================================================
+% Slide 2
+% Slide Header: Topic 7 Outline
+% ============================================================
 \begin{frame}{Topic 7 Outline}
-    \begin{block}{Topic Objective}
-        Analysis of program control flow manipulation in AArch64, mapping condition codes, comparison flags, branching mechanisms, and high-level loops/selections into assembly.
-    \end{block}
-    \vspace{0.4em}
-    \begin{itemize}
-        \item \key{Section 1}: Program Control Flow and the Program Counter (\code{PC})
-        \item \key{Section 2}: Comparison Instructions and Condition Flags (\code{NZCV})
-        \item \key{Section 3}: Branch Instructions and Specialized Opcodes
-        \item \key{Section 4}: Translating Selection Structures (If-Else)
-        \item \key{Section 5}: Translating Loops and Iteration Constructs
-        \item \key{Section 6}: Summary and Worked Self-Test Exercises
-    \end{itemize}
-\end{frame}
-
-% --- Slide 3: Introductory Concepts ---
-\begin{frame}{The Mechanics of Execution Sequencing}
-    \begin{block}{Sequential vs. Divergent Execution}
-        Normally, the CPU fetches and executes instructions sequentially, advancing the Program Counter (\code{PC}) by 4 bytes per instruction. Control flow instructions break this sequence to implement decision-making and repetition.
-    \end{block}
-    \vspace{0.4em}
-    \begin{itemize}
-        \item \key{Sequential Flow}: \code{PC} $\leftarrow$ \code{PC} $+$ \code{4} (automatic instruction pacing).
-        \item \key{Divergent Flow}: Target addresses rewrite the \code{PC} directly, causing a jump (branch) to a new execution routine.
-        \item Essential for building conditional logic, functions, and iterative loops.
-    \end{itemize}
+\begin{block}{Topic Objective}
+Explain how AArch64 changes program execution order using comparisons, condition flags, branches, and loop patterns.
+\end{block}
+\vspace{0.25cm}
+\begin{itemize}
+\item \key{Section 1}: Sequential execution and branch targets
+\item \key{Section 2}: Comparisons and condition flags
+\item \key{Section 3}: Conditional and unconditional branches
+\item \key{Section 4}: Translating \code{if}, \code{else}, and loops
+\item \key{Section 5}: Specialized branch forms
+\item \key{Section 6}: Summary and self-test
+\end{itemize}
 \end{frame}
 
 % ============================================================
-% SECTION 1
+% Slide 3
+% Slide Header: Sequential Execution and Branch Targets
 % ============================================================
-\sectiondivider{Section 01}{Control Flow and the Program Counter}
+\sectiondivider{Section 01}{Sequential Execution and Branch Targets}
 
-% --- Slide 5: The Program Counter in AArch64 ---
-\begin{frame}{The Role of the Program Counter (\code{PC})}
-    The Program Counter governs execution flow within the processor datapath:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item Holds the memory address of the instruction currently being executed or fetched.
-        \item Fixed 32-bit instruction encoding means sequential instructions are always spaced by 4 bytes.
-        \item \key{Branch Target}: When a branch is taken, the target address (typically represented via symbolic labels) is loaded directly into the \code{PC}.
-    \end{itemize}
-    \vspace{0.3em}
-    \begin{block}{Branch Taken vs. Not Taken}
-        If a branch condition holds, the branch is \textbf{taken} (PC updates to the target). If the condition fails, the branch is \textbf{not taken} and execution proceeds sequentially.
-    \end{block}
-\end{frame}
-
-% --- Slide 6: Symbolic Labels in Assembly ---
-\begin{frame}{Symbolic Labels as Branch Targets}
-    Hardcoding absolute memory addresses in assembly is error-prone and inflexible:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \key{Symbolic Labels} (e.g., \code{loop:}, \code{exit:}, \code{else\_block:}) provide human-readable names for target destinations.
-        \item \key{The Assembler's Role}: Replaces labels with numerical offsets relative to the current Program Counter (\code{PC}).
-        \item \key{Position Independence}: Allows code blocks to be relocated anywhere in memory without breaking branch references.
-    \end{itemize}
-    \vspace{0.2em}
-    \begin{block}{Two-Pass Assembly Resolution}
-        \begin{enumerate}
-            \small
-            \item \textbf{Pass 1}: The assembler scans the source, records every label's relative distance, and builds a symbol table.
-            \item \textbf{Pass 2}: It computes the exact instruction-byte offsets and encodes them into the branch instruction word.
-        \end{enumerate}
-    \end{block}
-\end{frame}
-
-% --- Slide 7: PC-Relative Addressing ---
-\begin{frame}{PC-Relative Branch Offset Limitations}
-    Branch instructions calculate targets relative to the current Program Counter:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item Unconditional branches (\code{b}) utilize a wide 27-bit signed offset, supporting jumps of $\pm 128\text{ MiB}$ within the text segment.
-        \item Conditional branches (\code{b.cond}) use a compact 19-bit offset ($\pm 1\text{ MiB}$).
-    \end{itemize}
-    \vspace{0.2em}
-    \begin{block}{Sample Calculation (Conditional Branch)}
-        \small
-        A 19-bit signed offset covers $2^{19} = 524,288$ instructions ($\pm 262,144$ instructions from the \code{PC}).
-        Since each instruction is $4$ bytes:
-        $$\pm 262,144 \times 4\text{ bytes} = \pm 1,048,576\text{ bytes} = \pm 1\text{ MiB}.$$
-    \end{block}
+% ============================================================
+% Slide 4
+% Slide Header: The Program Counter Controls Instruction Order
+% ============================================================
+\begin{frame}{The Program Counter Controls Instruction Order}
+\begin{block}{Program Counter}
+The program counter identifies the instruction address associated with the current control-flow position. In AArch64, it is not an ordinary general-purpose register.
+\end{block}
+\vspace{0.2cm}
+\begin{itemize}
+\item Sequential execution normally proceeds to the next 32-bit A64 instruction.
+\item A branch replaces that ordinary next-instruction behavior with a target address.
+\item Calls and returns are controlled changes in the same instruction stream.
+\item Exceptions can also redirect control flow, but that belongs to later systems material.
+\end{itemize}
+\vspace{0.15cm}
+\begin{block}{A64 Instruction Width}
+Because A64 instructions are 4 bytes wide, sequential execution commonly advances by 4 bytes before branch redirection is considered.
+\end{block}
 \end{frame}
 
 % ============================================================
-% SECTION 2
+% Slide 5
+% Slide Header: Labels Name Instruction Addresses
 % ============================================================
-\sectiondivider{Section 02}{Comparison Instructions and Condition Flags}
-
-% --- Slide 9: The PSTATE NZCV Flags ---
-\begin{frame}{Condition Flags: The \code{NZCV} Register}
-    AArch64 maintains processor state flags within the \code{PSTATE} register, updated explicitly by status-setting instructions:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \key{\code{N} (Negative)}: Set if the result is negative (Bit 63 of a 64-bit result is 1).
-        \item \key{\code{Z} (Zero)}: Set if the result evaluates exactly to \code{0x0}.
-        \item \key{\code{C} (Carry)}: Set on unsigned arithmetic overflow or valid carry-out.
-        \item \key{\code{V} (Overflow)}: Set on signed two's complement arithmetic overflow.
-    \end{itemize}
-    \vspace{0.2em}
-    \begin{block}{Example: Flag State After Subtraction}
-        If calculating \code{5 - 5}, the result is \code{0}, so the \textbf{Z (Zero) flag} is set to 1. If calculating \code{3 - 5}, the result is \code{-2}, setting the \textbf{N (Negative) flag} to 1.
-    \end{block}
-\end{frame}
-
-% --- Slide 10: The Compare Instruction (CMP) ---
-\begin{frame}{Evaluating Conditions: The \code{cmp} Instruction}
-    Decision-making begins by evaluating operands without destroying data:
-    \vspace{0.3em}
-    \begin{block}{Semantics of \code{cmp}}
-        $$\code{cmp x1, x2}$$
-        Performs an internal subtraction ($\text{operand1} - \text{operand2}$), discards the numeric result, and updates the \code{NZCV} condition flags based on the outcome.
-    \end{block}
-    \vspace{0.3em}
-    \begin{itemize}
-        \item Equivalent to executing \code{subs xzr, x1, x2} using the hardwired zero register.
-        \item Subsequent conditional instructions inspect the \code{NZCV} flags to determine control flow paths.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 11: Setting Flags Explicitly (SUBS) ---
-\begin{frame}{Explicit Flag Updates with Arithmetic Opcodes}
-    Comparison is not restricted to the dedicated \code{cmp} instruction:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item Arithmetic instructions with an \code{s} suffix (such as \code{adds}, \code{subs}, or \code{ands}) perform the computation \emph{and} update the \code{NZCV} flags simultaneously.
-        \item \code{cmp x0, x1} is actually just an assembler alias for \code{subs xzr, x0, x1} (subtracting into the hardwired zero register).
-    \end{itemize}
-    \vspace{0.3em}
-    \begin{block}{Loop Decrement Pattern}
-        \small
-        \begin{tabbing}
-            \quad \code{subs x0, x0, \#1} \quad\quad \= \textit{// Decrements counter in x0 and updates flags} \\
-            \quad \code{b.ne loop\_start} \> \textit{// Inspects Z flag; loops if x0 $\neq$ 0}
-        \end{tabbing}
-    \end{block}
+\begin{frame}{Labels Name Instruction Addresses}
+\begin{block}{Assembler Labels}
+A label is a symbolic name for an instruction address. The assembler resolves the label into the branch target encoded in the machine instruction.
+\end{block}
+\vspace{0.2cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.50\textwidth}
+\begin{block}{Assembly Pattern}
+\large
+\codeline{loop:}\\[0.10cm]
+\codeline{subs x0, x0, \#1}\\[0.10cm]
+\codeline{b.ne loop}
+\normalsize
+\end{block}
+\column{0.46\textwidth}
+\begin{block}{Meaning}
+\begin{itemize}
+\item \code{loop:} marks an address.
+\item \code{b.ne loop} can redirect execution back to that address.
+\item The label does not occupy a machine instruction by itself.
+\end{itemize}
+\end{block}
+\end{columns}
 \end{frame}
 
 % ============================================================
-% SECTION 3
+% Slide 6
+% Slide Header: Control Flow Changes the Instruction Stream
 % ============================================================
-\sectiondivider{Section 03}{Branch Instructions and Specialized Opcodes}
+\begin{frame}{Control Flow Changes the Instruction Stream}
+\begin{center}
+\begin{tikzpicture}[
+  scale=.9,
+  transform shape,
+  node distance=.5cm,
+  inst/.style={
+    draw=navy,
+    fill=softgray,
+    rounded corners=2pt,
+    minimum width=3.0cm,
+    minimum height=.48cm,
+    align=center,
+    font=\small\ttfamily
+  },
+  note/.style={
+    font=\small,
+    align=center
+  }
+]
 
-% --- Slide 13: Unconditional Branch (B) ---
-\begin{frame}{Unconditional Branch: The \code{b} Instruction}
-    \begin{block}{Syntax and Semantics}
-        $$\code{b label}$$
-        Unconditionally redirects program execution to the specified target label, updating the \code{PC} via a 27-bit PC-relative offset.
-    \end{block}
-    \vspace{0.3em}
-    \begin{itemize}
-        \item Used for implementing unconditional jumps, loop retries, and escaping control structures.
-        \item Completely independent of condition flags.
-    \end{itemize}
-\end{frame}
+\node[inst] (i1) {cmp x0, x1};
+\node[inst,below=of i1] (i2) {b.eq equal};
+\node[inst,below=of i2] (i3) {sub x2, x0, x1};
+\node[inst,below=of i3] (i4) {b done};
+\node[inst,below=of i4,fill=gold!25] (i5) {equal: add x2, x0, x1};
+\node[inst,below=of i5] (i6) {done: str x2, [x3]};
 
-% --- Slide 14: Conditional Branch Opcodes ---
-\begin{frame}{Conditional Branching Syntax (\code{b.cond})}
-    Conditional branches inspect the \code{NZCV} flags set by a preceding \code{cmp} instruction:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \code{b.eq label} $\rightarrow$ Branch if \textbf{Equal} ($Z == 1$)
-        \item \code{b.ne label} $\rightarrow$ Branch if \textbf{Not Equal} ($Z == 0$)
-        \item \code{b.lt label} $\rightarrow$ Branch if \textbf{Less Than} (signed)
-        \item \code{b.ge label} $\rightarrow$ Branch if \textbf{Greater than or Equal} (signed)
-        \item \code{b.hi label} $\rightarrow$ Branch if \textbf{Higher} (unsigned greater than)
-        \item \code{b.ls label} $\rightarrow$ Branch if \textbf{Lower or Same} (unsigned)
-    \end{itemize}
-\end{frame}
+% Sequential flow
+\draw[-{Latex},thick,deepblue]
+  (i1.south) -- (i2.north);
 
-% --- Slide 15: Conditional Branch Execution Flow ---
-\begin{frame}{Conditional Execution Flow Example}
-    Translating a simple equality check:
-    \vspace{0.3em}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{C Code Segment}
-                \small
-                \begin{tabbing}
-                    \quad \code{if (a == b) \{} \\
-                    \quad \quad \code{x = 1;} \\
-                    \quad \code{\} else \{} \\
-                    \quad \quad \code{x = 2;} \\
-                    \quad \code{\}}
-                \end{tabbing}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{AArch64 Translation}
-                \small
-                \begin{tabbing}
-                    \quad \code{cmp x1, x2} \\
-                    \quad \code{b.ne else\_block} \\
-                    \quad \code{mov x0, \#1} \\
-                    \quad \code{b end\_if} \\
-                    \quad \code{else\_block: mov x0, \#2} \\
-                    \quad \code{end\_if:}
-                \end{tabbing}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
+\draw[-{Latex},thick,deepblue]
+  (i2.south) --
+  node[left,note]{not taken}
+  (i3.north);
 
-% --- Slide 16: CBZ and CBNZ Instructions ---
-\begin{frame}{Optimized Branching: \code{cbz} and \code{cbnz}}
-    AArch64 provides specialized compare-and-branch instructions for checking zero status:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \key{\code{cbz Rt, label}} (Compare and Branch on Zero): Branches to label if register \code{Rt} equals zero.
-        \item \key{\code{cbnz Rt, label}} (Compare and Branch on Non-Zero): Branches to label if register \code{Rt} is non-zero.
-    \end{itemize}
-    \vspace{0.3em}
-    \begin{block}{Architectural Advantage}
-        \begin{itemize}
-            \item Combines a register test and a conditional branch into a single instruction.
-            \item \textbf{Does not affect condition flags} (\code{NZCV} remain untouched), saving instruction overhead in loops and pointer checks.
-        \end{itemize}
-    \end{block}
-\end{frame}
+\draw[-{Latex},thick,deepblue]
+  (i3.south) -- (i4.north);
 
-% --- Slide 17: TBNZ and TBZ Test-and-Branch ---
-\begin{frame}{Bit-Level Branching: \code{tbz} and \code{tbnz}}
-    For testing individual bit positions without full register comparisons:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item \key{\code{tbnz Rt, \#imm, label}}: Test bit number \code{imm} in register \code{Rt}; branch to label if the bit is non-zero (1).
-        \item \key{\code{tbz Rt, \#imm, label}}: Branch if the specified bit is zero.
-    \end{itemize}
-    \vspace{0.3em}
-    \begin{block}{Use Case}
-        Ideal for inspecting hardware status flags, bitfields, or permission bits packed into integers without requiring separate masking and comparison steps.
-    \end{block}
+\draw[-{Latex},thick,deepblue]
+  (i5.south) -- (i6.north);
+
+% Conditional branch to equal
+\draw[-{Latex},thick,navy]
+  (i2.east)
+  -- ++(1.45,0)
+  |- (i5.east);
+
+\node[note, above right=0.05cm and 0.25cm of i2.east] {taken};
+
+% Unconditional branch to done
+\draw[-{Latex},thick,navy]
+  (i4.east)
+  -- ++(1.80,0)
+  |- (i6.east);
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{-0.2cm}
+
+\begin{block}{Branch Outcome}
+A conditional branch either transfers control to its target or falls through to the next sequential instruction.
+\end{block}
 \end{frame}
 
 % ============================================================
-% SECTION 4
+% Slide 7
+% Slide Header: Comparisons and Condition Flags
 % ============================================================
-\sectiondivider{Section 04}{Translating Selection Structures (If-Else)}
+\sectiondivider{Section 02}{Comparisons and Condition Flags}
 
-% --- Slide 19: Translating If-Else Selection Structures ---
-\begin{frame}{Translating Selection Structures (If-Else)}
-    Branching logic handles mutual exclusion in conditional statements:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \key{Design Rule}: Assembly must invert the high-level condition to jump *over* the true block when the condition fails.
-        \item Minimizes execution overhead and eliminates unnecessary jumps.
-    \end{itemize}
-    \vspace{0.3em}
-    \begin{block}{General Assembly Pattern}
-        \begin{enumerate}
-            \item Evaluate condition using \code{cmp}.
-            \item Branch to alternate path on condition failure (\code{b.ne} / \code{b.le}).
-            \item Execute true block, then unconditionally branch past the false block (\code{b}).
-        \end{enumerate}
-    \end{block}
-\end{frame}
-
-% --- Slide 20: Nested If Statements ---
-\begin{frame}{Handling Nested Selection Logic}
-    Complex logical conditions (such as \code{if (a > 0 \&\& b < 5)}) require chained evaluations:
-    \vspace{0.2em}
-    \begin{itemize}
-        \item \key{Short-Circuit Evaluation}: If the first condition fails, execution immediately jumps to the failure block without evaluating subsequent conditions.
-        \item Implemented via sequential comparison and conditional branch blocks, matching standard compiler optimization strategies.
-    \end{itemize}
-    \vspace{0.2em}
-    \begin{block}{Assembly Implementation Strategy}
-        \small
-        \begin{tabbing}
-            \quad \code{cmp x1, \#0} \quad\quad \= \textit{// Evaluate first condition (a > 0)} \\
-            \quad \code{b.le fail\_label} \> \textit{// If a $\le$ 0, short-circuit and exit} \\
-            \quad \code{cmp x2, \#5} \> \textit{// Evaluate second condition (b < 5)} \\
-            \quad \code{b.ge fail\_label} \> \textit{// If b $\ge$ 5, exit} \\
-            \quad \textit{// True Block Code Here...}
-        \end{tabbing}
-    \end{block}
+% ============================================================
+% Slide 8
+% Slide Header: cmp Updates Flags by Subtraction
+% ============================================================
+\begin{frame}{\code{cmp} Updates Flags by Subtraction}
+\begin{block}{Underlying Operation}
+\code{cmp x0, x1} performs a subtraction for flags and discards the numeric result.
+\end{block}
+\vspace{0.25cm}
+\large
+\hspace{3.8cm}\code{cmp x0, x1}\\[0.15cm]
+\hspace{3.8cm}\code{subs xzr, x0, x1}
+\normalsize
+\vspace{0.25cm}
+\begin{itemize}
+\item The computed value \code{x0 - x1} is not kept as a data result.
+\item NZCV is updated from the subtraction.
+\item Later conditional branches inspect those flags.
+\item This connects comparison directly to the flag-setting arithmetic from Topic 5.
+\end{itemize}
 \end{frame}
 
 % ============================================================
-% SECTION 5
+% Slide 9
+% Slide Header: The NZCV Flags Used by Branches
 % ============================================================
-\sectiondivider{Section 05}{Translating Loops and Iteration Constructs}
-
-% --- Slide 22: Translating While Loops ---
-\begin{frame}{Translating While Loops}
-    High-level iteration constructs map cleanly to assembly structures:
-    \vspace{0.3em}
-    \begin{columns}[T]
-        \begin{column}{0.45\textwidth}
-            \begin{block}{C Code}
-                \small
-                \begin{tabbing}
-                    \quad \code{while (i > 0) \{} \\
-                    \quad \quad \code{i--;} \\
-                    \quad \code{\}}
-                \end{tabbing}
-            \end{block}
-        \end{column}
-        \begin{column}{0.51\textwidth}
-            \begin{block}{AArch64 Assembly Translation}
-                \small
-                \begin{tabbing}
-                    \quad \code{loop\_start:} \\
-                    \quad \quad \code{cmp x0, \#0} \\
-                    \quad \quad \code{b.le loop\_end} \\
-                    \quad \quad \code{sub x0, x0, \#1} \\
-                    \quad \quad \code{b loop\_start} \\
-                    \quad \code{loop\_end:}
-                \end{tabbing}
-            \end{block}
-        \end{column}
-    \end{columns}
-    \vspace{0.2em}
-    \begin{itemize}
-        \item Condition check occurs at the \emph{top} of the loop.
-        \item Unconditional branch (\code{b}) loops back to the evaluation point.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 23: Translating For Loops ---
-\begin{frame}{Translating For Loops and Indexed Bounds}
-    Iterating through fixed numerical bounds:
-    \vspace{0.3em}
-    \begin{columns}[T]
-        \begin{column}{0.45\textwidth}
-            \begin{block}{C Code}
-                \small
-                \begin{tabbing}
-                    \quad \code{for (int i = 0; i < 10; i++) \{} \\
-                    \quad \quad \code{sum += i;} \\
-                    \quad \code{\}}
-                \end{tabbing}
-            \end{block}
-        \end{column}
-        \begin{column}{0.51\textwidth}
-            \begin{block}{AArch64 Assembly Translation}
-                \small
-                \begin{tabbing}
-                    \quad \code{mov x1, \#0 \quad // i = 0} \\
-                    \quad \code{mov x2, \#0 \quad // sum = 0} \\
-                    \quad \code{for\_loop:} \\
-                    \quad \quad \code{cmp x1, \#10} \\
-                    \quad \quad \code{b.ge for\_end} \\
-                    \quad \quad \code{add x2, x2, x1} \\
-                    \quad \quad \code{add x1, x1, \#1} \\
-                    \quad \quad \code{b for\_loop} \\
-                    \quad \code{for\_end:}
-                \end{tabbing}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% --- Slide 24: Do-While Loop Translation ---
-\begin{frame}{Translating Do-While Loops}
-    Unlike while loops, do-while loops evaluate their condition at the *end* of the block:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item Guaranteed to execute the loop body at least once.
-        \item Assembly places the conditional branch at the bottom, pointing back to the loop start.
-        \item Avoids an extra initial branch instruction required by top-checked loops.
-    \end{itemize}
-\end{frame}
-
-% --- Slide 25: Loop Optimization via CBZ ---
-\begin{frame}{Optimizing Loop Counters with CBZ}
-    Using specialized opcodes for compact loop decrementing:
-    \vspace{0.3em}
-    \begin{itemize}
-        \item Instead of separate \code{cmp} and \code{b.eq} instructions, a counter can be decremented using \code{subs} and tested in one step via \code{cbnz}:
-        \begin{tabbing}
-            \quad \code{loop\_top:} \\
-            \quad \quad \code{sub x0, x0, \#1} \quad\quad \= \textit{// decrement counter} \\
-            \quad \quad \code{cbnz x0, loop\_top} \> \textit{// repeat if not zero}
-        \end{tabbing}
-        \item Reduces instruction count and improves pipeline performance.
-    \end{itemize}
+\begin{frame}{The NZCV Flags Used by Branches}
+\begin{center}
+\begin{tikzpicture}[
+  fld/.style={
+    draw=navy,
+    thick,
+    minimum width=2.2cm,
+    minimum height=1.0cm,
+    align=center,
+    font=\bfseries
+  }
+]
+\node[fld,fill=navy,text=white] (n) {N\\Negative};
+\node[fld,fill=deepblue,text=white,right=.15cm of n] (z) {Z\\Zero};
+\node[fld,fill=gold!35,text=navy,right=.15cm of z] (c) {C\\Carry};
+\node[fld,fill=softgray,text=navy,right=.15cm of c] (v) {V\\Overflow};
+\end{tikzpicture}
+\end{center}
+\vspace{0.25cm}
+\begin{itemize}
+\item \key{Z}: equality after a compare.
+\item \key{N} and \key{V}: signed ordering after subtraction.
+\item \key{C}: unsigned ordering after subtraction; \code{C=1} means no unsigned borrow.
+\item The same compare can support signed or unsigned branch decisions.
+\end{itemize}
 \end{frame}
 
 % ============================================================
-% SECTION 6
+% Slide 10
+% Slide Header: Equality Branches
 % ============================================================
-\sectiondivider{Section 06}{Summary \& Self-Test}
-
-% --- Slide 27: Topic Summary ---
-\begin{frame}{Topic 7 Comprehensive Summary}
-    \begin{itemize}
-        \item \key{Program Counter}: Controls execution sequencing; branching modifies the \code{PC} to jump to target labels.
-        \item \key{Condition Flags}: Instructions like \code{cmp} update \code{NZCV} flags in \code{PSTATE} via silent subtraction.
-        \item \key{Branch Instructions}: Unconditional branches (\code{b}) and conditional branches (\code{b.eq}, \code{b.ne}, etc.) handle directional jumps.
-        \item \key{Specialized Opcodes}: \code{cbz} and \code{cbnz} provide efficient zero-comparison branching without altering flags.
-        \item \key{Flow Translation}: High-level loops and selection structures translate cleanly into label-and-branch assembly patterns.
-    \end{itemize}
+\begin{frame}{Equality Branches}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Equal}
+\large
+\hspace{1.8cm}\code{b.eq target}
+\normalsize
+\begin{itemize}
+\item Branches when \code{Z=1}.
+\item Used after \code{cmp}, \code{subs}, or another flag-setting operation.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Not Equal}
+\large
+\hspace{1.7cm}\code{b.ne target}
+\normalsize
+\begin{itemize}
+\item Branches when \code{Z=0}.
+\item Common for loop continuation and mismatch tests.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{Example}
+\large
+\hspace{3.3cm}\code{cmp x0, x1}\\[0.12cm]
+\hspace{3.3cm}\code{b.eq equal\_case}
+\normalsize
+\end{block}
 \end{frame}
 
-% --- Slide 28: Self-Test: Questions 1 \& 2 ---
-\begin{frame}{Self-Test: Questions 1 \& 2}
-    \begin{block}{Question 1: The CMP Instruction}
-        What underlying operation does the \code{cmp x0, x1} instruction perform, and how does it affect the processor state without modifying general-purpose registers?
-    \end{block}
-    \vspace{0.4em}
-    \begin{block}{Question 2: Conditional Branch Flags}
-        After executing \code{cmp x5, \#10} followed by \code{b.ne error\_label}, which condition flag is inspected by the processor to decide whether to take the branch?
-    \end{block}
+% ============================================================
+% Slide 11
+% Slide Header: Signed and Unsigned Ordering
+% ============================================================
+\begin{frame}{Signed and Unsigned Ordering}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{2.7cm}
+  >{\raggedright\arraybackslash}m{3.8cm}
+  >{\raggedright\arraybackslash}m{4.7cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Branch} &
+{\color{white}\bfseries Interpretation} &
+{\color{white}\bfseries Condition after \code{cmp x0, x1}} \\
+\rowcolor{softgray}
+\code{b.lt label} &
+signed less than &
+\code{x0 < x1} as two's complement, $N \ne V$ \\
+\rowcolor{white}
+\code{b.ge label} &
+signed greater/equal &
+\code{x0 >= x1} as two's complement, $N = V$ \\
+\rowcolor{softgray}
+\code{b.lo label} &
+unsigned lower &
+\code{x0 < x1} as unsigned, $C=0$ \\
+\rowcolor{white}
+\code{b.hs label} &
+unsigned higher/same &
+\code{x0 >= x1} as unsigned, $C=1$ \\
+\end{tabular}
+\end{center}
+\vspace{0.25cm}
+\begin{block}{Important Distinction}
+Do not use signed and unsigned branch mnemonics interchangeably. They inspect different flag evidence.
+\end{block}
 \end{frame}
 
-% --- Slide 29: Self-Test: Solutions 1 \& 2 ---
-\begin{frame}{Self-Test: Solutions 1 \& 2}
-    \begin{block}{Solution 1}
-        \code{cmp} performs an internal subtraction ($\text{x0} - \text{x1}$), discards the calculated numeric result, and updates the \code{NZCV} condition flags in \code{PSTATE} based on the outcome.
-    \end{block}
-    \vspace{0.3em}
-    \begin{block}{Solution 2}
-        It inspects the \textbf{Zero (\code{Z}) flag}. If $Z == 0$ (meaning the subtraction result was non-zero, hence values were not equal), the branch is taken.
-    \end{block}
+% ============================================================
+% Slide 12
+% Slide Header: Same cmp, Different Meaning
+% ============================================================
+\begin{frame}{Same \code{cmp}, Different Meaning}
+\begin{block}{Example Bit Patterns}
+For 8-bit intuition, compare \code{0xff} with \code{0x01}. The bit patterns are the same, but the numerical interpretation changes.
+\end{block}
+\vspace{0.15cm}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{3.2cm}
+  >{\raggedright\arraybackslash}m{3.5cm}
+  >{\raggedright\arraybackslash}m{4.2cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Interpretation} &
+{\color{white}\bfseries Values} &
+{\color{white}\bfseries Correct ordering} \\
+\rowcolor{softgray}
+Unsigned & $255$ and $1$ & $255 > 1$ \\
+\rowcolor{white}
+Signed two's complement & $-1$ and $1$ & $-1 < 1$ \\
+\end{tabular}
+\end{center}
+\vspace{0.25cm}
+\begin{block}{AArch64 Consequence}
+After the same comparison, \code{b.lo} and \code{b.lt} may lead to different control-flow paths.
+\end{block}
 \end{frame}
 
-% --- Slide 30: Self-Test: Questions 3 \& 4 ---
-\begin{frame}{Self-Test: Questions 3 \& 4}
-    \begin{block}{Question 3: CBZ Advantage}
-        What is the primary architectural advantage of using \code{cbz x0, label} over doing a separate \code{cmp x0, \#0} followed by \code{b.eq label}?
-    \end{block}
-    \vspace{0.4em}
-    \begin{block}{Question 4: Loop Translation}
-        When translating a high-level \code{while} loop into AArch64 assembly, why is an unconditional branch (\code{b}) typically placed at the end of the loop body?
-    \end{block}
+% ============================================================
+% Slide 13
+% Slide Header: Conditional and Unconditional Branches
+% ============================================================
+\sectiondivider{Section 03}{Conditional and Unconditional Branches}
+
+% ============================================================
+% Slide 14
+% Slide Header: Unconditional Branch
+% ============================================================
+\begin{frame}{Unconditional Branch}
+\begin{block}{Branch Always}
+\code{b label} transfers control to the target label without testing NZCV flags.
+\end{block}
+\vspace{0.25cm}
+\large
+\hspace{4.0cm}\code{b done}\\[0.15cm]
+\hspace{4.0cm}\code{add x0, x0, \#1}\\[0.15cm]
+\hspace{4.0cm}\code{done:}
+\normalsize
+\vspace{0.25cm}
+\begin{itemize}
+\item Used to skip over an alternative block.
+\item Used at the bottom of loops to return to the loop test or loop body.
+\item Does not depend on signed or unsigned interpretation.
+\end{itemize}
 \end{frame}
 
-% --- Slide 31: Self-Test: Solutions 3 \& 4 ---
-\begin{frame}{Self-Test: Solutions 3 \& 4}
-    \begin{block}{Solution 3}
-        \code{cbz} combines the comparison and branch into a single instruction (reducing code footprint) and \textbf{does not modify condition flags}, preserving existing flag states.
-    \end{block}
-    \vspace{0.3em}
-    \begin{block}{Solution 4}
-        The unconditional branch forces execution to jump backward to the loop condition evaluation point at the top, creating the repetition cycle required for iteration.
-    \end{block}
+% ============================================================
+% Slide 15
+% Slide Header: Conditional Branch Pattern
+% ============================================================
+\begin{frame}{Conditional Branch Pattern}
+\begin{block}{Two-Step Decision}
+A common AArch64 decision first sets flags, then uses a branch instruction to test those flags.
+\end{block}
+\vspace{0.2cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Step 1: Compare}
+\large
+\hspace{1.7cm}\code{cmp x0, x1}
+\normalsize
+\begin{itemize}
+\item Computes \code{x0 - x1} for flags.
+\item Updates NZCV.
+\item Does not keep the subtraction result.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Step 2: Branch}
+\large
+\hspace{1.5cm}\code{b.lt less}
+\normalsize
+\begin{itemize}
+\item Tests the relevant flag condition.
+\item Redirects control if the condition is true.
+\item Falls through otherwise.
+\end{itemize}
+\end{block}
+\end{columns}
 \end{frame}
 
-% --- Slide 32: Self-Test: Questions 5 \& 6 ---
-\begin{frame}{Self-Test: Questions 5 \& 6}
-    \begin{block}{Question 5: Do-While vs. While Loops}
-        Where is the condition check placed in a compiled \code{do-while} loop compared to a standard \code{while} loop, and what is the execution benefit?
-    \end{block}
-    \vspace{0.4em}
-    \begin{block}{Question 6: Symbolic Labels}
-        Why does AArch64 use symbolic labels for branch targets instead of absolute memory addresses in source code?
-    \end{block}
+% ============================================================
+% Slide 16
+% Slide Header: Common Conditional Branch Mnemonics
+% ============================================================
+\begin{frame}{Common Conditional Branch Mnemonics}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{2.0cm}
+  >{\raggedright\arraybackslash}m{3.0cm}
+  >{\raggedright\arraybackslash}m{2.0cm}
+  >{\raggedright\arraybackslash}m{3.3cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Branch} &
+{\color{white}\bfseries Meaning} &
+{\color{white}\bfseries Branch} &
+{\color{white}\bfseries Meaning} \\
+\rowcolor{softgray}
+\code{b.eq} & equal &
+\code{b.ne} & not equal \\
+\rowcolor{white}
+\code{b.lt} & signed less than &
+\code{b.ge} & signed greater/equal \\
+\rowcolor{softgray}
+\code{b.gt} & signed greater than &
+\code{b.le} & signed less/equal \\
+\rowcolor{white}
+\code{b.lo} & unsigned lower &
+\code{b.hs} & unsigned higher/same \\
+\rowcolor{softgray}
+\code{b.hi} & unsigned higher &
+\code{b.ls} & unsigned lower/same \\
+\end{tabular}
+\end{center}
+\vspace{0.2cm}
+\begin{block}{Mnemonic Choice}
+The comparison operation may be identical, but the branch mnemonic determines how the flags are interpreted.
+\end{block}
 \end{frame}
 
-% --- Slide 33: Self-Test: Solutions 5 \& 6 ---
-\begin{frame}{Self-Test: Solutions 5 \& 6}
-    \begin{block}{Solution 5}
-        In a \code{do-while} loop, the check is at the bottom, ensuring the block runs at least once and saving an initial branch instruction. A \code{while} loop checks at the top.
-    \end{block}
-    \vspace{0.3em}
-    \begin{block}{Solution 6}
-        Symbolic labels allow the assembler and linker to compute PC-relative offsets automatically, making code position-independent and immune to shifting memory layouts.
-    \end{block}
+% ============================================================
+% Slide 17
+% Slide Header: Calls and Returns
+% ============================================================
+\begin{frame}{Calls and Returns}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Branch with Link}
+\large
+\hspace{1.5cm}\code{bl function}
+\normalsize
+\begin{itemize}
+\item Branches to a function label.
+\item Saves the return address in \code{x30}.
+\item \code{x30} is also called \code{lr}.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Return}
+\large
+\hspace{2.1cm}\code{ret}
+\normalsize
+\begin{itemize}
+\item Returns using the link register by default.
+\item Control resumes after the original \code{bl}.
+\item Stack discipline is covered in procedure topics.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{Function-Call State}
+A call changes control flow and also creates a calling-convention obligation to preserve the right registers.
+\end{block}
 \end{frame}
 
-% --- Slide 34: Review: Condition Code Summary Table ---
-\begin{frame}{Review: Common Condition Suffixes}
-    \begin{table}[]
-        \centering
-        \small
-        \begin{tabular}{p{2.5cm} p{3.2cm} p{4.8cm}}
-            \toprule
-            \textbf{Suffix} & \textbf{Mnemonic Example} & \textbf{Logical Meaning / Flag Test} \\
-            \midrule
-            \code{eq} & \code{b.eq label} & Equal ($Z == 1$) \\
-            \hline
-            \code{ne} & \code{b.ne label} & Not Equal ($Z == 0$) \\
-            \hline
-            \code{lt} & \code{b.lt label} & Less Than (signed) \\
-            \hline
-            \code{ge} & \code{b.ge label} & Greater than or Equal (signed) \\
-            \hline
-            \code{hi} & \code{b.hi label} & Higher (unsigned greater than) \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
+% ============================================================
+% Slide 18
+% Slide Header: Translating Selection and Iteration
+% ============================================================
+\sectiondivider{Section 04}{Translating Selection and Iteration}
+
+% ============================================================
+% Slide 19
+% Slide Header: Translating an if Statement
+% ============================================================
+\begin{frame}{Translating an \code{if} Statement}
+\begin{columns}[T,onlytextwidth]
+\column{0.43\textwidth}
+\begin{block}{C}
+\large
+\hspace{0.6cm}\code{if (x == y) \{}\\[0.10cm]
+\hspace{1.1cm}\code{z = x + y;}\\[0.10cm]
+\hspace{0.6cm}\code{\}}
+\normalsize
+\end{block}
+\column{0.53\textwidth}
+\begin{block}{AArch64}
+\large
+\hspace{0.7cm}\code{cmp x0, x1}\\[0.10cm]
+\hspace{0.7cm}\code{b.ne endif}\\[0.10cm]
+\hspace{0.7cm}\code{add x2, x0, x1}\\[0.10cm]
+\hspace{0.7cm}\code{endif:}
+\normalsize
+\end{block}
+\end{columns}
+\vspace{0.2cm}
+\begin{block}{Control-Flow Shape}
+The branch often tests the opposite of the high-level condition so execution can skip the body when the condition is false.
+\end{block}
 \end{frame}
 
-% --- Slide 35: Wrap-Up \& Transition to Topic 8 ---
-\begin{frame}{Wrap-Up and Next Steps}
-    \begin{block}{Transition to Topic 8}
-        Building upon branching and control flow mechanics, the next module examines:
-        \begin{itemize}
-            \item \key{Procedures and the Stack}: Managing modular software execution and runtime memory spaces.
-            \item \key{Procedure Calls and Returns}: Utilizing branch-with-link (\code{bl}) and return (\code{ret}) instructions.
-            \item \key{Stack Organization}: Structuring stack frames, frame pointers (\code{x29}), and stack pointer alignments.
-            \item \key{Parameter Passing}: Distributing arguments and return values across registers (\code{x0}--\code{x7}).
-            \item \key{Calling Conventions}: Enforcing standards for caller-saved and callee-saved register preservation.
-        \end{itemize}
-    \end{block}
+% ============================================================
+% Slide 20
+% Slide Header: Translating if-else
+% ============================================================
+\begin{frame}{Translating \code{if}-\code{else}}
+\begin{columns}[T,onlytextwidth]
+\column{0.43\textwidth}
+\begin{block}{C}
+\small
+\hspace{0.4cm}\code{if (x == y) \{}\\[0.08cm]
+\hspace{0.8cm}\code{z = x + y;}\\[0.08cm]
+\hspace{0.4cm}\code{\} else \{}\\[0.08cm]
+\hspace{0.8cm}\code{z = x - y;}\\[0.08cm]
+\hspace{0.4cm}\code{\}}
+\end{block}
+\column{0.53\textwidth}
+\begin{block}{AArch64}
+\small
+\hspace{0.7cm}\code{cmp x0, x1}\\[0.08cm]
+\hspace{0.7cm}\code{b.ne else\_case}\\[0.08cm]
+\hspace{0.7cm}\code{add x2, x0, x1}\\[0.08cm]
+\hspace{0.7cm}\code{b end\_if}\\[0.08cm]
+\hspace{0.7cm}\code{else\_case:}\\[0.08cm]
+\hspace{0.7cm}\code{sub x2, x0, x1}\\[0.08cm]
+\hspace{0.7cm}\code{end\_if:}
+\end{block}
+\end{columns}
+\vspace{0.15cm}
+\begin{block}{Unconditional Skip}
+The unconditional branch after the true block prevents fall-through into the false block.
+\end{block}
 \end{frame}
 
-\end{document}
+% ============================================================
+% Slide 21
+% Slide Header: Translating a while Loop
+% ============================================================
+\begin{frame}{Translating a \code{while} Loop}
+\begin{columns}[T,onlytextwidth]
+\column{0.43\textwidth}
+\begin{block}{C}
+\small
+\hspace{0.4cm}\code{while (i < n) \{}\\[0.08cm]
+\hspace{0.8cm}\code{sum += a[i];}\\[0.08cm]
+\hspace{0.8cm}\code{i++;}\\[0.08cm]
+\hspace{0.4cm}\code{\}}
+\end{block}
+\column{0.53\textwidth}
+\begin{block}{AArch64 Skeleton}
+\small
+\hspace{0.5cm}\code{loop\_test:}\\[0.08cm]
+\hspace{0.5cm}\code{cmp x1, x2}\\[0.08cm]
+\hspace{0.5cm}\code{b.ge loop\_done}\\[0.08cm]
+\hspace{0.5cm}\code{// loop body}\\[0.08cm]
+\hspace{0.5cm}\code{add x1, x1, \#1}\\[0.08cm]
+\hspace{0.5cm}\code{b loop\_test}\\[0.08cm]
+\hspace{0.5cm}\code{loop\_done:}
+\end{block}
+\end{columns}
+\vspace{0.15cm}
+\begin{block}{Test Before Body}
+A \code{while} loop checks its condition before executing the body, so the body may execute zero times.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 22
+% Slide Header: Translating a do-while Loop
+% ============================================================
+\begin{frame}{Translating a \code{do}-\code{while} Loop}
+\begin{columns}[T,onlytextwidth]
+\column{0.43\textwidth}
+\begin{block}{C}
+\small
+\hspace{0.4cm}\code{do \{}\\[0.08cm]
+\hspace{0.8cm}\code{sum += *p;}\\[0.08cm]
+\hspace{0.8cm}\code{p++;}\\[0.08cm]
+\hspace{0.4cm}\code{\} while (*p != 0);}
+\end{block}
+\column{0.53\textwidth}
+\begin{block}{AArch64 Skeleton}
+\small
+\hspace{0.5cm}\code{loop\_body:}\\[0.08cm]
+\hspace{0.5cm}\code{// loop body}\\[0.08cm]
+\hspace{0.5cm}\code{ldr x3, [x0]}\\[0.08cm]
+\hspace{0.5cm}\code{cmp x3, xzr}\\[0.08cm]
+\hspace{0.5cm}\code{b.ne loop\_body}
+\end{block}
+\end{columns}
+\vspace{0.15cm}
+\begin{block}{Test After Body}
+A \code{do}-\code{while} loop executes the body once before the first condition test.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 23
+% Slide Header: Counted Loop with subs
+% ============================================================
+\begin{frame}{Counted Loop with \code{subs}}
+\begin{block}{Decrement and Test}
+A decrementing loop can combine counter update and flag update using \code{subs}.
+\end{block}
+\vspace{0.25cm}
+\large
+\hspace{3.6cm}\code{loop:}\\[0.12cm]
+\hspace{3.6cm}\code{// loop body}\\[0.12cm]
+\hspace{3.6cm}\code{subs x0, x0, \#1}\\[0.12cm]
+\hspace{3.6cm}\code{b.ne loop}
+\normalsize
+\vspace{0.25cm}
+\begin{itemize}
+\item \code{subs} decrements \code{x0} and updates NZCV.
+\item \code{b.ne} repeats while the result is not zero.
+\item This works naturally when the initial count is positive.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 24
+% Slide Header: Array Traversal Loop
+% ============================================================
+\begin{frame}{Array Traversal Loop}
+\begin{block}{Example}
+Sum \code{n} 64-bit integers. Let \code{x0} hold the base pointer, \code{x1} hold \code{n}, and \code{x2} hold the running sum.
+\end{block}
+\vspace{0.05cm}
+\scriptsize
+\hspace{2.8cm}\code{mov x2, xzr}\\[0.08cm]
+\hspace{2.8cm}\code{loop:}\\[0.08cm]
+\hspace{2.8cm}\code{cbz x1, done}\\[0.08cm]
+\hspace{2.8cm}\code{ldr x3, [x0], \#8}\\[0.08cm]
+\hspace{2.8cm}\code{add x2, x2, x3}\\[0.08cm]
+\hspace{2.8cm}\code{sub x1, x1, \#1}\\[0.08cm]
+\hspace{2.8cm}\code{b loop}\\[0.08cm]
+\hspace{2.8cm}\code{done:}
+\vspace{0.05cm}
+\begin{block}{Pointer Update}
+\code{ldr x3, [x0], \#8} loads the current element and advances the pointer by one 64-bit element.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 25
+% Slide Header: String Traversal Loop
+% ============================================================
+\begin{frame}{String Traversal Loop}
+\begin{block}{Null-Terminated Strings}
+A C string ends with a zero byte. Byte loads are used so the loop tests one character at a time.
+\end{block}
+\vspace{0.15cm}
+\small
+\hspace{3.0cm}\code{loop:}\\[0.08cm]
+\hspace{3.0cm}\code{ldrb w1, [x0], \#1}\\[0.08cm]
+\hspace{3.0cm}\code{cbz w1, done}\\[0.08cm]
+\hspace{3.0cm}\code{// process character in w1}\\[0.08cm]
+\hspace{3.0cm}\code{b loop}\\[0.08cm]
+\hspace{3.0cm}\code{done:}
+\vspace{0.15cm}
+\begin{itemize}
+\item \code{ldrb} reads one byte and zero-extends into \code{w1}.
+\item Post-indexing advances \code{x0} after the load.
+\item \code{cbz} tests for the null terminator without modifying NZCV.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 26
+% Slide Header: Specialized Branch Forms
+% ============================================================
+\sectiondivider{Section 05}{Specialized Branch Forms}
+
+% ============================================================
+% Slide 27
+% Slide Header: Compare and Branch on Zero
+% ============================================================
+\begin{frame}{Compare and Branch on Zero}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Branch if Zero}
+\large
+\hspace{1.5cm}\code{cbz x0, target}
+\normalsize
+\begin{itemize}
+\item Tests whether \code{x0} equals zero.
+\item Branches if the test is true.
+\item Does not update NZCV flags.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Branch if Nonzero}
+\large
+\hspace{1.4cm}\code{cbnz x0, target}
+\normalsize
+\begin{itemize}
+\item Tests whether \code{x0} is nonzero.
+\item Branches if the test is true.
+\item Useful for pointer and counter tests.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{Technical Precision}
+These are architectural instructions that combine a zero test with a branch. Do not describe their speed as universally one cycle; latency depends on the processor implementation.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 28
+% Slide Header: Test Bit and Branch
+% ============================================================
+\begin{frame}{Test Bit and Branch}
+\begin{block}{Bit-Specific Control Flow}
+\code{tbz} and \code{tbnz} test a selected bit in a register and branch based on whether that bit is zero or nonzero.
+\end{block}
+\vspace{0.2cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Test Bit Zero}
+\large
+\hspace{1.1cm}\code{tbz x0, \#3, clear}
+\normalsize
+\begin{itemize}
+\item Tests bit 3 of \code{x0}.
+\item Branches if the bit is 0.
+\item Does not update NZCV.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Test Bit Nonzero}
+\large
+\hspace{1.0cm}\code{tbnz x0, \#3, set}
+\normalsize
+\begin{itemize}
+\item Tests bit 3 of \code{x0}.
+\item Branches if the bit is 1.
+\item Useful for flags packed in a word.
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% Slide 29
+% Slide Header: Branches and Flags
+% ============================================================
+\begin{frame}{Branches and Flags}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.16}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{3.0cm}
+  >{\raggedright\arraybackslash}m{4.0cm}
+  >{\raggedright\arraybackslash}m{4.2cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Branch form} &
+{\color{white}\bfseries Tests} &
+{\color{white}\bfseries NZCV effect} \\
+\rowcolor{softgray}
+\code{b.cond label} &
+Existing condition flags &
+Reads NZCV; does not update it \\
+\rowcolor{white}
+\code{cbz/cbnz} &
+Register equals zero or nonzero &
+Does not update NZCV \\
+\rowcolor{softgray}
+\code{tbz/tbnz} &
+One selected register bit &
+Does not update NZCV \\
+\rowcolor{white}
+\code{b label} &
+No condition &
+Does not test or update NZCV \\
+\end{tabular}
+\end{center}
+\vspace{0.25cm}
+\begin{block}{Programming Implication}
+Use \code{b.cond} when flags already contain the comparison needed. Use \code{cbz}, \code{cbnz}, \code{tbz}, or \code{tbnz} when a direct register test is clearer.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 30
+% Slide Header: Control Flow and Performance
+% ============================================================
+\begin{frame}{Control Flow and Performance}
+\begin{block}{Branch Cost Is Implementation-Dependent}
+AArch64 specifies branch behavior, not a universal branch timing. Performance depends on the microarchitecture and workload.
+\end{block}
+\vspace{0.25cm}
+\begin{itemize}
+\item Sequential instruction fetch is simple when the next address is predictable.
+\item Conditional branches introduce uncertainty into the instruction stream.
+\item Branch prediction tries to keep the pipeline supplied with useful instructions.
+\item A mispredicted branch may discard speculative work and increase effective CPI.
+\end{itemize}
+\vspace{0.15cm}
+\begin{block}{Course Connection}
+Branches connect architectural control flow to later microarchitecture topics such as pipelines, prediction, and hazards.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 31
+% Slide Header: Common Branching Mistakes
+% ============================================================
+\begin{frame}{Common Branching Mistakes}
+\begin{itemize}
+\item Using \code{b.lt} for an unsigned comparison that should use \code{b.lo}.
+\item Forgetting that \code{cmp x0, x1} means the flags reflect \code{x0 - x1}, not \code{x1 - x0}.
+\item Assuming \code{cbz}, \code{cbnz}, \code{tbz}, or \code{tbnz} update NZCV flags.
+\item Omitting the unconditional branch needed to skip an \code{else} block.
+\item Placing a loop update after a branch target where it no longer executes on every iteration.
+\end{itemize}
+\vspace{0.15cm}
+\begin{block}{Debugging Practice}
+Trace the values, then trace the flags, then trace the branch target. Avoid guessing from the high-level source alone.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide 32
+% Slide Header: Summary and Self-Test
+% ============================================================
+\sectiondivider{Section 06}{Summary and Self-Test}
+
+% ============================================================
+% Slide 33
+% Slide Header: Topic 7 Summary
+% ============================================================
+\begin{frame}{Topic 7 Summary}
+\begin{itemize}
+\item The program counter determines the current control-flow position, but it is not an ordinary AArch64 general-purpose register.
+\item \code{cmp} updates NZCV by performing a flag-setting subtraction and discarding the result.
+\item Conditional branches use flags, while \code{cbz}, \code{cbnz}, \code{tbz}, and \code{tbnz} test registers directly without updating NZCV.
+\item Signed and unsigned branch mnemonics must be selected according to the intended interpretation.
+\item High-level \code{if}, \code{else}, \code{while}, and \code{do}-\code{while} constructs translate into labels, comparisons, conditional branches, and fall-through paths.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide 34
+% Slide Header: Self-Test 1/2
+% ============================================================
+\begin{frame}{Self-Test 1/2}
+\begin{enumerate}
+\item What does \code{cmp x0, x1} compute internally, and where is the result stored?
+\item Why can the same \code{cmp} support both signed and unsigned comparisons?
+\item Which branch should be used for unsigned lower-than: \code{b.lt} or \code{b.lo}?
+\item What does \code{b.eq} test after a comparison?
+\item Why is an unconditional \code{b} often needed in an \code{if}-\code{else} translation?
+\end{enumerate}
+\end{frame}
+
+% ============================================================
+% Slide 35
+% Slide Header: Self-Test 2/2
+% ============================================================
+\begin{frame}{Self-Test 2/2}
+\begin{enumerate}
+\setcounter{enumi}{5}
+\item How does \code{cbz x0, target} differ from \code{cmp x0, xzr} followed by \code{b.eq target}?
+\item Why does \code{ldrb w1, [x0], \#1} help with string traversal?
+\item What is the difference between a \code{while} loop and a \code{do}-\code{while} loop in branch structure?
+\item What role does \code{x30} play after a \code{bl} instruction?
+\item Why should branch timing not be described as a fixed ISA property?
+\end{enumerate}
+\end{frame}
+
+% ============================================================
+% Slide 36
+% Slide Header: Review Exercise
+% ============================================================
+\begin{frame}{Review Exercise}
+\begin{block}{Classify the Branch Behavior}
+For each instruction, state whether it reads NZCV, updates NZCV, directly tests a register, or branches unconditionally.
+\end{block}
+\vspace{0.15cm}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.16}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{4.2cm}
+  >{\raggedright\arraybackslash}m{6.3cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Instruction} &
+{\color{white}\bfseries Classification} \\
+\rowcolor{softgray}
+\code{b.eq target} & \\
+\rowcolor{white}
+\code{cbz x0, target} & \\
+\rowcolor{softgray}
+\code{tbz x1, \#4, target} & \\
+\rowcolor{white}
+\code{b target} & \\
+\rowcolor{softgray}
+\code{cmp x0, x1} & \\
+\end{tabular}
+\end{center}
+\end{frame}
+
+% ============================================================
+% Slide 37
+% Slide Header: Next Topic
+% ============================================================
+\begin{frame}{Next Topic}
+\begin{block}{Procedures and the Stack}
+The next lecture applies control flow to function calls, register-saving conventions, stack frames, and procedure-level organization.
+\end{block}
+\vspace{0.25cm}
+\begin{itemize}
+\item Function calls using \code{bl}
+\item Return addresses and \code{x30}
+\item Stack pointer updates
+\item Caller-saved and callee-saved registers
+\item Stack frame layout
+\end{itemize}
+\end{frame}
 
 \end{document}
