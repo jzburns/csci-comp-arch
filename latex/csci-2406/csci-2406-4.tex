@@ -687,56 +687,6 @@ A negative value minus a positive value should become more negative. If the fixe
 \end{frame}
 
 % ============================================================
-% Slide 21
-% Slide Header: Comparisons and Branch Interpretation
-% ============================================================
-\begin{frame}{Comparisons and Branch Interpretation}
-\vspace{-0.08cm}
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.13}
-\begin{tabular}{
->{\raggedright\arraybackslash}m{2.7cm}
->{\raggedright\arraybackslash}m{3.2cm}
->{\raggedright\arraybackslash}m{4.4cm}
-}
-\rowcolor{navy}
-{\color{white}\bfseries Branch} &
-{\color{white}\bfseries Interpretation} &
-{\color{white}\bfseries Condition after \code{cmp x0, x1}} \\
-\rowcolor{softgray}
-\code{b.eq} &
-equal &
-\code{Z=1} \\
-\rowcolor{white}
-\code{b.ne} &
-not equal &
-\code{Z=0} \\
-\rowcolor{softgray}
-\code{b.lt} &
-signed $<$ &
-\code{N != V} \\
-\rowcolor{white}
-\code{b.ge} &
-signed $\ge$ &
-\code{N == V} \\
-\rowcolor{softgray}
-\code{b.lo} &
-unsigned $<$ &
-\code{C=0} \\
-\rowcolor{white}
-\code{b.hs} &
-unsigned $\ge$ &
-\code{C=1} \\
-\end{tabular}
-\end{center}
-\vspace{0.15cm}
-\begin{block}{Logical Flow}
-\code{Z} answers equality, \code{C} supports unsigned ordering, and the combination of \code{N} and \code{V} supports signed ordering.
-\end{block}
-\end{frame}
-
-% ============================================================
 % Slide 22
 % Slide Header: Multiplication, Division, and Shifts
 % ============================================================
