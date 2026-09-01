@@ -3,14 +3,11 @@
 % ============================================================
 % Theme and typography
 % ============================================================
-
 \usetheme{Madrid}
 \usecolortheme{default}
 \usefonttheme{professionalfonts}
-
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
-
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
@@ -20,28 +17,18 @@
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
-
-\setbeamersize{
-  text margin left=0.65cm,
-  text margin right=0.65cm
-}
-
+\setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
-
-% Block vertical padding adjustments
 \addtobeamertemplate{block begin}{\vspace{0.05em}}{\vspace{0.05em}}
 \addtobeamertemplate{block end}{}{\vspace{0.10em}}
-
-% Base list item separation
 \setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{3pt}}
 \setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
 
 % ============================================================
 % Packages
 % ============================================================
-
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage[scale=0.92]{sourcecodepro}
@@ -50,22 +37,15 @@
 \usepackage{array}
 \usepackage{colortbl}
 \usepackage{tikz}
-
-\usetikzlibrary{
-  arrows.meta,
-  positioning,
-  shapes.geometric,
-  calc,
-  decorations.pathreplacing
-}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
 
 % ============================================================
 % Colors
 % ============================================================
-
 \definecolor{navy}{RGB}{24,43,68}
 \definecolor{deepblue}{RGB}{45,88,130}
 \definecolor{softgray}{RGB}{245,247,250}
+\definecolor{mediumgray}{RGB}{232,235,239}
 \definecolor{darkgray}{RGB}{25,28,32}
 \definecolor{gold}{RGB}{200,145,35}
 
@@ -84,18 +64,17 @@
 % ============================================================
 % Formatting shortcuts
 % ============================================================
-
 \setlength{\parskip}{0pt}
 
 \newcommand{\key}[1]{\textbf{#1}}
 \newcommand{\bits}[1]{\texttt{#1}}
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\codeline}[1]{\hspace{0.7cm}\code{#1}}
 
 % ============================================================
 % Section divider
 % ============================================================
-
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
@@ -114,31 +93,16 @@
 % ============================================================
 % Metadata
 % ============================================================
-
-\title[Topic 6]{
-  Data Transfer, ELF Memory Maps, and Addressing
-}
-
-\subtitle{
-  ELF segments, load and store instructions, addressing modes,\\
-  memory alignment, and traversal of arrays, pointers, and strings in AArch64
-}
-
-\author{
-  Computer Organization \& Architecture
-}
-
-\date{Topic 6}
-
-% ============================================================
-% Presentation Body
-% ============================================================
+\title[Topic 7]{Branching, Iteration, and Control Flow}
+\subtitle{Comparisons, condition flags, conditional branches, loops, and translation of high-level control structures}
+\author{Computer Organization \& Architecture}
+\date{Topic 7}
 
 \begin{document}
 
 % ============================================================
 % Slide 1
-% Slide Header: Data Transfer and Addressing
+% Slide Header: Branching, Iteration, and Control Flow
 % ============================================================
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
@@ -147,11 +111,11 @@
 \end{tikzpicture}
 \vspace{1.0cm}
 \begin{minipage}{0.9\textwidth}
-{\color{gold}\large\bfseries CSCI 2406: Topic 06\par}
+{\color{gold}\large\bfseries CSCI 2406: Topic 07\par}
 \vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries Data Transfer and Addressing\par}
+{\color{white}\fontsize{20}{24}\selectfont\bfseries Branching, Iteration, and Control Flow\par}
 \vspace{0.3cm}
-{\color{softgray}\normalsize ELF memory maps, load/store architecture, addressing modes, and string/array traversal in AArch64\par}
+{\color{softgray}\normalsize Comparisons, condition flags, conditional branches, loops, and translation of high-level control structures\par}
 \vspace{0.6cm}
 {\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad AArch64 Reference\par}
 \end{minipage}
@@ -159,682 +123,915 @@
 
 % ============================================================
 % Slide 2
-% Slide Header: Topic 6 Outline
+% Slide Header: Topic 7 Outline
 % ============================================================
-\begin{frame}{Topic 6 Outline}
+\begin{frame}{Topic 7 Outline}
 \begin{block}{Topic Objective}
-Analysis of program memory organization (ELF layouts), AArch64 load-store architecture, memory addressing modes, alignment constraints, and pointer-based data traversal.
+Explain how AArch64 changes program execution order using comparisons, condition flags, branches, and loop patterns.
 \end{block}
-\vspace{0.4em}
+\vspace{0.25cm}
 \begin{itemize}
-\item \key{Section 1}: Program Memory Organization (ELF Layouts)
-\item \key{Section 2}: The Load-Store Architecture Paradigm
-\item \key{Section 3}: Load and Store Instructions (\code{ldr}, \code{str})
-\item \key{Section 4}: AArch64 Memory Addressing Modes
-\item \key{Section 5}: Memory Access, Alignment, and Pair Transfers
-\item \key{Section 6}: Traversing Arrays, Pointers, and Strings
-\item \key{Section 7}: Summary and Worked Self-Test Exercises
+\item \key{Section 1}: Sequential execution and branch targets
+\item \key{Section 2}: Comparisons and condition flags
+\item \key{Section 3}: Conditional and unconditional branches
+\item \key{Section 4}: Translating \code{if}, \code{else}, and loops
+\item \key{Section 5}: Specialized branch forms
+\item \key{Section 6}: Summary and self-test
 \end{itemize}
 \end{frame}
 
 % ============================================================
 % Slide 3
-% Slide Header: Program Memory Organization
+% Slide Header: Sequential Execution and Branch Targets
 % ============================================================
-\sectiondivider{Section 01}{Program Memory Organization}
+\sectiondivider{Section 01}{Sequential Execution and Branch Targets}
 
 % ============================================================
 % Slide 4
-% Slide Header: The ELF Memory Layout Paradigm
+% Slide Header: The Program Counter Controls Instruction Order
 % ============================================================
-\begin{frame}{The ELF Memory Layout Paradigm}
-\begin{block}{What is ELF?}
-ELF (Executable and Linkable Format) is the standard binary file format for executables, object code, and shared libraries in Unix-like systems.
+\begin{frame}{The Program Counter Controls Instruction Order}
+\begin{block}{Program Counter}
+The program counter identifies the instruction address associated with the current control-flow position. In AArch64, it is not an ordinary general-purpose register.
 \end{block}
-\vspace{0.3em}
+\vspace{0.2cm}
 \begin{itemize}
-\item Defines how code, static data, and linking symbols are organized on disk and loaded into memory.
-\item Contains processor-specific flags, such as machine type identification and alignment requirements.
-\item When an ELF binary executes, the operating system maps it into virtual memory segments.
+\item Sequential execution normally proceeds to the next 32-bit A64 instruction.
+\item A branch replaces that ordinary next-instruction behavior with a target address.
+\item Calls and returns are controlled changes in the same instruction stream.
+\item Exceptions can also redirect control flow, but that belongs to later systems material.
 \end{itemize}
+\vspace{0.15cm}
+\begin{block}{A64 Instruction Width}
+Because A64 instructions are 4 bytes wide, sequential execution commonly advances by 4 bytes before branch redirection is considered.
+\end{block}
 \end{frame}
 
 % ============================================================
 % Slide 5
-% Slide Header: The Linux Virtual Memory Map
+% Slide Header: Labels Name Instruction Addresses
 % ============================================================
-\begin{frame}{The Linux Virtual Memory Map}
-\begin{columns}[T]
-\begin{column}{0.52\textwidth}
-\begin{itemize}
-\item \textbf{Kernel Space}: Reserved space for kernel code, process tables, and kernel stacks.
-\item \textbf{User Stack}: Grows downward; stores local variables and activation frames.
-\item \textbf{Shared Libraries}: Mapped memory regions for dynamic libraries.
-\item \textbf{Runtime Heap}: Grows upward via dynamic allocation (\code{malloc}).
-\item \textbf{BSS / Data / Text}: Uninitialized, initialized, and executable code segments.
-\end{itemize}
-\end{column}
-\begin{column}{0.42\textwidth}
-\begin{block}{Process Virtual Memory}
-\centering
-\begin{tikzpicture}[
-  x=1cm,
-  y=1cm,
-  region/.style={
-    draw=navy,
-    line width=0.7pt,
-    minimum width=5.15cm,
-    align=center,
-    font=\small
-  },
-  static/.style={
-    region,
-    fill=softgray
-  },
-  dynamic/.style={
-    region,
-    fill=white
-  },
-  kernel/.style={
-    region,
-    fill=deepblue!15,
-    font=\small\bfseries
-  }
-]
-\node[kernel,minimum height=0.78cm] (k) at (0,4.25)
-  {Kernel Virtual Memory};
-\node[dynamic,minimum height=0.72cm,below=0pt of k] (s)
-  {User Stack $\downarrow$};
-\node[dynamic,minimum height=0.82cm,below=0pt of s] (m)
-  {Memory-Mapped Region};
-\node[dynamic,minimum height=0.72cm,below=0pt of m] (h)
-  {Runtime Heap $\uparrow$};
-\node[static,minimum height=0.58cm,below=0pt of h] (b)
-  {Uninitialized Data (\code{.bss})};
-\node[static,minimum height=0.58cm,below=0pt of b] (d)
-  {Initialized Data (\code{.data})};
-\node[static,minimum height=0.58cm,below=0pt of d] (t)
-  {Program Text (\code{.text})};
-\end{tikzpicture}
+\begin{frame}{Labels Name Instruction Addresses}
+\begin{block}{Assembler Labels}
+A label is a symbolic name for an instruction address. The assembler resolves the label into the branch target encoded in the machine instruction.
 \end{block}
-\end{column}
+\vspace{0.2cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.50\textwidth}
+\begin{block}{Assembly Pattern}
+\large
+\codeline{loop:}\\[0.10cm]
+\codeline{subs x0, x0, \#1}\\[0.10cm]
+\codeline{b.ne loop}
+\normalsize
+\end{block}
+\column{0.46\textwidth}
+\begin{block}{Meaning}
+\begin{itemize}
+\item \code{loop:} marks an address.
+\item \code{b.ne loop} can redirect execution back to that address.
+\item The label does not occupy a machine instruction by itself.
+\end{itemize}
+\end{block}
 \end{columns}
 \end{frame}
 
 % ============================================================
 % Slide 6
-% Slide Header: Load-Store Architecture
+% Slide Header: Control Flow Changes the Instruction Stream
 % ============================================================
-\sectiondivider{Section 02}{Load-Store Architecture}
+\begin{frame}{Control Flow Changes the Instruction Stream}
+\begin{center}
+\begin{tikzpicture}[
+  scale=.92,
+  transform shape,
+  node distance=.5cm,
+  inst/.style={
+    draw=navy,
+    fill=softgray,
+    rounded corners=2pt,
+    minimum width=3.0cm,
+    minimum height=.48cm,
+    align=center,
+    font=\small\ttfamily
+  },
+  note/.style={
+    font=\small,
+    align=center
+  }
+]
 
-% ============================================================
-% Slide 7
-% Slide Header: Load-Store Architecture Principles
-% ============================================================
-\begin{frame}{Load-Store Architecture Principles}
-AArch64 follows a strict RISC load-store design philosophy:
-\vspace{0.2em}
-\begin{itemize}
-\item \key{Separation of Concerns}: Computation instructions (\code{add}, \code{sub}) process register operands exclusively. Memory instructions (\code{ldr}, \code{str}) handle data movement.
-\item \key{No In-Memory Arithmetic}: An instruction cannot simultaneously fetch from memory, add, and write back.
-\item \key{Simplified Datapath}: Keeps hardware control logic streamlined, highly predictable, and optimized for deep pipelining.
-\end{itemize}
-\vspace{0.3em}
-\begin{block}{C Code Implication}
-C statements like \code{a = b + c;} require explicit loading of variables from memory into registers, addition, and a final store instruction.
+\node[inst] (i1) {cmp x0, x1};
+\node[inst,below=of i1] (i2) {b.eq equal};
+\node[inst,below=of i2] (i3) {sub x2, x0, x1};
+\node[inst,below=of i3] (i4) {b done};
+\node[inst,below=of i4,fill=gold!25] (i5) {equal: add x2, x0, x1};
+\node[inst,below=of i5] (i6) {done: str x2, [x3]};
+
+% Sequential flow
+\draw[-{Latex},thick,deepblue]
+  (i1.south) -- (i2.north);
+
+\draw[-{Latex},thick,deepblue]
+  (i2.south) --
+  node[left,note]{not taken}
+  (i3.north);
+
+\draw[-{Latex},thick,deepblue]
+  (i3.south) -- (i4.north);
+
+\draw[-{Latex},thick,deepblue]
+  (i5.south) -- (i6.north);
+
+% Conditional branch to equal
+\draw[-{Latex},thick,navy]
+  (i2.east)
+  -- ++(1.45,0)
+  |- (i5.east);
+
+\node[note, above right=0.05cm and 0.25cm of i2.east] {taken};
+
+% Unconditional branch to done
+\draw[-{Latex},thick,navy]
+  (i4.east)
+  -- ++(1.80,0)
+  |- (i6.east);
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{-0.2cm}
+
+\begin{block}{Branch Outcome}
+A conditional branch either transfers control to its target or falls through to the next sequential instruction.
 \end{block}
 \end{frame}
 
 % ============================================================
-% Slide 8
-% Slide Header: Memory Addresses as Register Values
+% Slide 7
+% Slide Header: Comparisons and Condition Flags
 % ============================================================
-\begin{frame}{Memory Addresses as Register Values}
-Memory locations are targeted using 64-bit virtual addresses held in general-purpose registers:
-\vspace{0.3em}
-\begin{itemize}
-\item The base address of a variable, array, or data structure is loaded into an \code{x} register (e.g., \code{x1}).
-\item Load/store instructions treat this register as a pointer referencing the target byte location.
-\item Pointer arithmetic can manipulate base addresses dynamically.
-\end{itemize}
-\vspace{0.4em}
-\begin{block}{Pointer Register Rule}
-Only 64-bit general-purpose registers (\code{x0}--\code{x30}) can serve as base address pointers in AArch64.
+\sectiondivider{Section 02}{Comparisons and Condition Flags}
+
+% ============================================================
+% Slide 8
+% Slide Header: cmp Updates Flags by Subtraction
+% ============================================================
+\begin{frame}{\code{cmp} Updates Flags by Subtraction}
+\begin{block}{Underlying Operation}
+\code{cmp x0, x1} performs a subtraction for flags and discards the numeric result.
 \end{block}
+\vspace{0.25cm}
+\large
+\hspace{3.8cm}\code{cmp x0, x1}\\[0.15cm]
+\hspace{3.8cm}\code{subs xzr, x0, x1}
+\normalsize
+\vspace{0.25cm}
+\begin{itemize}
+\item The computed value \code{x0 - x1} is not kept as a data result.
+\item NZCV is updated from the subtraction.
+\item Later conditional branches inspect those flags.
+\item This connects comparison directly to the flag-setting arithmetic from Topic 5.
+\end{itemize}
 \end{frame}
 
 % ============================================================
 % Slide 9
-% Slide Header: Load and Store Instructions
+% Slide Header: The NZCV Flags Used by Branches
 % ============================================================
-\sectiondivider{Section 03}{Load and Store Instructions}
+\begin{frame}{The NZCV Flags Used by Branches}
+\begin{center}
+\begin{tikzpicture}[
+  fld/.style={
+    draw=navy,
+    thick,
+    minimum width=2.2cm,
+    minimum height=1.0cm,
+    align=center,
+    font=\bfseries
+  }
+]
+\node[fld,fill=navy,text=white] (n) {N\\Negative};
+\node[fld,fill=deepblue,text=white,right=.15cm of n] (z) {Z\\Zero};
+\node[fld,fill=gold!35,text=navy,right=.15cm of z] (c) {C\\Carry};
+\node[fld,fill=softgray,text=navy,right=.15cm of c] (v) {V\\Overflow};
+\end{tikzpicture}
+\end{center}
+\vspace{0.25cm}
+\begin{itemize}
+\item \key{Z}: equality after a compare.
+\item \key{N} and \key{V}: signed ordering after subtraction.
+\item \key{C}: unsigned ordering after subtraction; \code{C=1} means no unsigned borrow.
+\item The same compare can support signed or unsigned branch decisions.
+\end{itemize}
+\end{frame}
 
 % ============================================================
 % Slide 10
-% Slide Header: Loading Data: The ldr Instruction
+% Slide Header: Equality Branches
 % ============================================================
-\begin{frame}{Loading Data: The \code{ldr} Instruction}
-The Load Register (\code{ldr}) instruction copies data from memory into a target register:
-\vspace{0.3em}
+\begin{frame}{Equality Branches}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Equal}
+\large
+\hspace{1.8cm}\code{b.eq target}
+\normalsize
 \begin{itemize}
-\item \key{Syntax Format}: \code{ldr destination\_reg, [base\_register]}
-\item \key{64-bit Transfer}: \code{ldr x0, [x1]} loads 8 bytes from the address in \code{x1} into \code{x0}.
-\item \key{32-bit Transfer}: \code{ldr w0, [x1]} loads 4 bytes into \code{w0}, zero-extending the upper 32 bits of \code{x0}.
+\item Branches when \code{Z=1}.
+\item Used after \code{cmp}, \code{subs}, or another flag-setting operation.
 \end{itemize}
-\vspace{0.4em}
-\begin{block}{Data Sizing Suffixes}
-Sub-word loads are supported via explicit qualifiers like \code{ldrb} (byte) and \code{ldrh} (halfword), with sign-extended variants (\code{ldrsb}, \code{ldrsh}).
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Not Equal}
+\large
+\hspace{1.7cm}\code{b.ne target}
+\normalsize
+\begin{itemize}
+\item Branches when \code{Z=0}.
+\item Common for loop continuation and mismatch tests.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{Example}
+\large
+\hspace{3.3cm}\code{cmp x0, x1}\\[0.12cm]
+\hspace{3.3cm}\code{b.eq equal\_case}
+\normalsize
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 11
-% Slide Header: Storing Data: The str Instruction
+% Slide Header: Signed and Unsigned Ordering
 % ============================================================
-\begin{frame}{Storing Data: The \code{str} Instruction}
-The Store Register (\code{str}) instruction copies data from a register into memory:
-\vspace{0.3em}
-\begin{itemize}
-\item \key{Syntax Format}: \code{str source\_reg, [base\_register]}
-\item \key{64-bit Transfer}: \code{str x0, [x1]} writes the 8-byte contents of \code{x0} to the memory address held in \code{x1}.
-\item \key{32-bit Transfer}: \code{str w0, [x1]} writes the lower 4 bytes of \code{w0} to memory.
-\end{itemize}
-\vspace{0.4em}
-\begin{block}{Sub-Word Stores}
-Corresponding store variants \code{strb} (store byte) and \code{strh} (store halfword) allow granular writing of lower register bytes to memory destinations.
+\begin{frame}{Signed and Unsigned Ordering}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{2.7cm}
+  >{\raggedright\arraybackslash}m{3.8cm}
+  >{\raggedright\arraybackslash}m{4.7cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Branch} &
+{\color{white}\bfseries Interpretation} &
+{\color{white}\bfseries Condition after \code{cmp x0, x1}} \\
+\rowcolor{softgray}
+\code{b.lt label} &
+signed less than &
+\code{x0 < x1} as two's complement, $N \ne V$ \\
+\rowcolor{white}
+\code{b.ge label} &
+signed greater/equal &
+\code{x0 >= x1} as two's complement, $N = V$ \\
+\rowcolor{softgray}
+\code{b.lo label} &
+unsigned lower &
+\code{x0 < x1} as unsigned, $C=0$ \\
+\rowcolor{white}
+\code{b.hs label} &
+unsigned higher/same &
+\code{x0 >= x1} as unsigned, $C=1$ \\
+\end{tabular}
+\end{center}
+\vspace{0.25cm}
+\begin{block}{Important Distinction}
+Do not use signed and unsigned branch mnemonics interchangeably. They inspect different flag evidence.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 12
-% Slide Header: Precision Data Sizing and Sign Extension
+% Slide Header: Same cmp, Different Meaning
 % ============================================================
-\begin{frame}{Precision Data Sizing and Sign Extension}
-AArch64 load instructions allow precise control over data width and extension behavior:
-\vspace{0.2em}
+\begin{frame}{Same \code{cmp}, Different Meaning}
+\begin{block}{Example Bit Patterns}
+For 8-bit intuition, compare \code{0xff} with \code{0x01}. The bit patterns are the same, but the numerical interpretation changes.
+\end{block}
+\vspace{0.15cm}
 \begin{center}
 \small
-\begin{tabular}{p{3.2cm} p{3.0cm} p{5.4cm}}
-\toprule
-\textbf{Instruction} &
-\textbf{Bytes Loaded} &
-\textbf{Extension Behavior} \\
-\midrule
-\code{ldrb w0, [x1]} &
-1 Byte ($8$ bits) &
-Zero-extended to 32 bits in \code{w0} \\
-\code{ldrsb x0, [x1]} &
-1 Byte ($8$ bits) &
-Sign-extended to 64 bits in \code{x0} \\
-\code{ldrh w0, [x1]} &
-2 Bytes ($16$ bits) &
-Zero-extended to 32 bits in \code{w0} \\
-\code{ldrsh x0, [x1]} &
-2 Bytes ($16$ bits) &
-Sign-extended to 64 bits in \code{x0} \\
-\bottomrule
+\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{3.2cm}
+  >{\raggedright\arraybackslash}m{3.5cm}
+  >{\raggedright\arraybackslash}m{4.2cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Interpretation} &
+{\color{white}\bfseries Values} &
+{\color{white}\bfseries Correct ordering} \\
+\rowcolor{softgray}
+Unsigned & $255$ and $1$ & $255 > 1$ \\
+\rowcolor{white}
+Signed two's complement & $-1$ and $1$ & $-1 < 1$ \\
 \end{tabular}
 \end{center}
-\vspace{0.2em}
-\begin{block}{Sign Extension Importance}
-When loading signed 8-bit or 16-bit integers into larger registers, using sign-extended variants (\code{ldrsb}/\code{ldrsh}) preserves negative values correctly.
+\vspace{0.25cm}
+\begin{block}{AArch64 Consequence}
+After the same comparison, \code{b.lo} and \code{b.lt} may lead to different control-flow paths.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 13
-% Slide Header: Memory Addressing Modes
+% Slide Header: Conditional and Unconditional Branches
 % ============================================================
-\sectiondivider{Section 04}{Memory Addressing Modes}
+\sectiondivider{Section 03}{Conditional and Unconditional Branches}
 
 % ============================================================
 % Slide 14
-% Slide Header: Addressing Mode Classification
+% Slide Header: Unconditional Branch
 % ============================================================
-\begin{frame}{Addressing Mode Classification}
-An addressing mode defines how the CPU calculates the target memory address for a load or store instruction:
-\vspace{0.2em}
+\begin{frame}{Unconditional Branch}
+\begin{block}{Branch Always}
+\code{b label} transfers control to the target label without testing NZCV flags.
+\end{block}
+\vspace{0.25cm}
+\large
+\hspace{4.0cm}\code{b done}\\[0.15cm]
+\hspace{4.0cm}\code{add x0, x0, \#1}\\[0.15cm]
+\hspace{4.0cm}\code{done:}
+\normalsize
+\vspace{0.25cm}
 \begin{itemize}
-\item \key{Base Register (Indirect)}: Address is taken directly from the base register.
-\item \key{Immediate Offset}: Adds a constant offset to the base register without modifying the base.
-\item \key{Register Offset}: Adds a scaling or offset register to the base address.
-\item \key{Pre-Indexed}: Applies an offset, updates the base register, and accesses memory.
-\item \key{Post-Indexed}: Accesses memory using the base address, then updates the base register.
+\item Used to skip over an alternative block.
+\item Used at the bottom of loops to return to the loop test or loop body.
+\item Does not depend on signed or unsigned interpretation.
 \end{itemize}
 \end{frame}
 
 % ============================================================
 % Slide 15
-% Slide Header: Base Register (Indirect) Addressing
+% Slide Header: Conditional Branch Pattern
 % ============================================================
-\begin{frame}{Base Register (Indirect) Addressing}
-\begin{block}{Syntax and Semantics}
-\vspace{0.05cm}
-\large
-\hspace{4.0cm}\code{ldr x0, [x1]}
-\normalsize
-\vspace{0.05cm}
-
-The memory address is taken strictly from the contents of the base register \code{x1}. The base register remains unchanged after execution.
+\begin{frame}{Conditional Branch Pattern}
+\begin{block}{Two-Step Decision}
+A common AArch64 decision first sets flags, then uses a branch instruction to test those flags.
 \end{block}
-\vspace{0.3em}
+\vspace{0.2cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Step 1: Compare}
+\large
+\hspace{1.7cm}\code{cmp x0, x1}
+\normalsize
 \begin{itemize}
-\item \key{Use Case}: Accessing a variable or dereferencing a pointer whose exact address is already loaded in a register.
-\item Analogous to pointer dereferencing in C: \code{*ptr}.
+\item Computes \code{x0 - x1} for flags.
+\item Updates NZCV.
+\item Does not keep the subtraction result.
 \end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Step 2: Branch}
+\large
+\hspace{1.5cm}\code{b.lt less}
+\normalsize
+\begin{itemize}
+\item Tests the relevant flag condition.
+\item Redirects control if the condition is true.
+\item Falls through otherwise.
+\end{itemize}
+\end{block}
+\end{columns}
 \end{frame}
 
 % ============================================================
 % Slide 16
-% Slide Header: Immediate Offset Addressing
+% Slide Header: Common Conditional Branch Mnemonics
 % ============================================================
-\begin{frame}{Immediate Offset Addressing}
-\begin{block}{Syntax and Semantics}
-\vspace{0.05cm}
-\large
-\hspace{4.0cm}\code{ldr x0, [x1, \#16]}
-\normalsize
-\vspace{0.05cm}
-
-Computes the target address by adding an immediate constant offset (\code{+\#16}) to the base register \code{x1}. The base register \code{x1} is \textbf{not} modified.
+\begin{frame}{Common Conditional Branch Mnemonics}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{2.0cm}
+  >{\raggedright\arraybackslash}m{3.0cm}
+  >{\raggedright\arraybackslash}m{2.0cm}
+  >{\raggedright\arraybackslash}m{3.3cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Branch} &
+{\color{white}\bfseries Meaning} &
+{\color{white}\bfseries Branch} &
+{\color{white}\bfseries Meaning} \\
+\rowcolor{softgray}
+\code{b.eq} & equal &
+\code{b.ne} & not equal \\
+\rowcolor{white}
+\code{b.lt} & signed less than &
+\code{b.ge} & signed greater/equal \\
+\rowcolor{softgray}
+\code{b.gt} & signed greater than &
+\code{b.le} & signed less/equal \\
+\rowcolor{white}
+\code{b.lo} & unsigned lower &
+\code{b.hs} & unsigned higher/same \\
+\rowcolor{softgray}
+\code{b.hi} & unsigned higher &
+\code{b.ls} & unsigned lower/same \\
+\end{tabular}
+\end{center}
+\vspace{0.2cm}
+\begin{block}{Mnemonic Choice}
+The comparison operation may be identical, but the branch mnemonic determines how the flags are interpreted.
 \end{block}
-\vspace{0.3em}
-\begin{itemize}
-\item \key{Use Case}: Accessing fields within a structure or fixed offsets in a local stack frame.
-\item Immediate range rules depend on transfer size.
-\end{itemize}
 \end{frame}
 
 % ============================================================
 % Slide 17
-% Slide Header: Pre-Indexed Addressing Mode
+% Slide Header: Calls and Returns
 % ============================================================
-\begin{frame}{Pre-Indexed Addressing Mode}
-\begin{block}{Syntax and Semantics}
-\vspace{0.05cm}
+\begin{frame}{Calls and Returns}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Branch with Link}
 \large
-\hspace{4.0cm}\code{ldr x0, [x1, \#8]!}
+\hspace{1.5cm}\code{bl function}
 \normalsize
-\vspace{0.05cm}
-
-The immediate offset (\code{+\#8}) is added to base register \code{x1}. This new calculated address is used for the memory load, \textbf{and} is written back into \code{x1}.
-\end{block}
-\vspace{0.3em}
 \begin{itemize}
-\item Identified by the trailing exclamation mark (\code{!}).
-\item \key{Use Case}: Updating a pointer before accessing the next sequential memory item.
+\item Branches to a function label.
+\item Saves the return address in \code{x30}.
+\item \code{x30} is also called \code{lr}.
 \end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Return}
+\large
+\hspace{2.1cm}\code{ret}
+\normalsize
+\begin{itemize}
+\item Returns using the link register by default.
+\item Control resumes after the original \code{bl}.
+\item Stack discipline is covered in procedure topics.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{Function-Call State}
+A call changes control flow and also creates a calling-convention obligation to preserve the right registers.
+\end{block}
 \end{frame}
 
 % ============================================================
 % Slide 18
-% Slide Header: Post-Indexed Addressing Mode
+% Slide Header: Translating Selection and Iteration
 % ============================================================
-\begin{frame}{Post-Indexed Addressing Mode}
-\begin{block}{Syntax and Semantics}
-\vspace{0.05cm}
-\large
-\hspace{4.0cm}\code{ldr x0, [x1], \#8}
-\normalsize
-\vspace{0.05cm}
-
-Data is loaded from the unmodified address in \code{x1}. After the memory access completes, the offset (\code{+\#8}) is added to \code{x1}, updating the pointer register.
-\end{block}
-\vspace{0.3em}
-\begin{itemize}
-\item Identified by placing the offset outside the square brackets.
-\item \key{Use Case}: Fetching current array elements and automatically advancing the pointer for the next iteration.
-\end{itemize}
-\end{frame}
+\sectiondivider{Section 04}{Translating Selection and Iteration}
 
 % ============================================================
 % Slide 19
-% Slide Header: Register Offset and Scaled Addressing
+% Slide Header: Translating an if Statement
 % ============================================================
-\begin{frame}{Register Offset and Scaled Addressing}
-AArch64 allows an index register to offset the base pointer, optionally scaled by data size:
-\vspace{0.3em}
-\begin{itemize}
-\item \key{Syntax}: \code{ldr x0, [x1, x2]} $\rightarrow$ Address is $\code{x1} + \code{x2}$.
-\item \key{Scaled Register Offset}: \code{ldr x0, [x1, x2, lsl \#3]} $\rightarrow$ Address is $\code{x1} + (\code{x2} \times 8)$.
-\end{itemize}
-\vspace{0.3em}
-\begin{block}{Array Indexing Power}
-Scaling shifts the index register by the exact byte width of the data item ($2^3 = 8$ bytes for doublewords), mapping C array subscripts directly into hardware addressing.
+\begin{frame}{Translating an \code{if} Statement}
+\begin{columns}[T,onlytextwidth]
+\column{0.43\textwidth}
+\begin{block}{C}
+\large
+\hspace{0.6cm}\code{if (x == y) \{}\\[0.10cm]
+\hspace{1.1cm}\code{z = x + y;}\\[0.10cm]
+\hspace{0.6cm}\code{\}}
+\normalsize
+\end{block}
+\column{0.53\textwidth}
+\begin{block}{AArch64}
+\large
+\hspace{0.7cm}\code{cmp x0, x1}\\[0.10cm]
+\hspace{0.7cm}\code{b.ne endif}\\[0.10cm]
+\hspace{0.7cm}\code{add x2, x0, x1}\\[0.10cm]
+\hspace{0.7cm}\code{endif:}
+\normalsize
+\end{block}
+\end{columns}
+\vspace{0.2cm}
+\begin{block}{Control-Flow Shape}
+The branch often tests the opposite of the high-level condition so execution can skip the body when the condition is false.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 20
-% Slide Header: Addressing Mode Summary
+% Slide Header: Translating if-else
 % ============================================================
-\begin{frame}{Addressing Mode Summary}
-\begin{table}[]
-\centering
+\begin{frame}{Translating \code{if}-\code{else}}
+\begin{columns}[T,onlytextwidth]
+\column{0.43\textwidth}
+\begin{block}{C}
 \small
-\begin{tabular}{p{2.6cm} p{4.2cm} p{2.4cm} p{2.8cm}}
-\toprule
-\textbf{Mode} &
-\textbf{AArch64 Assembly} &
-\textbf{Address} &
-\textbf{Base Register} \\
-\midrule
-Offset &
-\code{ldr x0, [x1, x2]} &
-$\code{x1} + \code{x2}$ &
-Unchanged \\
-\hline
-Pre-index &
-\code{ldr x0, [x1, x2]!} &
-$\code{x1} + \code{x2}$ &
-$\code{x1} = \code{x1} + \code{x2}$ \\
-\hline
-Post-index &
-\code{ldr x0, [x1], x2} &
-$\code{x1}$ &
-$\code{x1} = \code{x1} + \code{x2}$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-\vspace{0.2em}
-\begin{block}{Note on Register vs. Immediate}
-Offset and index quantities can be specified as general-purpose registers, as shown above, or compatible immediate byte constants such as \code{\#8}.
+\hspace{0.4cm}\code{if (x == y) \{}\\[0.08cm]
+\hspace{0.8cm}\code{z = x + y;}\\[0.08cm]
+\hspace{0.4cm}\code{\} else \{}\\[0.08cm]
+\hspace{0.8cm}\code{z = x - y;}\\[0.08cm]
+\hspace{0.4cm}\code{\}}
+\end{block}
+\column{0.53\textwidth}
+\begin{block}{AArch64}
+\small
+\hspace{0.7cm}\code{cmp x0, x1}\\[0.08cm]
+\hspace{0.7cm}\code{b.ne else\_case}\\[0.08cm]
+\hspace{0.7cm}\code{add x2, x0, x1}\\[0.08cm]
+\hspace{0.7cm}\code{b end\_if}\\[0.08cm]
+\hspace{0.7cm}\code{else\_case:}\\[0.08cm]
+\hspace{0.7cm}\code{sub x2, x0, x1}\\[0.08cm]
+\hspace{0.7cm}\code{end\_if:}
+\end{block}
+\end{columns}
+\vspace{0.15cm}
+\begin{block}{Unconditional Skip}
+The unconditional branch after the true block prevents fall-through into the false block.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 21
-% Slide Header: Memory Access, Alignment, and Pair Transfers
+% Slide Header: Translating a while Loop
 % ============================================================
-\sectiondivider{Section 05}{Memory Access, Alignment,\\and Pair Transfers}
+\begin{frame}{Translating a \code{while} Loop}
+\begin{columns}[T,onlytextwidth]
+\column{0.43\textwidth}
+\begin{block}{C}
+\small
+\hspace{0.4cm}\code{while (i < n) \{}\\[0.08cm]
+\hspace{0.8cm}\code{sum += a[i];}\\[0.08cm]
+\hspace{0.8cm}\code{i++;}\\[0.08cm]
+\hspace{0.4cm}\code{\}}
+\end{block}
+\column{0.53\textwidth}
+\begin{block}{AArch64 Skeleton}
+\small
+\hspace{0.5cm}\code{loop\_test:}\\[0.08cm]
+\hspace{0.5cm}\code{cmp x1, x2}\\[0.08cm]
+\hspace{0.5cm}\code{b.ge loop\_done}\\[0.08cm]
+\hspace{0.5cm}\code{// loop body}\\[0.08cm]
+\hspace{0.5cm}\code{add x1, x1, \#1}\\[0.08cm]
+\hspace{0.5cm}\code{b loop\_test}\\[0.08cm]
+\hspace{0.5cm}\code{loop\_done:}
+\end{block}
+\end{columns}
+\vspace{0.15cm}
+\begin{block}{Test Before Body}
+A \code{while} loop checks its condition before executing the body, so the body may execute zero times.
+\end{block}
+\end{frame}
 
 % ============================================================
 % Slide 22
-% Slide Header: Memory Alignment Rules in AArch64
+% Slide Header: Translating a do-while Loop
 % ============================================================
-\begin{frame}{Memory Alignment Rules in AArch64}
-Data alignment dictates how memory addresses map to data sizes:
-\vspace{0.2em}
-\begin{itemize}
-\item \key{Natural Alignment}: An $n$-byte data item should be stored at an address divisible by $n$.
-\begin{itemize}
-\item Doublewords ($8$ bytes) are naturally aligned at addresses divisible by $8$.
-\item Words ($4$ bytes) are naturally aligned at addresses divisible by $4$.
-\item Halfwords ($2$ bytes) are naturally aligned at addresses divisible by $2$.
-\end{itemize}
-\item \key{Performance and Correctness}: Alignment requirements depend on the particular access and system configuration; naturally aligned accesses are generally preferred.
-\end{itemize}
+\begin{frame}{Translating a \code{do}-\code{while} Loop}
+\begin{columns}[T,onlytextwidth]
+\column{0.43\textwidth}
+\begin{block}{C}
+\small
+\hspace{0.4cm}\code{do \{}\\[0.08cm]
+\hspace{0.8cm}\code{sum += *p;}\\[0.08cm]
+\hspace{0.8cm}\code{p++;}\\[0.08cm]
+\hspace{0.4cm}\code{\} while (*p != 0);}
+\end{block}
+\column{0.53\textwidth}
+\begin{block}{AArch64 Skeleton}
+\small
+\hspace{0.5cm}\code{loop\_body:}\\[0.08cm]
+\hspace{0.5cm}\code{// loop body}\\[0.08cm]
+\hspace{0.5cm}\code{ldr x3, [x0]}\\[0.08cm]
+\hspace{0.5cm}\code{cmp x3, xzr}\\[0.08cm]
+\hspace{0.5cm}\code{b.ne loop\_body}
+\end{block}
+\end{columns}
+\vspace{0.15cm}
+\begin{block}{Test After Body}
+A \code{do}-\code{while} loop executes the body once before the first condition test.
+\end{block}
 \end{frame}
 
 % ============================================================
 % Slide 23
-% Slide Header: Load and Store Pair Instructions
+% Slide Header: Counted Loop with subs
 % ============================================================
-\begin{frame}{Load and Store Pair Instructions (\code{ldp} / \code{stp})}
-AArch64 provides specialized instructions to transfer \textbf{two registers} with one instruction:
-\vspace{0.3em}
-\begin{itemize}
-\item \key{Load Pair (\code{ldp})}: \code{ldp x0, x1, [x2]} loads two 64-bit registers from consecutive memory locations starting at \code{x2}.
-\item \key{Store Pair (\code{stp})}: \code{stp x0, x1, [x2]} stores two 64-bit registers consecutively to memory.
-\end{itemize}
-\vspace{0.3em}
-\begin{block}{Instruction-Count Benefit}
-Pair instructions move two register values with one architectural instruction and are especially useful for stack-frame save/restore operations.
+\begin{frame}{Counted Loop with \code{subs}}
+\begin{block}{Decrement and Test}
+A decrementing loop can combine counter update and flag update using \code{subs}.
 \end{block}
+\vspace{0.25cm}
+\large
+\hspace{3.6cm}\code{loop:}\\[0.12cm]
+\hspace{3.6cm}\code{// loop body}\\[0.12cm]
+\hspace{3.6cm}\code{subs x0, x0, \#1}\\[0.12cm]
+\hspace{3.6cm}\code{b.ne loop}
+\normalsize
+\vspace{0.25cm}
+\begin{itemize}
+\item \code{subs} decrements \code{x0} and updates NZCV.
+\item \code{b.ne} repeats while the result is not zero.
+\item This works naturally when the initial count is positive.
+\end{itemize}
 \end{frame}
 
 % ============================================================
 % Slide 24
-% Slide Header: Stack Operations via Pair Transfers
+% Slide Header: Array Traversal Loop
 % ============================================================
-\begin{frame}{Stack Operations via Pair Transfers}
-Stack management relies heavily on pre-index and post-index pair instructions:
-\vspace{0.3em}
-\begin{block}{Pushing to the Stack (Pre-Index)}
-\vspace{0.05cm}
-\large
-\hspace{3.0cm}\code{stp x29, x30, [sp, \#-16]!}
-\normalsize
-\vspace{0.05cm}
-
-Decrements stack pointer (\code{sp}) by $16$ bytes, then stores frame pointer (\code{x29}) and link register (\code{x30}).
+\begin{frame}{Array Traversal Loop}
+\begin{block}{Example}
+Sum \code{n} 64-bit integers. Let \code{x0} hold the base pointer, \code{x1} hold \code{n}, and \code{x2} hold the running sum.
 \end{block}
-\vspace{0.2em}
-\begin{block}{Popping from the Stack (Post-Index)}
 \vspace{0.05cm}
-\large
-\hspace{4.0cm}\code{ldp x29, x30, [sp], \#16}
-\normalsize
+\scriptsize
+\hspace{2.8cm}\code{mov x2, xzr}\\[0.08cm]
+\hspace{2.8cm}\code{loop:}\\[0.08cm]
+\hspace{2.8cm}\code{cbz x1, done}\\[0.08cm]
+\hspace{2.8cm}\code{ldr x3, [x0], \#8}\\[0.08cm]
+\hspace{2.8cm}\code{add x2, x2, x3}\\[0.08cm]
+\hspace{2.8cm}\code{sub x1, x1, \#1}\\[0.08cm]
+\hspace{2.8cm}\code{b loop}\\[0.08cm]
+\hspace{2.8cm}\code{done:}
 \vspace{0.05cm}
-
-Loads registers from current \code{sp}, then increments stack pointer by $16$ bytes, restoring stack balance.
+\begin{block}{Pointer Update}
+\code{ldr x3, [x0], \#8} loads the current element and advances the pointer by one 64-bit element.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 25
-% Slide Header: Traversing Arrays, Pointers, and Strings
+% Slide Header: String Traversal Loop
 % ============================================================
-\sectiondivider{Section 06}{Traversing Arrays, Pointers,\\and Strings}
-
-% ============================================================
-% Slide 26
-% Slide Header: Initializing Base Pointers in C and Assembly
-% ============================================================
-\begin{frame}{Initializing Base Pointers in C and Assembly}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\begin{block}{C Pointer Initialization}
-\small
-\begin{itemize}
-\item \code{int array[6] = \{2, 3, 11, 4, 55, 6\};}
-\item \code{int *ptr = array; // base pointer}
-\item \code{*(ptr += 4) += 10;}
-\end{itemize}
+\begin{frame}{String Traversal Loop}
+\begin{block}{Null-Terminated Strings}
+A C string ends with a zero byte. Byte loads are used so the loop tests one character at a time.
 \end{block}
-\end{column}
-\begin{column}{0.48\textwidth}
-\begin{block}{AArch64 Base Register Setup}
+\vspace{0.15cm}
 \small
+\hspace{3.0cm}\code{loop:}\\[0.08cm]
+\hspace{3.0cm}\code{ldrb w1, [x0], \#1}\\[0.08cm]
+\hspace{3.0cm}\code{cbz w1, done}\\[0.08cm]
+\hspace{3.0cm}\code{// process character in w1}\\[0.08cm]
+\hspace{3.0cm}\code{b loop}\\[0.08cm]
+\hspace{3.0cm}\code{done:}
+\vspace{0.15cm}
 \begin{itemize}
-\item Declare static data arrays in the \code{.data} section.
-\item Load the array base address into a pointer register using symbol directives:
-\item \code{ldr x0, =array}
+\item \code{ldrb} reads one byte and zero-extends into \code{w1}.
+\item Post-indexing advances \code{x0} after the load.
+\item \code{cbz} tests for the null terminator without modifying NZCV.
 \end{itemize}
-\end{block}
-\end{column}
-\end{columns}
 \end{frame}
 
 % ============================================================
-% Slide 27
-% Slide Header: Mapping C Arrays to AArch64 Assembly
+% Slide 26
+% Slide Header: Specialized Branch Forms
 % ============================================================
-\begin{frame}{Mapping C Arrays to AArch64 Assembly}
-Arrays consist of contiguous memory locations holding elements of identical size:
-\vspace{0.2em}
+\sectiondivider{Section 05}{Specialized Branch Forms}
+
+% ============================================================
+% Slide 27
+% Slide Header: Compare and Branch on Zero
+% ============================================================
+\begin{frame}{Compare and Branch on Zero}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Branch if Zero}
+\large
+\hspace{1.5cm}\code{cbz x0, target}
+\normalsize
 \begin{itemize}
-\item Let \code{x1} hold the base address of an integer array (\code{int A[]}, where each element is 4 bytes).
-\item Accessing element \code{A[i]} requires computing the effective address:
-\[
-\text{Base} + (\text{Index} \times \text{Element Size})
-\]
-\item Assembly implementations can use scaled register offsets or explicit pointer arithmetic.
+\item Tests whether \code{x0} equals zero.
+\item Branches if the test is true.
+\item Does not update NZCV flags.
 \end{itemize}
-\vspace{0.2em}
-\begin{block}{Example Array Access}
-\code{ldr w0, [x1, x2, lsl \#2]} loads \code{A[i]} into \code{w0}, where \code{x2} holds index \code{i} and the shift multiplies it by $4$.
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Branch if Nonzero}
+\large
+\hspace{1.4cm}\code{cbnz x0, target}
+\normalsize
+\begin{itemize}
+\item Tests whether \code{x0} is nonzero.
+\item Branches if the test is true.
+\item Useful for pointer and counter tests.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.25cm}
+\begin{block}{Technical Precision}
+These are architectural instructions that combine a zero test with a branch. Do not describe their speed as universally one cycle; latency depends on the processor implementation.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 28
-% Slide Header: Iterating Over Strings
+% Slide Header: Test Bit and Branch
 % ============================================================
-\begin{frame}{Iterating Over Strings (\code{.asciz})}
-Strings in C/C++ are represented as contiguous character arrays terminated by a null byte ($0$):
-\vspace{0.3em}
-\begin{itemize}
-\item Declared using assembler directives such as \code{message: .asciz "Hello World!"}.
-\item Accessing individual characters requires byte-level instructions such as \code{ldrb}.
-\item Using a post-indexed byte load, \code{ldrb w1, [x0], \#1}, fetches the current character and then advances the pointer.
-\end{itemize}
-\vspace{0.3em}
-\begin{block}{Loop Termination Check}
-The loop continues reading until the loaded character equals zero, for example with \code{cmp w1, \#0} followed by \code{b.eq end}.
+\begin{frame}{Test Bit and Branch}
+\begin{block}{Bit-Specific Control Flow}
+\code{tbz} and \code{tbnz} test a selected bit in a register and branch based on whether that bit is zero or nonzero.
 \end{block}
+\vspace{0.2cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Test Bit Zero}
+\large
+\hspace{1.1cm}\code{tbz x0, \#3, clear}
+\normalsize
+\begin{itemize}
+\item Tests bit 3 of \code{x0}.
+\item Branches if the bit is 0.
+\item Does not update NZCV.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Test Bit Nonzero}
+\large
+\hspace{1.0cm}\code{tbnz x0, \#3, set}
+\normalsize
+\begin{itemize}
+\item Tests bit 3 of \code{x0}.
+\item Branches if the bit is 1.
+\item Useful for flags packed in a word.
+\end{itemize}
+\end{block}
+\end{columns}
 \end{frame}
 
 % ============================================================
 % Slide 29
-% Slide Header: Summary and Self-Test
+% Slide Header: Branches and Flags
 % ============================================================
-\sectiondivider{Section 07}{Summary \& Self-Test}
+\begin{frame}{Branches and Flags}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.16}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{3.0cm}
+  >{\raggedright\arraybackslash}m{4.0cm}
+  >{\raggedright\arraybackslash}m{4.2cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Branch form} &
+{\color{white}\bfseries Tests} &
+{\color{white}\bfseries NZCV effect} \\
+\rowcolor{softgray}
+\code{b.cond label} &
+Existing condition flags &
+Reads NZCV; does not update it \\
+\rowcolor{white}
+\code{cbz/cbnz} &
+Register equals zero or nonzero &
+Does not update NZCV \\
+\rowcolor{softgray}
+\code{tbz/tbnz} &
+One selected register bit &
+Does not update NZCV \\
+\rowcolor{white}
+\code{b label} &
+No condition &
+Does not test or update NZCV \\
+\end{tabular}
+\end{center}
+\vspace{0.25cm}
+\begin{block}{Programming Implication}
+Use \code{b.cond} when flags already contain the comparison needed. Use \code{cbz}, \code{cbnz}, \code{tbz}, or \code{tbnz} when a direct register test is clearer.
+\end{block}
+\end{frame}
 
 % ============================================================
 % Slide 30
-% Slide Header: Topic 6 Comprehensive Summary
+% Slide Header: Control Flow and Performance
 % ============================================================
-\begin{frame}{Topic 6 Comprehensive Summary}
+\begin{frame}{Control Flow and Performance}
+\begin{block}{Branch Cost Is Implementation-Dependent}
+AArch64 specifies branch behavior, not a universal branch timing. Performance depends on the microarchitecture and workload.
+\end{block}
+\vspace{0.25cm}
 \begin{itemize}
-\item \key{ELF Memory Layout}: Programs execute across mapped virtual regions including text, data, BSS, heap, mapped regions, and stack.
-\item \key{Load-Store Paradigm}: Memory access uses explicit load/store instructions; arithmetic and logical computation operates on registers.
-\item \key{Addressing Modes}: AArch64 supports base, immediate offset, register offset, pre-indexed, and post-indexed addressing forms.
-\item \key{Alignment \& Pairs}: Natural alignment is preferred, while \code{ldp} and \code{stp} provide efficient pair transfers.
-\item \key{Data Structures}: Scaled offsets, pointers, and byte loads support array and string traversal.
+\item Sequential instruction fetch is simple when the next address is predictable.
+\item Conditional branches introduce uncertainty into the instruction stream.
+\item Branch prediction tries to keep the pipeline supplied with useful instructions.
+\item A mispredicted branch may discard speculative work and increase effective CPI.
 \end{itemize}
+\vspace{0.15cm}
+\begin{block}{Course Connection}
+Branches connect architectural control flow to later microarchitecture topics such as pipelines, prediction, and hazards.
+\end{block}
 \end{frame}
 
 % ============================================================
 % Slide 31
-% Slide Header: Self-Test: Questions 1 & 2
+% Slide Header: Common Branching Mistakes
 % ============================================================
-\begin{frame}{Self-Test: Questions 1 \& 2}
-\begin{block}{Question 1: ELF Segments}
-What is the primary difference between the \code{.text} segment and the \code{.data} segment in an ELF executable?
-\end{block}
-\vspace{0.4em}
-\begin{block}{Question 2: Immediate vs. Indexed Addressing}
-What is the primary operational difference between immediate offset addressing (\code{[x1, \#8]}) and pre-indexed addressing (\code{[x1, \#8]!})?
+\begin{frame}{Common Branching Mistakes}
+\begin{itemize}
+\item Using \code{b.lt} for an unsigned comparison that should use \code{b.lo}.
+\item Forgetting that \code{cmp x0, x1} means the flags reflect \code{x0 - x1}, not \code{x1 - x0}.
+\item Assuming \code{cbz}, \code{cbnz}, \code{tbz}, or \code{tbnz} update NZCV flags.
+\item Omitting the unconditional branch needed to skip an \code{else} block.
+\item Placing a loop update after a branch target where it no longer executes on every iteration.
+\end{itemize}
+\vspace{0.15cm}
+\begin{block}{Debugging Practice}
+Trace the values, then trace the flags, then trace the branch target. Avoid guessing from the high-level source alone.
 \end{block}
 \end{frame}
 
 % ============================================================
 % Slide 32
-% Slide Header: Self-Test: Solutions 1 & 2
+% Slide Header: Summary and Self-Test
 % ============================================================
-\begin{frame}{Self-Test: Solutions 1 \& 2}
-\begin{block}{Solution 1}
-The \code{.text} segment stores the program's executable machine instructions, while the \code{.data} segment stores initialized global and static variables.
-\end{block}
-\vspace{0.3em}
-\begin{block}{Solution 2}
-Immediate offset adds the constant to the base register solely to calculate the target address, leaving the base register unchanged. Pre-indexed addressing calculates the address \textbf{and writes the updated address back} into the base register.
-\end{block}
-\end{frame}
+\sectiondivider{Section 06}{Summary and Self-Test}
 
 % ============================================================
 % Slide 33
-% Slide Header: Self-Test: Questions 3 & 4
+% Slide Header: Topic 7 Summary
 % ============================================================
-\begin{frame}{Self-Test: Questions 3 \& 4}
-\begin{block}{Question 3: Post-Indexed String Traversal}
-How does the instruction \code{ldrb w1, [x0], \#1} simplify iterating through a null-terminated string compared with using a separate addition instruction?
-\end{block}
-\vspace{0.4em}
-\begin{block}{Question 4: Memory Alignment}
-Why is natural alignment generally preferred for memory accesses?
-\end{block}
+\begin{frame}{Topic 7 Summary}
+\begin{itemize}
+\item The program counter determines the current control-flow position, but it is not an ordinary AArch64 general-purpose register.
+\item \code{cmp} updates NZCV by performing a flag-setting subtraction and discarding the result.
+\item Conditional branches use flags, while \code{cbz}, \code{cbnz}, \code{tbz}, and \code{tbnz} test registers directly without updating NZCV.
+\item Signed and unsigned branch mnemonics must be selected according to the intended interpretation.
+\item High-level \code{if}, \code{else}, \code{while}, and \code{do}-\code{while} constructs translate into labels, comparisons, conditional branches, and fall-through paths.
+\end{itemize}
 \end{frame}
 
 % ============================================================
 % Slide 34
-% Slide Header: Self-Test: Solutions 3 & 4
+% Slide Header: Self-Test 1/2
 % ============================================================
-\begin{frame}{Self-Test: Solutions 3 \& 4}
-\begin{block}{Solution 3}
-It loads the byte at the current address in \code{x0} into \code{w1} and then increments \code{x0} by 1 as part of the same architectural instruction, eliminating a separate \code{add x0, x0, \#1}.
-\end{block}
-\vspace{0.3em}
-\begin{block}{Solution 4}
-Natural alignment matches the data size to an appropriately aligned address and generally avoids unnecessary access complexity or implementation-dependent penalties.
-\end{block}
+\begin{frame}{Self-Test 1/2}
+\begin{enumerate}
+\item What does \code{cmp x0, x1} compute internally, and where is the result stored?
+\item Why can the same \code{cmp} support both signed and unsigned comparisons?
+\item Which branch should be used for unsigned lower-than: \code{b.lt} or \code{b.lo}?
+\item What does \code{b.eq} test after a comparison?
+\item Why is an unconditional \code{b} often needed in an \code{if}-\code{else} translation?
+\end{enumerate}
 \end{frame}
 
 % ============================================================
 % Slide 35
-% Slide Header: Self-Test: Questions 5 & 6
+% Slide Header: Self-Test 2/2
 % ============================================================
-\begin{frame}{Self-Test: Questions 5 \& 6}
-\begin{block}{Question 5: Pair Transfers on the Stack}
-How do \code{stp} and \code{ldp} manage stack pointer updates during function entry and exit?
-\end{block}
-\vspace{0.4em}
-\begin{block}{Question 6: Scaled Register Addressing}
-In the instruction \code{ldr x0, [x1, x2, lsl \#3]}, what role does the \code{lsl \#3} modifier play in indexing an array of 64-bit integers?
-\end{block}
+\begin{frame}{Self-Test 2/2}
+\begin{enumerate}
+\setcounter{enumi}{5}
+\item How does \code{cbz x0, target} differ from \code{cmp x0, xzr} followed by \code{b.eq target}?
+\item Why does \code{ldrb w1, [x0], \#1} help with string traversal?
+\item What is the difference between a \code{while} loop and a \code{do}-\code{while} loop in branch structure?
+\item What role does \code{x30} play after a \code{bl} instruction?
+\item Why should branch timing not be described as a fixed ISA property?
+\end{enumerate}
 \end{frame}
 
 % ============================================================
 % Slide 36
-% Slide Header: Self-Test: Solutions 5 & 6
+% Slide Header: Review Exercise
 % ============================================================
-\begin{frame}{Self-Test: Solutions 5 \& 6}
-\begin{block}{Solution 5}
-Using pre-indexed store pair (\code{stp ... [sp, \#-16]!}), the stack pointer is decremented before the registers are stored. Post-indexed load pair (\code{ldp ... [sp], \#16}) restores the registers and then increments the stack pointer.
+\begin{frame}{Review Exercise}
+\begin{block}{Classify the Branch Behavior}
+For each instruction, state whether it reads NZCV, updates NZCV, directly tests a register, or branches unconditionally.
 \end{block}
-\vspace{0.3em}
-\begin{block}{Solution 6}
-The \code{lsl \#3} scales the index in \code{x2} by multiplying it by $2^3 = 8$, the byte size of a 64-bit element, translating an array index into a byte offset.
-\end{block}
+\vspace{0.15cm}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.16}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}m{4.2cm}
+  >{\raggedright\arraybackslash}m{6.3cm}
+}
+\rowcolor{navy}
+{\color{white}\bfseries Instruction} &
+{\color{white}\bfseries Classification} \\
+\rowcolor{softgray}
+\code{b.eq target} & \\
+\rowcolor{white}
+\code{cbz x0, target} & \\
+\rowcolor{softgray}
+\code{tbz x1, \#4, target} & \\
+\rowcolor{white}
+\code{b target} & \\
+\rowcolor{softgray}
+\code{cmp x0, x1} & \\
+\end{tabular}
+\end{center}
 \end{frame}
 
 % ============================================================
 % Slide 37
-% Slide Header: Review: Addressing Mode Summary Table
+% Slide Header: Next Topic
 % ============================================================
-\begin{frame}{Review: Addressing Mode Summary Table}
-\begin{table}[]
-\centering
-\small
-\begin{tabular}{p{3.2cm} p{3.8cm} p{4.5cm}}
-\toprule
-\textbf{Addressing Mode} &
-\textbf{Assembly Syntax Example} &
-\textbf{Base Register State After Access} \\
-\midrule
-\key{Base Register} &
-\code{ldr x0, [x1]} &
-Unchanged \\
-\key{Immediate Offset} &
-\code{ldr x0, [x1, \#16]} &
-Unchanged \\
-\key{Pre-Indexed} &
-\code{ldr x0, [x1, \#8]!} &
-Updated ($\text{Base} + 8$) \\
-\key{Post-Indexed} &
-\code{ldr x0, [x1], \#8} &
-Updated ($\text{Base} + 8$) \\
-\bottomrule
-\end{tabular}
-\end{table}
-\end{frame}
-
-% ============================================================
-% Slide 38
-% Slide Header: Wrap-Up and Next Steps
-% ============================================================
-\begin{frame}{Wrap-Up and Next Steps}
-\begin{block}{Transition to Topic 7}
-Building upon data transfer and memory addressing mechanics, the next module examines:
-\begin{itemize}
-\item \key{Branching and Iteration}: Managing program flow and dynamic execution paths.
-\item \key{Comparison Instructions}: Evaluating operand relationships to set processor condition flags.
-\item \key{Conditional and Unconditional Branches}: Controlling execution jumps based on flag states or targets.
-\item \key{Loops and Selection Structures}: Implementing constructs such as \code{if-else} branches and iterative loops.
-\item \key{Translation of High-Level Control Flow}: Converting high-level programming logic into assembly routines.
-\end{itemize}
+\begin{frame}{Next Topic}
+\begin{block}{Procedures and the Stack}
+The next lecture applies control flow to function calls, register-saving conventions, stack frames, and procedure-level organization.
 \end{block}
+\vspace{0.25cm}
+\begin{itemize}
+\item Function calls using \code{bl}
+\item Return addresses and \code{x30}
+\item Stack pointer updates
+\item Caller-saved and callee-saved registers
+\item Stack frame layout
+\end{itemize}
 \end{frame}
 
 \end{document}
