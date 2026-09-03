@@ -71,7 +71,9 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[scale=0.92]{sourcecodepro}
+\IfFileExists{sourcecodepro.sty}
+  {\usepackage[scale=0.92]{sourcecodepro}}
+  {\usepackage{courier}}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -379,9 +381,9 @@
 \vspace{0.25cm}
 
 \begin{block}{Reference Platform}
-The conceptual examples in this lecture use AArch64,
-while later exercises may compare AArch32 encodings
-and behavior when useful.
+Examples use AArch64 as the primary reference.
+Selected exercises use AArch32 only when a comparison
+clarifies an architectural difference.
 \end{block}
 
 \end{frame}
@@ -392,7 +394,7 @@ and behavior when useful.
 
 \begin{frame}{Topic 1 Outline}
 
-\begin{block}{Foundational Focus}
+\begin{block}{Topic Goal}
 Establish the distinction between
 what software can observe
 and how hardware implements it,
@@ -586,7 +588,7 @@ and
 
 \column{0.36\textwidth}
 
-\begin{alertblock}{Architecture / ISA Boundary}
+\begin{block}{Architecture / ISA Boundary}
 
 Defines the machine behavior
 software may rely on:
@@ -598,7 +600,7 @@ software may rely on:
   \item memory behavior
 \end{itemize}
 
-\end{alertblock}
+\end{block}
 
 \column{0.31\textwidth}
 
@@ -1211,7 +1213,7 @@ internal organizations.
 
 \begin{frame}{The Stored-Program Concept}
 
-\begin{block}{Foundational Definition}
+\begin{block}{Stored-Program Definition}
 Program instructions are represented
 as binary information
 and stored in memory,
@@ -1239,13 +1241,13 @@ without changing the hardware.
 
 \vspace{0.05cm}
 
-\begin{alertblock}{Important Distinction}
+\begin{block}{Memory Organization Is a Separate Choice}
 Von Neumann and Harvard
 are different ways
 to organize instruction
 and data access
 in a stored-program computer.
-\end{alertblock}
+\end{block}
 
 \end{frame}
 
@@ -1319,13 +1321,12 @@ occupies addresses
 % Slide 21
 % ============================================================
 
-\begin{frame}{The CPU--Memory Interface: A Conceptual Model}
+\begin{frame}{What a Memory Access Must Specify}
 
 \vspace{-0.45cm}
 
 \begin{block}{How the CPU Communicates with Memory}
-At the conceptual level,
-a memory access requires three kinds of information:
+Every memory access requires three kinds of information:
 \key{where} to access,
 \key{what data} to transfer,
 and \key{what operation} to perform.
@@ -1439,7 +1440,7 @@ node[
         and coordinate the transfer.
 \end{itemize}
 
-\vspace{0.05cm}
+\vspace{0cm}
 
 \small
 
@@ -1616,26 +1617,34 @@ just like data.
 % Slide 25
 % ============================================================
 
-% ============================================================
-% Slide 25
-% ============================================================
-
 \begin{frame}{The von Neumann Architecture}
+
 \begin{columns}[T,onlytextwidth]
+
 \column{0.55\textwidth}
 
 \key{Core Characteristics}:
 
 \begin{itemize}
-\item \key{Unified Memory}: instructions and data share one memory/address space.
-\item \key{Shared Access Path}: instruction fetches and data accesses use the same memory path.
-\item These accesses can therefore \key{contend for the same resource}.
-\item This organization is the classical model associated with the von Neumann bottleneck.
+  \item \key{Unified Memory}:
+        instructions and data
+        share one memory/address space.
+  \item \key{Shared Access Path}:
+        instruction fetches
+        and data accesses
+        use the same memory path.
+  \item These accesses can therefore
+        \key{contend for the same resource}.
+  \item This organization
+        is the classical model
+        associated with
+        the von Neumann bottleneck.
 \end{itemize}
 
 \column{0.42\textwidth}
 
 \begin{center}
+
 \begin{tikzpicture}[
   scale=0.82,
   every node/.style={font=\small},
@@ -1673,29 +1682,16 @@ just like data.
 ]
 
 \node[memory] (umem) {};
-
 \node[
   text=navy,
   font=\small\bfseries,
   anchor=north
-]
-at ([yshift=-0.16cm]umem.north)
-{Unified Memory};
+] at ([yshift=-0.16cm]umem.north) {Unified Memory};
 
-\node[cell]
-at ([yshift=0.18cm]umem.center)
-{Program};
+\node[cell] at ([yshift=0.18cm]umem.center) {Program};
+\node[cell] at ([yshift=-0.66cm]umem.center) {Data};
 
-\node[cell]
-at ([yshift=-0.66cm]umem.center)
-{Data};
-
-\node[
-  processor,
-  below=1.30cm of umem
-]
-(cpu)
-{CPU Core};
+\node[processor,below=1.30cm of umem] (cpu) {CPU Core};
 
 \draw[
   thick,
@@ -1704,17 +1700,15 @@ at ([yshift=-0.66cm]umem.center)
 ]
 (umem.south)
 --
-node[
-  right=0.10cm,
-  pathlabel
-]
-{shared instruction/\\data path}
+node[right=0.10cm,pathlabel]{shared instruction/\\data path}
 (cpu.north);
 
 \end{tikzpicture}
+
 \end{center}
 
 \end{columns}
+
 \end{frame}
 
 % ============================================================
@@ -1722,21 +1716,33 @@ node[
 % ============================================================
 
 \begin{frame}{The Harvard Architecture}
+
 \begin{columns}[T,onlytextwidth]
+
 \column{0.55\textwidth}
 
 \key{Core Characteristics}:
 
 \begin{itemize}
-\item \key{Separated Memories}: instruction and data storage are distinct.
-\item \key{Independent Access Paths}: each side has its own path to the processor.
-\item \key{Parallel Operation}: instruction fetch and a data read/write can proceed concurrently.
-\item Instruction and data memories may use different widths or storage technologies.
+  \item \key{Separated Memories}:
+        instruction and data storage
+        are distinct.
+  \item \key{Independent Access Paths}:
+        each side has its own path
+        to the processor.
+  \item \key{Parallel Operation}:
+        instruction fetch
+        and a data read/write
+        can proceed concurrently.
+  \item Instruction and data memories
+        may use different widths
+        or storage technologies.
 \end{itemize}
 
 \column{0.42\textwidth}
 
 \begin{center}
+
 \begin{tikzpicture}[
   scale=0.78,
   every node/.style={font=\small},
@@ -1791,22 +1797,24 @@ node[right=0.10cm,pathlabel]{data path}
 (dmem.north);
 
 \end{tikzpicture}
+
 \end{center}
 
 \end{columns}
+
 \end{frame}
+
 % ============================================================
 % Slide 27
 % ============================================================
 
-\begin{frame}{Structural Separation: The Key Distinction}
+\begin{frame}{Shared versus Separate Memory Paths}
 
-\begin{block}{The Fundamental Question}
-The important distinction
-is whether instruction access
+\begin{block}{What Changes?}
+Instruction access
 and data access
-share the same memory path
-or use structurally separate paths.
+either share one memory path
+or use separate paths.
 \end{block}
 
 \vspace{0.35cm}
@@ -1858,7 +1866,7 @@ and data access.
 % Slide 28
 % ============================================================
 
-\begin{frame}{The Modern Standard: Modified Harvard Organization}
+\begin{frame}{Many Modern Processors Use Modified Harvard Organization}
 
 Modern high-performance processors
 often combine elements
@@ -2059,7 +2067,7 @@ with shared lower hierarchy
 
 \vspace{0.35cm}
 
-\begin{block}{Key Takeaway}
+\begin{block}{ISA and Memory Organization Are Independent}
 The ISA does not,
 by itself,
 require a processor
@@ -2156,6 +2164,8 @@ to execute many different programs?
 % ============================================================
 
 \begin{frame}{Self-Test: Solutions 1--3}
+
+\vspace{-0.08cm}
 
 \begin{block}{Solution 1}
 \key{Architecture}:
@@ -2255,9 +2265,9 @@ within one unified address space.
 % Slide 36
 % ============================================================
 
-\begin{frame}{Wrap-Up and Next Steps}
+\begin{frame}{Next Topic: RISC Principles and ARM Architecture}
 
-\begin{block}{Next Topic: RISC Principles and ARM Architecture}
+\begin{block}{Topic 2 Preview}
 
 \begin{itemize}
   \item \key{RISC design principles}
@@ -2270,13 +2280,9 @@ within one unified address space.
 
 \vspace{0.3cm}
 
-Today established the conceptual framework.
-
-The next lecture uses AArch64
-more concretely
-to examine how a RISC ISA
-presents operations and state
-to software.
+Topic 2 examines how RISC principles appear in AArch64
+and how the ISA presents operations, registers,
+and architectural state to software.
 
 \end{frame}
 
