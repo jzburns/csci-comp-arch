@@ -124,6 +124,7 @@ Abstraction, stored-program organization, data representation, and processor per
 \column{0.49\textwidth}
 
 \begin{block}{Instructor Contact}
+
 \begin{itemize}
   \item \key{Email}:
         \code{jburns@ada.edu.az}
@@ -137,11 +138,13 @@ Abstraction, stored-program organization, data representation, and processor per
         channel for academic matters. No
         Teams or Blackboard messages, please.
 \end{itemize}
+
 \end{block}
 
 \column{0.48\textwidth}
 
 \begin{block}{Classroom Expectations}
+
 \begin{itemize}
   \item \key{The Golden Rule}:
         Once class commences, personal 
@@ -154,6 +157,7 @@ Abstraction, stored-program organization, data representation, and processor per
         your work, I will ask you to explain 
         it to me in person in B317. 
 \end{itemize}
+
 \end{block}
 
 \end{columns}
@@ -200,6 +204,7 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 \vfill
 
 \begin{center}
+
 \begin{tikzpicture}[
   xscale=0.85,
   yscale=0.48,
@@ -328,6 +333,7 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
   {Electron Transport in Silicon Substrates};
 
 \end{tikzpicture}
+
 \end{center}
 
 \end{frame}
@@ -803,12 +809,12 @@ The stored-program model allows a machine to run different programs by changing 
   box/.style={draw=navy, fill=lightblue, rounded corners=2pt, minimum width=3.2cm, minimum height=1.0cm, align=center, font=\small\bfseries},
   syncbox/.style={draw=gold!80!black, fill=gold!20, line width=1pt, rounded corners=2pt, minimum width=3.6cm, minimum height=1.1cm, align=center, font=\small\bfseries}
 ]
-\node[box] (data) {1. Write Code\\(Data Side / D-Cache)};
-\node[syncbox, right=1.0cm of data] (sync) {2. Cache Synchronization\\(DC Clean $\rightarrow$ IC Invalidate)};
-\node[box, right=1.0cm of sync] (inst) {3. Fetch Code\\(Instruction Side / I-Cache)};
+  \node[box] (data) {1. Write Code\\(Data Side / D-Cache)};
+  \node[syncbox, right=1.0cm of data] (sync) {2. Cache Synchronization\\(DC Clean $\rightarrow$ IC Invalidate)};
+  \node[box, right=1.0cm of sync] (inst) {3. Fetch Code\\(Instruction Side / I-Cache)};
 
-\draw[-{Latex}, thick, navy] (data) -- (sync);
-\draw[-{Latex}, thick, navy] (sync) -- (inst);
+  \draw[-{Latex}, thick, navy] (data) -- (sync);
+  \draw[-{Latex}, thick, navy] (sync) -- (inst);
 \end{tikzpicture}
 
 \vfill
@@ -946,6 +952,7 @@ Exact latencies are implementation-dependent; the architectural lesson is the ex
 \vfill
 
 \begin{center}
+
 \footnotesize
 
 \begin{tabular}{ll}
@@ -1233,6 +1240,7 @@ Arithmetic instructions update status flags in the PSTATE register to describe t
 \small
 
 \begin{center}
+
 \begin{tabular}{cll}
 \toprule
 Flag & Name & Evaluation Meaning \\
@@ -1243,6 +1251,7 @@ C & Carry & Unsigned carry-out (add) or no-borrow (sub) \\
 V & Overflow & Signed mathematical result is outside the destination range \\
 \bottomrule
 \end{tabular}
+
 \end{center}
 
 \vfill
@@ -1264,6 +1273,7 @@ After \code{cmp x0, x1}, the processor has conceptually subtracted the operands 
 \small
 
 \begin{center}
+
 \begin{tabular}{llll}
 \toprule
 Branch & Context & Flag Condition & Meaning \\
@@ -1294,6 +1304,7 @@ Lower / Higher or Equal
 \\
 \bottomrule
 \end{tabular}
+
 \end{center}
 
 \vfill
@@ -1337,8 +1348,8 @@ The same 64-bit pattern can represent a negative signed integer or a very large 
   boxlat/.style={draw=navy, fill=lightblue, rounded corners=2pt, minimum width=5.6cm, minimum height=0.8cm, align=center, font=\small},
   boxthru/.style={draw=navy, fill=gold!20, line width=1pt, rounded corners=2pt, minimum width=5.6cm, minimum height=0.8cm, align=center, font=\small}
 ]
-\node[boxlat] (lat) {\textbf{Latency:} one task takes 5 cycles};
-\node[boxthru, right=of lat] (thru) {\textbf{Throughput:} one task may finish each cycle};
+  \node[boxlat] (lat) {\textbf{Latency:} one task takes 5 cycles};
+  \node[boxthru, right=of lat] (thru) {\textbf{Throughput:} one task may finish each cycle};
 \end{tikzpicture}
 
 \vfill
@@ -1598,7 +1609,6 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
 \end{itemize}
 
 \vfill
-
 \begin{block}{Core Takeaway}
 System software must respect these boundaries; for example, newly generated code may require explicit synchronization between data writes and instruction fetch.
 \end{block}
@@ -1615,7 +1625,6 @@ System software must respect these boundaries; for example, newly generated code
 \end{itemize}
 
 \vfill
-
 \begin{block}{Core Takeaway}
 Microarchitectural improvements involve trade-offs: improving one performance factor can increase complexity, power, latency, or pressure elsewhere in the system.
 \end{block}
@@ -1625,20 +1634,25 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 \begin{frame}{Self-Test Diagnostic Questions: Architecture \& Binary}
 
 \begin{enumerate}\setlength{\itemsep}{6pt}
+
   \item \key{ISA vs.\ Microarchitecture:} Categorize the following:
+
   \begin{itemize}\setlength{\itemsep}{1.5pt}
     \item Number of visible registers (\bits{x0}--\bits{x30}).
     \item Size of the L1 instruction cache.
     \item Binary machine encoding of the \code{add} instruction.
   \end{itemize}
   \vspace{0.2cm}
+
   \item \key{Two's Complement Construction:}
   Show the mathematical logic and bitwise inversion steps required to reliably encode $-37$ as an 8-bit two's-complement value.
   \vspace{0.2cm}
+
   \item \key{Carry vs.\ Overflow:}
   In a 4-bit ALU evaluating
   \(\mathtt{1001}_2 + \mathtt{1100}_2\),
   determine the output sum, Carry flag ($C$), and Signed Overflow flag ($V$). Explain why they differ.
+
 \end{enumerate}
 
 \vfill
@@ -1647,18 +1661,22 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 \begin{frame}{Self-Test Questions: Performance \& Memory}
 
 \begin{enumerate}\setlength{\itemsep}{6pt}
+
   \item \key{Iron Law Analysis:}
   A compiler optimization decreases dynamic instruction count by $20\%$,
   but increases average CPI by $15\%$.
   Does overall application performance improve?
   Calculate the exact speedup.
   \vspace{0.2cm}
+
   \item \key{Amdahl's Law Application:}
   Memory stalls strictly account for $70\%$ of application execution time.
   In order to achieve an overall hardware speedup of $2.5\times$, what exact speedup must be targeted in the memory portion alone?
   \vspace{0.2cm}
+
   \item \key{Generated Code and Split Caches:}
   Explain precisely why a runtime system that dynamically writes new machine instructions requires barrier synchronization before those instructions are safely fetched and executed.
+
 \end{enumerate}
 
 \vfill
