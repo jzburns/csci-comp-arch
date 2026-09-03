@@ -28,6 +28,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\IfFileExists{sourcecodepro.sty}{\usepackage[scale=0.92]{sourcecodepro}}{\usepackage{courier}}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -112,6 +113,53 @@ Abstraction, stored-program organization, data representation, and processor per
 \vspace*{\fill}
 \end{frame}
 
+% ============================================================
+% Slide 2
+% ============================================================
+
+\begin{frame}{Course Information \& Administration}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.49\textwidth}
+
+\begin{block}{Instructor Contact}
+\begin{itemize}
+  \item \key{Email}:
+        \code{jburns@ada.edu.az}
+  \item \key{Office}:
+        B317
+  \item \key{Office Hours}:
+        Tues/Thurs 12:00--14:00\\
+        (or by appointment)
+  \item \key{Note}:
+        Email is the appropriate 
+        channel for academic matters. No
+        Teams or Blackboard messages, please.
+\end{itemize}
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Classroom Expectations}
+\begin{itemize}
+  \item \key{The Golden Rule}:
+        Once class commences, personal 
+        classroom conversations are not permitted.
+  \item \key{Demonstrating Understanding:} Students are 
+        expected to demonstrate 
+        their understanding of work they 
+        submit for assessment. Should I have any 
+        reason to question the authenticity of 
+        your work, I will ask you to explain 
+        it to me in person in B317. 
+\end{itemize}
+\end{block}
+
+\end{columns}
+
+\end{frame}
+
 % --- Section Divider 1 ---
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
@@ -132,9 +180,9 @@ Abstraction, stored-program organization, data representation, and processor per
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item Connects \key{software-visible behavior} with \key{hardware implementation}.
   \item Provides a reliable interface that software can target without knowing underlying physics.
-  \item Implementation choices strictly determine performance, efficiency, and hardware limits.
+  \item Implementation choices strongly influence performance, efficiency, and practical hardware limits.
   \item Design is a balancing act between correctness, performance, power, area, and cost.
-  \item It serves as the translation layer between abstract algorithms and physical electrons.
+  \item The ISA provides the key contract between software and the processor that executes it.
 \end{itemize}
 
 \vspace{0.4cm}
@@ -152,7 +200,6 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 \vfill
 
 \begin{center}
-
 \begin{tikzpicture}[
   xscale=0.85,
   yscale=0.48,
@@ -281,7 +328,6 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
   {Electron Transport in Silicon Substrates};
 
 \end{tikzpicture}
-
 \end{center}
 
 \end{frame}
@@ -314,7 +360,7 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 
 \vfill
 
-Performance-sensitive software often exposes lower-level machine behavior, requiring programmers to actively optimize for spatial locality, predictable branching, and cache-friendly data structures to prevent severe execution penalties.
+Performance-sensitive software often exposes lower-level machine behavior. Programmers may need to consider locality, branch behavior, and data layout when execution time matters.
 
 \end{frame}
 
@@ -322,55 +368,57 @@ Performance-sensitive software often exposes lower-level machine behavior, requi
 
 \begin{center}
 \begin{tikzpicture}[
-  node distance=0.25cm,
-  box/.style={
+  node distance=0.78cm and 1.55cm,
+  stage/.style={
     rounded corners=3pt,
     draw=navy,
     fill=lightblue,
     align=center,
     font=\small,
-    minimum width=8.2cm,
-    minimum height=0.42cm
-  }
+    minimum width=3.05cm,
+    minimum height=1.05cm
+  },
+  exec/.style={
+    rounded corners=3pt,
+    draw=gold!80!black,
+    fill=gold!20,
+    align=center,
+    font=\small,
+    minimum width=3.05cm,
+    minimum height=1.05cm
+  },
+  flowlabel/.style={font=\scriptsize\bfseries,text=deepblue,align=center}
 ]
 
-\node[box] (c)
-  {High-level source: \code{c = a + b;}};
+% South -> east -> north flow
+\node[stage] (src)
+  {C Source\\[0.04cm]{\footnotesize\code{c = a + b;}}};
 
-\node[box,below=of c] (asm)
-  {Assembly: \code{add x0, x1, x2}};
+\node[stage,below=of src] (asm)
+  {AArch64 Assembly\\[0.04cm]{\footnotesize\code{add x0, x1, x2}}};
 
-\node[box,below=of asm] (obj)
-  {Object / executable representation};
+\node[stage,right=of asm] (exe)
+  {Executable /\\Machine Code};
 
-\node[box,below=of obj] (inst)
-  {Fetched instruction word: \code{0x8b020020}};
-
-\node[box,below=of inst] (uarch)
-  {Microarchitecture: fetch, decode, execute, retire};
-
-\node[box,below=of uarch] (logic)
-  {Hardware: datapaths, storage, and control logic};
+\node[exec,above=of exe] (cpu)
+  {Processor\\Fetch, Decode, Execute};
 
 \draw[-{Latex[length=2mm]},thick,navy]
-  (c) -- (asm)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Compiler};
+  (src) -- (asm)
+  node[midway,left=0.16cm,flowlabel]{Compiler};
 
 \draw[-{Latex[length=2mm]},thick,navy]
-  (asm) -- (obj)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Assembler / linker};
-
-\draw[-{Latex},thick,navy]
-  (obj) -- (inst)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Load / fetch};
+  (asm) -- (exe)
+  node[midway,above=0.13cm,flowlabel]{Assembler\\/ Linker};
 
 \draw[-{Latex[length=2mm]},thick,navy]
-  (inst) -- (uarch)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Decode};
+  (exe) -- (cpu)
+  node[midway,right=0.16cm,flowlabel]{Loader +\\Instruction Fetch};
 
-\draw[-{Latex},thick,navy]
-  (uarch) -- (logic)
-  node[midway,right,font=\tiny\bfseries,text=deepblue]{Implementation};
+\draw[decorate,decoration={brace,amplitude=5pt},thick,navy]
+  ([xshift=0.22cm]exe.north east) -- ([xshift=0.22cm]exe.south east)
+  node[midway,right=0.34cm,font=\footnotesize,text=navy,align=left]
+  {ISA boundary:\\32-bit AArch64\\instruction words};
 
 \end{tikzpicture}
 \end{center}
@@ -379,7 +427,7 @@ Performance-sensitive software often exposes lower-level machine behavior, requi
 
 \small
 
-The ISA is the rigid boundary between program representation and processor execution. Understanding this translation pipeline is essential for debugging performance bottlenecks that occur directly at the hardware-software interface.
+The compiler and assembler translate program intent into AArch64 instructions. The processor then fetches and executes those instructions according to the ISA, while the microarchitecture determines how that execution is implemented internally.
 
 \end{frame}
 
@@ -419,14 +467,14 @@ Different processors can implement the exact same ISA using radically different 
 
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item \key{Load/Store Architecture:} Memory is accessed exclusively through specific load and store instructions, keeping complex arithmetic isolated to registers.
-  \item \key{Simplified Decoding:} Fixed-length instruction encodings streamline the fetch and decode stages, enabling higher clock frequencies.
+  \item \key{Simplified Decoding:} Fixed-length instruction encodings simplify instruction fetch, alignment, and decode.
   \item \key{Abundant Registers:} A large, uniform register file minimizes the need to spill temporary variables to slower main memory.
 \end{itemize}
 
 \vspace{0.4cm}
 
 \begin{block}{The RISC Philosophy}
-Complexity is deliberately pushed to the compiler, allowing the hardware implementation to focus entirely on executing simple, uniform operations at maximum throughput.
+RISC designs favor simple, regular instructions and rely on compilers to combine them effectively, reducing complexity in instruction decoding and execution.
 \end{block}
 
 \end{frame}
@@ -453,7 +501,7 @@ within the uniform 32-bit word.
 
 \vfill
 
-This uniform structural alignment completely avoids the complex, multi-cycle sequential decode logic required by variable-length architectures like x86.
+Fixed-width encoding simplifies instruction fetch, alignment, and decoding compared with variable-length instruction sets such as x86.
 
 \end{frame}
 
@@ -503,7 +551,7 @@ This uniform structural alignment completely avoids the complex, multi-cycle seq
   draw=navy,
   fill=softgray,
   rounded corners=2pt,
-  right=1.3cm of mem,
+  right=2.35cm of mem,
   minimum width=2.8cm,
   minimum height=0.8cm,
   font=\small\bfseries
@@ -538,7 +586,7 @@ This uniform structural alignment completely avoids the complex, multi-cycle seq
 
 \small
 
-The stored-program idea makes agile software deployment possible: changing memory contents can change both the data being processed and the instructions being executed without rewiring hardware.
+The stored-program model allows a machine to run different programs by changing the instructions held in memory rather than rewiring the hardware.
 
 \end{frame}
 
@@ -755,19 +803,19 @@ The stored-program idea makes agile software deployment possible: changing memor
   box/.style={draw=navy, fill=lightblue, rounded corners=2pt, minimum width=3.2cm, minimum height=1.0cm, align=center, font=\small\bfseries},
   syncbox/.style={draw=gold!80!black, fill=gold!20, line width=1pt, rounded corners=2pt, minimum width=3.6cm, minimum height=1.1cm, align=center, font=\small\bfseries}
 ]
-  \node[box] (data) {1. Write Code\\(Data Side / D-Cache)};
-  \node[syncbox, right=1.0cm of data] (sync) {2. Cache Synchronization\\(DC Clean $\rightarrow$ IC Invalidate)};
-  \node[box, right=1.0cm of sync] (inst) {3. Fetch Code\\(Instruction Side / I-Cache)};
+\node[box] (data) {1. Write Code\\(Data Side / D-Cache)};
+\node[syncbox, right=1.0cm of data] (sync) {2. Cache Synchronization\\(DC Clean $\rightarrow$ IC Invalidate)};
+\node[box, right=1.0cm of sync] (inst) {3. Fetch Code\\(Instruction Side / I-Cache)};
 
-  \draw[-{Latex}, thick, navy] (data) -- (sync);
-  \draw[-{Latex}, thick, navy] (sync) -- (inst);
+\draw[-{Latex}, thick, navy] (data) -- (sync);
+\draw[-{Latex}, thick, navy] (sync) -- (inst);
 \end{tikzpicture}
 
 \vfill
 
 \small
 
-The exact AArch64 cache-maintenance and barrier instructions are system-software details that will be heavily revisited, as failure to synchronize data and instruction streams will result in executing unpredictable garbage instructions.
+The exact AArch64 cache-maintenance and barrier instructions are system-software details that we will revisit later. Without the required synchronization, instruction fetch may observe stale instructions rather than the newly generated code.
 
 \end{frame}
 
@@ -837,13 +885,13 @@ The exact AArch64 cache-maintenance and barrier instructions are system-software
 
 \end{columns}
 
-\vspace{0.3cm}
+\vspace{0.12cm}
 
 \begin{block}{Why the Hierarchy Works: Locality}
 Programs rarely access memory randomly. They exhibit:
 \begin{itemize}\setlength{\itemsep}{1pt}
-  \item \textbf{Temporal Locality:} Recently accessed items (e.g., active stack frames) are highly likely to be reused soon.
-  \item \textbf{Spatial Locality:} Items located near recently accessed data (e.g., arrays) are likely to be accessed soon.
+  \item \textbf{Temporal Locality:} Recently accessed items are likely to be reused soon.
+  \item \textbf{Spatial Locality:} Nearby memory locations are likely to be accessed soon.
 \end{itemize}
 \end{block}
 
@@ -854,7 +902,7 @@ Programs rarely access memory randomly. They exhibit:
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item Processor execution capability has scaled much faster than off-chip DRAM latency.
   \item A cache hierarchy attempts to keep the processor working on nearby copies of frequently used data.
-  \item When locality fails and a request travels down the hierarchy, the processor must stall for many cycles.
+  \item When locality fails and a request travels down the hierarchy, dependent instructions may wait many cycles, although independent work can sometimes continue.
   \item While memory bandwidth scales reasonably well, physical memory \emph{latency} remains a strict bottleneck.
 \end{itemize}
 
@@ -892,13 +940,12 @@ Exact latencies are implementation-dependent; the architectural lesson is the ex
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item Hardware stores binary bit patterns; \key{meaning comes from context}.
   \item The stored-program model therefore permits the same memory bytes to be interpreted differently depending on how they are used.
-  \item Hardware enforces no inherent "type safety"—using a float operation on an integer bit-pattern simply produces meaningless numerical garbage.
+  \item Hardware enforces no inherent "type safety"; the same bit pattern can be interpreted differently by different instructions.
 \end{itemize}
 
 \vfill
 
 \begin{center}
-
 \footnotesize
 
 \begin{tabular}{ll}
@@ -938,7 +985,7 @@ Bits do not carry a built-in ``type''; instructions and software conventions det
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item In positional binary, each bit contributes a power of two ($\text{Value} = \sum_{i=0}^{n-1} b_i 2^i$).
   \item Hexadecimal is a compact notation for binary because one hex digit represents exactly four bits.
-  \item Exceeding the maximum representable value ($2^n - 1$ for unsigned $n$ bits) results in arithmetic overflow, wrapping the value back to zero.
+  \item For fixed-width unsigned arithmetic, results are computed modulo $2^n$; values beyond $2^n-1$ wrap around within the available $n$ bits.
 \end{itemize}
 
 \vfill
@@ -1081,47 +1128,57 @@ $-5 = \bits{11111011}$
   draw=navy,
   fill=lightblue,
   rounded corners=2pt,
-  minimum width=2.1cm,
+  minimum width=2.0cm,
   minimum height=0.65cm,
   font=\small\bfseries
-] (a) {$A$};
+] (a) at (-3.4,0.8) {$A$};
 
 \node[
   draw=navy,
   fill=softgray,
   rounded corners=2pt,
-  right=0.8cm of a,
-  minimum width=2.1cm,
+  minimum width=2.0cm,
   minimum height=0.65cm,
   font=\small\bfseries
-] (b) {$B$ or $\sim B$};
+] (b) at (-3.4,-0.8) {$B$};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=2pt,
+  minimum width=2.3cm,
+  minimum height=0.65cm,
+  font=\small\bfseries
+] (sel) at (-0.5,-0.8) {$B$ or $\sim B$};
 
 \node[
   draw=gold!80!black,
   fill=gold!20,
   rounded corners=2pt,
-  right=0.8cm of b,
   minimum width=2.5cm,
-  minimum height=0.65cm,
+  minimum height=1.1cm,
   font=\small\bfseries
-] (add) {Adder};
+] (add) at (2.6,0) {Adder};
 
 \node[
   draw=navy,
   fill=lightblue,
   rounded corners=2pt,
-  right=0.8cm of add,
   minimum width=2.3cm,
   minimum height=0.65cm,
   font=\small\bfseries
-] (r) {Result};
+] (r) at (5.8,0) {Result};
 
-\draw[-{Latex},thick,navy] (a) -- (b);
-\draw[-{Latex},thick,navy] (b) -- (add);
+\node[font=\tiny\bfseries,text=deepblue] (sub) at (-0.5,-1.75)
+  {subtract control};
+
+\draw[-{Latex},thick,navy] (a.east) -- ++(1.0,0) |- (add.west);
+\draw[-{Latex},thick,navy] (b) -- (sel);
+\draw[-{Latex},thick,navy] (sel.east) -- ++(0.9,0) |- (add.west);
 \draw[-{Latex},thick,navy] (add) -- (r);
-
-\node[font=\tiny\bfseries] at (5.5,-0.55)
-  {carry-in = 1 for subtraction};
+\draw[-{Latex},thick,deepblue] (sub) -- (sel);
+\draw[-{Latex},thick,deepblue] (sub.east) -| (add.south)
+  node[pos=0.72,right,font=\tiny\bfseries,text=deepblue]{carry-in = 1};
 
 \end{tikzpicture}
 \end{center}
@@ -1129,7 +1186,7 @@ $-5 = \bits{11111011}$
 \vfill
 
 \small
-Using a single unified adder design drastically reduces the chip area and power required to implement mathematical execution units.
+A unified adder lets the processor reuse the same core arithmetic hardware for both addition and subtraction.
 
 \end{frame}
 
@@ -1162,7 +1219,7 @@ Example: \code{ldrb} preserves the unsigned magnitude of an 8-bit value.
 \vfill
 
 \begin{block}{Why It Matters}
-Using the wrong extension changes the interpreted value and can invalidate comparisons, bounds checks, or address calculations—frequently leading to buffer overflow vulnerabilities.
+Using the wrong extension changes the interpreted value and can invalidate comparisons, bounds checks, or address calculations; in some contexts, this can contribute to software vulnerabilities.
 \end{block}
 
 \end{frame}
@@ -1176,7 +1233,6 @@ Arithmetic instructions update status flags in the PSTATE register to describe t
 \small
 
 \begin{center}
-
 \begin{tabular}{cll}
 \toprule
 Flag & Name & Evaluation Meaning \\
@@ -1187,7 +1243,6 @@ C & Carry & Unsigned carry-out (add) or no-borrow (sub) \\
 V & Overflow & Signed mathematical result is outside the destination range \\
 \bottomrule
 \end{tabular}
-
 \end{center}
 
 \vfill
@@ -1209,7 +1264,6 @@ After \code{cmp x0, x1}, the processor has conceptually subtracted the operands 
 \small
 
 \begin{center}
-
 \begin{tabular}{llll}
 \toprule
 Branch & Context & Flag Condition & Meaning \\
@@ -1240,7 +1294,6 @@ Lower / Higher or Equal
 \\
 \bottomrule
 \end{tabular}
-
 \end{center}
 
 \vfill
@@ -1284,8 +1337,8 @@ The same 64-bit pattern can represent a negative signed integer or a very large 
   boxlat/.style={draw=navy, fill=lightblue, rounded corners=2pt, minimum width=5.6cm, minimum height=0.8cm, align=center, font=\small},
   boxthru/.style={draw=navy, fill=gold!20, line width=1pt, rounded corners=2pt, minimum width=5.6cm, minimum height=0.8cm, align=center, font=\small}
 ]
-  \node[boxlat] (lat) {\textbf{Latency:} one task takes 5 cycles};
-  \node[boxthru, right=of lat] (thru) {\textbf{Throughput:} one task may finish each cycle};
+\node[boxlat] (lat) {\textbf{Latency:} one task takes 5 cycles};
+\node[boxthru, right=of lat] (thru) {\textbf{Throughput:} one task may finish each cycle};
 \end{tikzpicture}
 
 \vfill
@@ -1456,7 +1509,7 @@ The Iron Law equation strictly compares measured assumptions; the numerical resu
 
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item Suppose only fraction $f$ of an application's execution time can be accelerated through architectural enhancements.
-  \item Even an infinitely huge improvement to that fraction cannot eliminate the bottleneck of the unaffected portion $(1-f)$.
+  \item Even if the enhanced fraction became infinitely fast, the unaffected portion $(1-f)$ would still limit overall speedup.
 \end{itemize}
 
 \vfill
@@ -1508,8 +1561,8 @@ S_{\max}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item Simple metrics such as MIPS (Millions of Instructions Per Second) are unreliable across different ISAs because instruction counts and instruction meanings drastically differ.
-  \item Benchmark suites such as SPEC CPU use highly representative workloads to compare complete systems reliably.
-  \item These benchmark suites rely on geometric means to accurately summarize normalized performance scores across diverse programs without skewing averages.
+  \item Benchmark suites such as SPEC CPU provide standardized workloads for comparing complete systems.
+  \item Geometric means are commonly used to summarize normalized performance ratios across a benchmark suite.
 \end{itemize}
 
 \vfill
@@ -1545,8 +1598,9 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
 \end{itemize}
 
 \vfill
+
 \begin{block}{Core Takeaway}
-System software must actively manage these boundaries, as failing to synchronize data stores with instruction fetch paths causes catastrophic execution errors.
+System software must respect these boundaries; for example, newly generated code may require explicit synchronization between data writes and instruction fetch.
 \end{block}
 
 \end{frame}
@@ -1561,8 +1615,9 @@ System software must actively manage these boundaries, as failing to synchronize
 \end{itemize}
 
 \vfill
+
 \begin{block}{Core Takeaway}
-Microarchitectural performance improvements are never free; optimizing one facet of the Iron Law usually requires complex concessions in power, pipeline depth, or compiler efficiency.
+Microarchitectural improvements involve trade-offs: improving one performance factor can increase complexity, power, latency, or pressure elsewhere in the system.
 \end{block}
 
 \end{frame}
@@ -1570,25 +1625,20 @@ Microarchitectural performance improvements are never free; optimizing one facet
 \begin{frame}{Self-Test Diagnostic Questions: Architecture \& Binary}
 
 \begin{enumerate}\setlength{\itemsep}{6pt}
-
   \item \key{ISA vs.\ Microarchitecture:} Categorize the following:
-
   \begin{itemize}\setlength{\itemsep}{1.5pt}
     \item Number of visible registers (\bits{x0}--\bits{x30}).
     \item Size of the L1 instruction cache.
     \item Binary machine encoding of the \code{add} instruction.
   \end{itemize}
   \vspace{0.2cm}
-
   \item \key{Two's Complement Construction:}
   Show the mathematical logic and bitwise inversion steps required to reliably encode $-37$ as an 8-bit two's-complement value.
   \vspace{0.2cm}
-
   \item \key{Carry vs.\ Overflow:}
   In a 4-bit ALU evaluating
   \(\mathtt{1001}_2 + \mathtt{1100}_2\),
   determine the output sum, Carry flag ($C$), and Signed Overflow flag ($V$). Explain why they differ.
-
 \end{enumerate}
 
 \vfill
@@ -1597,22 +1647,18 @@ Microarchitectural performance improvements are never free; optimizing one facet
 \begin{frame}{Self-Test Questions: Performance \& Memory}
 
 \begin{enumerate}\setlength{\itemsep}{6pt}
-
   \item \key{Iron Law Analysis:}
   A compiler optimization decreases dynamic instruction count by $20\%$,
   but increases average CPI by $15\%$.
   Does overall application performance improve?
   Calculate the exact speedup.
   \vspace{0.2cm}
-
   \item \key{Amdahl's Law Application:}
   Memory stalls strictly account for $70\%$ of application execution time.
   In order to achieve an overall hardware speedup of $2.5\times$, what exact speedup must be targeted in the memory portion alone?
   \vspace{0.2cm}
-
   \item \key{Generated Code and Split Caches:}
   Explain precisely why a runtime system that dynamically writes new machine instructions requires barrier synchronization before those instructions are safely fetched and executed.
-
 \end{enumerate}
 
 \vfill
@@ -1629,9 +1675,9 @@ RISC vs.\ CISC: Instruction Set Design Principles \& Trade-offs
 
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item \key{Complexity Distribution:}
-  Examining how different Instruction Set Architectures deliberately distribute complexity between the compiler software and the hardware execution units.
+  Examining how different instruction sets divide work between software and hardware.
   \item \key{Key Architectural Trade-offs:}
-  Evaluating how instruction encoding length, decode logic complexity, pipeline efficiency, and register pressure impact quantitative processor performance.
+  Evaluating how instruction encoding, decode complexity, pipeline behavior, and register use affect processor performance.
   \item \key{Historical Context:}
   Understanding why x86 dominates desktop computing while AArch64 and ARM dominate the mobile and efficiency-first sectors.
 \end{itemize}
