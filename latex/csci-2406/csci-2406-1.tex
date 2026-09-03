@@ -1321,6 +1321,8 @@ occupies addresses
 
 \begin{frame}{The CPU--Memory Interface: A Conceptual Model}
 
+\vspace{-0.45cm}
+
 \begin{block}{How the CPU Communicates with Memory}
 At the conceptual level,
 a memory access requires three kinds of information:
@@ -1329,7 +1331,7 @@ a memory access requires three kinds of information:
 and \key{what operation} to perform.
 \end{block}
 
-\vspace{0.2cm}
+\vspace{-0.15cm}
 
 \begin{center}
 
@@ -1614,110 +1616,105 @@ just like data.
 % Slide 25
 % ============================================================
 
+% ============================================================
+% Slide 25
+% ============================================================
+
 \begin{frame}{The von Neumann Architecture}
-
 \begin{columns}[T,onlytextwidth]
-
 \column{0.55\textwidth}
 
 \key{Core Characteristics}:
 
 \begin{itemize}
-  \item \key{Unified Memory}:
-        instructions and data
-        share one memory/address space.
-  \item \key{Shared Access Path}:
-        instruction fetches
-        and data accesses
-        use the same memory path.
-  \item These accesses can therefore
-        \key{contend for the same resource}.
-  \item This organization
-        is the classical model
-        associated with
-        the von Neumann bottleneck.
+\item \key{Unified Memory}: instructions and data share one memory/address space.
+\item \key{Shared Access Path}: instruction fetches and data accesses use the same memory path.
+\item These accesses can therefore \key{contend for the same resource}.
+\item This organization is the classical model associated with the von Neumann bottleneck.
 \end{itemize}
 
 \column{0.42\textwidth}
 
 \begin{center}
-
 \begin{tikzpicture}[
-  scale=0.75,
-  every node/.style={font=\footnotesize}
+  scale=0.82,
+  every node/.style={font=\small},
+  memory/.style={
+    draw=navy,
+    thick,
+    fill=lightblue,
+    minimum width=4.2cm,
+    minimum height=2.65cm,
+    align=center
+  },
+  cell/.style={
+    draw=navy!65,
+    fill=softgray,
+    minimum width=3.45cm,
+    minimum height=0.62cm,
+    align=center,
+    font=\small
+  },
+  processor/.style={
+    draw=navy,
+    thick,
+    fill=navy,
+    text=white,
+    minimum width=3.1cm,
+    minimum height=0.95cm,
+    align=center,
+    font=\small\bfseries
+  },
+  pathlabel/.style={
+    font=\scriptsize,
+    align=left,
+    text=darkgray
+  }
 ]
 
-\draw[
-  thick,
-  fill=navy,
-  text=white
-]
-(0,0)
-rectangle
-(2.2,3.5);
-
-\node[
-  text=white,
-  font=\small\bfseries,
-  align=center
-]
-at (1.1,1.75)
-{CPU\\Core};
-
-\draw[
-  thick,
-  fill=lightblue,
-  text=darkgray
-]
-(4.0,0)
-rectangle
-(6.2,3.5);
+\node[memory] (umem) {};
 
 \node[
   text=navy,
-  font=\small\bfseries
+  font=\small\bfseries,
+  anchor=north
 ]
-at (5.1,3.1)
+at ([yshift=-0.16cm]umem.north)
 {Unified Memory};
 
-\draw[
-  fill=softgray
-]
-(4.2,1.8)
-rectangle
-(6.0,2.7);
-
-\node
-at (5.1,2.25)
+\node[cell]
+at ([yshift=0.18cm]umem.center)
 {Program};
 
-\draw[
-  fill=softgray
-]
-(4.2,0.4)
-rectangle
-(6.0,1.3);
-
-\node
-at (5.1,0.85)
+\node[cell]
+at ([yshift=-0.66cm]umem.center)
 {Data};
+
+\node[
+  processor,
+  below=1.30cm of umem
+]
+(cpu)
+{CPU Core};
 
 \draw[
   thick,
   Latex-Latex,
   draw=deepblue
 ]
-(2.2,1.75)
+(umem.south)
 --
-node[above]{\tiny Shared path}
-(4.0,1.75);
+node[
+  right=0.10cm,
+  pathlabel
+]
+{shared instruction/\\data path}
+(cpu.north);
 
 \end{tikzpicture}
-
 \end{center}
 
 \end{columns}
-
 \end{frame}
 
 % ============================================================
@@ -1725,111 +1722,79 @@ node[above]{\tiny Shared path}
 % ============================================================
 
 \begin{frame}{The Harvard Architecture}
-
 \begin{columns}[T,onlytextwidth]
-
 \column{0.55\textwidth}
 
 \key{Core Characteristics}:
 
 \begin{itemize}
-  \item \key{Separated Memories}:
-        instruction and data storage
-        are distinct.
-  \item \key{Independent Access Paths}:
-        each side has its own path
-        to the processor.
-  \item \key{Parallel Operation}:
-        instruction fetch
-        and a data read/write
-        can proceed concurrently.
-  \item Instruction and data memories
-        may use different widths
-        or storage technologies.
+\item \key{Separated Memories}: instruction and data storage are distinct.
+\item \key{Independent Access Paths}: each side has its own path to the processor.
+\item \key{Parallel Operation}: instruction fetch and a data read/write can proceed concurrently.
+\item Instruction and data memories may use different widths or storage technologies.
 \end{itemize}
 
 \column{0.42\textwidth}
 
 \begin{center}
-
 \begin{tikzpicture}[
-  scale=0.63,
-  every node/.style={font=\tiny}
+  scale=0.78,
+  every node/.style={font=\small},
+  memory/.style={
+    draw=navy,
+    thick,
+    fill=lightblue,
+    minimum width=4.1cm,
+    minimum height=0.95cm,
+    align=center,
+    font=\small\bfseries
+  },
+  processor/.style={
+    draw=navy,
+    thick,
+    fill=navy,
+    text=white,
+    minimum width=3.1cm,
+    minimum height=0.95cm,
+    align=center,
+    font=\small\bfseries
+  },
+  pathlabel/.style={
+    font=\scriptsize,
+    align=left,
+    text=darkgray
+  }
 ]
+
+\node[memory] (imem) {Instruction Memory};
+\node[processor,below=1.25cm of imem] (cpu) {CPU};
+\node[memory,below=1.25cm of cpu] (dmem) {Data Memory};
 
 \draw[
   thick,
-  fill=navy,
-  text=white
+  Latex-Latex,
+  draw=deepblue
 ]
-(2.2,0)
-rectangle
-(4.0,4.0);
-
-\node[
-  text=white,
-  font=\small\bfseries,
-  align=center
-]
-at (3.1,2.0)
-{CPU};
-
-\draw[
-  thick,
-  fill=lightblue
-]
-(-1.2,0.5)
-rectangle
-(0.8,3.5);
-
-\node[
-  font=\bfseries,
-  align=center
-]
-at (-0.2,2.0)
-{Data\\Memory};
-
-\draw[
-  thick,
-  fill=lightblue
-]
-(5.4,0.5)
-rectangle
-(7.4,3.5);
-
-\node[
-  font=\bfseries,
-  align=center
-]
-at (6.4,2.0)
-{Instruction\\Memory};
-
-\draw[
-  thick,
-  Latex-Latex
-]
-(2.2,2.0)
+(imem.south)
 --
-node[above]{\tiny data path}
-(0.8,2.0);
+node[right=0.10cm,pathlabel]{instruction path}
+(cpu.north);
 
 \draw[
   thick,
-  Latex-Latex
+  Latex-Latex,
+  draw=deepblue
 ]
-(4.0,2.0)
+(cpu.south)
 --
-node[above]{\tiny instruction path}
-(5.4,2.0);
+node[right=0.10cm,pathlabel]{data path}
+(dmem.north);
 
 \end{tikzpicture}
-
 \end{center}
 
 \end{columns}
-
 \end{frame}
-
 % ============================================================
 % Slide 27
 % ============================================================
