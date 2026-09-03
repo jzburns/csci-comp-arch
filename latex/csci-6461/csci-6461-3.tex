@@ -346,11 +346,11 @@
     node[midway, translabel] {ERET};
 
   % Privilege Level Axis
-  \draw[-{Latex[length=3mm]}, line width=1.2pt, gold!90!black] (-3.1, 0.0) -- (-3.1, 4.2);
+  \draw[-{Latex[length=3mm]}, line width=1.2pt, gold!90!black] (-3.1, 4.2) -- (-3.1, 0.0);
   \node[rotate=90, font=\scriptsize\bfseries, text=navy] at (-3.4, 2.1) {Increasing Privilege ($\text{EL0} \to \text{EL3}$)};
 \end{tikzpicture}
 \begin{block}{CSCI 6461 Scope}
-\footnotesize Analysis focuses on \key{EL0} execution mechanics and the \key{EL0 $\to$ EL1} system call boundary. The diagram shows typical paths; exact exception routing is configuration-dependent.
+\footnotesize Exception levels are included only for architectural context. CSCI 6461 focuses on the programmer-visible ISA, registers, instructions, addressing, and control flow.
 \end{block}
 \end{column}
 
