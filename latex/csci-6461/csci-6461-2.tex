@@ -44,6 +44,9 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\IfFileExists{sourcecodepro.sty}
+  {\usepackage[scale=0.92]{sourcecodepro}}
+  {\usepackage{courier}}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -144,23 +147,30 @@
 \end{tikzpicture}
 
 \vspace*{\fill}
+
 \begin{minipage}{0.88\textwidth}
 {\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 2\par}
+
 \vspace{0.25cm}
+
 {\color{white}\fontsize{24}{28}\selectfont\bfseries
- RISC vs. CISC:\\[0.08cm]
- Instruction Set Design Principles \& Trade-offs
+RISC vs. CISC:\\[0.08cm]
+Instruction Set Design Principles \& Trade-offs
 \par}
+
 \vspace{0.35cm}
+
 {\color{white!80}\large
- ISA boundaries, microarchitectural costs,
- and quantitative trade-offs
+ISA boundaries, microarchitectural costs,
+and quantitative trade-offs
 \par}
 \end{minipage}
 
 \vfill
+
 {\color{white}\normalsize Dr. J. Burns\par}
 {\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
+
 \vspace*{\fill}
 \end{frame}
 
@@ -169,7 +179,9 @@
 % ============================================================
 
 \begin{frame}{Topic 2: Module Roadmap}
+
 \vfill
+
 \begin{enumerate}\setlength{\itemsep}{8pt}
   \item \key{ISA Foundations \& Complexity Distribution}
   \begin{itemize}
@@ -191,7 +203,9 @@
     \item Iron Law evaluation, Amdahl's Law, legacy compatibility, and modern $\mu\text{op}$ cracking.
   \end{itemize}
 \end{enumerate}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -205,7 +219,9 @@
 % ============================================================
 
 \begin{frame}{What Is an Instruction Set Architecture?}
+
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item An ISA is the \key{programmer-visible functional specification} of a processor.
   \item Defines instructions, register files, addressing modes, and architectural state.
@@ -214,19 +230,54 @@
 \end{itemize}
 
 \vfill
+
 \centering
+
 \begin{tikzpicture}[scale=0.88, every node/.style={transform shape}]
-  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small, minimum width=3.5cm, minimum height=0.5cm] (sw) {Software (Compiler / OS)};
-  \node[draw=gold, fill=white, line width=1pt, rounded corners=3pt, font=\small\bfseries, right=0.5cm of sw, minimum width=3.2cm, minimum height=0.5cm] (isa) {ISA Contract};
-  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small, right=0.5cm of isa, minimum width=3.5cm, minimum height=0.5cm] (hw) {Hardware (Datapath)};
-  \draw[{Latex}-{Latex}, thick, navy] (sw) -- (isa);
-  \draw[{Latex}-{Latex}, thick, navy] (isa) -- (hw);
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=3pt,
+  font=\small,
+  minimum width=3.5cm,
+  minimum height=0.5cm
+] (sw) {Software (Compiler / OS)};
+
+\node[
+  draw=gold,
+  fill=white,
+  line width=1pt,
+  rounded corners=3pt,
+  font=\small\bfseries,
+  right=0.5cm of sw,
+  minimum width=3.2cm,
+  minimum height=0.5cm
+] (isa) {ISA Contract};
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=3pt,
+  font=\small,
+  right=0.5cm of isa,
+  minimum width=3.5cm,
+  minimum height=0.5cm
+] (hw) {Hardware (Datapath)};
+
+\draw[{Latex}-{Latex}, thick, navy] (sw) -- (isa);
+\draw[{Latex}-{Latex}, thick, navy] (isa) -- (hw);
+
 \end{tikzpicture}
 
 \vfill
+
 \small
+
 A well-designed ISA survives decades of microarchitectural overhauls by maintaining this strict software contract while hardware implementation evolves underneath it.
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -234,19 +285,25 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 % ============================================================
 
 \begin{frame}{Historical Constraints Shaped Early ISAs (CISC Era)}
+
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{8pt}
-  \item \key{Expensive, Slow Memory (1960s--1970s):} Small core memory and high DRAM latency placed a premium on minimizing binary program size.
+  \item \key{Expensive, Limited Memory (1960s--1970s):} Small memory capacities and relatively costly memory access placed a premium on minimizing binary program size.
   \item \key{Assembly-Centric Programming:} Programs were frequently hand-written; rich instructions helped express high-level constructs directly.
-  \item \key{Microprogrammed ROM Control:} Complex multi-cycle instructions were cheap to implement via on-chip microcode routines.
+  \item \key{Microprogrammed Control:} Microcode made complex multi-cycle instruction behavior practical to implement without hardwiring every control sequence.
   \item \key{The Semantic Gap:} Early designers believed machine instructions should mirror high-level statements directly.
 \end{itemize}
 
 \vfill
+
 \begin{block}{The CISC Philosophy}
-\small Designers prioritized memory efficiency and expressive instructions to support human assembly programmers, willingly trading hardware decoding complexity for smaller binary sizes.
+\small
+Designers prioritized memory efficiency and expressive instructions to support human assembly programmers, willingly trading hardware decoding complexity for smaller binary sizes.
 \end{block}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -260,7 +317,9 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 % ============================================================
 
 \begin{frame}{The CISC Architectural Model}
+
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{8pt}
   \item \key{CISC:} \emph{Complex Instruction Set Computer} (e.g., VAX, x86).
   \item \key{Variable-Length Encodings:} Instructions range from 1 to 15 bytes to maximize code density and pack small instructions tightly.
@@ -269,10 +328,14 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 \end{itemize}
 
 \vfill
+
 \begin{block}{The Decoding Bottleneck}
-\small Parsing variable-length instructions sequentially creates a fundamental thermal and frequency limit in modern superscalar front-ends, consuming massive transistor budgets just to find instruction boundaries.
+\small
+Variable-length instructions require additional front-end logic to determine instruction boundaries and support parallel decoding, increasing implementation complexity and decode energy compared with fixed-width instruction sets.
 \end{block}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -280,25 +343,34 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 % ============================================================
 
 \begin{frame}{CISC Execution: Register-Memory Translation}
+
 \vfill
+
 \begin{block}{CISC Instruction Example (x86-64)}
-$$\code{add [rdi + 8], rax}$$
+\[
+\code{add [rdi + 8], rax}
+\]
 \end{block}
 
 \vfill
+
 \begin{columns}[T,onlytextwidth]
+
 \begin{column}{0.48\textwidth}
+
 \begin{block}{Architectural View (Software)}
 \small
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item 1 single instruction fetched.
   \item Compact variable encoding.
-  \item Atomic arithmetic operates directly on main memory.
+  \item One architectural instruction reads a memory operand, performs the addition, and writes the result back to memory.
 \end{itemize}
 \end{block}
+
 \end{column}
 
 \begin{column}{0.48\textwidth}
+
 \begin{block}{Hardware Decomposition ($\mu\text{ops}$)}
 \small
 \begin{enumerate}\setlength{\itemsep}{4pt}
@@ -307,13 +379,19 @@ $$\code{add [rdi + 8], rax}$$
   \item \key{Store:} Write result back to \code{[rdi+8]}.
 \end{enumerate}
 \end{block}
+
 \end{column}
+
 \end{columns}
 
 \vfill
+
 \normalsize
-One architectural instruction decomposes into multiple hardware micro-operations, completely abstracting the pipeline timing away from the compiler.
+
+One architectural instruction may be decomposed into multiple internal micro-operations. The exact decomposition is implementation-dependent and is not visible to software.
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -327,18 +405,24 @@ One architectural instruction decomposes into multiple hardware micro-operations
 % ============================================================
 
 \begin{frame}{The 1980s Shift: Emergence of RISC}
+
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{8pt}
-  \item \key{Empirical Workload Findings:} Patterson \& Hennessy demonstrated that compiled code utilized $<20\%$ of available CISC instruction repertoires over $90\%$ of the time.
-  \item \key{Pipeline Hazards:} Variable-length, irregular instructions created severe pipeline stalls and hazard control logic bottlenecks.
-  \item \key{Compiler Advancements:} Modern optimizing compilers handle register allocation and instruction scheduling far more effectively than monolithic hardware.
+  \item \key{Empirical Workload Findings:} Early RISC studies observed that compiled programs relied heavily on a relatively small set of simple instructions and addressing modes.
+  \item \key{Pipeline Regularity:} Irregular instruction formats and complex instruction behavior made pipelining and instruction decoding more difficult to organize.
+  \item \key{Compiler Advancements:} Improving compilers made it increasingly practical to rely on software for register allocation, instruction selection, and scheduling.
 \end{itemize}
 
 \vfill
+
 \begin{block}{The Compiler's New Role}
-\small Instead of relying on rigid hardware to interpret complex commands, RISC shifts the burden of scheduling, register allocation, and optimization entirely to the compiler.
+\small
+RISC designs expose a simpler instruction set and rely more heavily on compilers for instruction selection, register allocation, and scheduling, while modern processors still perform extensive dynamic optimization in hardware.
 \end{block}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -346,19 +430,25 @@ One architectural instruction decomposes into multiple hardware micro-operations
 % ============================================================
 
 \begin{frame}{The RISC Design Principles}
+
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item \key{Fixed 32-Bit Instruction Width:} Simplifies parallel instruction fetch and multi-decoder design.
   \item \key{Strict Load/Store Architecture:} ALU operations use \emph{only} registers; memory access is restricted to explicit \code{ldr}/\code{str}.
   \item \key{Large Orthogonal Register File:} 31 general-purpose registers (AArch64 \bits{x0}--\bits{x30}) maintain active variables on-chip.
-  \item \key{Single-Cycle Execution Goal:} Uniform pipeline stage latencies prevent instruction bubbles and hardware stalling.
+  \item \key{Regular Instruction Formats:} Consistent encodings and operand rules simplify fetch, decode, and pipeline organization.
 \end{itemize}
 
 \vfill
+
 \begin{block}{The Hardware Benefit}
-\small By simplifying the logic required to decode and route instructions, processors can redirect massive chip area into larger L1 caches, more execution units, and deeper predictive pipelines.
+\small
+Simpler instruction formats can reduce front-end decode complexity, leaving implementation resources available for structures such as caches, execution units, and prediction hardware.
 \end{block}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -366,12 +456,17 @@ One architectural instruction decomposes into multiple hardware micro-operations
 % ============================================================
 
 \begin{frame}{Code Comparison: RISC vs. CISC Memory Addition}
+
 \vfill
+
 High-level statement: \code{c = a + b;} (operands in memory)
 
 \vfill
+
 \begin{columns}[T,onlytextwidth]
+
 \begin{column}{0.48\textwidth}
+
 \begin{block}{AArch64 RISC Assembly}
 \small
 \begin{tabular}{ll}
@@ -381,24 +476,32 @@ High-level statement: \code{c = a + b;} (operands in memory)
 \bits{str x3, [x0, \#16]} & \text{\scriptsize store $c$} \\
 \end{tabular}
 \end{block}
+
 \end{column}
 
 \begin{column}{0.48\textwidth}
+
 \begin{block}{x86-64 CISC Assembly}
 \small
 \begin{tabular}{ll}
-\bits{mov rax, [rdi]}     & \text{\scriptsize load $a$} \\
-\bits{add rax, [rdi + 8]} & \text{\scriptsize load $b$ + add} \\
-\bits{mov [rdi + 16], rax}& \text{\scriptsize store $c$} \\
+\bits{mov rax, [rdi]}      & \text{\scriptsize load $a$} \\
+\bits{add rax, [rdi + 8]}  & \text{\scriptsize load $b$ + add} \\
+\bits{mov [rdi + 16], rax} & \text{\scriptsize store $c$} \\
 \end{tabular}
 \end{block}
+
 \end{column}
+
 \end{columns}
 
 \vfill
+
 \normalsize
-RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$); CISC uses 3 variable-length instructions, but the actual silicon workload executed in the hardware datapath is identical.
+
+RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC uses 3 variable-length instructions. Both sequences perform the same programmer-visible computation, but their instruction counts and internal implementations differ.
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -406,83 +509,150 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$); CISC uses 3
 % ============================================================
 
 \begin{frame}{Fetch Complexity: Concrete Byte Encodings}
+
 \vfill
+
 \begin{columns}[T,onlytextwidth]
+
 \begin{column}{0.48\textwidth}
+
 \begin{block}{RISC Fixed 32-Bit Decode}
 \small
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item Every instruction is exactly 4 bytes.
   \item \code{add x0, x1, x2} $\implies$ \hex{8B020020}
-  \item Enables simple parallel decoders (e.g., 8-wide decode) by strictly fetching $\text{pc} + 4k$.
+  \item Fixed boundaries make it straightforward to identify successive instruction words and feed multiple decoders in parallel.
 \end{itemize}
 \end{block}
+
 \end{column}
 
 \begin{column}{0.48\textwidth}
+
 \begin{block}{CISC Variable-Length Decode}
 \small
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item \code{add eax, ebx} $\implies$ \hex{01D8} (2 bytes)
   \item \code{add rax, rbx} $\implies$ \hex{4801D8} (3 bytes)
   \item \code{add rax, [rbx+rcx*4+0x10]} $\implies$ 8 bytes!
-  \item Requires sequential pre-decoders just to locate instruction boundaries.
+  \item Requires additional front-end logic to identify instruction boundaries before or during parallel decode.
 \end{itemize}
 \end{block}
+
 \end{column}
+
 \end{columns}
 
 \vfill
+
 \begin{block}{The Hardware Penalty}
-\small The computational effort of determining where one CISC instruction ends and the next begins requires massive transistor budgets, directly degrading a chip's Performance-per-Watt.
+\small
+Determining variable-length instruction boundaries adds front-end circuitry and switching activity, which can increase decode complexity and energy consumption.
 \end{block}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
 % Slide 11
 % ============================================================
 
-\begin{frame}{The Cost of Legacy Backwards Compatibility}
+\begin{frame}{Legacy Compatibility and Encoding Overhead}
+
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{The CISC Decoder Tax:} x86-64 carries decades of binary compatibility baggage (16-bit 8086, 32-bit i386). To execute modern 64-bit commands, it relies on \key{prefix bytes} (e.g., the \hex{48} REX prefix) layered over legacy opcodes.
-  \item \key{Sequential Choke Point:} A hardware decoder cannot know an instruction's true length until it reads these prefixes byte-by-byte in real time.
-  \item \key{The AArch64 Clean Slate:} ARM deliberately dropped legacy 32-bit instruction compatibility (A32) within its new 64-bit execution state (A64).
-  \item \key{The RISC Advantage:} This strict severing of legacy ties guaranteed a clean, zero-prefix 4-byte instruction width, enabling massively parallel instruction fetching without historical penalties.
+  \item \key{x86-64 Compatibility Overhead:} x86-64 preserves decades of binary compatibility, and some modern 64-bit instructions use prefix bytes such as the \hex{48} REX prefix in addition to legacy opcode structures.
+  \item \key{Instruction-Boundary Detection:} Variable-length x86 instructions require the front end to determine where each instruction ends before it can be fully decoded.
+  \item \key{AArch64 Execution State:} AArch64 introduced the A64 instruction set with fixed 32-bit encodings. Many ARMv8-A implementations historically supported AArch32 separately, while newer implementations may omit it.
+  \item \key{Fixed-Width Benefit:} A64 instruction boundaries are known directly from the 4-byte alignment, simplifying instruction fetch and parallel decode relative to variable-length encodings.
 \end{itemize}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
-% Slide 12: Architectural Comparison (Key Metrics)
+% Slide 12
 % ============================================================
 
 \begin{frame}{ISA Comparison: AArch64 vs. x86-64}
+
 \vfill
+
 \centering
-\footnotesize
-\renewcommand{\arraystretch}{1.08}
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{lll}
+
+\scriptsize
+
+\renewcommand{\arraystretch}{1.10}
+\setlength{\tabcolsep}{4pt}
+
+\begin{tabular}{
+  >{\raggedright\arraybackslash}p{0.20\textwidth}
+  >{\raggedright\arraybackslash}p{0.35\textwidth}
+  >{\raggedright\arraybackslash}p{0.38\textwidth}
+}
 \toprule
-\textbf{Design Metric} & \textbf{AArch64 (Modern RISC)} & \textbf{x86-64 (Modern CISC)} \\
+\textbf{Design Metric}
+&
+\textbf{AArch64 (Modern RISC)}
+&
+\textbf{x86-64 (Modern CISC)}
+\\
 \midrule
-\key{Instruction Width}  & Fixed 32-bit (4 bytes)                & Variable (1 to 15 bytes) \\
-\key{ALU Operands}        & 3-operand (\code{add d, s1, s2})       & 2-operand destructive (\code{add dst, src}) \\
-\key{Memory Access}       & Load/Store only (\code{ldr}/\code{str})& Register-Memory (\code{add rax, [rbx]}) \\
-\key{General Registers}   & 31 orthogonal (\bits{x0}--\bits{x30})  & 16 non-uniform (\bits{rax}, \bits{rbx}\dots) \\
-\key{Decode Logic}        & Direct parallel single-cycle           & Sequential scan + $\mu\text{op}$ cache \\
-\key{Design Focus}        & Compiler-driven scheduling            & Dynamic hardware translation \\
-\key{Primary Benefit}     & Parallel decode \& power efficiency    & Compact binaries \& backwards compatibility \\
+\key{Instruction Width}
+&
+Fixed 32-bit (4 bytes)
+&
+Variable (1 to 15 bytes)
+\\
+\key{ALU Operands}
+&
+Commonly 3-operand (\code{add d, s1, s2})
+&
+Many scalar integer forms are 2-operand; newer vector forms also support 3 operands
+\\
+\key{Memory Access}
+&
+Load/Store only (\code{ldr}/\code{str})
+&
+Register-Memory (\code{add rax, [rbx]})
+\\
+\key{General Registers}
+&
+31 general-purpose registers, with architectural roles for \bits{sp}/\bits{xzr}
+&
+16 general-purpose registers in x86-64
+\\
+\key{Decode Logic}
+&
+Fixed-width boundaries simplify parallel decode
+&
+Variable-length boundaries require additional decode machinery
+\\
+\key{Scheduling}
+&
+Compiler scheduling plus dynamic hardware techniques
+&
+Compiler scheduling plus dynamic hardware techniques
+\\
+\key{Primary Benefit}
+&
+Regular encoding and load/store simplicity
+&
+Code density and long-term software compatibility
+\\
 \bottomrule
 \end{tabular}
 
-\vfill
+\vspace{0.15cm}
+
 \begin{block}{Architectural Trade-Off}
-\small CISC minimizes binary size and maintains historical software compatibility through complex hardware decoders; RISC simplifies datapath logic to maximize decode throughput and energy efficiency.
+\scriptsize
+Fixed-width load/store ISAs simplify instruction boundaries and operand handling; variable-length ISAs can improve code density and preserve long-term binary compatibility. Modern implementations of both can use sophisticated microarchitectures.
 \end{block}
-\vfill
+
 \end{frame}
 
 % ============================================================
@@ -496,12 +666,26 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$); CISC uses 3
 % ============================================================
 
 \begin{frame}{The Performance Equation (Iron Law)}
+
 \vfill
+
 \begin{block}{CPU Execution Time Equation}
-$$T_{\text{CPU}} = \mathit{IC} \times \mathit{CPI} \times T_{\text{clk}} = \frac{\mathit{IC} \times \mathit{CPI}}{f_{\text{clk}}}$$
+\[
+T_{\text{CPU}}
+=
+\mathit{IC}
+\times
+\mathit{CPI}
+\times
+T_{\text{clk}}
+=
+\frac{\mathit{IC}\times\mathit{CPI}}
+     {f_{\text{clk}}}
+\]
 \end{block}
 
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item \key{Instruction Count ($\mathit{IC}$):} Total executed instructions (influenced by ISA and compiler).
   \item \key{CPI:} Average clock cycles per instruction (influenced by pipeline and memory stalls).
@@ -509,10 +693,14 @@ $$T_{\text{CPU}} = \mathit{IC} \times \mathit{CPI} \times T_{\text{clk}} = \frac
 \end{itemize}
 
 \vfill
+
 \begin{block}{The Optimization Tug-of-War}
-\small Enhancing one metric frequently degrades another. For instance, deepening a pipeline to increase $f_{\text{clk}}$ often increases $\mathit{CPI}$ due to more expensive branch misprediction penalties.
+\small
+Enhancing one metric frequently degrades another. For instance, deepening a pipeline to increase $f_{\text{clk}}$ often increases $\mathit{CPI}$ due to more expensive branch misprediction penalties.
 \end{block}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -520,12 +708,17 @@ $$T_{\text{CPU}} = \mathit{IC} \times \mathit{CPI} \times T_{\text{clk}} = \frac
 % ============================================================
 
 \begin{frame}{Worked Performance Comparison}
+
 \vfill
+
 Workload evaluation across two competing microarchitectures:
 
 \vfill
+
 \begin{columns}[T,onlytextwidth]
+
 \begin{column}{0.48\textwidth}
+
 \begin{block}{Machine A (RISC / AArch64)}
 \small
 \begin{itemize}\setlength{\itemsep}{2pt}
@@ -533,13 +726,26 @@ Workload evaluation across two competing microarchitectures:
   \item $\mathit{CPI} = 1.10$
   \item $f_{\text{clk}} = 3.0\text{ GHz}$
 \end{itemize}
+
 \vfill
-$$T_A = \frac{1.4 \times 10^9 \times 1.10}{3.0 \times 10^9} = \mathbf{0.513\text{ s}}$$
+
+\[
+T_A
+=
+\frac{1.4 \times 10^9 \times 1.10}
+     {3.0 \times 10^9}
+=
+\mathbf{0.513\text{ s}}
+\]
+
 \vfill
+
 \end{block}
+
 \end{column}
 
 \begin{column}{0.48\textwidth}
+
 \begin{block}{Machine B (CISC / x86-64)}
 \small
 \begin{itemize}\setlength{\itemsep}{2pt}
@@ -547,16 +753,32 @@ $$T_A = \frac{1.4 \times 10^9 \times 1.10}{3.0 \times 10^9} = \mathbf{0.513\text
   \item $\mathit{CPI} = 1.60$ (Higher CPI)
   \item $f_{\text{clk}} = 3.0\text{ GHz}$
 \end{itemize}
+
 \vfill
-$$T_B = \frac{1.0 \times 10^9 \times 1.60}{3.0 \times 10^9} = \mathbf{0.533\text{ s}}$$
+
+\[
+T_B
+=
+\frac{1.0 \times 10^9 \times 1.60}
+     {3.0 \times 10^9}
+=
+\mathbf{0.533\text{ s}}
+\]
+
 \vfill
+
 \end{block}
+
 \end{column}
+
 \end{columns}
 
 \vfill
-RISC wins ($\text{Speedup} \approx 1.04\times$) because its highly predictable, lower $\mathit{CPI}$ strictly compensates for executing more total operations.
+
+Under these assumed instruction-count and CPI values, Machine A completes the workload about $1.04\times$ faster. The example illustrates the Iron Law; it does not imply that one ISA inherently guarantees a lower CPI.
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -564,20 +786,37 @@ RISC wins ($\text{Speedup} \approx 1.04\times$) because its highly predictable, 
 % ============================================================
 
 \begin{frame}{Amdahl's Law and Performance Limits}
+
 \vfill
+
 \begin{block}{Amdahl's Law Equation}
-$$S_{\text{overall}} = \frac{1}{(1 - f) + \frac{f}{S_{\text{enhanced}}}}$$
+\[
+S_{\text{overall}}
+=
+\frac{1}
+     {(1-f)+\frac{f}{S_{\text{enhanced}}}}
+\]
 \end{block}
 
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item $f$: Fraction of execution time subjected to optimization.
   \item $S_{\text{enhanced}}$: Speedup factor achieved on that specific fraction.
   \item \key{Example ($f = 0.60, S_{\text{enhanced}} = 10$):}
-  $$S_{\text{overall}} = \frac{1}{0.40 + \frac{0.60}{10}} \approx \mathbf{2.17\times}$$
-  \item \key{Application to Architecture:} You cannot optimize total CPU performance indefinitely if front-end decode bottlenecks ($1-f$) remain sequentially limited by variable-length processing.
+  \[
+  S_{\text{overall}}
+  =
+  \frac{1}
+       {0.40+\frac{0.60}{10}}
+  \approx
+  \mathbf{2.17\times}
+  \]
+  \item \key{Application to Architecture:} Improving one part of a processor yields limited overall benefit when a substantial fraction of execution time is spent elsewhere, such as in memory stalls, branch recovery, or other unaffected work.
 \end{itemize}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -585,36 +824,63 @@ $$S_{\text{overall}} = \frac{1}{(1 - f) + \frac{f}{S_{\text{enhanced}}}}$$
 % ============================================================
 
 \begin{frame}{Energy, Thermal Limits \& Performance-per-Watt}
+
 \vfill
+
 \begin{columns}[T,onlytextwidth]
+
 \begin{column}{0.48\textwidth}
+
 \begin{block}{Dynamic Power Equation}
 \small
-$$P = C \cdot V_{\text{dd}}^2 \cdot f + P_{\text{static}}$$
+
+\[
+P
+=
+C \cdot V_{\text{dd}}^2 \cdot f
++
+P_{\text{static}}
+\]
+
 \begin{itemize}\setlength{\itemsep}{3pt}
   \item Complex decoders increase switching capacitance ($C$).
-  \item Higher frequencies ($f$) require higher voltages ($V_{\text{dd}}$).
+  \item Higher operating voltages can enable higher frequency, but increase dynamic power quadratically through the $V_{\text{dd}}^2$ term.
 \end{itemize}
+
 \end{block}
+
 \end{column}
 
 \begin{column}{0.48\textwidth}
+
 \begin{block}{Performance-per-Watt}
 \small
-$$\frac{\text{Workload Throughput}}{\text{Watts}}$$
+
+\[
+\frac{\text{Workload Throughput}}
+     {\text{Watts}}
+\]
+
 \begin{itemize}\setlength{\itemsep}{3pt}
   \item Primary metric for mobile batteries and cloud data center racks.
-  \item Streamlined RISC front-ends deliver high IPC at low decode energy.
+  \item Front-end organization, instruction encoding, cache behavior, and execution width all influence energy efficiency.
 \end{itemize}
+
 \end{block}
+
 \end{column}
+
 \end{columns}
 
 \vfill
+
 \begin{block}{The Dark Silicon Era}
-\small Because modern dense transistors cannot all be powered simultaneously without melting the chip, power efficiency is now the primary limit dictating multi-core processor performance.
+\small
+Power-density and thermal constraints prevent all transistors from operating at maximum activity simultaneously, making energy efficiency a central constraint in modern multicore design.
 \end{block}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -622,31 +888,65 @@ $$\frac{\text{Workload Throughput}}{\text{Watts}}$$
 % ============================================================
 
 \begin{frame}{Microarchitectural Convergence: Modern x86 Internals}
-\vfill
-Modern x86 processors preserve the CISC ISA externally, but execute a \key{RISC datapath internally}:
 
 \vfill
+
+Modern x86 processors preserve the CISC ISA externally, while many architectural instructions are translated into simpler internal micro-operations:
+
+\vfill
+
 \begin{center}
+
 \begin{tikzpicture}[scale=0.85, every node/.style={transform shape}]
-  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small\bfseries, minimum width=3.5cm, minimum height=0.55cm] (x86) {\code{add [rdi], rax} (CISC)};
-  
-  \node[draw=navy, fill=softgray, rounded corners=3pt, font=\small, right=2.0cm of x86, align=left] (uops) {
-    $\mu\text{op 1: } \text{load } \text{temp} \leftarrow [\code{rdi}]$ \\
-    $\mu\text{op 2: } \text{add } \text{temp} \leftarrow \text{temp} + \code{rax}$ \\
-    $\mu\text{op 3: } \text{store } [\code{rdi}] \leftarrow \text{temp}$
-  };
-  
-  \draw[-{Latex[length=2.5mm]}, thick, navy] (x86) -- (uops) 
-    node[midway, above=2pt, align=center, font=\scriptsize\bfseries, text=deepblue] {Hardware Decode \\ / Crack};
+
+\node[
+  draw=navy,
+  fill=lightblue,
+  rounded corners=3pt,
+  font=\small\bfseries,
+  minimum width=3.5cm,
+  minimum height=0.55cm
+] (x86) {\code{add [rdi], rax} (CISC)};
+
+\node[
+  draw=navy,
+  fill=softgray,
+  rounded corners=3pt,
+  font=\small,
+  right=2.0cm of x86,
+  align=left
+] (uops) {
+  $\mu\text{op 1: } \text{load } \text{temp} \leftarrow [\code{rdi}]$ \\
+  $\mu\text{op 2: } \text{add } \text{temp} \leftarrow \text{temp} + \code{rax}$ \\
+  $\mu\text{op 3: } \text{store } [\code{rdi}] \leftarrow \text{temp}$
+};
+
+\draw[
+  -{Latex[length=2.5mm]},
+  thick,
+  navy
+] (x86) -- (uops)
+  node[
+    midway,
+    above=2pt,
+    align=center,
+    font=\scriptsize\bfseries,
+    text=deepblue
+  ] {Hardware Decode \\ / Crack};
+
 \end{tikzpicture}
+
 \end{center}
 
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item The execution core is an out-of-order engine processing RISC-like micro-operations ($\mu\text{ops}$).
-  \item CISC-to-RISC translation occurs dynamically, incurring a front-end decode power overhead that RISC architectures natively bypass.
+  \item High-performance x86 cores typically execute internal micro-operations ($\mu\text{ops}$) using out-of-order scheduling and other techniques also found in modern AArch64 cores.
+  \item Translating variable-length x86 instructions into internal $\mu\text{ops}$ adds front-end decode overhead; fixed-width AArch64 avoids that particular boundary-detection requirement but still uses sophisticated front-end hardware.
 \end{itemize}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
@@ -656,70 +956,93 @@ Modern x86 processors preserve the CISC ISA externally, but execute a \key{RISC 
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
 % ============================================================
-% Slide 18: Comprehensive Summary
+% Slide 18
 % ============================================================
 
 \begin{frame}{Topic 2: Comprehensive Summary}
+
 \vfill
-\begin{itemize}\setlength{\itemsep}{8pt}
-  \item \key{Complexity Redistribution:} ISA design strictly governs the workload distribution between software compilers and hardware decoders.
-  \item \key{CISC Trade-offs:} Maximizes code density via variable-length encodings and register-memory math, at the steep cost of front-end decode bottlenecks and legacy prefix overhead.
-  \item \key{RISC Trade-offs:} Enforces pipeline regularity via fixed 32-bit widths and strict load/store rules, dropping backwards compatibility to prioritize low CPI and high parallelism.
-  \item \key{Microarchitectural Convergence:} Modern x86 fundamentally validates RISC by internally cracking CISC instructions into $\mu\text{ops}$.
-  \item \key{Evaluation Metrics:} True architectural efficiency is evaluated via the Iron Law ($T_{\text{CPU}} = \frac{\mathit{IC} \times \mathit{CPI}}{f_{\text{clk}}}$) and Performance-per-Watt.
+
+\small
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item \key{Complexity Redistribution:} ISA design influences how work is divided among compilers, instruction decoding, and processor implementation.
+  \item \key{CISC Trade-offs:} Variable-length encodings and register-memory operations can improve code density and preserve compatibility, while increasing front-end decode complexity.
+  \item \key{RISC Trade-offs:} Fixed-width encodings and load/store rules simplify instruction boundaries and operand handling, although performance still depends on the complete microarchitecture and workload.
+  \item \key{Microarchitectural Convergence:} Modern high-performance x86 and AArch64 processors use many similar techniques, including pipelining, speculation, register renaming, out-of-order execution, and caching.
+  \item \key{Evaluation Metrics:} Processor performance should be evaluated using measured execution time, the Iron Law
+  \[
+  T_{\text{CPU}}
+  =
+  \frac{\mathit{IC}\times\mathit{CPI}}
+       {f_{\text{clk}}}
+  \]
+  and energy-efficiency metrics such as Performance-per-Watt.
 \end{itemize}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
-% Slide 19: Self-Test Questions (Part 1)
+% Slide 19
 % ============================================================
 
 \begin{frame}{Self-Test Questions: ISA Principles \& Mechanics}
+
 \vfill
+
 \begin{enumerate}\setlength{\itemsep}{12pt}
   \item \key{Load/Store Boundary:} Why does a strict load/store architecture simplify pipelined execution compared to an architecture permitting memory operands directly in ALU instructions?
-  
-  \item \key{Parallel Decode Efficiency:} Why is an 8-wide instruction decoder significantly simpler and more power-efficient for a fixed 32-bit RISC ISA than for variable-length CISC?
-  
-  \item \key{Micro-operation Translation:} When an x86 processor executes \code{add [rdi + 8], rax}, how does the front-end decoder functionally translate this instruction into internal $\mu\text{ops}$?
+  \item \key{Parallel Decode Efficiency:} Why do fixed 32-bit instruction boundaries simplify wide instruction fetch and decode compared with variable-length encodings?
+  \item \key{Micro-operation Translation:} When an x86 processor executes \code{add [rdi + 8], rax}, what kinds of internal $\mu\text{ops}$ might a processor use to implement the architectural behavior?
 \end{enumerate}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
-% Slide 20: Self-Test Questions (Part 2)
+% Slide 20
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Quantitative Analysis \& Power}
+
 \vfill
+
 \begin{enumerate}\setlength{\itemsep}{12pt}
   \item \key{Iron Law Calculation:} A RISC core executes $1.5 \times 10^9$ instructions at $\text{CPI} = 1.1$ on a 3.0\,GHz CPU. A CISC core executes $1.1 \times 10^9$ instructions at $\text{CPI} = 1.6$ on a 3.2\,GHz CPU. Which finishes faster?
-  
   \item \key{Front-End Power Cost:} Why does instruction decoding consume a measurably higher percentage of core power in modern x86 processors than in modern AArch64 cores?
-  
   \item \key{Performance-per-Watt:} Why has Performance-per-Watt superseded raw clock frequency as the primary architectural design metric in modern computing?
 \end{enumerate}
+
 \vfill
+
 \end{frame}
 
 % ============================================================
-% Look Ahead to Topic 3 (Final Slide of Topic 2 Deck)
+% Look Ahead to Topic 3
 % ============================================================
 
 \begin{frame}{Looking Ahead}
+
 \vfill
+
 \begin{block}{Next Lecture Preview}
-\key{Our Next Topic:} The Hardware/Software Interface \& AArch64 Programmer's Model
+\key{Our Next Topic:}
+The Hardware/Software Interface \& AArch64 Programmer's Model
 \end{block}
 
 \vfill
+
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item \key{Architectural State:} Defining the precise software-visible hardware contract (registers, condition flags, stack pointer, and memory space).
   \item \key{AArch64 Register File:} Examining register naming conventions (\bits{x0}--\bits{x30} vs.\ \bits{w0}--\bits{w30}), the zero register (\bits{xzr}), and standard ABI calling conventions.
   \item \key{Instruction Mechanics:} Exploring foundational instruction classes, memory addressing modes, and control flow translation.
 \end{itemize}
+
 \vfill
+
 \end{frame}
 
 \end{document}
