@@ -14,7 +14,7 @@
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
-    CSCI 6461 --- Computer Systems Architecture (AArch64 Reference / RISC Philosophy)
+    CSCI 6461 --- Computer Systems Architecture
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
@@ -44,6 +44,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\IfFileExists{sourcecodepro.sty}{\usepackage[scale=0.92]{sourcecodepro}}{\usepackage{courier}}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -201,13 +202,12 @@
 % ============================================================
 
 \begin{frame}{Arithmetic Primitives: Addition \& Subtraction}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Many AArch64 data-processing instructions use a \key{3-operand non-destructive format}:
-  $$\code{op\quad destination,\; source1,\; source2}$$
+\normalsize
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Many AArch64 data-processing instructions use a \key{3-operand non-destructive format}. Flag-setting forms such as \code{adds} and \code{subs} update NZCV; \code{add} and \code{sub} do not.
 \end{itemize}
 
-\vspace{0.15cm}
+\vspace{0.08cm}
 \begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
@@ -216,18 +216,18 @@
 \textbf{Instruction} & \textbf{Operation} & \textbf{Flags Updated?} \\
 \midrule
 \code{add  x0, x1, x2}  & $x_0 \leftarrow x_1 + x_2$ & No \\
-\code{adds x0, x1, x2}  & $x_0 \leftarrow x_1 + x_2$ & \key{Yes (Updates NZCV)} \\
+\code{adds x0, x1, x2}  & $x_0 \leftarrow x_1 + x_2$ & \key{Yes (NZCV)} \\
 \code{sub  x0, x1, x2}  & $x_0 \leftarrow x_1 - x_2$ & No \\
-\code{subs x0, x1, x2}  & $x_0 \leftarrow x_1 - x_2$ & \key{Yes (Updates NZCV)} \\
-\code{neg  x0, x1}      & $x_0 \leftarrow 0 - x_1$   & No (Alias for \code{sub x0, xzr, x1}) \\
+\code{subs x0, x1, x2}  & $x_0 \leftarrow x_1 - x_2$ & \key{Yes (NZCV)} \\
+\code{neg  x0, x1}      & $x_0 \leftarrow 0 - x_1$   & No; alias of \code{sub x0, xzr, x1} \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.2cm}
-\normalsize
+\vspace{0.08cm}
 \begin{block}{Immediate Constant Arithmetic}
-\code{add x0, x1, \#42} adds a 12-bit immediate ($0\text{ to } 4095$). 32-bit registers (\bits{w0}--\bits{w30}) follow identical syntax.
+\small
+\code{add x0, x1, \#42} uses a 12-bit immediate. The add/sub immediate form can also shift that field left by 12 bits. The corresponding \bits{w}-register form performs 32-bit arithmetic.
 \end{block}
 \end{frame}
 
@@ -236,33 +236,32 @@
 % ============================================================
 
 \begin{frame}{Shifted-Register Operands and Shift Operations}
-
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item The AArch64 ISA allows many instructions to encode a shifted register operand directly within the instruction word.
-  \item Execution latency for shifted operands depends on the specific processor implementation.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Many AArch64 data-processing instructions can encode a shifted register operand directly in the instruction.
+  \item Execution latency for shifted operands is implementation-dependent.
 \end{itemize}
 
-\vspace{0.2cm}
+\vspace{0.12cm}
 \begin{center}
-\small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lll}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{0.22\textwidth}p{0.15\textwidth}p{0.55\textwidth}}
 \toprule
 \textbf{Shift Type} & \textbf{Mnemonic} & \textbf{Operation Meaning} \\
 \midrule
-Logical Shift Left  & \code{lsl \#k} & Equivalent to multiplication by $2^k$ modulo the register width (zero-fill). \\
-Logical Shift Right & \code{lsr \#k} & Equivalent to floor division by $2^k$ (zero-fill). \\
-Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift (replicates sign bit; differs from truncation toward zero for negative numbers). \\
+Logical Shift Left & \code{lsl \#k} & Multiply by $2^k$ modulo the register width; zeros enter the low bits. \\
+Logical Shift Right & \code{lsr \#k} & Unsigned floor division by $2^k$; zeros enter the high bits. \\
+Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift; the sign bit is replicated into the high bits. \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.15cm}
+\vspace{0.10cm}
 \begin{block}{Integrated Shift-Add Examples}
-\small
-\begin{tabular}{lll}
-\code{add x0, x1, x2, lsl \#3} & $\implies x_0 \leftarrow x_1 + (x_2 \times 8)$ & (Scale an index by 8 bytes) \\
-\code{sub x0, x1, x2, lsr \#1} & $\implies x_0 \leftarrow x_1 - (x_2 / 2)$     & (Subtract half of unsigned value) \\
+\footnotesize
+\begin{tabular}{ll}
+\code{add x0, x1, x2, lsl \#3} & $x_0 \leftarrow x_1 + (x_2 \times 8)$ \\
+\code{sub x0, x1, x2, lsr \#1} & $x_0 \leftarrow x_1 - \lfloor x_2/2 \rfloor$ for unsigned $x_2$ \\
 \end{tabular}
 \end{block}
 \end{frame}
@@ -285,7 +284,7 @@ Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift (replicate
 \toprule
 \textbf{Instruction} & \textbf{RTL Semantic Action} & \textbf{Description} \\
 \midrule
-\code{mul  x0, x1, x2}        & $x_0 \leftarrow x_1 \times x_2$         & 64-bit integer product (lower 64 bits) \\
+\code{mul  x0, x1, x2}        & $x_0 \leftarrow x_1 \times x_2$         & Lower 64 bits of the product \\
 \code{madd x0, x1, x2, x3}    & $x_0 \leftarrow x_3 + (x_1 \times x_2)$ & Multiply-Add \\
 \code{msub x0, x1, x2, x3}    & $x_0 \leftarrow x_3 - (x_1 \times x_2)$ & Multiply-Subtract \\
 \code{sdiv x0, x1, x2}        & $x_0 \leftarrow x_1 / x_2$             & Signed division \\
@@ -297,7 +296,7 @@ Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift (replicate
 \vspace{0.25cm}
 \normalsize
 \begin{block}{Division by Zero}
-AArch64 division by zero does \textbf{not} raise an exception; it returns \bits{0} in the destination register.
+AArch64 integer division by zero does \textbf{not} raise an exception; it returns \bits{0} in the destination register. For signed division, the overflow case $\mathrm{INT64\_MIN}/(-1)$ also does not trap; the destination receives the architecturally defined 64-bit result.
 \end{block}
 \end{frame}
 
@@ -340,33 +339,32 @@ AArch64 division by zero does \textbf{not} raise an exception; it returns \bits{
 % ============================================================
 
 \begin{frame}{Bitfield Extraction: \texttt{ubfx}}
-
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item AArch64 provides bitfield instructions that extract packed fields without explicit manual mask-and-shift steps.
-  \item \code{ubfx xd, xn, \#lsb, \#width}: Unsigned bitfield extract.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item AArch64 provides bitfield instructions that extract packed fields without explicit mask-and-shift sequences.
+  \item \code{ubfx xd, xn, \#lsb, \#width}: unsigned bitfield extract.
 \end{itemize}
 
-\vspace{0.2cm}
-\centering
-\begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
-  \draw[fill=softgray, draw=navy] (0,0) rectangle (9.0,0.55);
-  \draw[fill=gold!40, draw=navy, thick] (4.0,0) rectangle (6.5,0.55);
-  \node at (5.25, 0.275) {\small\textbf{Extracted Field (\bits{width} bits)}};
-  \node[anchor=south, font=\tiny\bfseries] at (4.0, 0.55) {Bit $(\text{lsb}+\text{width}-1)$};
-  \node[anchor=south, font=\tiny\bfseries] at (6.5, 0.55) {Bit $\text{lsb}$};
-  \node[anchor=south, font=\tiny\bfseries] at (0.2, 0.55) {Bit 63};
-  \node[anchor=south, font=\tiny\bfseries] at (8.8, 0.55) {Bit 0};
+\vspace{0.12cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.82,every node/.style={transform shape}]
+\draw[fill=lightblue,draw=navy] (0,0) rectangle (7,0.55);
+\draw[fill=gold!30,draw=navy] (3.0,0) rectangle (5.0,0.55);
+\node[font=\tiny\bfseries] at (0.15,0.85) {Bit 63};
+\node[font=\tiny\bfseries] at (3.0,0.85) {Bit (lsb + width - 1)};
+\node[font=\tiny\bfseries] at (5.0,0.85) {Bit lsb};
+\node[font=\tiny\bfseries] at (6.85,0.85) {Bit 0};
+\node[font=\small\bfseries] at (4.0,0.28) {Extracted Field};
 \end{tikzpicture}
+\end{center}
 
-\vspace{0.3cm}
+\vspace{0.15cm}
 \begin{block}{Example: Extract 8-bit Field Starting at Bit 16}
-\small
-\begin{tabular}{lll}
-\textbf{Mask-and-shift approach:} & \code{lsr x0, x1, \#16} \quad $\to$ \quad \code{and x0, x0, \#0xff} & (2 instructions) \\
-\textbf{Bitfield Extract:}  & \code{ubfx x0, x1, \#16, \#8}                                       & \key{1 instruction!} \\
+\footnotesize
+\begin{tabular}{ll}
+\textbf{Mask + shift:} & \code{lsr x0, x1, \#16} $\to$ \code{and x0, x0, \#0xff} \\
+\textbf{Bitfield extract:} & \code{ubfx x0, x1, \#16, \#8} \\
 \end{tabular}
 \end{block}
-
 \end{frame}
 
 % ============================================================
@@ -414,34 +412,32 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 % ============================================================
 
 \begin{frame}{Comparison Instructions: \texttt{cmp} and \texttt{tst}}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Comparisons evaluate values, set NZCV flags, and discard the computed output.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Comparison aliases set NZCV flags and discard the computed result.
 \end{itemize}
 
-\vspace{0.15cm}
+\vspace{0.10cm}
 \begin{center}
-\small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lll}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{0.17\textwidth}p{0.31\textwidth}p{0.44\textwidth}}
 \toprule
-\textbf{Instruction} & \textbf{Equivalent Machine Operation} & \textbf{Flags Set} \\
+\textbf{Instruction} & \textbf{Equivalent Operation} & \textbf{Flags Set} \\
 \midrule
-\code{cmp x0, x1} & \code{subs xzr, x0, x1} & Sets NZCV based on $x_0 - x_1$ \\
-\code{cmn x0, x1} & \code{adds xzr, x0, x1} & Sets NZCV based on $x_0 + x_1$ (Compare Negative) \\
-\code{tst x0, x1} & \code{ands xzr, x0, x1} & Sets N and Z from result; clears C and V to 0 (Bit Test) \\
+\code{cmp x0, x1} & \code{subs xzr, x0, x1} & NZCV from $x_0-x_1$ \\
+\code{cmn x0, x1} & \code{adds xzr, x0, x1} & NZCV from $x_0+x_1$ \\
+\code{tst x0, x1} & \code{ands xzr, x0, x1} & N/Z from the AND result; C/V cleared \\
 \bottomrule
-\tabularnewline
 \end{tabular}
 \end{center}
 
-\vspace{0.25cm}
-\normalsize
+\vspace{0.12cm}
 \begin{block}{Checking Flags After \texttt{cmp x0, x1}}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item If $x_0 == x_1$: \key{Z flag is set to 1}.
-  \item If $x_0 < x_1$ (signed): \key{$\text{N} \neq \text{V}$}.
-  \item If $x_0 < x_1$ (unsigned): \key{$\text{C} = 0$}.
+\small
+\begin{itemize}\setlength{\itemsep}{1pt}
+  \item $x_0 == x_1$: \key{$Z=1$}.
+  \item $x_0 < x_1$ (signed): \key{$N \neq V$}.
+  \item $x_0 < x_1$ (unsigned): \key{$C=0$}.
 \end{itemize}
 \end{block}
 \end{frame}
@@ -466,10 +462,10 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \code{b.gt} & Signed Greater Than ($>$) & $(\text{Z} == 0) \land (\text{N} == \text{V})$ & \key{Signed} \\
 \code{b.ge} & Signed Greater or Equal ($\ge$) & $\text{N} == \text{V}$ & \key{Signed} \\
 \midrule
-\code{b.lo} & Unsigned Lower ($<$)      & $\text{C} == 0$           & \key{Unsigned / Addresses} \\
-\code{b.hs} & Unsigned Higher or Same ($\ge$) & $\text{C} == 1$      & \key{Unsigned / Addresses} \\
-\code{b.hi} & Unsigned Higher ($>$)     & $(\text{C} == 1) \land (\text{Z} == 0)$ & \key{Unsigned / Addresses} \\
-\code{b.ls} & Unsigned Lower or Equal ($\le$) & $(\text{C} == 0) \lor (\text{Z} == 1)$ & \key{Unsigned / Addresses} \\
+\code{b.lo} & Unsigned Lower ($<$)      & $\text{C} == 0$           & \key{Unsigned} \\
+\code{b.hs} & Unsigned Higher or Same ($\ge$) & $\text{C} == 1$      & \key{Unsigned} \\
+\code{b.hi} & Unsigned Higher ($>$)     & $(\text{C} == 1) \land (\text{Z} == 0)$ & \key{Unsigned} \\
+\code{b.ls} & Unsigned Lower or Equal ($\le$) & $(\text{C} == 0) \lor (\text{Z} == 1)$ & \key{Unsigned} \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -477,7 +473,7 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \vspace{-0.35cm}
 \normalsize
 \begin{block}{Usage Context}
-Unsigned conditions are appropriate when the program semantics treat the values as unsigned or address-like quantities.
+Unsigned conditions are appropriate when the program semantics treat the values as unsigned; they are also commonly used for address and range comparisons.
 \end{block}
 \end{frame}
 
@@ -491,43 +487,38 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 % Slide 11
 % ============================================================
 
-\begin{frame}{Fused Branch-and-Test: \texttt{cbz} and \texttt{cbnz}}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Compare and Branch on Zero (\code{cbz}) / Non-Zero (\code{cbnz}):}
-  \begin{itemize}\setlength{\itemsep}{3pt}
-    \item Tests register contents directly; does \textbf{not} alter NZCV flags.
-    \item Saves 1 instruction compared to an explicit \code{cmp} $+$ \code{b.eq}.
-  \end{itemize}
+\begin{frame}{Compare-and-Branch Instructions: \texttt{cbz} and \texttt{cbnz}}
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item \key{\code{cbz} / \code{cbnz}} test a register directly and do not alter NZCV.
+  \item They encode the zero test and branch in one architectural instruction instead of a separate compare and conditional branch.
 \end{itemize}
 
-\vspace{0.2cm}
+\vspace{0.12cm}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.48\textwidth}
 \begin{block}{Null Pointer Validation}
-\small
+\footnotesize
 \begin{tabular}{ll}
-\code{cbz x0, .Lhandle\_null} & \text{\scriptsize // If ptr == NULL, jump} \\
-\code{ldr x1, [x0]}           & \text{\scriptsize // Access non-null pointer} \\
+\code{cbz x0, .Lnull} & \text{\scriptsize // branch if null} \\
+\code{ldr x1, [x0]}   & \text{\scriptsize // dereference} \\
 \end{tabular}
 \end{block}
 \end{column}
-
 \begin{column}{0.48\textwidth}
 \begin{block}{Loop Counter Decrement}
-\small
+\footnotesize
 \begin{tabular}{ll}
 \code{.Lloop:} & \\
-\code{sub  x1, x1, \#1} & \text{\scriptsize // count-- (flags not needed)} \\
-\code{cbnz x1, .Lloop}  & \text{\scriptsize // Loop until count == 0} \\
+\code{sub  x1, x1, \#1} & \text{\scriptsize // count--} \\
+\code{cbnz x1, .Lloop} & \text{\scriptsize // repeat if nonzero} \\
 \end{tabular}
 \end{block}
 \end{column}
 \end{columns}
 
-\vspace{0.25cm}
-\normalsize
-\key{Single Bit Check:} \code{tbz x0, \#0, label} branches if bit 0 is zero (even number test).
+\vspace{0.12cm}
+\small
+\key{Single-Bit Test:} \code{tbz x0, \#0, label} branches if bit 0 is zero.
 \end{frame}
 
 % ============================================================
@@ -615,38 +606,34 @@ while (i < n) {
 
 \vspace{0.25cm}
 \normalsize
-\key{Efficiency Rule:} Placing the branch at the bottom requires only one loop-closing conditional branch in the steady-state loop body.
+\key{Common Loop Layout:} Placing the test at the bottom gives the steady-state loop body one loop-closing conditional branch.
 \end{frame}
 
 % ============================================================
 % Slide 14
 % ============================================================
 
-\begin{frame}{Branch Penalties \& Branchless Selection (\texttt{csel})}
-
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item Pipelined processors speculatively execute instructions ahead of branches.
-  \item An unpredictable branch misprediction can cost many clock cycles depending on pipeline depth.
-  \item \key{Conditional Select (\code{csel}):} Selects between operands based on condition flags without introducing a control-flow branch (execution latency is implementation-dependent).
-  \item \key{Performance Note:} Branchless execution removes misprediction risk but can lengthen dependency chains; a highly predictable branch can sometimes outperform conditional selection.
+\begin{frame}{Branch Misprediction \& Conditional Selection (\texttt{csel})}
+\small
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item A mispredicted conditional branch discards younger speculative work; the cost is implementation-dependent.
+  \item \key{\code{csel}} chooses between two register operands from NZCV without changing control flow.
+  \item \key{Trade-off:} Conditional selection avoids prediction for that decision but can extend a data-dependency chain.
 \end{itemize}
 
-\vspace{0.15cm}
+\vspace{0.08cm}
 \begin{block}{Signed Maximum: $\code{result} = (x_1 > x_2) \mathbin{?} x_1 : x_2$}
-\small
-\begin{tabular}{lll}
-\code{cmp  x1, x2}          & \text{\scriptsize // Set NZCV flags based on x1 - x2} \\
-\code{csel x0, x1, x2, gt}  & \text{\scriptsize // Uses signed \texttt{gt} condition (use \texttt{hi} for unsigned)} \\
+\footnotesize
+\begin{tabular}{ll}
+\code{cmp  x1, x2}          & \text{\scriptsize // set NZCV from x1 - x2} \\
+\code{csel x0, x1, x2, gt}  & \text{\scriptsize // signed max; use hi for unsigned} \\
 \end{tabular}
 \end{block}
 
-\vspace{0.15cm}
-\begin{block}{Related Branchless Helpers}
-\small
-\begin{tabular}{lll}
-\code{cset w0, eq}          & $w_0 \leftarrow (\text{eq} \mathbin{?} 1 : 0)$ & (Convert condition to boolean 1 or 0) \\
-\code{cinc x0, x1, eq}      & $x_0 \leftarrow x_1 + (\text{eq} \mathbin{?} 1 : 0)$ & (Conditional increment) \\
-\end{tabular}
+\vspace{0.08cm}
+\begin{block}{Related Forms}
+\footnotesize
+\code{cset w0, eq} sets 0 or 1 from a condition; \code{cinc x0, x1, eq} conditionally increments \bits{x1}.
 \end{block}
 \end{frame}
 
@@ -661,15 +648,14 @@ while (i < n) {
 % ============================================================
 
 \begin{frame}{Topic 4: Comprehensive Summary}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Instruction Encoding:} Many AArch64 instructions encode a shifted register operand within a single instruction.
-  \item \key{Bitwise Primitives:} Bitwise operations apply independently to each corresponding bit position, with native support for \code{and}, \code{orr}, \code{eor}, and bit clearing via \code{bic}; field extraction via \code{ubfx}.
-  \item \key{Flag-Setting Forms:} Common flag-setting forms include ``\code{s}'' variants (\code{adds}, \code{subs}) and explicit comparisons (\code{cmp}, \code{tst}); carry flag is active ($C=1$) when subtraction does not borrow.
-  \item \key{Control Flow Idioms:} A common control-flow layout inverts the condition so one path falls through; loop inversion cuts branch overhead to one loop-closing branch in steady state.
-  \item \key{Branch Elimination:} Conditional select instructions (\code{csel}, \code{cset}) avoid misprediction risk, though performance trade-offs depend on pipeline depth and dependency chains.
+\small
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item \key{Arithmetic \& Shifts:} Regular register and immediate arithmetic includes shifted-register operands in many data-processing instructions.
+  \item \key{Bitwise Operations:} \code{and}, \code{orr}, \code{eor}, \code{bic}, and bitfield instructions operate directly on packed binary data.
+  \item \key{NZCV Flags:} Flag-setting arithmetic and aliases such as \code{cmp} and \code{tst} support signed and unsigned conditions.
+  \item \key{Control Flow:} Compilers commonly arrange one path as fall-through and use bottom-tested loops where appropriate.
+  \item \key{Conditional Selection:} \code{csel} and related forms can replace short conditional branches when data-dependent selection is preferable.
 \end{itemize}
-
 \end{frame}
 
 % ============================================================
@@ -698,12 +684,12 @@ while (i < n) {
 \begin{frame}{Self-Test Questions: Control Flow \& Selection}
 
 \begin{enumerate}\setlength{\itemsep}{7pt}
-  \item \key{Loop Inversion Benefit:} Why do optimizing compilers place the conditional loop branch at the bottom of the loop body rather than at the top?
+  \item \key{Bottom-Tested Loop Layout:} Why do compilers often place the conditional loop branch at the bottom of the loop body rather than at the top?
 
   \item \key{Branchless Translation:} Write an equivalent 3-instruction branchless AArch64 sequence using \code{cmp}, \code{neg}, and \code{csel} to implement:
   $$\code{int64\_t abs\_val = (val < 0) ? -val : val;}$$
 
-  \item \key{Fused Branch Instructions:} When should an assembly programmer use \code{cbz x0, label} instead of \code{cmp x0, \#0} followed by \code{b.eq label}?
+  \item \key{Compare-and-Branch Instructions:} When should an assembly programmer use \code{cbz x0, label} instead of \code{cmp x0, \#0} followed by \code{b.eq label}?
 
   \item \key{Branch Misprediction Trade-off:} What factors determine whether \code{csel} or a conditional branch is faster?
 \end{enumerate}
