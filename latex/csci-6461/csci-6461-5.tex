@@ -14,7 +14,7 @@
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
-    CSCI 6461 --- Computer Systems Architecture (AArch64 Reference / RISC Philosophy)
+    CSCI 6461 --- Computer Systems Architecture
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
@@ -44,6 +44,9 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\IfFileExists{sourcecodepro.sty}
+  {\usepackage[scale=0.92]{sourcecodepro}}
+  {\usepackage{courier}}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -210,10 +213,10 @@
 \begin{frame}{The Fundamental Memory Challenge}
 \large
 \begin{itemize}\setlength{\itemsep}{7pt}
-  \item CPU registers execute in \key{sub-nanosecond timeframes} ($< 0.5\text{ ns}$).
-  \item Off-chip main memory (DRAM) requires \key{tens to hundreds of nanoseconds} ($50\text{--}100\text{ ns}$).
-  \item \key{Architectural Goal:} How should the instruction set structure memory access so the processor does not stall waiting for data?
-  \item The RISC response is the strict \key{Load/Store discipline}.
+  \item Register access is extremely fast, while off-chip DRAM access is much slower; exact latencies are implementation-dependent.
+  \item \key{Architectural Question:} How should the instruction set organize data movement between memory and the register file?
+  \item AArch64 uses a strict \key{load/store discipline}: ALU instructions operate on registers, while explicit load/store instructions access memory.
+  \item Caches, prefetching, speculation, and out-of-order execution are microarchitectural techniques used to reduce the impact of memory latency.
 \end{itemize}
 
 \vspace{0.3cm}
@@ -233,8 +236,8 @@ ALU instructions process \emph{only} registers. Memory access is performed by lo
 \begin{block}{The Pipeline Contract}
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item Arithmetic instructions do not directly access data memory.
-  \item Simplifies datapath organization and dependency tracking.
-  \item Simplifies out-of-order execution and dependency tracking.
+  \item Simplifies datapath organization and operand handling.
+  \item Makes memory operations explicit for scheduling and dependency analysis.
 \end{itemize}
 \end{block}
 \end{column}
@@ -302,7 +305,7 @@ ALU instructions process \emph{only} registers. Memory access is performed by lo
 
 \vspace{0.35cm}
 \normalsize
-\key{Takeaway:} RISC exposes data movement directly to the compiler rather than hiding it inside complex hardware decoders.
+\key{Takeaway:} AArch64 exposes data movement through explicit load/store instructions, while x86-64 permits some architectural instructions to combine memory access with computation.
 \end{frame}
 
 % ============================================================
@@ -409,8 +412,8 @@ Replicate the sign bit to preserve negative values.
 \begin{frame}{Signed Loads: Sign-Extension (\texttt{ldrsb}, \texttt{ldrsh}, \texttt{ldrsw})}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item The ``\code{s}'' in \code{ldrsb}, \code{ldrsh}, and \code{ldrsw} stands for \key{Signed Load}.
-  \item Copies the sign bit across all upper bits up to the destination width.
+  \item The \code{ldrsb}, \code{ldrsh}, and \code{ldrsw} variants load a smaller signed value and sign-extend it to the destination width.
+  \item Sign extension copies the source sign bit across the upper destination bits.
 \end{itemize}
 
 \vspace{0.2cm}
@@ -554,11 +557,11 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
 % Slide 14
 % ============================================================
 
-\begin{frame}{Offset Scaling for Efficiency}
+\begin{frame}{Unsigned Scaled Immediate Offsets}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item In 32-bit instructions, immediate fields have limited bit width.
-  \item AArch64 uses \key{scaled offsets} matching the operand size:
+  \item In the unsigned scaled-immediate form, AArch64 scales the 12-bit offset by the access size:
   \begin{itemize}\setlength{\itemsep}{3pt}
     \item 64-bit loads scale offsets by $\times 8$ ($0, 8, 16, \dots, 32760$).
     \item 32-bit loads scale offsets by $\times 4$ ($0, 4, 8, \dots, 16380$).
@@ -737,7 +740,7 @@ Directly implements high-level array access: \code{val = arr[i];}.
 
 \vspace{0.25cm}
 \normalsize
-Can reach any global data variable within $\pm 4\text{ GB}$ of the current instruction (for the standard small model).
+The \code{adrp} instruction forms a page-relative address within its architectural range; the linker then resolves the page and low-offset relocation for the selected code model.
 \end{frame}
 
 % ============================================================
@@ -777,7 +780,7 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 \begin{frame}{Paired Transfers: \texttt{ldp} and \texttt{stp}}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item AArch64 provides dedicated instructions to move \key{two registers in one command}:
+  \item AArch64 provides dedicated instructions to transfer \key{two registers with one architectural instruction}:
   $$\code{ldp\quad x0,\; x1,\; [x2]} \qquad \code{stp\quad x0,\; x1,\; [x2]}$$
   \item Reduces instruction count by handling two registers per memory transfer instruction.
 \end{itemize}
@@ -792,7 +795,7 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 \midrule
 \code{stp x29, x30, [sp, \#-16]!} & Push Frame Pointer \& Link Register & Function entry (prologue) \\
 \code{ldp x29, x30, [sp], \#16}   & Restore FP \& LR, adjust stack      & Function exit (epilogue) \\
-\code{ldp x0, x1, [x2]}           & Load two 64-bit values into x0, x1  & Fast struct/buffer copy \\
+\code{ldp x0, x1, [x2]}           & Load two 64-bit values into x0, x1  & Adjacent-value or buffer access \\
 \bottomrule
 \tabularnewline
 \end{tabular}
@@ -837,7 +840,7 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 
 \vspace{0.35cm}
 \normalsize
-\key{Efficiency Impact:} Cuts the memory instruction count for the shown pair of saves/restores by $50\%$.
+\key{Instruction-Count Impact:} For the shown pair of saves/restores, a paired transfer uses one memory instruction instead of two.
 \end{frame}
 
 % ============================================================
@@ -858,7 +861,7 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 \centering
 \vspace{0.1cm}
 \begin{tikzpicture}[scale=0.75]
-  \draw[fill=lightblue, draw=navy] (0,0) rectangle (4,0.6) node[midway, font=\footnotesize] {64-bit Word [Bytes 0--7]};
+  \draw[fill=lightblue, draw=navy] (0,0) rectangle (5,0.6) node[midway, font=\footnotesize] {64-bit Word [Bytes 0--7]};
 \end{tikzpicture}
 \vspace{0.1cm}
 Typically maps cleanly to memory access structures without boundary crossing.
@@ -878,6 +881,10 @@ May require additional internal accesses, especially when crossing cache-line or
 \end{block}
 \end{column}
 \end{columns}
+
+\vspace{0.2cm}
+\small
+Many ordinary accesses to Normal memory can be unaligned, although boundary crossings may require extra internal work. Some access types or configured environments impose stricter alignment requirements.
 \end{frame}
 
 % ============================================================
@@ -888,7 +895,7 @@ May require additional internal accesses, especially when crossing cache-line or
 \large
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item The standard AArch64 procedure call standard (AAPCS64) mandates a strict \key{16-byte alignment rule for the Stack Pointer (\bits{sp})} as a core ABI requirement.
-  \item Violating 16-byte alignment can cause compatibility issues, ABI violations, or runtime faults in certain software environments and exception handlers.
+  \item Violating the 16-byte alignment rule breaks the ABI contract and can cause incorrect interaction with code that assumes a conforming stack layout.
   \item When allocating local variables or saving registers, stack-frame allocation is normally rounded to a multiple of 16 bytes.
 \end{itemize}
 
@@ -908,8 +915,9 @@ May require additional internal accesses, especially when crossing cache-line or
 % ============================================================
 
 \begin{frame}[fragile]{Standard Function Stack Frame Layout}
+\vspace{-0.5cm}
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.50\textwidth}
+\begin{column}{0.55\textwidth}
 \begin{block}{Function Code}
 \small
 \begin{verbatim}
@@ -951,9 +959,9 @@ my_func:
 % ============================================================
 
 \begin{frame}[fragile]{Worked Pattern 1: Stepping Through an Array}
+\vspace{-0.2cm}
 \small \key{Goal:} Sum $N$ 64-bit Integers
-
-\vspace{0.1cm}
+\vspace{-0.1cm}
 \begin{block}{AArch64 Implementation (Using Post-Indexed Addressing)}
 \small
 \begin{tabular}{lll}
@@ -972,9 +980,9 @@ my_func:
 \end{tabular}
 \end{block}
 
-\vspace{0.15cm}
+\vspace{-0.15cm}
 \normalsize
-Post-indexing eliminates a separate \code{add x0, x0, \#8} instruction inside the loop.
+Post-indexing avoids a separate pointer-update instruction such as \code{add x0, x0, \#8} inside the loop.
 \end{frame}
 
 % ============================================================
@@ -1025,7 +1033,7 @@ Combines index scaling and load into a single instruction without modifying the 
 
 \vspace{0.25cm}
 \normalsize
-Moves 32 bytes of memory in just 4 instructions using dual-register operations.
+Copies 32 bytes using four paired load/store instructions.
 \end{frame}
 
 % ============================================================
@@ -1066,7 +1074,7 @@ Global Variable Reference     & PC-Relative Page Offset       & \code{adrp} $+$ 
 
 \vspace{0.25cm}
 \begin{block}{Performance Insight}
-Sequential post-indexed access patterns tend to use cache lines efficiently, running significantly faster than scattered random access.
+Sequential access patterns usually make better use of spatial locality and hardware prefetching than scattered access patterns.
 \end{block}
 \end{frame}
 
@@ -1077,7 +1085,7 @@ Sequential post-indexed access patterns tend to use cache lines efficiently, run
 \begin{frame}{Common Memory Access Mistakes}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Wrong Sizing:} Using \code{ldr} (64-bit) instead of \code{ldr wt} (32-bit) on an array of integers reads adjacent memory as garbage.
+  \item \key{Wrong Sizing:} Using \code{ldr} (64-bit) instead of \code{ldr wt} (32-bit) on an array of integers reads unintended adjacent bytes as part of the value.
   \item \key{Missing Sign Extension:} Using \code{ldrb} instead of \code{ldrsb} on negative numbers corrupts signed comparisons.
   \item \key{Incorrect Shift Scale:} Using \code{lsl \#2} instead of \code{lsl \#3} on an array of 64-bit pointers accesses the wrong memory location.
   \item \key{Stack Misalignment:} Violating AAPCS64 16-byte stack alignment conventions can lead to compliance or runtime issues.
@@ -1097,7 +1105,7 @@ Sequential post-indexed access patterns tend to use cache lines efficiently, run
 \begin{frame}{Topic 5: Comprehensive Summary}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{Load/Store Discipline:} Arithmetic operations are strictly decoupled from memory; data transfers are handled by load/store-family instructions.
+  \item \key{Load/Store Discipline:} ALU instructions operate on registers, while load/store-family instructions perform memory transfers.
   \item \key{Data Widths \& Extensions:} Sub-word loads zero-extend by default; signed data requires explicit \code{ldrsb}, \code{ldrsh}, or \code{ldrsw} to preserve negative values.
   \item \key{Core Addressing Modes:}
   \begin{itemize}\setlength{\itemsep}{1.5pt}
@@ -1152,6 +1160,28 @@ Sequential post-indexed access patterns tend to use cache lines efficiently, run
   \item \key{Position-Independent References:} Why are \code{adrp} and offset/GOT sequences commonly used for position-independent global references in AArch64?
 \end{enumerate}
 
+\end{frame}
+
+% ============================================================
+% Looking Ahead
+% ============================================================
+
+\begin{frame}{Looking Ahead}
+
+\begin{block}{Next Lecture Preview}
+\key{Our Next Topic:}
+AArch64 Subroutines, Calling Conventions, \& the Stack
+\end{block}
+
+\vfill
+
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item \key{Subroutine Calls:} Using \code{bl}, \code{blr}, and \code{ret}.
+  \item \key{Calling Convention:} Passing arguments, returning values, and preserving registers.
+  \item \key{Stack Frames:} Building and restoring function stack frames using AAPCS64 conventions.
+\end{itemize}
+
+\vfill
 \end{frame}
 
 \end{document}
