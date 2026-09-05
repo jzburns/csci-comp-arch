@@ -1301,9 +1301,11 @@ $-5 = \bits{11111011}$
 \node[font=\tiny\bfseries,text=deepblue] (sub) at (-0.5,-1.75)
   {subtract control};
 
-\draw[-{Latex},thick,navy] (a.east) -- ++(1.0,0) |- (add.west);
+\draw[-{Latex},thick,navy,shorten >=1.0pt]
+  (a.east) -- ++(1.0,0) |- ([yshift=0.23cm]add.west);
 \draw[-{Latex},thick,navy] (b) -- (sel);
-\draw[-{Latex},thick,navy] (sel.east) -- ++(0.9,0) |- (add.west);
+\draw[-{Latex},thick,navy,shorten >=1.0pt]
+  (sel.east) -- ++(0.35,0) |- ([yshift=-0.23cm]add.west);
 \draw[-{Latex},thick,navy] (add) -- (r);
 \draw[-{Latex},thick,deepblue] (sub) -- (sel);
 \draw[-{Latex},thick,deepblue] (sub.east) -| (add.south)
