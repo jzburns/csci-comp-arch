@@ -94,18 +94,37 @@
 
 % Section divider macro
 \newcommand{\sectiondivider}[2]{%
+
+% ============================================================
+% Slide 1
+% ============================================================
+
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
+
 \vspace*{\fill}
-\begin{minipage}{0.85\textwidth}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
 \vspace*{\fill}
+
 \end{frame}
 }
 
@@ -136,38 +155,51 @@
 \begin{document}
 
 % ============================================================
-% Slide 1: Title Slide
+% Slide 2
 % ============================================================
 
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
 \vspace*{\fill}
+
 \begin{minipage}{0.88\textwidth}
-{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 3\par}
+
+{\color{gold}\normalsize\bfseries
+CSCI 6461 \;|\; Computer Systems Architecture \;|\; TOPIC 3
+\par}
+
 \vspace{0.25cm}
+
 {\color{white}\fontsize{24}{28}\selectfont\bfseries
- The Hardware/Software Interface\\[0.08cm]
- \& AArch64 Programmer's Model
+The Hardware/Software Interface\\[0.08cm]\& AArch64 Programmer's Model
 \par}
+
 \vspace{0.35cm}
+
 {\color{white!80}\large
- Architectural state, registers, memory organization,
- and foundational instruction mechanics
+Architectural state, registers, memory organization,\\and foundational instruction mechanics
 \par}
+
 \end{minipage}
 
 \vfill
-{\color{white}\normalsize Dr. J. Burns\par}
-{\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
 \vspace*{\fill}
+
 \end{frame}
 
 % ============================================================
-% Slide 2: Module Topics
+% Slide 3
 % ============================================================
 
 \begin{frame}{Topic 3: Module Topics}
@@ -193,7 +225,7 @@
 
   \item \key{Core Instruction Classes \& Execution Mechanics}
   \begin{itemize}
-    \item Data movement, arithmetic/logical operations, NZCV condition flags, and condition codes.
+    \item Data movement, arithmetic/logical operations, memory access, and basic branch structure.
   \end{itemize}
 \end{enumerate}
 \vfill
@@ -206,7 +238,7 @@
 \sectiondivider{PART 1}{Architectural State \& Execution Model}
 
 % ============================================================
-% Slide 3
+% Slide 4
 % ============================================================
 
 \begin{frame}{What Is Architectural State?}
@@ -217,7 +249,7 @@
   \begin{itemize}\setlength{\itemsep}{2pt}
     \item General-Purpose Registers (\bits{x0}--\bits{x30}).
     \item Program Counter (\bits{pc}) and Stack Pointer (\bits{sp}).
-    \item Processor state and condition flags (\bits{pstate} / NZCV).
+    \item Processor state (\bits{pstate}), including the architectural location of condition flags.
     \item System control and configuration registers (e.g., $\text{TTBR0\_EL1}$, $\text{SCTLR\_EL1}$ for memory management).
     \item Architecturally visible memory state associated with the executing program.
   \end{itemize}
@@ -230,7 +262,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 4
+% Slide 5
 % ============================================================
 
 \begin{frame}{Architectural vs.\ Microarchitectural State}
@@ -242,7 +274,7 @@
 \begin{itemize}\setlength{\itemsep}{3pt}
   \item Defined strictly by the ISA specification.
   \item Software directly reads/writes this state.
-  \item \key{Examples:} Registers \bits{x0}--\bits{x30}, \bits{pc}, architectural memory, NZCV flags.
+  \item \key{Examples:} Registers \bits{x0}--\bits{x30}, \bits{pc}, architectural memory and processor state.
 \end{itemize}
 \end{block}
 \end{column}
@@ -267,7 +299,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 5
+% Slide 6
 % ============================================================
 
 \begin{frame}{The AArch64 Execution State}
@@ -286,7 +318,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 6 (Expanded Full-Height Hierarchy & Privilege Model)
+% Slide 7
 % ============================================================
 
 \begin{frame}{Privilege Levels (Exception Levels)}
@@ -376,7 +408,7 @@
 \sectiondivider{PART 2}{AArch64 Register Architecture \& ABI}
 
 % ============================================================
-% Slide 7
+% Slide 8
 % ============================================================
 
 \begin{frame}{General-Purpose Registers: \texttt{x0}--\texttt{x30}}
@@ -404,7 +436,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 8
+% Slide 9
 % ============================================================
 
 \begin{frame}{32-Bit Register Views: \texttt{w0}--\texttt{w30}}
@@ -436,7 +468,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 9
+% Slide 10
 % ============================================================
 
 \begin{frame}{The Zero Register: \texttt{xzr} and \texttt{wzr}}
@@ -465,7 +497,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 10
+% Slide 11
 % ============================================================
 
 \begin{frame}{Special-Purpose Registers: \texttt{sp}, \texttt{pc}, \texttt{lr}}
@@ -502,7 +534,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 11
+% Slide 12
 % ============================================================
 
 \begin{frame}{The Calling Convention: Caller- vs.\ Callee-Saved}
@@ -539,7 +571,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 12
+% Slide 13
 % ============================================================
 
 \begin{frame}{AArch64 Register File Overview}
@@ -569,39 +601,25 @@
 \end{frame}
 
 % ============================================================
-% Slide 13
+% Slide 14
 % ============================================================
 
-\begin{frame}{Process State: \texttt{pstate} and Condition Flags}
+\begin{frame}{Process State: \texttt{pstate}}
 \vfill
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item The processor maintains architectural processor state in \bits{pstate}, including the NZCV condition flags.
-  \item The upper 4 bits evaluate the \key{NZCV Arithmetic Condition Flags}:
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \bits{pstate} contains selected processor status fields visible to the architecture.
+  \item One part of \bits{pstate} holds the condition flags used by conditional execution.
+  \item Topic 4 gives the full treatment of those flags when they are used for comparisons, branches, and conditional select.
 \end{itemize}
 
 \vfill
-\begin{center}
-\footnotesize
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{cll}
-\toprule
-\textbf{Flag} & \textbf{Name} & \textbf{Condition Under Which Flag Is Set to 1} \\
-\midrule
-\key{N} & \textbf{Negative} & Result bit 63 (or bit 31) is 1 (negative signed value) \\
-\key{Z} & \textbf{Zero}     & Computed result is exactly zero \\
-\key{C} & \textbf{Carry}    & Operation generated an unsigned carry-out (or no borrow in sub) \\
-\key{V} & \textbf{Overflow} & Signed result cannot be represented in the destination width \\
-\bottomrule
-\end{tabular}
-\end{center}
 
-\vfill
-\begin{block}{Selective Flag Updates}
-\small Standard ALU instructions (\code{add}, \code{sub}) do \key{not} modify flags. Only instructions with an ``\code{s}'' suffix (\code{adds}, \code{subs}) or comparison instructions (\code{cmp}) update NZCV.
+\begin{block}{Course Boundary}
+\small In this topic, \bits{pstate} is introduced as part of the programmer-visible state. The detailed interpretation of \bits{N}, \bits{Z}, \bits{C}, and \bits{V} belongs with AArch64 assembly control flow.
 \end{block}
+
 \vfill
 \end{frame}
-
 % ============================================================
 % Section 3 Divider
 % ============================================================
@@ -609,7 +627,7 @@
 \sectiondivider{PART 3}{Memory Model, Alignment \& Endianness}
 
 % ============================================================
-% Slide 14
+% Slide 15
 % ============================================================
 
 \begin{frame}{Memory Organization \& Byte Addressing}
@@ -646,7 +664,7 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{frame}
 
 % ============================================================
-% Slide 15
+% Slide 16
 % ============================================================
 
 \begin{frame}{Memory Alignment Rules}
@@ -688,7 +706,7 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{frame}
 
 % ============================================================
-% Slide 16
+% Slide 17
 % ============================================================
 
 \begin{frame}{Byte Ordering: Little-Endian vs.\ Big-Endian}
@@ -746,7 +764,7 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{frame}
 
 % ============================================================
-% Slide 17
+% Slide 18
 % ============================================================
 
 \begin{frame}{The Process Address Space Layout}
@@ -790,7 +808,7 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \sectiondivider{PART 4}{Foundational Instruction Classes}
 
 % ============================================================
-% Slide 18
+% Slide 19
 % ============================================================
 
 \begin{frame}{Instruction Syntax Conventions}
@@ -823,7 +841,7 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{frame}
 
 % ============================================================
-% Slide 19
+% Slide 20
 % ============================================================
 
 \begin{frame}{Arithmetic Instructions: Addition \& Subtraction}
@@ -854,7 +872,7 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{frame}
 
 % ============================================================
-% Slide 20
+% Slide 21
 % ============================================================
 
 \begin{frame}{Logical Operations: Bitwise Manipulation}
@@ -890,7 +908,7 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{frame}
 
 % ============================================================
-% Slide 21
+% Slide 22
 % ============================================================
 
 \begin{frame}{Shift Operations: Barrel Shifter Integration}
@@ -927,35 +945,6 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 % ============================================================
 % Slide 22
 % ============================================================
-
-\begin{frame}{Comparison and Testing Instructions}
-\vfill
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Comparison instructions evaluate operands, update NZCV flags, and discard the numerical result.
-\end{itemize}
-
-\vfill
-\begin{center}
-\footnotesize
-\renewcommand{\arraystretch}{1.0}
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lll}
-\toprule
-\textbf{Instruction} & \textbf{Underlying Operation} & \textbf{Flags Updated} \\
-\midrule
-\code{cmp  xn, xm}      & \code{subs xzr, xn, xm}   & Evaluates $x_n - x_m \to \text{NZCV}$ \\
-\code{cmn  xn, xm}      & \code{adds xzr, xn, xm}   & Evaluates $x_n + x_m \to \text{NZCV}$ (Compare Negative) \\
-\code{tst  xn, xm}      & \code{ands xzr, xn, xm}   & Evaluates $x_n \land x_m \to \text{NZCV}$ (Bit Test) \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vfill
-\begin{block}{Flag Interpretation Rules}
-\small If $x_n == x_m$, \code{cmp} asserts \key{Z (Zero)} since $x_n - x_m = 0$. If $x_n < x_m$ (signed), \code{cmp} configures flags such that $\text{N} \neq \text{V}$ (Negative differs from Overflow).
-\end{block}
-\vfill
-\end{frame}
 
 % ============================================================
 % Slide 23
@@ -1174,40 +1163,8 @@ stp x29, x30, [sp, #-16]!
 % Slide 29
 % ============================================================
 
-\begin{frame}{Conditional Branches \& Condition Codes}
-\vfill
-\small Syntax: \code{b.cond label} (Branches to \code{label} only if the condition evaluates to true).
-
-\vfill
-\begin{center}
-\footnotesize
-\renewcommand{\arraystretch}{0.92}
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{llll}
-\toprule
-\textbf{Condition Code} & \textbf{Meaning} & \textbf{Flag Condition} & \textbf{Comparison Context} \\
-\midrule
-\code{b.eq} & Equal / Zero               & $\text{Z} == 1$ & Signed / Unsigned \\
-\code{b.ne} & Not Equal / Non-Zero       & $\text{Z} == 0$ & Signed / Unsigned \\
-\code{b.lt} & Signed Less Than           & $\text{N} \neq \text{V}$ & Signed \\
-\code{b.le} & Signed Less Than or Equal  & $(\text{Z} == 1) \lor (\text{N} \neq \text{V})$ & Signed \\
-\code{b.gt} & Signed Greater Than        & $(\text{Z} == 0) \land (\text{N} == \text{V})$ & Signed \\
-\code{b.ge} & Signed Greater or Equal    & $\text{N} == \text{V}$ & Signed \\
-\code{b.lo} & Unsigned Lower ($<$)       & $\text{C} == 0$ & Unsigned \\
-\code{b.hi} & Unsigned Higher ($>$)      & $(\text{C} == 1) \land (\text{Z} == 0)$ & Unsigned \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vfill
-\begin{block}{Branch Prediction Context}
-\small A mispredicted conditional branch can disrupt speculative execution and require younger instructions to be discarded and refetched. Processors reduce this cost with hardware branch predictors and branch target buffers (BTBs).
-\end{block}
-\vfill
-\end{frame}
-
 % ============================================================
-% Slide 30
+% Slide 29
 % ============================================================
 
 \begin{frame}[fragile]{Control Flow Idiom: If-Else Translation}
@@ -1251,7 +1208,7 @@ if (a == b) {
 \end{frame}
 
 % ============================================================
-% Slide 31
+% Slide 30
 % ============================================================
 
 \begin{frame}[fragile]{Control Flow Idiom: While-Loop Translation}
@@ -1300,7 +1257,7 @@ while (i < n) {
 \end{frame}
 
 % ============================================================
-% Slide 32
+% Slide 31
 % ============================================================
 
 \begin{frame}{Conditional Select Instructions: Avoiding Selected Branches}
@@ -1344,24 +1301,24 @@ while (i < n) {
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
 % ============================================================
-% Slide 33: Comprehensive Summary
+% Slide 32
 % ============================================================
 
 \begin{frame}{Topic 3: Comprehensive Summary}
 \vspace{0.08cm}
 \small
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{Architectural State:} Precise hardware-software contract defined by general registers (\bits{x0}--\bits{x30}), flags (NZCV), stack pointer (\bits{sp}), program counter (\bits{pc}), and byte-addressed memory.
+  \item \key{Architectural State:} Precise hardware-software contract defined by general registers (\bits{x0}--\bits{x30}), processor state, stack pointer (\bits{sp}), program counter (\bits{pc}), and byte-addressed memory.
   \item \key{Register Structure:} 31 highly regular 64-bit general-purpose registers (\bits{x0}--\bits{x30}) have corresponding 32-bit views (\bits{w0}--\bits{w30}); writing a \bits{w} register clears the upper 32 bits of the corresponding \bits{x} register.
   \item \key{ABI Rules:} \bits{x0}--\bits{x7} handle arguments/returns (caller-saved); \bits{x19}--\bits{x28} hold local variables across calls (callee-saved).
   \item \key{Load/Store Operations:} Integer ALU operations use registers, while memory is accessed with explicit load/store instruction classes, including offset, indexed, and paired forms.
-  \item \key{Control Flow:} Branching can evaluate NZCV flags updated by \code{adds}/\code{subs}/\code{cmp}; conditional select (\code{csel}) can avoid a conditional branch for suitable expressions.
+  \item \key{Control Flow Preview:} Branches update the program counter; conditional flag interpretation is developed in Topic 4.
 \end{itemize}
 \vfill
 \end{frame}
 
 % ============================================================
-% Slide 34: Self-Test Questions (Part 1)
+% Slide 33
 % ============================================================
 
 \begin{frame}{Self-Test Questions: State \& Register Mechanics}
@@ -1379,7 +1336,7 @@ while (i < n) {
 \end{frame}
 
 % ============================================================
-% Slide 35: Self-Test Questions (Part 2)
+% Slide 34
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Memory \& Instruction Mechanics}
@@ -1391,14 +1348,12 @@ while (i < n) {
 
   \item \key{Branch Elimination via \texttt{csel}:} Convert this C statement into branchless assembly using \code{cmp} and \code{csel}:\\
   \code{int64\_t result = (val1 <= val2) ? (val1 + 10) : (val2 - 5);}
-
-  \item \key{Condition Flag Verification:} If \bits{x0} contains $5$ and \bits{x1} contains $10$, which NZCV flags are asserted ($=1$) following \code{cmp x0, x1}?
 \end{enumerate}
 \vfill
 \end{frame}
 
 % ============================================================
-% Slide 36: Look Ahead
+% Slide 35
 % ============================================================
 
 \begin{frame}{Looking Ahead}
@@ -1411,7 +1366,7 @@ while (i < n) {
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item \key{ALU \& Shifted Operands:} Arithmetic using shifted-register operands integrated into AArch64 data-processing instructions.
   \item \key{Bitwise Logic \& Field Extraction:} Manipulating bitfields using masks, bit clears (\code{bic}), and bitfield extracts (\code{ubfx}).
-  \item \key{Condition Flags \& Comparisons:} Leveraging NZCV flags and choosing between signed vs.\ unsigned branch conditions.
+  \item \key{Condition Flags \& Comparisons:} Using \bits{N}, \bits{Z}, \bits{C}, and \bits{V} for comparisons and conditional control flow.
   \item \key{Control Flow \& Conditional Selection:} Translating loops and nested conditionals while using \code{csel} to reduce reliance on conditional branches for suitable expressions.
 \end{itemize}
 \vfill

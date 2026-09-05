@@ -80,7 +80,6 @@
 
 \begin{document}
 
-
 % ============================================================
 % Slide 1
 % ============================================================
@@ -221,7 +220,6 @@ clarifies an architectural difference.
 % Topic 1 Outline
 % ============================================================
 
-
 % ============================================================
 % Slide 4
 % ============================================================
@@ -243,7 +241,7 @@ clarifies an architectural difference.
 
   \item \key{Binary Representation \& Arithmetic}
         \begin{itemize}
-          \item Binary and hexadecimal, endianness, two's complement, extension, and condition flags
+          \item Binary and hexadecimal, endianness, two's complement, and value extension
         \end{itemize}
 
   \item \key{Quantitative Processor Performance}
@@ -288,7 +286,6 @@ Architecture Foundations \& Abstraction\par}
 
 \end{frame}
 
-
 % ============================================================
 % Slide 6
 % ============================================================
@@ -310,7 +307,6 @@ Architecture Foundations \& Abstraction\par}
 \end{block}
 
 \end{frame}
-
 
 % ============================================================
 % Slide 7
@@ -457,7 +453,6 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 
 \end{frame}
 
-
 % ============================================================
 % Slide 8
 % ============================================================
@@ -493,7 +488,6 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 Performance-sensitive software often exposes lower-level machine behavior. Programmers may need to consider locality, branch behavior, and data layout when execution time matters.
 
 \end{frame}
-
 
 % ============================================================
 % Slide 9
@@ -566,7 +560,6 @@ The compiler and assembler translate program intent into AArch64 instructions. T
 
 \end{frame}
 
-
 % ============================================================
 % Slide 10
 % ============================================================
@@ -603,7 +596,6 @@ Different processors can implement the exact same ISA using radically different 
 
 \end{frame}
 
-
 % ============================================================
 % Slide 11
 % ============================================================
@@ -623,7 +615,6 @@ RISC designs favor simple, regular instructions and rely on compilers to combine
 \end{block}
 
 \end{frame}
-
 
 % ============================================================
 % Slide 12
@@ -688,7 +679,6 @@ Stored-Program Organization \& Memory\par}
 \vspace*{\fill}
 
 \end{frame}
-
 
 % ============================================================
 % Slide 14
@@ -764,7 +754,6 @@ The stored-program model allows a machine to run different programs by changing 
 
 \end{frame}
 
-
 % ============================================================
 % Slide 15
 % ============================================================
@@ -815,7 +804,6 @@ The stored-program model allows a machine to run different programs by changing 
 \end{itemize}
 
 \end{frame}
-
 
 % ============================================================
 % Slide 16
@@ -970,7 +958,6 @@ The stored-program model allows a machine to run different programs by changing 
 
 \end{frame}
 
-
 % ============================================================
 % Slide 17
 % ============================================================
@@ -1007,7 +994,6 @@ The stored-program model allows a machine to run different programs by changing 
 The exact AArch64 cache-maintenance and barrier instructions are system-software details that we will revisit later. Without the required synchronization, instruction fetch may observe stale instructions rather than the newly generated code.
 
 \end{frame}
-
 
 % ============================================================
 % Slide 18
@@ -1091,7 +1077,6 @@ Programs rarely access memory randomly. They exhibit:
 
 \end{frame}
 
-
 % ============================================================
 % Slide 19
 % ============================================================
@@ -1153,7 +1138,6 @@ Binary Representation \& Arithmetic\par}
 
 \end{frame}
 
-
 % ============================================================
 % Slide 21
 % ============================================================
@@ -1204,7 +1188,6 @@ Bits do not carry a built-in ``type''; instructions and software conventions det
 
 \end{frame}
 
-
 % ============================================================
 % Slide 22
 % ============================================================
@@ -1231,7 +1214,6 @@ $=
 \end{block}
 
 \end{frame}
-
 
 % ============================================================
 % Slide 23
@@ -1289,7 +1271,6 @@ Lowest address $\rightarrow$ most-significant byte
 
 \end{frame}
 
-
 % ============================================================
 % Slide 24
 % ============================================================
@@ -1315,7 +1296,6 @@ For an $n$-bit two's-complement number, $\text{Value} = -b_{n-1}2^{n-1} + \sum_{
 \emph{Give the most-significant bit a negative weight, and add the remaining positive bit weights normally.}
 
 \end{frame}
-
 
 % ============================================================
 % Slide 25
@@ -1355,7 +1335,6 @@ $-5 = \bits{11111011}$
 \end{itemize}
 
 \end{frame}
-
 
 % ============================================================
 % Slide 26
@@ -1441,7 +1420,6 @@ A unified adder lets the processor reuse the same core arithmetic hardware for b
 
 \end{frame}
 
-
 % ============================================================
 % Slide 27
 % ============================================================
@@ -1484,100 +1462,13 @@ Using the wrong extension changes the interpreted value and can invalidate compa
 % ============================================================
 % Slide 28
 % ============================================================
-
-\begin{frame}{AArch64 NZCV Condition Flags}
-
-Arithmetic instructions update status flags in the PSTATE register to describe the result characteristics:
-
-\vfill
-
-\small
-
-\begin{center}
-
-\begin{tabular}{cll}
-\toprule
-Flag & Name & Evaluation Meaning \\
-\midrule
-N & Negative & Most-significant result bit is 1 \\
-Z & Zero & All result bits are zero \\
-C & Carry & Unsigned carry-out (add) or no-borrow (sub) \\
-V & Overflow & Signed mathematical result is outside the destination range \\
-\bottomrule
-\end{tabular}
-
-\end{center}
-
-\vfill
-
-\begin{block}{Same Bits, Different Questions}
-For \(\mathtt{1111}_2 + \mathtt{0001}_2\) in 4 bits, the stored result is \(\mathtt{0000}_2\).\\
-Unsigned interpretation: $15+1=16$ produces a carry-out ($C=1$).\\
-Signed interpretation: $-1+1=0$ does not overflow the limits ($V=0$).
-\end{block}
-
-\end{frame}
-
-
 % ============================================================
 % Slide 29
 % ============================================================
-
-\begin{frame}{Signed vs.\ Unsigned Conditional Branching}
-
-After \code{cmp x0, x1}, the processor has conceptually subtracted the operands and set NZCV. The compiler maps C-level types (e.g., \code{int} vs \code{unsigned int}) to specific branch mnemonics.
-
-\vfill
-
-\small
-
-\begin{center}
-
-\begin{tabular}{llll}
-\toprule
-Branch & Context & Flag Condition & Meaning \\
-\midrule
-\code{b.eq} / \code{b.ne}
-&
-Universal
-&
-$Z=1$ / $Z=0$
-&
-Equal / Not Equal
-\\
-\code{b.lt} / \code{b.ge}
-&
-Signed
-&
-$N \neq V$ / $N = V$
-&
-Less Than / Greater or Equal
-\\
-\code{b.lo} / \code{b.hs}
-&
-Unsigned
-&
-$C=0$ / $C=1$
-&
-Lower / Higher or Equal
-\\
-\bottomrule
-\end{tabular}
-
-\end{center}
-
-\vfill
-
-\begin{block}{Why the Mnemonic Depends on Interpretation}
-The same 64-bit pattern can represent a negative signed integer or a very large unsigned integer. The correct branch condition follows the program's intended interpretation, not the raw bits alone.
-\end{block}
-
-\end{frame}
-
 % --- Section Divider 4 ---
 
 % ============================================================
-% Slide 30
+% Slide 28
 % ============================================================
 
 \begin{frame}[plain]
@@ -1608,9 +1499,8 @@ Quantitative Processor Performance\par}
 
 \end{frame}
 
-
 % ============================================================
-% Slide 31
+% Slide 29
 % ============================================================
 
 \begin{frame}{Defining Performance: Latency and Throughput}
@@ -1643,9 +1533,8 @@ IPC (Instructions Per Cycle) is a measure of instruction throughput inside a pro
 
 \end{frame}
 
-
 % ============================================================
-% Slide 32
+% Slide 30
 % ============================================================
 
 \begin{frame}{Dynamic Instruction Count and Average CPI}
@@ -1665,10 +1554,8 @@ A processor will naturally exhibit wildly different CPI values on different prog
 
 \end{frame}
 
-
-
 % ============================================================
-% Slide 33
+% Slide 31
 % ============================================================
 
 \begin{frame}{Clock Frequency and Clock Period}
@@ -1706,10 +1593,8 @@ T_{\text{clk}}
 
 \end{frame}
 
-
-
 % ============================================================
-% Slide 34
+% Slide 32
 % ============================================================
 
 \begin{frame}{The Iron Law of Processor Performance}
@@ -1770,9 +1655,8 @@ These factors are \key{not independent}. A design change that improves one facto
 
 \end{frame}
 
-
 % ============================================================
-% Slide 35
+% Slide 33
 % ============================================================
 
 \begin{frame}{Iron Law: Comparative Evaluation Example}
@@ -1839,9 +1723,8 @@ The Iron Law equation strictly compares measured assumptions; the numerical resu
 
 \end{frame}
 
-
 % ============================================================
-% Slide 36
+% Slide 34
 % ============================================================
 
 \begin{frame}{The Megahertz Myth and Speedup}
@@ -1861,9 +1744,8 @@ The Iron Law equation strictly compares measured assumptions; the numerical resu
 
 \end{frame}
 
-
 % ============================================================
-% Slide 37
+% Slide 35
 % ============================================================
 
 \begin{frame}{Amdahl's Law: Why Partial Optimization Is Limited}
@@ -1918,9 +1800,8 @@ S_{\max}
 
 \end{frame}
 
-
 % ============================================================
-% Slide 38
+% Slide 36
 % ============================================================
 
 \begin{frame}{Benchmarking and Architectural Trade-Offs}
@@ -1942,7 +1823,7 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
 % --- Section Divider 5 ---
 
 % ============================================================
-% Slide 39
+% Slide 37
 % ============================================================
 
 \begin{frame}[plain]
@@ -1959,9 +1840,8 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
 \vspace*{\fill}
 \end{frame}
 
-
 % ============================================================
-% Slide 40
+% Slide 38
 % ============================================================
 
 \begin{frame}{Topic 1 Summary: Architecture \& Memory}
@@ -1980,16 +1860,15 @@ System software must respect these boundaries; for example, newly generated code
 
 \end{frame}
 
-
 % ============================================================
-% Slide 41
+% Slide 39
 % ============================================================
 
 \begin{frame}{Topic 1 Summary: Representation \& Performance}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item \key{Two's Complement:} Signed integers use a representation that supports one zero and a unified hardware addition/subtraction datapath.
-  \item \key{Condition Flags:} NZCV correctly distinguishes unsigned carry boundaries from signed arithmetic overflow limits.
+  \item \key{Signed and Unsigned Arithmetic:} Carry and overflow describe different arithmetic questions.
   \item \key{The Iron Law:} CPU execution time depends jointly and inextricably on instruction count, average CPI, and clock period.
   \item \key{Amdahl's Law:} Overall speedup is mathematically limited by the fraction of execution time that remains untouched by enhancements.
 \end{itemize}
@@ -2001,9 +1880,8 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 
 \end{frame}
 
-
 % ============================================================
-% Slide 42
+% Slide 40
 % ============================================================
 
 \begin{frame}{Self-Test Diagnostic Questions: Architecture \& Binary}
@@ -2033,9 +1911,8 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 \vfill
 \end{frame}
 
-
 % ============================================================
-% Slide 43
+% Slide 41
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Performance \& Memory}
@@ -2062,9 +1939,8 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 \vfill
 \end{frame}
 
-
 % ============================================================
-% Slide 44
+% Slide 42
 % ============================================================
 
 \begin{frame}{Looking Ahead}

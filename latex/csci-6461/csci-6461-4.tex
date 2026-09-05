@@ -93,17 +93,37 @@
 
 % Section divider macro
 \newcommand{\sectiondivider}[2]{%
+
+% ============================================================
+% Slide 1
+% ============================================================
+
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -134,38 +154,51 @@
 \begin{document}
 
 % ============================================================
-% Slide 1: Title Slide
+% Slide 2
 % ============================================================
 
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
-\vspace{0.8cm}
+\vspace*{\fill}
+
 \begin{minipage}{0.88\textwidth}
-{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 4\par}
+
+{\color{gold}\normalsize\bfseries
+CSCI 6461 \;|\; Computer Systems Architecture \;|\; TOPIC 4
+\par}
+
 \vspace{0.25cm}
+
 {\color{white}\fontsize{24}{28}\selectfont\bfseries
- AArch64 Assembly Programming:\\[0.08cm]
- Arithmetic, Logic, \& Control Flow
+AArch64 Assembly Programming:\\[0.08cm]Arithmetic, Logic, \& Control Flow
 \par}
+
 \vspace{0.35cm}
+
 {\color{white!80}\large
- ALU mechanics, shifted-register operands, bitwise operations,\\
- condition flags, structured branches, and conditional selection
+ALU mechanics, shifted-register operands, bitwise operations,\\condition flags, structured branches, and conditional selection
 \par}
+
 \end{minipage}
 
 \vfill
-{\color{white}\normalsize Dr. J. Burns\par}
-{\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
-\vspace{0.35cm}
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
+
 \end{frame}
 
 % ============================================================
-% Slide 2: Module Topics Overview
+% Slide 3
 % ============================================================
 
 \begin{frame}{Topic 4: Core Lecture Outline}
@@ -198,7 +231,7 @@
 \sectiondivider{PART 1}{ALU Operations: Arithmetic, Shifting, \& Bitwise Logic}
 
 % ============================================================
-% Slide 3
+% Slide 4
 % ============================================================
 
 \begin{frame}{Arithmetic Primitives: Addition \& Subtraction}
@@ -232,7 +265,7 @@
 \end{frame}
 
 % ============================================================
-% Slide 4
+% Slide 5
 % ============================================================
 
 \begin{frame}{Shifted-Register Operands and Shift Operations}
@@ -267,7 +300,7 @@ Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift; the sign 
 \end{frame}
 
 % ============================================================
-% Slide 5
+% Slide 6
 % ============================================================
 
 \begin{frame}{Integer Multiplication \& Division}
@@ -301,7 +334,7 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 \end{frame}
 
 % ============================================================
-% Slide 6
+% Slide 7
 % ============================================================
 
 \begin{frame}{Bitwise Logic Primitives}
@@ -335,7 +368,7 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 \end{frame}
 
 % ============================================================
-% Slide 7
+% Slide 8
 % ============================================================
 
 \begin{frame}{Bitfield Extraction: \texttt{ubfx}}
@@ -374,13 +407,14 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 \sectiondivider{PART 2}{Condition Flags \& Comparison Mechanics}
 
 % ============================================================
-% Slide 8
+% Slide 9
 % ============================================================
 
-\begin{frame}{The NZCV Condition Flags}
+\begin{frame}{NZCV Condition Flags for Control Flow}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Flag bits reside in \bits{pstate} and record status of the most recent instruction that updates NZCV.
+  \item Topic 4 is where we use the \bits{pstate} condition flags in assembly programs.
+  \item The NZCV bits record the status of the most recent instruction that updates them.
   \item Common flag-setting forms include instructions with an ``\code{s}'' suffix and explicit comparisons.
 \end{itemize}
 
@@ -408,12 +442,12 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \end{frame}
 
 % ============================================================
-% Slide 9
+% Slide 10
 % ============================================================
 
-\begin{frame}{Comparison Instructions: \texttt{cmp} and \texttt{tst}}
+\begin{frame}{Comparison Instructions: \texttt{cmp}, \texttt{cmn}, and \texttt{tst}}
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Comparison aliases set NZCV flags and discard the computed result.
+  \item Comparison aliases set NZCV flags and discard the computed result; later branches interpret those flags.
 \end{itemize}
 
 \vspace{0.10cm}
@@ -443,7 +477,7 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \end{frame}
 
 % ============================================================
-% Slide 10
+% Slide 11
 % ============================================================
 
 \begin{frame}{Condition Codes: Signed vs.\ Unsigned Branches}
@@ -484,7 +518,7 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 \sectiondivider{PART 3}{Control Flow: Branches \& Selection}
 
 % ============================================================
-% Slide 11
+% Slide 12
 % ============================================================
 
 \begin{frame}{Compare-and-Branch Instructions: \texttt{cbz} and \texttt{cbnz}}
@@ -522,7 +556,7 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 \end{frame}
 
 % ============================================================
-% Slide 12
+% Slide 13
 % ============================================================
 
 \begin{frame}[fragile]{Translating \texttt{if-then-else} Blocks}
@@ -564,7 +598,7 @@ if (x > y) {
 \end{frame}
 
 % ============================================================
-% Slide 13
+% Slide 14
 % ============================================================
 
 \begin{frame}[fragile]{Loop Translation: Inverted Loop Pattern}
@@ -610,7 +644,7 @@ while (i < n) {
 \end{frame}
 
 % ============================================================
-% Slide 14
+% Slide 15
 % ============================================================
 
 \begin{frame}{Branch Misprediction \& Conditional Selection (\texttt{csel})}
@@ -644,7 +678,7 @@ while (i < n) {
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
 % ============================================================
-% Slide 15: Comprehensive Summary
+% Slide 16
 % ============================================================
 
 \begin{frame}{Topic 4: Comprehensive Summary}
@@ -659,7 +693,7 @@ while (i < n) {
 \end{frame}
 
 % ============================================================
-% Slide 16: Self-Test Questions (Part 1)
+% Slide 17
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Arithmetic \& Logic}
@@ -678,7 +712,7 @@ while (i < n) {
 \end{frame}
 
 % ============================================================
-% Slide 17: Self-Test Questions (Part 2)
+% Slide 18
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Control Flow \& Selection}
@@ -699,6 +733,11 @@ while (i < n) {
 
 % ============================================================
 % Look Ahead to Topic 5
+% ============================================================
+
+
+% ============================================================
+% Slide 19
 % ============================================================
 
 \begin{frame}{Looking Ahead}
