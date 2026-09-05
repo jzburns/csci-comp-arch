@@ -94,17 +94,31 @@
 % Section divider macro
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
+
 \vspace*{\fill}
-\begin{minipage}{0.85\textwidth}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
 \vspace*{\fill}
+
 \end{frame}
 }
 
@@ -134,39 +148,58 @@
 
 \begin{document}
 
+
+
 % ============================================================
-% Slide 1: Title Slide
+% Slide 1
 % ============================================================
 
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
 \vspace*{\fill}
+
 \begin{minipage}{0.88\textwidth}
-{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 2\par}
+
+{\color{gold}\normalsize\bfseries
+CSCI 6461 \;|\; Computer Systems Architecture \;|\; TOPIC 2
+\par}
+
 \vspace{0.25cm}
+
 {\color{white}\fontsize{24}{28}\selectfont\bfseries
- RISC vs. CISC:\\[0.08cm]
- Instruction Set Design Principles \& Trade-offs
+RISC vs. CISC:\\[0.08cm]
+Instruction Set Design Principles \& Trade-offs
 \par}
+
 \vspace{0.35cm}
+
 {\color{white!80}\large
- ISA boundaries, microarchitectural costs,
- and quantitative trade-offs
+ISA boundaries, microarchitectural costs,\\
+and quantitative trade-offs
 \par}
+
 \end{minipage}
 
 \vfill
-{\color{white}\normalsize Dr. J. Burns\par}
-{\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
 \vspace*{\fill}
+
 \end{frame}
 
+
+
 % ============================================================
-% Slide 2: Topics Overview
+% Slide 2
 % ============================================================
 
 \begin{frame}{Topic 2: Module Roadmap}
@@ -201,6 +234,8 @@
 
 \sectiondivider{PART 1}{ISA Foundations \& Historical Context}
 
+
+
 % ============================================================
 % Slide 3
 % ============================================================
@@ -230,6 +265,8 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 \vfill
 \end{frame}
 
+
+
 % ============================================================
 % Slide 4
 % ============================================================
@@ -256,6 +293,8 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 
 \sectiondivider{PART 2}{The CISC Architectural Model}
 
+
+
 % ============================================================
 % Slide 5
 % ============================================================
@@ -275,6 +314,8 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 \end{block}
 \vfill
 \end{frame}
+
+
 
 % ============================================================
 % Slide 6
@@ -323,6 +364,8 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 
 \sectiondivider{PART 3}{The RISC Revolution \& Principles}
 
+
+
 % ============================================================
 % Slide 7
 % ============================================================
@@ -341,6 +384,8 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 \end{block}
 \vfill
 \end{frame}
+
+
 
 % ============================================================
 % Slide 8
@@ -361,6 +406,8 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 \end{block}
 \vfill
 \end{frame}
+
+
 
 % ============================================================
 % Slide 9
@@ -402,6 +449,8 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 \vfill
 \end{frame}
 
+
+
 % ============================================================
 % Slide 10
 % ============================================================
@@ -440,6 +489,8 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 \vfill
 \end{frame}
 
+
+
 % ============================================================
 % Slide 11
 % ============================================================
@@ -455,8 +506,10 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 12: Architectural Comparison (Key Metrics)
+% Slide 12
 % ============================================================
 
 \begin{frame}{ISA Comparison: AArch64 vs. x86-64}
@@ -489,31 +542,45 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 % Section 4 Divider
 % ============================================================
 
-\sectiondivider{PART 4}{Quantitative Performance \& Trade-offs}
+\sectiondivider{PART 4}{Quantitative ISA Trade-offs}
+
+
 
 % ============================================================
 % Slide 13
 % ============================================================
 
-\begin{frame}{The Performance Equation (Iron Law)}
+\begin{frame}{Applying the Iron Law to ISA Trade-offs}
 \vfill
-\begin{block}{CPU Execution Time Equation}
-$$T_{\text{CPU}} = \mathit{IC} \times \mathit{CPI} \times T_{\text{clk}} = \frac{\mathit{IC} \times \mathit{CPI}}{f_{\text{clk}}}$$
+
+\begin{block}{Recall from Topic 1}
+\[
+T_{\text{CPU}}
+=
+\mathit{IC}\times\mathit{CPI}\times T_{\text{clk}}
+=
+\frac{\mathit{IC}\times\mathit{CPI}}{f_{\text{clk}}}
+\]
 \end{block}
 
 \vfill
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Instruction Count ($\mathit{IC}$):} Total executed instructions (influenced by ISA and compiler).
-  \item \key{CPI:} Average clock cycles per instruction (influenced by pipeline and memory stalls).
-  \item \key{Clock Period ($T_{\text{clk}}$):} Duration of one cycle (influenced by circuit depth and design).
+
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item ISA design can change \key{dynamic instruction count} by changing how much work one instruction expresses.
+  \item ISA and implementation choices can also affect \key{CPI} through decode, scheduling, memory behavior, and pipeline effects.
+  \item Clock frequency is a property of the implementation, not a direct measure of ISA quality.
 \end{itemize}
 
 \vfill
-\begin{block}{The Optimization Tug-of-War}
-\small Enhancing one metric frequently degrades another. For instance, deepening a pipeline to increase $f_{\text{clk}}$ often increases $\mathit{CPI}$ due to more expensive branch misprediction penalties.
+
+\begin{block}{Use in This Topic}
+\small The Iron Law is used here as an evaluation tool: a lower instruction count is not automatically faster if CPI or clock period changes in the opposite direction.
 \end{block}
+
 \vfill
 \end{frame}
+
+
 
 % ============================================================
 % Slide 14
@@ -559,29 +626,11 @@ Under these assumed instruction-count and CPI values, Machine A completes the wo
 \vfill
 \end{frame}
 
+
+
+
 % ============================================================
 % Slide 15
-% ============================================================
-
-\begin{frame}{Amdahl's Law and Performance Limits}
-\vfill
-\begin{block}{Amdahl's Law Equation}
-$$S_{\text{overall}} = \frac{1}{(1 - f) + \frac{f}{S_{\text{enhanced}}}}$$
-\end{block}
-
-\vfill
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item $f$: Fraction of execution time subjected to optimization.
-  \item $S_{\text{enhanced}}$: Speedup factor achieved on that specific fraction.
-  \item \key{Example ($f = 0.60, S_{\text{enhanced}} = 10$):}
-  $$S_{\text{overall}} = \frac{1}{0.40 + \frac{0.60}{10}} \approx \mathbf{2.17\times}$$
-  \item \key{Application to Architecture:} Improving one part of a processor yields limited overall benefit when a substantial fraction of execution time is spent elsewhere, such as in memory stalls, branch recovery, or other unaffected work.
-\end{itemize}
-\vfill
-\end{frame}
-
-% ============================================================
-% Slide 16
 % ============================================================
 
 \begin{frame}{Energy, Thermal Limits \& Performance-per-Watt}
@@ -617,8 +666,10 @@ $$\frac{\text{Workload Throughput}}{\text{Watts}}$$
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 17
+% Slide 16
 % ============================================================
 
 \begin{frame}{Microarchitectural Convergence: Modern x86 Internals}
@@ -655,8 +706,10 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
+
+
 % ============================================================
-% Slide 18: Comprehensive Summary
+% Slide 17
 % ============================================================
 
 \begin{frame}{Topic 2: Comprehensive Summary}
@@ -667,13 +720,15 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
   \item \key{CISC Trade-offs:} Variable-length encodings and register-memory operations can improve code density and preserve compatibility, while increasing front-end decode complexity.
   \item \key{RISC Trade-offs:} Fixed-width encodings and load/store rules simplify instruction boundaries and operand handling, although performance still depends on the complete microarchitecture and workload.
   \item \key{Microarchitectural Convergence:} Modern high-performance x86 and AArch64 processors use many similar techniques, including pipelining, speculation, register renaming, out-of-order execution, and caching.
-  \item \key{Evaluation Metrics:} Processor performance should be evaluated using measured execution time, the Iron Law ($T_{\text{CPU}} = \frac{\mathit{IC} \times \mathit{CPI}}{f_{\text{clk}}}$), and energy-efficiency metrics such as Performance-per-Watt.
+  \item \key{Evaluation Metrics:} Topic 1's Iron Law provides a quantitative way to evaluate ISA trade-offs alongside measured execution time and energy-efficiency metrics such as Performance-per-Watt.
 \end{itemize}
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 19: Self-Test Questions (Part 1)
+% Slide 18
 % ============================================================
 
 \begin{frame}{Self-Test Questions: ISA Principles \& Mechanics}
@@ -688,8 +743,10 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 20: Self-Test Questions (Part 2)
+% Slide 19
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Quantitative Analysis \& Power}
@@ -708,6 +765,12 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 % Look Ahead to Topic 3 (Final Slide of Topic 2 Deck)
 % ============================================================
 
+
+
+% ============================================================
+% Slide 20
+% ============================================================
+
 \begin{frame}{Looking Ahead}
 \vfill
 \begin{block}{Next Lecture Preview}
@@ -716,9 +779,9 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 
 \vfill
 \begin{itemize}\setlength{\itemsep}{7pt}
-  \item \key{Architectural State:} Defining the precise software-visible hardware contract (registers, condition flags, stack pointer, and memory space).
+  \item \key{Architectural State:} Defining the precise software-visible hardware contract: registers, processor state, stack pointer, program counter, and memory.
   \item \key{AArch64 Register File:} Examining register naming conventions (\bits{x0}--\bits{x30} vs.\ \bits{w0}--\bits{w30}), the zero register (\bits{xzr}), and standard ABI calling conventions.
-  \item \key{Instruction Mechanics:} Exploring foundational instruction classes, memory addressing modes, and control flow translation.
+  \item \key{Instruction Mechanics:} Establishing AArch64 syntax and programmer-visible instruction behavior before detailed arithmetic and control flow in Topic 4.
 \end{itemize}
 \vfill
 \end{frame}

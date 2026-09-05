@@ -94,10 +94,6 @@
 % Section divider macro
 \newcommand{\sectiondivider}[2]{%
 
-% ============================================================
-% Slide 1
-% ============================================================
-
 \begin{frame}[plain]
 
 \begin{tikzpicture}[remember picture,overlay]
@@ -153,8 +149,10 @@
 
 \begin{document}
 
+
+
 % ============================================================
-% Slide 2
+% Slide 1
 % ============================================================
 
 \begin{frame}[plain]
@@ -197,8 +195,10 @@ Dr. J. Burns
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 3
+% Slide 2
 % ============================================================
 
 \begin{frame}{Topic 4: Core Lecture Outline}
@@ -230,8 +230,10 @@ Dr. J. Burns
 
 \sectiondivider{PART 1}{ALU Operations: Arithmetic, Shifting, \& Bitwise Logic}
 
+
+
 % ============================================================
-% Slide 4
+% Slide 3
 % ============================================================
 
 \begin{frame}{Arithmetic Primitives: Addition \& Subtraction}
@@ -264,8 +266,10 @@ Dr. J. Burns
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 5
+% Slide 4
 % ============================================================
 
 \begin{frame}{Shifted-Register Operands and Shift Operations}
@@ -299,8 +303,10 @@ Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift; the sign 
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 6
+% Slide 5
 % ============================================================
 
 \begin{frame}{Integer Multiplication \& Division}
@@ -333,8 +339,10 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 7
+% Slide 6
 % ============================================================
 
 \begin{frame}{Bitwise Logic Primitives}
@@ -367,8 +375,10 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 8
+% Slide 7
 % ============================================================
 
 \begin{frame}{Bitfield Extraction: \texttt{ubfx}}
@@ -406,8 +416,10 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 
 \sectiondivider{PART 2}{Condition Flags \& Comparison Mechanics}
 
+
+
 % ============================================================
-% Slide 9
+% Slide 8
 % ============================================================
 
 \begin{frame}{NZCV Condition Flags for Control Flow}
@@ -441,8 +453,10 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 10
+% Slide 9
 % ============================================================
 
 \begin{frame}{Comparison Instructions: \texttt{cmp}, \texttt{cmn}, and \texttt{tst}}
@@ -476,8 +490,10 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 11
+% Slide 10
 % ============================================================
 
 \begin{frame}{Condition Codes: Signed vs.\ Unsigned Branches}
@@ -517,8 +533,10 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 
 \sectiondivider{PART 3}{Control Flow: Branches \& Selection}
 
+
+
 % ============================================================
-% Slide 12
+% Slide 11
 % ============================================================
 
 \begin{frame}{Compare-and-Branch Instructions: \texttt{cbz} and \texttt{cbnz}}
@@ -555,8 +573,10 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 \key{Single-Bit Test:} \code{tbz x0, \#0, label} branches if bit 0 is zero.
 \end{frame}
 
+
+
 % ============================================================
-% Slide 13
+% Slide 12
 % ============================================================
 
 \begin{frame}[fragile]{Translating \texttt{if-then-else} Blocks}
@@ -597,8 +617,10 @@ if (x > y) {
 \key{Assembly Pattern:} Invert the high-level condition to fall through into the ``then'' path.
 \end{frame}
 
+
+
 % ============================================================
-% Slide 14
+% Slide 13
 % ============================================================
 
 \begin{frame}[fragile]{Loop Translation: Inverted Loop Pattern}
@@ -643,8 +665,10 @@ while (i < n) {
 \key{Common Loop Layout:} Placing the test at the bottom gives the steady-state loop body one loop-closing conditional branch.
 \end{frame}
 
+
+
 % ============================================================
-% Slide 15
+% Slide 14
 % ============================================================
 
 \begin{frame}{Branch Misprediction \& Conditional Selection (\texttt{csel})}
@@ -677,8 +701,10 @@ while (i < n) {
 
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
+
+
 % ============================================================
-% Slide 16
+% Slide 15
 % ============================================================
 
 \begin{frame}{Topic 4: Comprehensive Summary}
@@ -692,8 +718,10 @@ while (i < n) {
 \end{itemize}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 17
+% Slide 16
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Arithmetic \& Logic}
@@ -711,8 +739,10 @@ while (i < n) {
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 18
+% Slide 17
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Control Flow \& Selection}
@@ -736,8 +766,10 @@ while (i < n) {
 % ============================================================
 
 
+
+
 % ============================================================
-% Slide 19
+% Slide 18
 % ============================================================
 
 \begin{frame}{Looking Ahead}

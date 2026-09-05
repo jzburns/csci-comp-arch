@@ -95,10 +95,6 @@
 % Section divider macro
 \newcommand{\sectiondivider}[2]{%
 
-% ============================================================
-% Slide 1
-% ============================================================
-
 \begin{frame}[plain]
 
 \begin{tikzpicture}[remember picture,overlay]
@@ -154,8 +150,10 @@
 
 \begin{document}
 
+
+
 % ============================================================
-% Slide 2
+% Slide 1
 % ============================================================
 
 \begin{frame}[plain]
@@ -183,7 +181,7 @@ The Hardware/Software Interface\\[0.08cm]\& AArch64 Programmer's Model
 \vspace{0.35cm}
 
 {\color{white!80}\large
-Architectural state, registers, memory organization,\\and foundational instruction mechanics
+Architectural state, registers, memory organization,\\and programmer-visible conventions
 \par}
 
 \end{minipage}
@@ -198,8 +196,10 @@ Dr. J. Burns
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 3
+% Slide 2
 % ============================================================
 
 \begin{frame}{Topic 3: Module Topics}
@@ -225,7 +225,7 @@ Dr. J. Burns
 
   \item \key{Core Instruction Classes \& Execution Mechanics}
   \begin{itemize}
-    \item Data movement, arithmetic/logical operations, memory access, and basic branch structure.
+    \item Instruction syntax, immediate construction, and explicit load/store memory access.
   \end{itemize}
 \end{enumerate}
 \vfill
@@ -237,8 +237,10 @@ Dr. J. Burns
 
 \sectiondivider{PART 1}{Architectural State \& Execution Model}
 
+
+
 % ============================================================
-% Slide 4
+% Slide 3
 % ============================================================
 
 \begin{frame}{What Is Architectural State?}
@@ -261,8 +263,10 @@ Dr. J. Burns
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 5
+% Slide 4
 % ============================================================
 
 \begin{frame}{Architectural vs.\ Microarchitectural State}
@@ -298,8 +302,10 @@ Dr. J. Burns
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 6
+% Slide 5
 % ============================================================
 
 \begin{frame}{The AArch64 Execution State}
@@ -317,8 +323,10 @@ Dr. J. Burns
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 7
+% Slide 6
 % ============================================================
 
 \begin{frame}{Privilege Levels (Exception Levels)}
@@ -407,8 +415,10 @@ Dr. J. Burns
 
 \sectiondivider{PART 2}{AArch64 Register Architecture \& ABI}
 
+
+
 % ============================================================
-% Slide 8
+% Slide 7
 % ============================================================
 
 \begin{frame}{General-Purpose Registers: \texttt{x0}--\texttt{x30}}
@@ -435,8 +445,10 @@ Dr. J. Burns
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 9
+% Slide 8
 % ============================================================
 
 \begin{frame}{32-Bit Register Views: \texttt{w0}--\texttt{w30}}
@@ -467,8 +479,10 @@ Dr. J. Burns
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 10
+% Slide 9
 % ============================================================
 
 \begin{frame}{The Zero Register: \texttt{xzr} and \texttt{wzr}}
@@ -496,8 +510,10 @@ Dr. J. Burns
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 11
+% Slide 10
 % ============================================================
 
 \begin{frame}{Special-Purpose Registers: \texttt{sp}, \texttt{pc}, \texttt{lr}}
@@ -533,8 +549,10 @@ Dr. J. Burns
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 12
+% Slide 11
 % ============================================================
 
 \begin{frame}{The Calling Convention: Caller- vs.\ Callee-Saved}
@@ -570,8 +588,10 @@ Dr. J. Burns
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 13
+% Slide 12
 % ============================================================
 
 \begin{frame}{AArch64 Register File Overview}
@@ -600,8 +620,10 @@ Dr. J. Burns
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 14
+% Slide 13
 % ============================================================
 
 \begin{frame}{Process State: \texttt{pstate}}
@@ -626,8 +648,10 @@ Dr. J. Burns
 
 \sectiondivider{PART 3}{Memory Model, Alignment \& Endianness}
 
+
+
 % ============================================================
-% Slide 15
+% Slide 14
 % ============================================================
 
 \begin{frame}{Memory Organization \& Byte Addressing}
@@ -663,8 +687,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 16
+% Slide 15
 % ============================================================
 
 \begin{frame}{Memory Alignment Rules}
@@ -705,66 +731,11 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \vfill
 \end{frame}
 
-% ============================================================
-% Slide 17
-% ============================================================
 
-\begin{frame}{Byte Ordering: Little-Endian vs.\ Big-Endian}
-\vfill
-\small Storage of 32-bit Word \hex{0a0b0c0d} at Base Address \hex{1000}:
 
-\vfill
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\begin{block}{Little-Endian (AArch64 Default)}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item \key{Least Significant Byte (LSB)} stored at the \key{lowest} memory address.
-\end{itemize}
-\centering
-\footnotesize
-\begin{tabular}{cc}
-\toprule
-\textbf{Address} & \textbf{Stored Byte} \\
-\midrule
-\hex{1000} & \hex{0d} (LSB) \\
-\hex{1001} & \hex{0c} \\
-\hex{1002} & \hex{0b} \\
-\hex{1003} & \hex{0a} (MSB) \\
-\bottomrule
-\end{tabular}
-\end{block}
-\end{column}
-
-\begin{column}{0.48\textwidth}
-\begin{block}{Big-Endian (Network Order)}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item \key{Most Significant Byte (MSB)} stored at the \key{lowest} memory address.
-\end{itemize}
-\centering
-\footnotesize
-\begin{tabular}{cc}
-\toprule
-\textbf{Address} & \textbf{Stored Byte} \\
-\midrule
-\hex{1000} & \hex{0a} (MSB) \\
-\hex{1001} & \hex{0b} \\
-\hex{1002} & \hex{0c} \\
-\hex{1003} & \hex{0d} (LSB) \\
-\bottomrule
-\end{tabular}
-\end{block}
-\end{column}
-\end{columns}
-
-\vfill
-\begin{block}{Network Interoperability}
-\footnotesize Multi-byte network protocol fields conventionally use network byte order (big-endian). Software can convert them with instructions such as \code{rev}, library routines, or explicit byte-wise parsing.
-\end{block}
-\vfill
-\end{frame}
 
 % ============================================================
-% Slide 18
+% Slide 16
 % ============================================================
 
 \begin{frame}{The Process Address Space Layout}
@@ -807,8 +778,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 
 \sectiondivider{PART 4}{Foundational Instruction Classes}
 
+
+
 % ============================================================
-% Slide 19
+% Slide 17
 % ============================================================
 
 \begin{frame}{Instruction Syntax Conventions}
@@ -840,114 +813,14 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \vfill
 \end{frame}
 
-% ============================================================
-% Slide 20
-% ============================================================
 
-\begin{frame}{Arithmetic Instructions: Addition \& Subtraction}
-\vfill
-\begin{center}
-\small
-\renewcommand{\arraystretch}{0.95}
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{lll}
-\toprule
-\textbf{Instruction} & \textbf{Operation} & \textbf{Flags Updated?} \\
-\midrule
-\code{add  xd, xn, xm}  & $x_d \leftarrow x_n + x_m$ & No \\
-\code{adds xd, xn, xm}  & $x_d \leftarrow x_n + x_m$ & \key{Yes (Updates NZCV)} \\
-\code{sub  xd, xn, xm}  & $x_d \leftarrow x_n - x_m$ & No \\
-\code{subs xd, xn, xm}  & $x_d \leftarrow x_n - x_m$ & \key{Yes (Updates NZCV)} \\
-\code{neg  xd, xm}      & $x_d \leftarrow 0 - x_m$ (Alias: \code{sub xd, xzr, xm}) & No \\
-\code{negs xd, xm}      & $x_d \leftarrow 0 - x_m$ (Alias: \code{subs xd, xzr, xm}) & \key{Yes} \\
-\bottomrule
-\end{tabular}
-\end{center}
 
-\vfill
-\begin{block}{Immediate Scaling}
-\small Immediate values (\code{\#imm12}) span $0\text{ to }4095$ and can optionally be encoded with a 12-bit left shift, allowing selected larger constants to be represented in one instruction.
-\end{block}
-\vfill
-\end{frame}
+
+
+
 
 % ============================================================
-% Slide 21
-% ============================================================
-
-\begin{frame}{Logical Operations: Bitwise Manipulation}
-\vfill
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Bitwise operations execute concurrently across all 64 parallel bit slices in the ALU.
-\end{itemize}
-
-\vfill
-\begin{center}
-\small
-\renewcommand{\arraystretch}{0.95}
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lll}
-\toprule
-\textbf{Mnemonic} & \textbf{Operation} & \textbf{Bitwise Logic} \\
-\midrule
-\code{and  xd, xn, xm}  & Bitwise AND & $x_d \leftarrow x_n \land x_m$ \\
-\code{orr  xd, xn, xm}  & Bitwise OR  & $x_d \leftarrow x_n \lor x_m$ \\
-\code{eor  xd, xn, xm}  & Bitwise XOR & $x_d \leftarrow x_n \oplus x_m$ \\
-\code{bic  xd, xn, xm}  & Bit Clear (AND NOT) & $x_d \leftarrow x_n \land (\sim x_m)$ \\
-\code{mvn  xd, xm}      & Bitwise NOT & $x_d \leftarrow \sim x_m$ \\
-\code{ands xd, xn, xm}  & Bitwise AND with Flags & $x_d \leftarrow x_n \land x_m \to \text{NZCV}$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vfill
-\begin{block}{Bit Clear (\texttt{bic}) Utility}
-\small \code{bic x0, x1, x2} acts as a hardware mask, clearing every bit in $x_1$ where the corresponding bit in $x_2$ is \bits{1}.
-\end{block}
-\vfill
-\end{frame}
-
-% ============================================================
-% Slide 22
-% ============================================================
-
-\begin{frame}{Shift Operations: Barrel Shifter Integration}
-\vfill
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item AArch64 hardware integrates a dedicated \key{barrel shifter} onto the second operand datapath.
-  \item Shift instructions execute standalone or fold directly into primary ALU operations.
-\end{itemize}
-
-\vfill
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.0}
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lll}
-\toprule
-\textbf{Mnemonic} & \textbf{Operation Name} & \textbf{Mathematical Meaning} \\
-\midrule
-\code{lsl xd, xn, \#k} & Logical Shift Left  & $x_d \leftarrow x_n \ll k$ (Multiplication by $2^k$) \\
-\code{lsr xd, xn, \#k} & Logical Shift Right & $x_d \leftarrow x_n \gg k$ (Unsigned division by $2^k$, zero-fill) \\
-\code{asr xd, xn, \#k} & Arithmetic Shift Right & $x_d \leftarrow x_n \gg k$ (Signed division by $2^k$, sign-fill) \\
-\code{ror xd, xn, \#k} & Rotate Right        & Circular right bit rotation \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vfill
-\begin{block}{Integrated Shifted Register Example}
-\small \code{add x0, x1, x2, lsl \#3} $\implies x_0 \leftarrow x_1 + (x_2 \times 8)$ encodes the shifted register operand as part of a single AArch64 instruction.
-\end{block}
-\vfill
-\end{frame}
-
-% ============================================================
-% Slide 22
-% ============================================================
-
-% ============================================================
-% Slide 23
+% Slide 18
 % ============================================================
 
 \begin{frame}{Loading Immediate Constants: \texttt{movz}, \texttt{movk}, \texttt{movn}}
@@ -984,8 +857,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 24
+% Slide 19
 % ============================================================
 
 \begin{frame}{Memory Access: Basic Load/Store Architecture}
@@ -1021,8 +896,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 25
+% Slide 20
 % ============================================================
 
 \begin{frame}{Addressing Modes: Base with Immediate Offset}
@@ -1058,8 +935,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 26
+% Slide 21
 % ============================================================
 
 \begin{frame}{Advanced Addressing: Pre- and Post-Indexed}
@@ -1097,8 +976,10 @@ Base update happens \emph{after} access.
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 27
+% Slide 22
 % ============================================================
 
 \begin{frame}[fragile]{Loading and Storing Pairs (\texttt{ldp} and \texttt{stp})}
@@ -1124,175 +1005,9 @@ stp x29, x30, [sp, #-16]!
 \vfill
 \end{frame}
 
-% ============================================================
-% Slide 28
-% ============================================================
 
-\begin{frame}{Control Flow: Unconditional Branches}
-\vfill
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Control flow instructions redirect program execution by modifying the Program Counter (\bits{pc}).
-\end{itemize}
 
-\vfill
-\begin{center}
-\footnotesize
-\renewcommand{\arraystretch}{1.02}
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{lll}
-\toprule
-\textbf{Instruction} & \textbf{Name / Syntax} & \textbf{Operational Behavior} \\
-\midrule
-\code{b   label}     & Direct Branch        & $\text{pc} \leftarrow \text{label}$ (PC-relative range: $\pm 128\text{ MB}$) \\
-\code{br  xn}        & Indirect Branch      & $\text{pc} \leftarrow x_n$ (Jump to address held in register $x_n$) \\
-\code{bl  label}     & Branch with Link     & $x_{30} \leftarrow \text{pc} + 4$; $\text{pc} \leftarrow \text{label}$ (Subroutine call) \\
-\code{blr xn}        & Indirect Call        & $x_{30} \leftarrow \text{pc} + 4$; $\text{pc} \leftarrow x_n$ (Function pointer call) \\
-\code{ret}           & Subroutine Return    & $\text{pc} \leftarrow x_{30}$ (Default return via Link Register) \\
-\bottomrule
-\end{tabular}
-\end{center}
 
-\vfill
-\begin{block}{PC-Relative Addressing}
-\small Direct branch offsets are encoded as signed displacements relative to the current \bits{pc}. This supports position-independent code within the instruction\'s encoded displacement range.
-\end{block}
-\vfill
-\end{frame}
-
-% ============================================================
-% Slide 29
-% ============================================================
-
-% ============================================================
-% Slide 29
-% ============================================================
-
-\begin{frame}[fragile]{Control Flow Idiom: If-Else Translation}
-\vfill
-\begin{columns}[T]
-\begin{column}{0.44\textwidth}
-\begin{block}{High-Level C Code}
-\small
-\begin{verbatim}
-if (a == b) {
-    c = c + 1;
-} else {
-    c = c - 1;
-}
-\end{verbatim}
-\end{block}
-\end{column}
-
-\begin{column}{0.52\textwidth}
-\begin{block}{AArch64 Assembly Mapping}
-\small
-\begin{tabular}{ll}
-\multicolumn{2}{l}{\textit{// Assume: x0=a, x1=b, x2=c}} \\
-\code{cmp  x0, x1}        & \text{\scriptsize // Compare a and b} \\
-\code{b.ne .Lelse}        & \text{\scriptsize // If a != b, jump to else} \\
-\code{add  x2, x2, \#1}   & \text{\scriptsize // Then-body: c = c + 1} \\
-\code{b    .Lend}         & \text{\scriptsize // Skip else-body} \\
-\code{.Lelse:}            & \\
-\code{sub  x2, x2, \#1}   & \text{\scriptsize // Else-body: c = c - 1} \\
-\code{.Lend:}             & \\
-\end{tabular}
-\end{block}
-\end{column}
-\end{columns}
-
-\vfill
-\begin{block}{Assembly Inversion Pattern}
-\small Compilers often invert a condition so the branch skips over the preferred fall-through path and transfers control directly to the alternative path when needed.
-\end{block}
-\vfill
-\end{frame}
-
-% ============================================================
-% Slide 30
-% ============================================================
-
-\begin{frame}[fragile]{Control Flow Idiom: While-Loop Translation}
-\vfill
-\begin{columns}[T]
-\begin{column}{0.44\textwidth}
-\begin{block}{High-Level C Loop}
-\scriptsize
-\begin{verbatim}
-// Compute sum of array
-uint64_t i = 0;
-while (i < n) {
-    sum += arr[i];
-    i++;
-}
-\end{verbatim}
-\end{block}
-\end{column}
-
-\begin{column}{0.54\textwidth}
-\begin{block}{AArch64 Assembly Translation}
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\begin{tabular}{ll}
-\multicolumn{2}{l}{\textit{// x0=arr, x1=n, x2=i, x3=sum}} \\
-\code{mov  x2, xzr}       & \text{\tiny // i = 0} \\
-\code{mov  x3, xzr}       & \text{\tiny // sum = 0} \\
-\code{.Lloop:}            & \\
-\code{cmp  x2, x1}        & \text{\tiny // Test i < n} \\
-\code{b.hs .Ldone}        & \text{\tiny // Exit if i >= n (unsigned)} \\
-\code{ldr  x4, [x0, x2, lsl \#3]} & \text{\tiny // Load arr[i]} \\
-\code{add  x3, x3, x4}    & \text{\tiny // sum += arr[i]} \\
-\code{add  x2, x2, \#1}   & \text{\tiny // i++} \\
-\code{b    .Lloop}        & \text{\tiny // Repeat loop} \\
-\code{.Ldone:}            & \\
-\end{tabular}
-\end{block}
-\end{column}
-\end{columns}
-
-\vfill
-\begin{block}{Optimization Note}
-\small Compilers may unroll loop bodies to reduce branch frequency and amortize loop-control work across multiple iterations.
-\end{block}
-\vfill
-\end{frame}
-
-% ============================================================
-% Slide 31
-% ============================================================
-
-\begin{frame}{Conditional Select Instructions: Avoiding Selected Branches}
-\vfill
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Conditional branches can incur a recovery cost when prediction is incorrect.
-  \item AArch64 provides \key{conditional select instructions} that can replace a branch for suitable short conditional expressions:
-\end{itemize}
-
-\vfill
-\begin{center}
-\small
-\renewcommand{\arraystretch}{0.98}
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lll}
-\toprule
-\textbf{Instruction} & \textbf{Semantic Operation} & \textbf{C Ternary Equivalent} \\
-\midrule
-\code{csel  xd, xn, xm, cond} & $x_d \leftarrow \text{cond} \mathbin{?} x_n : x_m$ & \code{d = cond ? n : m;} \\
-\code{cinc  xd, xn, cond}       & $x_d \leftarrow \text{cond} \mathbin{?} (x_n + 1) : x_n$ & \code{d = n + (cond ? 1 : 0);} \\
-\code{cset  xd, cond}           & $x_d \leftarrow \text{cond} \mathbin{?} 1 : 0$ & \code{d = (cond) ? 1 : 0;} \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vfill
-\begin{block}{Branchless Maximum: $\max(x_1, x_2)$}
-\small
-\begin{tabular}{ll}
-\code{cmp  x1, x2}         & \text{\scriptsize // Compare x1 and x2} \\
-\code{csel x0, x1, x2, gt} & \text{\scriptsize // If x1 > x2, x0 = x1; else x0 = x2} \\
-\end{tabular}
-\end{block}
-\vfill
-\end{frame}
 
 % ============================================================
 % Section 5 Divider
@@ -1300,25 +1015,29 @@ while (i < n) {
 
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
+
+
 % ============================================================
-% Slide 32
+% Slide 23
 % ============================================================
 
 \begin{frame}{Topic 3: Comprehensive Summary}
 \vspace{0.08cm}
 \small
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{Architectural State:} Precise hardware-software contract defined by general registers (\bits{x0}--\bits{x30}), processor state, stack pointer (\bits{sp}), program counter (\bits{pc}), and byte-addressed memory.
-  \item \key{Register Structure:} 31 highly regular 64-bit general-purpose registers (\bits{x0}--\bits{x30}) have corresponding 32-bit views (\bits{w0}--\bits{w30}); writing a \bits{w} register clears the upper 32 bits of the corresponding \bits{x} register.
-  \item \key{ABI Rules:} \bits{x0}--\bits{x7} handle arguments/returns (caller-saved); \bits{x19}--\bits{x28} hold local variables across calls (callee-saved).
-  \item \key{Load/Store Operations:} Integer ALU operations use registers, while memory is accessed with explicit load/store instruction classes, including offset, indexed, and paired forms.
-  \item \key{Control Flow Preview:} Branches update the program counter; conditional flag interpretation is developed in Topic 4.
+  \item \key{Architectural State:} The programmer-visible contract includes general registers (\bits{x0}--\bits{x30}), processor state, stack pointer (\bits{sp}), program counter (\bits{pc}), and byte-addressed memory.
+  \item \key{Register Structure:} The 64-bit \bits{x0}--\bits{x30} registers have corresponding 32-bit \bits{w0}--\bits{w30} views; writing a \bits{w} register clears the upper 32 bits of the corresponding \bits{x} register.
+  \item \key{ABI Roles:} Register use is constrained by calling-convention rules, including argument/return registers and caller- vs.\ callee-saved registers.
+  \item \key{Memory Model:} AArch64 exposes byte-addressed memory with alignment requirements and explicit load/store instructions.
+  \item \key{Instruction Conventions:} Assembly syntax, immediate construction, and basic memory-reference forms establish the notation used in later programming topics.
 \end{itemize}
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 33
+% Slide 24
 % ============================================================
 
 \begin{frame}{Self-Test Questions: State \& Register Mechanics}
@@ -1335,25 +1054,28 @@ while (i < n) {
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 34
+% Slide 25
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Memory \& Instruction Mechanics}
 \vfill
-\begin{enumerate}\setlength{\itemsep}{7pt}
-  \item \key{Memory Addressing Modes:} Explain the mechanical difference in address calculation and base register updates between: \code{ldr x1, [x0, \#16]} vs.\ \code{ldr x1, [x0, \#16]!} vs.\ \code{ldr x1, [x0], \#16}.
+\begin{enumerate}\setlength{\itemsep}{9pt}
+  \item \key{Memory Addressing Modes:} Explain the mechanical difference in address calculation and base-register updates between \code{ldr x1, [x0, \#16]}, \code{ldr x1, [x0, \#16]!}, and \code{ldr x1, [x0], \#16}.
 
-  \item \key{Endianness Evaluation:} The 32-bit word \hex{deadbeef} is stored at address \hex{2000} on a little-endian AArch64 machine. What exact byte is stored at address \hex{2000}? At address \hex{2003}?
+  \item \key{Alignment:} Why can naturally aligned accesses be simpler for hardware than accesses that cross an alignment boundary?
 
-  \item \key{Branch Elimination via \texttt{csel}:} Convert this C statement into branchless assembly using \code{cmp} and \code{csel}:\\
-  \code{int64\_t result = (val1 <= val2) ? (val1 + 10) : (val2 - 5);}
+  \item \key{Immediate Construction:} Why may a 64-bit constant require more than one AArch64 instruction using \code{movz}/\code{movk}?
 \end{enumerate}
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 35
+% Slide 26
 % ============================================================
 
 \begin{frame}{Looking Ahead}
@@ -1364,7 +1086,7 @@ while (i < n) {
 
 \vfill
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{ALU \& Shifted Operands:} Arithmetic using shifted-register operands integrated into AArch64 data-processing instructions.
+  \item \key{ALU \& Shifted Operands:} Arithmetic and shifts using AArch64 data-processing instructions.
   \item \key{Bitwise Logic \& Field Extraction:} Manipulating bitfields using masks, bit clears (\code{bic}), and bitfield extracts (\code{ubfx}).
   \item \key{Condition Flags \& Comparisons:} Using \bits{N}, \bits{Z}, \bits{C}, and \bits{V} for comparisons and conditional control flow.
   \item \key{Control Flow \& Conditional Selection:} Translating loops and nested conditionals while using \code{csel} to reduce reliance on conditional branches for suitable expressions.

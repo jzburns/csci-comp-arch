@@ -80,6 +80,8 @@
 
 \begin{document}
 
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -119,6 +121,8 @@ Dr. J. Burns
 
 \vspace*{\fill}
 \end{frame}
+
+
 
 % ============================================================
 % Slide 2
@@ -165,6 +169,8 @@ Dr. J. Burns
 \end{columns}
 
 \end{frame}
+
+
 
 % ============================================================
 % Slide 3
@@ -220,6 +226,8 @@ clarifies an architectural difference.
 % Topic 1 Outline
 % ============================================================
 
+
+
 % ============================================================
 % Slide 4
 % ============================================================
@@ -254,6 +262,8 @@ clarifies an architectural difference.
 
 % --- Section Divider 1 ---
 
+
+
 % ============================================================
 % Slide 5
 % ============================================================
@@ -286,6 +296,8 @@ Architecture Foundations \& Abstraction\par}
 
 \end{frame}
 
+
+
 % ============================================================
 % Slide 6
 % ============================================================
@@ -307,6 +319,8 @@ Architecture Foundations \& Abstraction\par}
 \end{block}
 
 \end{frame}
+
+
 
 % ============================================================
 % Slide 7
@@ -453,6 +467,8 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 
 \end{frame}
 
+
+
 % ============================================================
 % Slide 8
 % ============================================================
@@ -488,6 +504,8 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 Performance-sensitive software often exposes lower-level machine behavior. Programmers may need to consider locality, branch behavior, and data layout when execution time matters.
 
 \end{frame}
+
+
 
 % ============================================================
 % Slide 9
@@ -560,6 +578,8 @@ The compiler and assembler translate program intent into AArch64 instructions. T
 
 \end{frame}
 
+
+
 % ============================================================
 % Slide 10
 % ============================================================
@@ -596,28 +616,11 @@ Different processors can implement the exact same ISA using radically different 
 
 \end{frame}
 
+
+
+
 % ============================================================
 % Slide 11
-% ============================================================
-
-\begin{frame}{RISC Design Principles}
-
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item \key{Load/Store Architecture:} Memory is accessed exclusively through specific load and store instructions, keeping complex arithmetic isolated to registers.
-  \item \key{Simplified Decoding:} Fixed-length instruction encodings simplify instruction fetch, alignment, and decode.
-  \item \key{Abundant Registers:} A large, uniform register file minimizes the need to spill temporary variables to slower main memory.
-\end{itemize}
-
-\vspace{0.4cm}
-
-\begin{block}{The RISC Philosophy}
-RISC designs favor simple, regular instructions and rely on compilers to combine them effectively, reducing complexity in instruction decoding and execution.
-\end{block}
-
-\end{frame}
-
-% ============================================================
-% Slide 12
 % ============================================================
 
 \begin{frame}{AArch64 Encoding Structure}
@@ -648,8 +651,10 @@ Fixed-width encoding simplifies instruction fetch, alignment, and decoding compa
 
 % --- Section Divider 2 ---
 
+
+
 % ============================================================
-% Slide 13
+% Slide 12
 % ============================================================
 
 \begin{frame}[plain]
@@ -680,8 +685,10 @@ Stored-Program Organization \& Memory\par}
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 14
+% Slide 13
 % ============================================================
 
 \begin{frame}{The Stored-Program Concept}
@@ -754,8 +761,10 @@ The stored-program model allows a machine to run different programs by changing 
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 15
+% Slide 14
 % ============================================================
 
 \begin{frame}{From Fetch to Completion: One Instruction}
@@ -805,8 +814,10 @@ The stored-program model allows a machine to run different programs by changing 
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 16
+% Slide 15
 % ============================================================
 
 \begin{frame}{Memory Topologies: von Neumann, Harvard, Modified Harvard}
@@ -958,8 +969,10 @@ The stored-program model allows a machine to run different programs by changing 
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 17
+% Slide 16
 % ============================================================
 
 \begin{frame}{Modified Harvard and Newly Generated Code}
@@ -995,8 +1008,10 @@ The exact AArch64 cache-maintenance and barrier instructions are system-software
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 18
+% Slide 17
 % ============================================================
 
 \begin{frame}{Memory Hierarchy: Why Multiple Levels Exist}
@@ -1077,8 +1092,10 @@ Programs rarely access memory randomly. They exhibit:
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 19
+% Slide 18
 % ============================================================
 
 \begin{frame}{The Memory Wall}
@@ -1106,8 +1123,10 @@ Exact latencies are implementation-dependent; the architectural lesson is the ex
 
 % --- Section Divider 3 ---
 
+
+
 % ============================================================
-% Slide 20
+% Slide 19
 % ============================================================
 
 \begin{frame}[plain]
@@ -1138,8 +1157,10 @@ Binary Representation \& Arithmetic\par}
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 21
+% Slide 20
 % ============================================================
 
 \begin{frame}{Bits and Interpretive Context}
@@ -1188,8 +1209,10 @@ Bits do not carry a built-in ``type''; instructions and software conventions det
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 22
+% Slide 21
 % ============================================================
 
 \begin{frame}{Positional Binary and Hexadecimal}
@@ -1215,8 +1238,10 @@ $=
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 23
+% Slide 22
 % ============================================================
 
 \begin{frame}{Endianness: Mapping Multi-Byte Values to Memory}
@@ -1271,8 +1296,10 @@ Lowest address $\rightarrow$ most-significant byte
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 24
+% Slide 23
 % ============================================================
 
 \begin{frame}{Why Two's Complement?}
@@ -1297,8 +1324,10 @@ For an $n$-bit two's-complement number, $\text{Value} = -b_{n-1}2^{n-1} + \sum_{
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 25
+% Slide 24
 % ============================================================
 
 \begin{frame}{Constructing a Negative Two's-Complement Number}
@@ -1336,8 +1365,10 @@ $-5 = \bits{11111011}$
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 26
+% Slide 25
 % ============================================================
 
 \begin{frame}{Unified Adder Datapath and Subtraction}
@@ -1420,8 +1451,10 @@ A unified adder lets the processor reuse the same core arithmetic hardware for b
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 27
+% Slide 26
 % ============================================================
 
 \begin{frame}{Sign Extension and Zero Extension}
@@ -1459,16 +1492,13 @@ Using the wrong extension changes the interpreted value and can invalidate compa
 \end{frame}
 
 
-% ============================================================
-% Slide 28
-% ============================================================
-% ============================================================
-% Slide 29
-% ============================================================
+
 % --- Section Divider 4 ---
 
+
+
 % ============================================================
-% Slide 28
+% Slide 27
 % ============================================================
 
 \begin{frame}[plain]
@@ -1499,8 +1529,10 @@ Quantitative Processor Performance\par}
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 29
+% Slide 28
 % ============================================================
 
 \begin{frame}{Defining Performance: Latency and Throughput}
@@ -1533,8 +1565,10 @@ IPC (Instructions Per Cycle) is a measure of instruction throughput inside a pro
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 30
+% Slide 29
 % ============================================================
 
 \begin{frame}{Dynamic Instruction Count and Average CPI}
@@ -1554,8 +1588,10 @@ A processor will naturally exhibit wildly different CPI values on different prog
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 31
+% Slide 30
 % ============================================================
 
 \begin{frame}{Clock Frequency and Clock Period}
@@ -1593,8 +1629,10 @@ T_{\text{clk}}
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 32
+% Slide 31
 % ============================================================
 
 \begin{frame}{The Iron Law of Processor Performance}
@@ -1655,8 +1693,10 @@ These factors are \key{not independent}. A design change that improves one facto
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 33
+% Slide 32
 % ============================================================
 
 \begin{frame}{Iron Law: Comparative Evaluation Example}
@@ -1723,8 +1763,10 @@ The Iron Law equation strictly compares measured assumptions; the numerical resu
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 34
+% Slide 33
 % ============================================================
 
 \begin{frame}{The Megahertz Myth and Speedup}
@@ -1744,8 +1786,10 @@ The Iron Law equation strictly compares measured assumptions; the numerical resu
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 35
+% Slide 34
 % ============================================================
 
 \begin{frame}{Amdahl's Law: Why Partial Optimization Is Limited}
@@ -1800,8 +1844,10 @@ S_{\max}
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 36
+% Slide 35
 % ============================================================
 
 \begin{frame}{Benchmarking and Architectural Trade-Offs}
@@ -1822,8 +1868,10 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
 
 % --- Section Divider 5 ---
 
+
+
 % ============================================================
-% Slide 37
+% Slide 36
 % ============================================================
 
 \begin{frame}[plain]
@@ -1840,8 +1888,10 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
 \vspace*{\fill}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 38
+% Slide 37
 % ============================================================
 
 \begin{frame}{Topic 1 Summary: Architecture \& Memory}
@@ -1860,8 +1910,10 @@ System software must respect these boundaries; for example, newly generated code
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 39
+% Slide 38
 % ============================================================
 
 \begin{frame}{Topic 1 Summary: Representation \& Performance}
@@ -1880,8 +1932,10 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 40
+% Slide 39
 % ============================================================
 
 \begin{frame}{Self-Test Diagnostic Questions: Architecture \& Binary}
@@ -1911,8 +1965,10 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 41
+% Slide 40
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Performance \& Memory}
@@ -1939,8 +1995,10 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 \vfill
 \end{frame}
 
+
+
 % ============================================================
-% Slide 42
+% Slide 41
 % ============================================================
 
 \begin{frame}{Looking Ahead}
