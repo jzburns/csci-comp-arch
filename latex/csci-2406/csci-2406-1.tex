@@ -222,60 +222,38 @@
 % ============================================================
 
 \begin{frame}[plain]
-
 \begin{tikzpicture}[remember picture,overlay]
-
-\fill[navy]
-  (current page.south west)
-  rectangle
-  (current page.north east);
-
-\fill[gold]
-  (current page.south west)
-  rectangle
-  ([yshift=.18cm]current page.south east);
-
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
-\vspace{1.0cm}
+\vspace*{\fill}
 
-\begin{minipage}{0.9\textwidth}
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries CSCI 2406 \;|\; TOPIC 1\par}
 
-{\color{gold}
- \large
- \bfseries
- CSCI 2406: Topic 1
- \par}
+\vspace{0.25cm}
 
-\vspace{0.3cm}
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+Computer Architecture \& \\ Organization Fundamentals
+\par}
 
-{\color{white}
- \fontsize{20}{24}\selectfont
- \bfseries
- Computer Architecture \& Organization Fundamentals
- \par}
+\vspace{0.35cm}
 
-\vspace{0.3cm}
-
-{\color{lightblue}
- \normalsize
- Architecture vs. Organization,
- ISA vs. Microarchitecture,\\
- Stored-Program Concept,
- and Memory Organization
- \par}
-
-\vspace{0.6cm}
-
-{\color{softgray}
- \small
- Computer Organization \& Architecture
- \quad\textbar\quad
- AArch64 Reference
- \par}
-
+{\color{white!80}\large
+Architecture vs. Organization, ISA vs. Microarchitecture,\\
+Stored-Program Concept, and Memory Organization
+\par}
 \end{minipage}
 
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns\\
+Computer Organization \& Architecture --- AArch64 Reference Platform
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
 % ============================================================
