@@ -164,6 +164,56 @@ Abstraction, stored-program organization, data representation, and processor per
 
 \end{frame}
 
+% ============================================================
+% Slide 3
+% ============================================================
+
+\begin{frame}{Reference Platform Emulation and Simulation Tools}
+
+\vspace{-0.25cm}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+
+\begin{block}{Software, Emulators and Hardware}
+\begin{itemize}
+  \item \key{C \& ARM64 Assembly}:
+        Source languages used to connect high-level code
+        with AArch64 machine-level behavior.
+
+  \item \key{QEMU}:
+        Cross-platform full-system and user-mode emulation
+        for AArch64.
+
+  \item \key{Cloud VMs and Laptops}:
+        Google Axion and Apple silicon (M-series).
+\end{itemize}
+\end{block}
+
+\column{0.48\textwidth}
+
+\begin{block}{Online Resources (Simulators)}
+\begin{itemize}
+  \item \key{WebAssembliss}:
+        Browser-based ARM64 assembly environment.
+
+  \item \key{CPUlator}:
+        Interactive ARMv7 simulator used where appropriate
+        for architectural comparison.
+\end{itemize}
+\end{block}
+
+\end{columns}
+
+\begin{block}{Reference Platform}
+Examples use AArch64 as the primary reference.
+Selected exercises use AArch32 only when a comparison
+clarifies an architectural difference.
+\end{block}
+
+\end{frame}
+
 % --- Section Divider 1 ---
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]

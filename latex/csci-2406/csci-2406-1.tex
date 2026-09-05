@@ -343,45 +343,43 @@
 % Slide 3
 % ============================================================
 
-\begin{frame}{Tools, Emulation, and Assessments}
+\begin{frame}{Reference Platform Emulation and Simulation Tools}
+
+\vspace{-0.25cm}
 
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
 
-\begin{block}{Software \& Emulation Stack}
-
+\begin{block}{Software, Emulators and Hardware}
 \begin{itemize}
   \item \key{C \& ARM64 Assembly}:
-        Core languages used for architecture programming.
-  \item \key{QEMU}:
-        Full-system and user-space emulator
-        for AArch64 execution.
-  \item \key{Compiler Explorer}:
-        Live ARM64 assembly inspection
-        from C source.
-\end{itemize}
+        Source languages used to connect high-level code
+        with AArch64 machine-level behavior.
 
+  \item \key{QEMU}:
+        Cross-platform full-system and user-mode emulation
+        for AArch64.
+
+  \item \key{Cloud VMs and Laptops}:
+        Google Axion and Apple silicon (M-series).
+\end{itemize}
 \end{block}
 
 \column{0.48\textwidth}
 
-\begin{block}{Online Programming Resources}
-
+\begin{block}{Online Resources (Simulators)}
 \begin{itemize}
   \item \key{WebAssembliss}:
-        Browser-based ARM64 Linux
-        assembly environment.
-  \item \key{CPUlator}:
-        Interactive ARM32 / ARMv7 simulator
-        used where appropriate for comparison.
-\end{itemize}
+        Browser-based ARM64 assembly environment.
 
+  \item \key{CPUlator}:
+        Interactive ARMv7 simulator used where appropriate
+        for architectural comparison.
+\end{itemize}
 \end{block}
 
 \end{columns}
-
-\vspace{0.25cm}
 
 \begin{block}{Reference Platform}
 Examples use AArch64 as the primary reference.
