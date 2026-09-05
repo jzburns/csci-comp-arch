@@ -222,15 +222,20 @@
 % ============================================================
 
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
 \vspace*{\fill}
 
 \begin{minipage}{0.88\textwidth}
-{\color{gold}\normalsize\bfseries CSCI 2406 \;|\; TOPIC 1\par}
+
+{\color{gold}\normalsize\bfseries
+CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 1
+\par}
 
 \vspace{0.25cm}
 
@@ -244,18 +249,18 @@ Computer Architecture \& \\ Organization Fundamentals
 Architecture vs. Organization, ISA vs. Microarchitecture,\\
 Stored-Program Concept, and Memory Organization
 \par}
+
 \end{minipage}
 
 \vfill
 
 {\color{white!70}\small
-Dr. J. Burns\\
-Computer Organization \& Architecture --- AArch64 Reference Platform
+Dr. J. Burns
 \par}
 
 \vspace*{\fill}
-\end{frame}
 
+\end{frame}
 % ============================================================
 % Slide 2
 % ============================================================
