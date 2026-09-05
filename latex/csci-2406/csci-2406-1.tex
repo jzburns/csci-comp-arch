@@ -164,38 +164,28 @@
 \begin{frame}[plain]
 
 \begin{tikzpicture}[remember picture,overlay]
-
-\fill[navy]
-  (current page.south west)
-  rectangle
-  (current page.north east);
-
-\fill[gold]
-  (current page.south west)
-  rectangle
-  ([yshift=.15cm]current page.south east);
-
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
-\vspace{1.5cm}
+\vspace*{\fill}
 
-\begin{minipage}{0.85\textwidth}
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
 
-{\color{gold}
- \large
- \bfseries
- #1
- \par}
+{\color{gold}\large\bfseries #1\par}
 
 \vspace{0.3cm}
 
-{\color{white}
- \fontsize{22}{26}\selectfont
- \bfseries
- #2
- \par}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
 
 \end{minipage}
+
+\vspace*{\fill}
 
 \end{frame}
 }
@@ -426,7 +416,7 @@ and instruction/data memory organization.
 % SECTION 1
 % ============================================================
 
-\sectiondivider{Section 01}{
+\sectiondivider{Section 1}{
   Key Abstraction Layers
 }
 
@@ -627,7 +617,7 @@ with very different internal organizations.
 % SECTION 2
 % ============================================================
 
-\sectiondivider{Section 02}{
+\sectiondivider{Section 2}{
   Computer Architecture vs.\\
   Computer Organization
 }
@@ -881,7 +871,7 @@ and cost.
 % SECTION 3
 % ============================================================
 
-\sectiondivider{Section 03}{
+\sectiondivider{Section 3}{
   ISA versus Microarchitecture
 }
 
@@ -1199,7 +1189,7 @@ internal organizations.
 % SECTION 4
 % ============================================================
 
-\sectiondivider{Section 04}{
+\sectiondivider{Section 4}{
   The Stored-Program Concept
 }
 
@@ -1604,7 +1594,7 @@ just like data.
 % SECTION 5
 % ============================================================
 
-\sectiondivider{Section 05}{
+\sectiondivider{Section 5}{
   von Neumann vs. Harvard\\
   Architectures
 }
@@ -2080,7 +2070,7 @@ internal organization.
 % SECTION 6
 % ============================================================
 
-\sectiondivider{Section 06}{
+\sectiondivider{Section 6}{
   Summary \& Self-Test
 }
 
