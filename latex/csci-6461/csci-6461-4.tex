@@ -151,6 +151,8 @@
 
 
 
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -197,12 +199,17 @@ Dr. J. Burns
 
 
 
+
+
+
 % ============================================================
 % Slide 2
 % ============================================================
 
-\begin{frame}{Topic 4: Core Lecture Outline}
+\begin{frame}{Topic 4 Outline}
 
+
+\setbeamertemplate{enumerate item}{\arabic{enumi}.}
 \begin{enumerate}\setlength{\itemsep}{12pt}
   \item \key{ALU Operations: Arithmetic, Shifting, \& Bitwise Logic}
   \begin{itemize}
@@ -210,9 +217,9 @@ Dr. J. Burns
     \item Bitwise logic (\code{and}, \code{orr}, \code{eor}, \code{bic}) and bitfield extraction (\code{ubfx}).
   \end{itemize}
 
-  \item \key{Condition Flags \& Comparison Mechanics}
+  \item \key{Condition Flags \& Comparisons}
   \begin{itemize}
-    \item NZCV flag generation, comparison instructions (\code{cmp}, \code{tst}), and signed vs.\ unsigned branches.
+    \item NZCV flags, comparison instructions (\code{cmp}, \code{cmn}, \code{tst}), and signed vs.\ unsigned branches.
   \end{itemize}
 
   \item \key{Control Flow: Branches \& Branchless Selection}
@@ -224,11 +231,14 @@ Dr. J. Burns
 
 \end{frame}
 
+
 % ============================================================
 % Section 1 Divider (Consolidated ALU: Arithmetic + Logic)
 % ============================================================
 
 \sectiondivider{PART 1}{ALU Operations: Arithmetic, Shifting, \& Bitwise Logic}
+
+
 
 
 
@@ -265,6 +275,8 @@ Dr. J. Burns
 \code{add x0, x1, \#42} uses a 12-bit immediate. The add/sub immediate form can also shift that field left by 12 bits. The corresponding \bits{w}-register form performs 32-bit arithmetic.
 \end{block}
 \end{frame}
+
+
 
 
 
@@ -305,6 +317,8 @@ Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift; the sign 
 
 
 
+
+
 % ============================================================
 % Slide 5
 % ============================================================
@@ -341,6 +355,8 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 
 
 
+
+
 % ============================================================
 % Slide 6
 % ============================================================
@@ -374,6 +390,8 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 \code{bic x0, x1, x2} sets bits to \bits{0} in $x_1$ wherever the mask in $x_2$ has \bits{1}s.
 \end{block}
 \end{frame}
+
+
 
 
 
@@ -418,6 +436,8 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 
 
 
+
+
 % ============================================================
 % Slide 8
 % ============================================================
@@ -455,6 +475,8 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 
 
 
+
+
 % ============================================================
 % Slide 9
 % ============================================================
@@ -489,6 +511,8 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \end{itemize}
 \end{block}
 \end{frame}
+
+
 
 
 
@@ -536,6 +560,8 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 
 
 
+
+
 % ============================================================
 % Slide 11
 % ============================================================
@@ -573,6 +599,8 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 \small
 \key{Single-Bit Test:} \code{tbz x0, \#0, label} branches if bit 0 is zero.
 \end{frame}
+
+
 
 
 
@@ -617,6 +645,8 @@ if (x > y) {
 \normalsize
 \key{Assembly Pattern:} Invert the high-level condition to fall through into the ``then'' path.
 \end{frame}
+
+
 
 
 
@@ -668,6 +698,8 @@ while (i < n) {
 
 
 
+
+
 % ============================================================
 % Slide 14
 % ============================================================
@@ -704,6 +736,8 @@ while (i < n) {
 
 
 
+
+
 % ============================================================
 % Slide 15
 % ============================================================
@@ -718,6 +752,8 @@ while (i < n) {
   \item \key{Conditional Selection:} \code{csel} and related forms can replace short conditional branches when data-dependent selection is preferable.
 \end{itemize}
 \end{frame}
+
+
 
 
 
@@ -739,6 +775,8 @@ while (i < n) {
 \end{enumerate}
 
 \end{frame}
+
+
 
 
 
@@ -765,6 +803,8 @@ while (i < n) {
 % ============================================================
 % Look Ahead to Topic 5
 % ============================================================
+
+
 
 
 

@@ -82,6 +82,8 @@
 
 
 
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -121,6 +123,8 @@ Dr. J. Burns
 
 \vspace*{\fill}
 \end{frame}
+
+
 
 
 
@@ -169,6 +173,8 @@ Dr. J. Burns
 \end{columns}
 
 \end{frame}
+
+
 
 
 
@@ -228,6 +234,8 @@ clarifies an architectural difference.
 
 
 
+
+
 % ============================================================
 % Slide 4
 % ============================================================
@@ -261,6 +269,8 @@ clarifies an architectural difference.
 \end{frame}
 
 % --- Section Divider 1 ---
+
+
 
 
 
@@ -298,6 +308,8 @@ Architecture Foundations \& Abstraction\par}
 
 
 
+
+
 % ============================================================
 % Slide 6
 % ============================================================
@@ -319,6 +331,8 @@ Architecture Foundations \& Abstraction\par}
 \end{block}
 
 \end{frame}
+
+
 
 
 
@@ -469,6 +483,8 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 
 
 
+
+
 % ============================================================
 % Slide 8
 % ============================================================
@@ -504,6 +520,8 @@ Computers manage immense complexity by enforcing clean hierarchical interfaces:
 Performance-sensitive software often exposes lower-level machine behavior. Programmers may need to consider locality, branch behavior, and data layout when execution time matters.
 
 \end{frame}
+
+
 
 
 
@@ -580,6 +598,8 @@ The compiler and assembler translate program intent into AArch64 instructions. T
 
 
 
+
+
 % ============================================================
 % Slide 10
 % ============================================================
@@ -619,6 +639,8 @@ Different processors can implement the exact same ISA using radically different 
 
 
 
+
+
 % ============================================================
 % Slide 11
 % ============================================================
@@ -653,6 +675,8 @@ Fixed-width encoding simplifies instruction fetch, alignment, and decoding compa
 
 
 
+
+
 % ============================================================
 % Slide 12
 % ============================================================
@@ -684,6 +708,8 @@ Stored-Program Organization \& Memory\par}
 \vspace*{\fill}
 
 \end{frame}
+
+
 
 
 
@@ -763,6 +789,8 @@ The stored-program model allows a machine to run different programs by changing 
 
 
 
+
+
 % ============================================================
 % Slide 14
 % ============================================================
@@ -813,6 +841,8 @@ The stored-program model allows a machine to run different programs by changing 
 \end{itemize}
 
 \end{frame}
+
+
 
 
 
@@ -971,6 +1001,8 @@ The stored-program model allows a machine to run different programs by changing 
 
 
 
+
+
 % ============================================================
 % Slide 16
 % ============================================================
@@ -1007,6 +1039,8 @@ The stored-program model allows a machine to run different programs by changing 
 The exact AArch64 cache-maintenance and barrier instructions are system-software details that we will revisit later. Without the required synchronization, instruction fetch may observe stale instructions rather than the newly generated code.
 
 \end{frame}
+
+
 
 
 
@@ -1094,6 +1128,8 @@ Programs rarely access memory randomly. They exhibit:
 
 
 
+
+
 % ============================================================
 % Slide 18
 % ============================================================
@@ -1122,6 +1158,8 @@ Exact latencies are implementation-dependent; the architectural lesson is the ex
 \end{frame}
 
 % --- Section Divider 3 ---
+
+
 
 
 
@@ -1156,6 +1194,8 @@ Binary Representation \& Arithmetic\par}
 \vspace*{\fill}
 
 \end{frame}
+
+
 
 
 
@@ -1211,6 +1251,8 @@ Bits do not carry a built-in ``type''; instructions and software conventions det
 
 
 
+
+
 % ============================================================
 % Slide 21
 % ============================================================
@@ -1237,6 +1279,8 @@ $=
 \end{block}
 
 \end{frame}
+
+
 
 
 
@@ -1298,6 +1342,8 @@ Lowest address $\rightarrow$ most-significant byte
 
 
 
+
+
 % ============================================================
 % Slide 23
 % ============================================================
@@ -1323,6 +1369,8 @@ For an $n$-bit two's-complement number, $\text{Value} = -b_{n-1}2^{n-1} + \sum_{
 \emph{Give the most-significant bit a negative weight, and add the remaining positive bit weights normally.}
 
 \end{frame}
+
+
 
 
 
@@ -1364,6 +1412,8 @@ $-5 = \bits{11111011}$
 \end{itemize}
 
 \end{frame}
+
+
 
 
 
@@ -1453,6 +1503,8 @@ A unified adder lets the processor reuse the same core arithmetic hardware for b
 
 
 
+
+
 % ============================================================
 % Slide 26
 % ============================================================
@@ -1497,6 +1549,8 @@ Using the wrong extension changes the interpreted value and can invalidate compa
 
 
 
+
+
 % ============================================================
 % Slide 27
 % ============================================================
@@ -1528,6 +1582,8 @@ Quantitative Processor Performance\par}
 \vspace*{\fill}
 
 \end{frame}
+
+
 
 
 
@@ -1567,6 +1623,8 @@ IPC (Instructions Per Cycle) is a measure of instruction throughput inside a pro
 
 
 
+
+
 % ============================================================
 % Slide 29
 % ============================================================
@@ -1587,6 +1645,8 @@ A processor will naturally exhibit wildly different CPI values on different prog
 \end{block}
 
 \end{frame}
+
+
 
 
 
@@ -1628,6 +1688,8 @@ T_{\text{clk}}
 \end{block}
 
 \end{frame}
+
+
 
 
 
@@ -1692,6 +1754,8 @@ These factors are \key{not independent}. A design change that improves one facto
 \end{block}
 
 \end{frame}
+
+
 
 
 
@@ -1765,6 +1829,8 @@ The Iron Law equation strictly compares measured assumptions; the numerical resu
 
 
 
+
+
 % ============================================================
 % Slide 33
 % ============================================================
@@ -1785,6 +1851,8 @@ The Iron Law equation strictly compares measured assumptions; the numerical resu
 \end{itemize}
 
 \end{frame}
+
+
 
 
 
@@ -1846,6 +1914,8 @@ S_{\max}
 
 
 
+
+
 % ============================================================
 % Slide 35
 % ============================================================
@@ -1870,23 +1940,41 @@ Later topics will quantify how choices such as pipeline depth, issue width, and 
 
 
 
+
+
 % ============================================================
 % Slide 36
 % ============================================================
 
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
+
 \vspace*{\fill}
-\begin{minipage}{0.85\textwidth}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries SUMMARY \& ASSESSMENT\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries Review and Self-Test Questions\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+Review and Self-Test Questions\par}
+
 \end{minipage}
+
 \vspace*{\fill}
+
 \end{frame}
+
+
 
 
 
@@ -1912,11 +2000,13 @@ System software must respect these boundaries; for example, newly generated code
 
 
 
+
+
 % ============================================================
 % Slide 38
 % ============================================================
 
-\begin{frame}{Topic 1: Summary}
+\begin{frame}{Topic 1 Outline}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item \key{Two's Complement:} Signed integers use a representation that supports one zero and a unified hardware addition/subtraction datapath.
@@ -1931,6 +2021,8 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 \end{block}
 
 \end{frame}
+
+
 
 
 
@@ -1967,6 +2059,8 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 
 
 
+
+
 % ============================================================
 % Slide 40
 % ============================================================
@@ -1994,6 +2088,8 @@ Microarchitectural improvements involve trade-offs: improving one performance fa
 
 \vfill
 \end{frame}
+
+
 
 
 

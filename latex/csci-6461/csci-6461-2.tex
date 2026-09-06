@@ -150,6 +150,8 @@
 
 
 
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -198,11 +200,16 @@ Dr. J. Burns
 
 
 
+
+
+
 % ============================================================
 % Slide 2
 % ============================================================
 
-\begin{frame}{Topic 2: Module Roadmap}
+\begin{frame}{Topic 2 Outline}
+
+\setbeamertemplate{enumerate item}{\arabic{enumi}.}
 \vfill
 \begin{enumerate}\setlength{\itemsep}{8pt}
   \item \key{ISA Foundations \& Complexity Distribution}
@@ -220,19 +227,22 @@ Dr. J. Burns
     \item Load/store discipline, fixed 32-bit width, and direct architectural comparison.
   \end{itemize}
 
-  \item \key{Quantitative Performance, Energy \& Modern Convergence}
+  \item \key{Performance, Energy \& Modern Processors}
   \begin{itemize}
-    \item Iron Law evaluation, Amdahl's Law, legacy compatibility, and modern $\mu\text{op}$ cracking.
+    \item Using performance equations, energy limits, legacy compatibility, and modern $\mu\text{op}$ cracking.
   \end{itemize}
 \end{enumerate}
 \vfill
 \end{frame}
+
 
 % ============================================================
 % Section 1 Divider
 % ============================================================
 
 \sectiondivider{PART 1}{ISA Foundations \& Historical Context}
+
+
 
 
 
@@ -267,6 +277,8 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 
 
 
+
+
 % ============================================================
 % Slide 4
 % ============================================================
@@ -295,6 +307,8 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 
 
 
+
+
 % ============================================================
 % Slide 5
 % ============================================================
@@ -314,6 +328,8 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -366,6 +382,8 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 
 
 
+
+
 % ============================================================
 % Slide 7
 % ============================================================
@@ -384,6 +402,8 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -406,6 +426,8 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -451,6 +473,8 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 
 
 
+
+
 % ============================================================
 % Slide 10
 % ============================================================
@@ -491,6 +515,8 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 
 
 
+
+
 % ============================================================
 % Slide 11
 % ============================================================
@@ -505,6 +531,8 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 \end{itemize}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -546,6 +574,8 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 
 
 
+
+
 % ============================================================
 % Slide 13
 % ============================================================
@@ -579,6 +609,8 @@ T_{\text{CPU}}
 
 \vfill
 \end{frame}
+
+
 
 
 
@@ -629,6 +661,8 @@ Under these assumed instruction-count and CPI values, Machine A completes the wo
 
 
 
+
+
 % ============================================================
 % Slide 15
 % ============================================================
@@ -665,6 +699,8 @@ $$\frac{\text{Workload Throughput}}{\text{Watts}}$$
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -708,6 +744,8 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 
 
 
+
+
 % ============================================================
 % Slide 17
 % ============================================================
@@ -727,6 +765,8 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 
 
 
+
+
 % ============================================================
 % Slide 18
 % ============================================================
@@ -742,6 +782,8 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 \end{enumerate}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -764,6 +806,8 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 % ============================================================
 % Look Ahead to Topic 3 (Final Slide of Topic 2 Deck)
 % ============================================================
+
+
 
 
 

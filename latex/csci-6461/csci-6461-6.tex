@@ -150,6 +150,8 @@
 
 
 
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -197,6 +199,41 @@ Dr. J. Burns
 
 
 % ============================================================
+% Slide 2
+% ============================================================
+
+\begin{frame}{Topic 6 Outline}
+
+\setbeamertemplate{enumerate item}{\arabic{enumi}.}
+
+\begin{enumerate}\setlength{\itemsep}{8pt}
+  \item \key{Function Calls and Returns}
+  \begin{itemize}
+    \item Branch-with-link, the link register, returns, leaf functions, and non-leaf functions.
+  \end{itemize}
+
+  \item \key{AAPCS64 Register Rules}
+  \begin{itemize}
+    \item Argument registers, return registers, caller-saved registers, and callee-saved registers.
+  \end{itemize}
+
+  \item \key{Stack Frames}
+  \begin{itemize}
+    \item Stack growth, frame records, frame pointer use, prologues, epilogues, and local storage.
+  \end{itemize}
+
+  \item \key{Worked Function Examples}
+  \begin{itemize}
+    \item Leaf functions, nested calls, recursion, extra arguments, and common linkage mistakes.
+  \end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+
+
+
+% ============================================================
 % Section 1 Divider
 % ============================================================
 
@@ -204,8 +241,10 @@ Dr. J. Burns
 
 
 
+
+
 % ============================================================
-% Slide 2
+% Slide 3
 % ============================================================
 
 \begin{frame}{High-Level Function Execution Model}
@@ -225,8 +264,10 @@ Dr. J. Burns
 
 
 
+
+
 % ============================================================
-% Slide 3
+% Slide 4
 % ============================================================
 
 \begin{frame}{The Link Register (\texttt{x30}) and Branch-with-Link (\texttt{bl})}
@@ -256,8 +297,10 @@ The \code{bl} instruction encodes a signed 26-bit immediate offset, allowing dir
 
 
 
+
+
 % ============================================================
-% Slide 4
+% Slide 5
 % ============================================================
 
 \begin{frame}{Subroutine Return Mechanics (\texttt{ret})}
@@ -284,8 +327,10 @@ The \code{bl} instruction encodes a signed 26-bit immediate offset, allowing dir
 
 
 
+
+
 % ============================================================
-% Slide 5
+% Slide 6
 % ============================================================
 
 \begin{frame}{Leaf vs.\ Non-Leaf Functions}
@@ -317,8 +362,10 @@ If a function makes another call and must later return to its own caller, its in
 
 
 
+
+
 % ============================================================
-% Slide 6
+% Slide 7
 % ============================================================
 
 \begin{frame}{Indirect Subroutine Calls (\texttt{blr})}
@@ -345,29 +392,55 @@ If a function makes another call and must later return to its own caller, its in
 
 
 
+
+
+
 % ============================================================
-% Slide 7
+% Slide 8
 % ============================================================
 
 \begin{frame}{Subroutine Call Execution Trace}
-\centering
-\vspace{0.1cm}
-\begin{tikzpicture}[scale=0.82, every node/.style={transform shape}]
-  \draw[navy, line width=1.5pt] (0,0) -- (0,4.5);
-  \node[anchor=south, font=\small\bfseries, navy] at (0,4.5) {Caller Code};
-  \draw[deepblue, line width=1.5pt] (5,0) -- (5,4.5);
-  \node[anchor=south, font=\small\bfseries, deepblue] at (5,4.5) {Callee Code};
-  \draw[-{Latex}, gold!80!black, line width=1.2pt] (0,3.5) -- (5,2.8)
-    node[midway, above, font=\tiny\bfseries] {1. \code{bl callee} ($x_{30} \leftarrow \text{PC}+4$)};
-  \node[anchor=west, font=\tiny] at (5.2,2.3) {Compute result...};
-  \draw[-{Latex}, navy, line width=1.2pt] (5,1.5) -- (0,0.8)
-    node[midway, above, font=\tiny\bfseries] {2. \code{ret} ($\text{PC} \leftarrow x_{30}$)};
-  \node[anchor=east, font=\tiny] at (-0.2,0.5) {Resume next instruction};
+
+\vspace{-0.15cm}
+
+\begin{center}
+\begin{tikzpicture}[
+  line/.style={thick,navy},
+  call/.style={-{Latex},thick,gold},
+  ret/.style={-{Latex},thick,navy},
+  lab/.style={font=\small\bfseries,navy},
+  note/.style={font=\small}
+]
+
+% Lifelines
+\draw[line] (0,0) -- (0,-4.6);
+\draw[line] (5.3,0) -- (5.3,-4.6);
+
+\node[lab] at (0,0.28) {Caller Code};
+\node[lab] at (5.3,0.28) {Callee Code};
+
+% Call and return
+\draw[call] (0,-1.05) -- node[above,sloped,font=\scriptsize\ttfamily]
+  {1. bl callee (x30 <- pc + 4)} (5.3,-1.75);
+
+\draw[ret] (5.3,-3.05) -- node[above,sloped,font=\scriptsize\ttfamily]
+  {2. ret (pc <- x30)} (0,-3.75);
+
+% Notes
+\node[note,anchor=west] at (5.65,-2.25) {Compute result};
+\node[note,anchor=east] at (-0.35,-4.05) {Resume next instruction};
+
 \end{tikzpicture}
-\vspace{0.2cm}
-\normalsize
-Control transfers from caller to callee and back using \bits{x30} to hold the return address.
+\end{center}
+
+\vspace{0.1cm}
+
+\begin{center}
+{\Large Control transfers from caller to callee, then returns using \bits{x30}.}
+\end{center}
+
 \end{frame}
+
 
 % ============================================================
 % Section 2 Divider
@@ -377,8 +450,10 @@ Control transfers from caller to callee and back using \bits{x30} to hold the re
 
 
 
+
+
 % ============================================================
-% Slide 8
+% Slide 9
 % ============================================================
 
 \begin{frame}{Purpose of Procedure Call Standards (AAPCS64)}
@@ -397,8 +472,10 @@ Control transfers from caller to callee and back using \bits{x30} to hold the re
 
 
 
+
+
 % ============================================================
-% Slide 9
+% Slide 10
 % ============================================================
 
 \begin{frame}{Parameter Passing Registers (\texttt{x0}--\texttt{x7})}
@@ -429,8 +506,10 @@ Arguments not assigned to registers are placed in the stack argument area accord
 
 
 
+
+
 % ============================================================
-% Slide 10
+% Slide 11
 % ============================================================
 
 \begin{frame}{Return Value Registers}
@@ -460,8 +539,10 @@ Floating-point and SIMD return rules use the SIMD/FP register file and are outsi
 
 
 
+
+
 % ============================================================
-% Slide 11
+% Slide 12
 % ============================================================
 
 \begin{frame}{Caller-Saved Registers (\texttt{x0}--\texttt{x17})}
@@ -492,8 +573,10 @@ A caller that needs a value in these registers after a call must preserve that v
 
 
 
+
+
 % ============================================================
-% Slide 12
+% Slide 13
 % ============================================================
 
 \begin{frame}{Callee-Saved Registers (\texttt{x19}--\texttt{x28})}
@@ -528,8 +611,10 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 
 
 
+
+
 % ============================================================
-% Slide 13
+% Slide 14
 % ============================================================
 
 \begin{frame}{Special-Purpose ABI Registers}
@@ -556,8 +641,10 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 
 
 
+
+
 % ============================================================
-% Slide 14
+% Slide 15
 % ============================================================
 
 \begin{frame}{Register Responsibility Summary}
@@ -587,8 +674,10 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 
 
 
+
+
 % ============================================================
-% Slide 15
+% Slide 16
 % ============================================================
 
 \begin{frame}{The Stack Memory Model}
@@ -614,8 +703,10 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 
 
 
+
+
 % ============================================================
-% Slide 16
+% Slide 17
 % ============================================================
 
 \begin{frame}{What Is a Stack Frame?}
@@ -644,8 +735,10 @@ frame pointer while \bits{sp} continues to track the current stack position.
 
 
 
+
+
 % ============================================================
-% Slide 17
+% Slide 18
 % ============================================================
 
 \begin{frame}{Example Activation Frame Structure}
@@ -677,8 +770,10 @@ frame pointer while \bits{sp} continues to track the current stack position.
 
 
 
+
+
 % ============================================================
-% Slide 18
+% Slide 19
 % ============================================================
 
 \begin{frame}{Frame Pointer (\texttt{x29}) and Frame Records}
@@ -703,8 +798,10 @@ frame pointer while \bits{sp} continues to track the current stack position.
 
 
 
+
+
 % ============================================================
-% Slide 19
+% Slide 20
 % ============================================================
 
 \begin{frame}[fragile]{Function Prologue Mechanics}
@@ -733,8 +830,10 @@ Pre-indexed \code{stp} combines stack-pointer writeback with the paired store of
 
 
 
+
+
 % ============================================================
-% Slide 20
+% Slide 21
 % ============================================================
 
 \begin{frame}[fragile]{Function Epilogue Mechanics}
@@ -766,8 +865,10 @@ Post-indexed \code{ldp} performs a paired architectural load and writeback in on
 
 
 
+
+
 % ============================================================
-% Slide 21
+% Slide 22
 % ============================================================
 
 \begin{frame}[fragile]{Local Variable Allocation on the Stack}
@@ -809,8 +910,10 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 
 
 
+
+
 % ============================================================
-% Slide 22
+% Slide 23
 % ============================================================
 
 \begin{frame}{Stack Alignment and Padding Rules}
@@ -848,8 +951,10 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 
 
 
+
+
 % ============================================================
-% Slide 23
+% Slide 24
 % ============================================================
 
 \begin{frame}[fragile]{Worked Example 1: Minimal Leaf Function}
@@ -875,8 +980,10 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 
 
 
+
+
 % ============================================================
-% Slide 24
+% Slide 25
 % ============================================================
 
 \begin{frame}[fragile]{Worked Example 2: Non-Leaf Nested Function}
@@ -903,8 +1010,10 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 
 
 
+
+
 % ============================================================
-% Slide 25
+% Slide 26
 % ============================================================
 
 \begin{frame}[fragile]{Worked Example 3: Recursive Factorial}
@@ -954,8 +1063,10 @@ factorial:
 
 
 
+
+
 % ============================================================
-% Slide 26
+% Slide 27
 % ============================================================
 
 \begin{frame}[fragile]{Worked Example 4: Passing More Than 8 Arguments}
@@ -994,8 +1105,10 @@ func_with_10_args:
 
 
 
+
+
 % ============================================================
-% Slide 27
+% Slide 28
 % ============================================================
 
 \begin{frame}{Common Function Linkage Bugs in Assembly}
@@ -1015,8 +1128,10 @@ func_with_10_args:
 
 
 
+
+
 % ============================================================
-% Slide 28
+% Slide 29
 % ============================================================
 
 \begin{frame}{Topic 6: Summary}
@@ -1034,8 +1149,10 @@ func_with_10_args:
 
 
 
+
+
 % ============================================================
-% Slide 29
+% Slide 30
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Linkage \& AAPCS64}
@@ -1052,8 +1169,10 @@ func_with_10_args:
 
 
 
+
+
 % ============================================================
-% Slide 30
+% Slide 31
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Stack Frame Management}
@@ -1081,8 +1200,10 @@ func_with_10_args:
 
 
 
+
+
 % ============================================================
-% Slide 31
+% Slide 32
 % ============================================================
 
 \begin{frame}{Looking Ahead}

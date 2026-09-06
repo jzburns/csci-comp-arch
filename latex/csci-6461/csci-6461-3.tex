@@ -156,6 +156,8 @@
 
 
 
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -206,14 +208,19 @@ Dr. J. Burns
 
 
 
+
+
+
 % ============================================================
 % Slide 2
 % ============================================================
 
 \begin{frame}{Topic 3 Outline}
+
+\setbeamertemplate{enumerate item}{\arabic{enumi}.}
 \vfill
 \begin{enumerate}\setlength{\itemsep}{7pt}
-  \item \key{Architectural State \& The Hardware Contract}
+  \item \key{Architectural State \& the Hardware Contract}
   \begin{itemize}
     \item Concrete definition of architectural state vs.\ microarchitectural structures.
     \item The AArch64 programmer's model and processor execution modes.
@@ -226,12 +233,12 @@ Dr. J. Burns
     \item Standard ABI register usage: arguments, return values, caller-saved, and callee-saved registers.
   \end{itemize}
 
-  \item \key{Memory Organization \& Endianness}
+  \item \key{Memory Organization \& Byte Addressing}
   \begin{itemize}
-    \item Byte-addressable 64-bit address space, memory alignment rules, and byte ordering.
+    \item Byte-addressable memory, alignment rules, and process address space.
   \end{itemize}
 
-  \item \key{Core Instruction Classes \& Execution Mechanics}
+  \item \key{Basic Instruction Form}
   \begin{itemize}
     \item Instruction syntax, immediate construction, and the basic load/store model.
   \end{itemize}
@@ -239,11 +246,14 @@ Dr. J. Burns
 \vfill
 \end{frame}
 
+
 % ============================================================
 % Section 1 Divider
 % ============================================================
 
 \sectiondivider{PART 1}{Architectural State \& Execution Model}
+
+
 
 
 
@@ -274,6 +284,8 @@ Dr. J. Burns
 \small Operating systems rely on architectural state to suspend and resume execution while preserving program behavior.
 \end{block}
 \end{frame}
+
+
 
 
 
@@ -324,6 +336,8 @@ Dr. J. Burns
 
 
 
+
+
 % ============================================================
 % Slide 5
 % ============================================================
@@ -342,6 +356,8 @@ Dr. J. Burns
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -445,6 +461,8 @@ Dr. J. Burns
 
 
 
+
+
 % ============================================================
 % Slide 7
 % ============================================================
@@ -472,6 +490,8 @@ Dr. J. Burns
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -517,6 +537,8 @@ Dr. J. Burns
 
 
 
+
+
 % ============================================================
 % Slide 9
 % ============================================================
@@ -545,6 +567,8 @@ Dr. J. Burns
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -595,6 +619,8 @@ Dr. J. Burns
 
 
 
+
+
 % ============================================================
 % Slide 11
 % ============================================================
@@ -638,6 +664,8 @@ Dr. J. Burns
 
 
 
+
+
 % ============================================================
 % Slide 12
 % ============================================================
@@ -674,6 +702,8 @@ Dr. J. Burns
 
 
 
+
+
 % ============================================================
 % Slide 13
 % ============================================================
@@ -699,6 +729,8 @@ Dr. J. Burns
 % ============================================================
 
 \sectiondivider{PART 3}{Memory Model, Alignment \& Endianness}
+
+
 
 
 
@@ -749,6 +781,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 
 
 
+
+
 % ============================================================
 % Slide 15
 % ============================================================
@@ -790,6 +824,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -848,6 +884,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 
 
 
+
+
 % ============================================================
 % Slide 17
 % ============================================================
@@ -880,6 +918,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -928,6 +968,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -992,6 +1034,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
 
+
+
 % ============================================================
 % Slide 20
 % ============================================================
@@ -1008,6 +1052,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{itemize}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -1039,6 +1085,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 
 
 
+
+
 % ============================================================
 % Slide 22
 % ============================================================
@@ -1054,6 +1102,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{enumerate}
 \vfill
 \end{frame}
+
+
 
 
 
