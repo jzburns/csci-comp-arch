@@ -17,7 +17,17 @@
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
-\setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
+    CSCI 2406 --- Computer Organization \& Architecture
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
@@ -77,17 +87,31 @@
 % ============================================================
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west)
   rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -105,31 +129,57 @@
 % Slide 1
 % Slide Header: Procedures and the Stack
 % ============================================================
+
+
+% ============================================================
+% Slide 1
+% ============================================================
+
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west)
-  rectangle ([yshift=.18cm]current page.south east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.0cm}
-\begin{minipage}{0.9\textwidth}
-{\color{gold}\large\bfseries CSCI 2406: Topic 08\par}
-\vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries
-  Procedures and the Stack\par}
-\vspace{0.3cm}
-{\color{softgray}\normalsize
-  AArch64 calls, stack frames, parameter passing, and AAPCS64\par}
-\vspace{0.6cm}
-{\color{softgray}\small Computer Organization \& Architecture
-  \quad\textbar\quad AArch64 Reference\par}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries
+CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 8
+\par}
+
+\vspace{0.25cm}
+
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+Procedures and the Stack
+\par}
+
+\vspace{0.35cm}
+
+{\color{white!80}\large
+Procedure calls, stack organization,\\parameter passing, and calling conventions
+\par}
 \end{minipage}
+
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
 % ============================================================
 % Slide 2
 % Slide Header: Topic 8 Outline
 % ============================================================
+
+
+% ============================================================
+% Slide 2
+% ============================================================
+
 \begin{frame}{Topic 8 Outline}
 \begin{block}{Topic Objective}
 Explain how AArch64 implements function calls using branch-with-link,
@@ -150,12 +200,18 @@ return addresses, stack discipline, and register-preservation rules.
 % Slide 3
 % Slide Header: Procedure Calls and Returns
 % ============================================================
-\sectiondivider{Section 01}{Procedure Calls and Returns}
+\sectiondivider{Section 1}{Procedure Calls and Returns}
 
 % ============================================================
 % Slide 4
 % Slide Header: Why Procedures Need a Convention
 % ============================================================
+
+
+% ============================================================
+% Slide 3
+% ============================================================
+
 \begin{frame}{Why Procedures Need a Convention}
 \begin{block}{Problem}
 A function call temporarily transfers control to another code region,
@@ -181,6 +237,12 @@ registers, preserved registers, return values, and stack rules.
 % Slide 5
 % Slide Header: Branch with Link
 % ============================================================
+
+
+% ============================================================
+% Slide 4
+% ============================================================
+
 \begin{frame}{Branch with Link}
 \begin{block}{Function Call Instruction}
 \large
@@ -206,6 +268,12 @@ frame.
 % Slide 6
 % Slide Header: Return from a Procedure
 % ============================================================
+
+
+% ============================================================
+% Slide 5
+% ============================================================
+
 \begin{frame}{Return from a Procedure}
 \begin{block}{Return Instruction}
 \large
@@ -230,6 +298,12 @@ means return to the address in \code{x30}.
 % Slide 7
 % Slide Header: Call and Return Control Flow
 % ============================================================
+
+
+% ============================================================
+% Slide 6
+% ============================================================
+
 \begin{frame}{Call and Return Control Flow}
 \begin{center}
 \begin{tikzpicture}[
@@ -273,6 +347,12 @@ after the original \code{bl} instruction.
 % Slide 8
 % Slide Header: Link Register Hazard
 % ============================================================
+
+
+% ============================================================
+% Slide 7
+% ============================================================
+
 \begin{frame}{The Link Register Hazard}
 \begin{block}{Why Non-Leaf Functions Need Care}
 A function that calls another function will execute its own \code{bl}.
@@ -308,12 +388,18 @@ address, it must save \code{x30} before the nested call.
 % Slide 9
 % Slide Header: Arguments and Return Values
 % ============================================================
-\sectiondivider{Section 02}{Arguments and Return Values}
+\sectiondivider{Section 2}{Arguments and Return Values}
 
 % ============================================================
 % Slide 10
 % Slide Header: Integer Argument Registers
 % ============================================================
+
+
+% ============================================================
+% Slide 8
+% ============================================================
+
 \begin{frame}{Integer Argument Registers}
 \begin{block}{AArch64 Procedure Call Standard}
 The first eight ordinary integer or pointer arguments use
@@ -356,6 +442,12 @@ temporary. \\
 % Slide 11
 % Slide Header: Arguments Beyond the Register Limit
 % ============================================================
+
+
+% ============================================================
+% Slide 9
+% ============================================================
+
 \begin{frame}{Arguments Beyond the Register Limit}
 \begin{columns}[T,onlytextwidth]
 \column{0.53\textwidth}
@@ -390,6 +482,12 @@ stores it at the incoming stack location for \code{combine9}.
 % Slide 12
 % Slide Header: Return Values
 % ============================================================
+
+
+% ============================================================
+% Slide 10
+% ============================================================
+
 \begin{frame}{Return Values}
 \begin{block}{Common Integer Return}
 \large
@@ -419,6 +517,12 @@ preserve it if the register is caller-saved.
 % Slide 13
 % Slide Header: Example Function Call
 % ============================================================
+
+
+% ============================================================
+% Slide 11
+% ============================================================
+
 \begin{frame}{Example Function Call}
 \begin{columns}[T,onlytextwidth]
 \column{0.43\textwidth}
@@ -453,6 +557,12 @@ in \code{x19}, \code{x20}, and \code{x21}.
 % Slide 14
 % Slide Header: Simple Leaf Function
 % ============================================================
+
+
+% ============================================================
+% Slide 12
+% ============================================================
+
 \begin{frame}{Simple Leaf Function}
 \begin{block}{C Function}
 \large
@@ -480,12 +590,18 @@ in \code{x19}, \code{x20}, and \code{x21}.
 % Slide 15
 % Slide Header: Register Preservation
 % ============================================================
-\sectiondivider{Section 03}{Register Preservation Rules}
+\sectiondivider{Section 3}{Register Preservation Rules}
 
 % ============================================================
 % Slide 16.a
 % Slide Header: AAPCS64 Is the Procedure-Call Blueprint
 % ============================================================
+
+
+% ============================================================
+% Slide 13
+% ============================================================
+
 \begin{frame}{AAPCS64 Is the Procedure-Call Blueprint}
 \begin{block}{Arm Procedure Call Standard for AArch64}
 AAPCS64 is the engineering blueprint that lets assembly routines,
@@ -520,6 +636,12 @@ procedure boundaries.
 % Slide 16.b
 % Slide Header: Caller-Saved and Callee-Saved Registers
 % ============================================================
+
+
+% ============================================================
+% Slide 14
+% ============================================================
+
 \begin{frame}{Caller-Saved and Callee-Saved Registers}
 \begin{center}
 \small
@@ -567,6 +689,12 @@ must be restored by the function that changes them.
 % Slide 17.a
 % Slide Header: A libc Call Uses the Same AAPCS64 Contract
 % ============================================================
+
+
+% ============================================================
+% Slide 15
+% ============================================================
+
 \begin{frame}{A libc Call Uses the Same AAPCS64 Contract}
 \key{C call with nine total arguments:}\quad
 \code{printf(format, v1, v2, \ldots, v8);}
@@ -621,6 +749,12 @@ follow AAPCS64. The surrounding non-leaf function preserves
 % Slide 17.b
 % Slide Header: Caller-Saved Example
 % ============================================================
+
+
+% ============================================================
+% Slide 16
+% ============================================================
+
 \begin{frame}{Caller-Saved Example}
 \begin{block}{Situation}
 The caller has a live value in \code{x0}, but also needs to call
@@ -647,6 +781,12 @@ still needs.
 % Slide 18
 % Slide Header: Callee-Saved Example
 % ============================================================
+
+
+% ============================================================
+% Slide 17
+% ============================================================
+
 \begin{frame}{Callee-Saved Example}
 \begin{block}{Situation}
 A function wants to use \code{x19}. Because \code{x19} is
@@ -671,6 +811,12 @@ returns as before the call began.
 % Slide 19
 % Slide Header: Common Register Roles
 % ============================================================
+
+
+% ============================================================
+% Slide 18
+% ============================================================
+
 \begin{frame}{Common Register Roles}
 \begin{center}
 \small
@@ -715,12 +861,18 @@ memory access. \\
 % Slide 20
 % Slide Header: Stack Frames
 % ============================================================
-\sectiondivider{Section 04}{Stack Frames}
+\sectiondivider{Section 4}{Stack Frames}
 
 % ============================================================
 % Slide 21
 % Slide Header: The Stack Grows Down
 % ============================================================
+
+
+% ============================================================
+% Slide 19
+% ============================================================
+
 \begin{frame}{The Stack Grows Down}
 \begin{columns}[T,onlytextwidth]
 \column{0.52\textwidth}
@@ -795,6 +947,12 @@ means decreasing \code{sp}.
 % Slide 22
 % Slide Header: Stack Frame Contents
 % ============================================================
+
+
+% ============================================================
+% Slide 20
+% ============================================================
+
 \begin{frame}{Stack Frame Contents}
 \begin{columns}[T,onlytextwidth]
 \column{0.50\textwidth}
@@ -838,6 +996,12 @@ means decreasing \code{sp}.
 % Slide 23
 % Slide Header: Function Prologue
 % ============================================================
+
+
+% ============================================================
+% Slide 21
+% ============================================================
+
 \begin{frame}{Function Prologue}
 \begin{block}{Purpose}
 A prologue prepares the callee's execution environment before the
@@ -868,6 +1032,12 @@ while preserving its obligations.
 % Slide 24
 % Slide Header: Function Epilogue
 % ============================================================
+
+
+% ============================================================
+% Slide 22
+% ============================================================
+
 \begin{frame}{Function Epilogue}
 \begin{block}{Purpose}
 An epilogue restores the caller's environment before returning.
@@ -895,6 +1065,12 @@ before returning.
 % Slide 25
 % Slide Header: Prologue and Epilogue Diagram
 % ============================================================
+
+
+% ============================================================
+% Slide 23
+% ============================================================
+
 \begin{frame}{Prologue and Epilogue Diagram}
 \begin{center}
 \begin{tikzpicture}[
@@ -960,6 +1136,12 @@ return state, and then \code{ret} transfers control back to the caller.
 % Slide 26
 % Slide Header: Local Stack Storage
 % ============================================================
+
+
+% ============================================================
+% Slide 24
+% ============================================================
+
 \begin{frame}{Local Stack Storage}
 \begin{block}{When Registers Are Not Enough}
 A function may allocate additional stack space for local arrays,
@@ -987,12 +1169,18 @@ instruction requirement.
 % Slide 27
 % Slide Header: Leaf and Non-Leaf Functions
 % ============================================================
-\sectiondivider{Section 05}{Function Calls and Recursion}
+\sectiondivider{Section 5}{Function Calls and Recursion}
 
 % ============================================================
 % Slide 28
 % Slide Header: Leaf Function without a Stack Frame
 % ============================================================
+
+
+% ============================================================
+% Slide 25
+% ============================================================
+
 \begin{frame}{Leaf Function without a Stack Frame}
 \begin{block}{Leaf Function}
 A leaf function calls no other function. If it only uses caller-saved
@@ -1018,6 +1206,12 @@ nested calls.
 % Slide 29
 % Slide Header: Non-Leaf Function Saves the Link Register
 % ============================================================
+
+
+% ============================================================
+% Slide 26
+% ============================================================
+
 \begin{frame}{Non-Leaf Function Saves the Link Register}
 \begin{block}{Nested Call}
 A non-leaf function must preserve its own return address before
@@ -1045,6 +1239,12 @@ The \code{bl inner} instruction overwrites \code{x30}; therefore
 % Slide 30
 % Slide Header: Recursion Requires Separate Frames
 % ============================================================
+
+
+% ============================================================
+% Slide 27
+% ============================================================
+
 \begin{frame}{Recursion Requires Separate Frames}
 \begin{block}{Recursive Calls}
 Each recursive call needs its own preserved state: return address,
@@ -1088,6 +1288,12 @@ distinct.
 % Slide 31
 % Slide Header: Recursive Factorial Uses One Frame per Call
 % ============================================================
+
+
+% ============================================================
+% Slide 28
+% ============================================================
+
 \begin{frame}{Recursive Factorial Uses One Frame per Call}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -1125,6 +1331,12 @@ the recursive result returns in \code{x0}.
 % Slide 32
 % Slide Header: Common Procedure Bugs
 % ============================================================
+
+
+% ============================================================
+% Slide 29
+% ============================================================
+
 \begin{frame}{Common Procedure Bugs}
 \begin{itemize}
 \item Forgetting that \code{bl} overwrites \code{x30}.
@@ -1149,12 +1361,18 @@ register-preservation rules.
 % Slide 33
 % Slide Header: Summary and Self-Test
 % ============================================================
-\sectiondivider{Section 06}{Summary and Self-Test}
+\sectiondivider{Section 6}{Summary and Self-Test}
 
 % ============================================================
 % Slide 34
 % Slide Header: Topic 8 Summary
 % ============================================================
+
+
+% ============================================================
+% Slide 30
+% ============================================================
+
 \begin{frame}{Topic 8 Summary}
 \begin{itemize}
 \item \code{bl} calls a function and writes the return address into
@@ -1177,6 +1395,12 @@ functions often need them.
 % Slide 35
 % Slide Header: Self-Test 1/2
 % ============================================================
+
+
+% ============================================================
+% Slide 31
+% ============================================================
+
 \begin{frame}{Self-Test 1/2}
 \begin{enumerate}
 \item What does \code{bl function} write into \code{x30}?
@@ -1194,6 +1418,12 @@ registers?
 % Slide 36
 % Slide Header: Self-Test 2/2
 % ============================================================
+
+
+% ============================================================
+% Slide 32
+% ============================================================
+
 \begin{frame}{Self-Test 2/2}
 \begin{enumerate}
 \setcounter{enumi}{5}
@@ -1212,6 +1442,12 @@ active call?
 % Slide 37
 % Slide Header: Register Preservation Exercise
 % ============================================================
+
+
+% ============================================================
+% Slide 33
+% ============================================================
+
 \begin{frame}{Register Preservation Exercise}
 \begin{block}{Classify Each Register}
 For each register, state whether it is mainly used for argument/return,
@@ -1249,6 +1485,12 @@ link register, or stack pointer.
 % Slide 38
 % Slide Header: Next Topic
 % ============================================================
+
+
+% ============================================================
+% Slide 34
+% ============================================================
+
 \begin{frame}{Next Topic}
 \begin{block}{Machine Instruction Encoding}
 Topic 9 moves from assembly-level procedure structure to the binary

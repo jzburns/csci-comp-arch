@@ -17,7 +17,17 @@
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
-\setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
+    CSCI 2406 --- Computer Organization \& Architecture
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
@@ -78,16 +88,31 @@
 % ============================================================
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -105,27 +130,57 @@
 % Slide 1
 % Slide Header: Data Transfer and Addressing
 % ============================================================
+
+
+% ============================================================
+% Slide 1
+% ============================================================
+
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.0cm}
-\begin{minipage}{0.9\textwidth}
-{\color{gold}\large\bfseries CSCI 2406: Topic 06\par}
-\vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries Data Transfer and Addressing\par}
-\vspace{0.3cm}
-{\color{softgray}\normalsize Memory operands, load/store widths, addressing modes, alignment, and data traversal\par}
-\vspace{0.6cm}
-{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad AArch64 Reference\par}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries
+CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 6
+\par}
+
+\vspace{0.25cm}
+
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+Data Transfer\\[0.08cm]and Addressing
+\par}
+
+\vspace{0.35cm}
+
+{\color{white!80}\large
+Load/store instructions, addressing modes,\\memory alignment, arrays, and pointers
+\par}
 \end{minipage}
+
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
 % ============================================================
 % Slide 2
 % Slide Header: Topic 6 Outline
 % ============================================================
+
+
+% ============================================================
+% Slide 2
+% ============================================================
+
 \begin{frame}{Topic 6 Outline}
 \begin{block}{Topic Objective}
 Explain how AArch64 transfers values between registers and memory and how an instruction forms the effective address for a memory access.
@@ -145,12 +200,18 @@ Explain how AArch64 transfers values between registers and memory and how an ins
 % Slide 3
 % Slide Header: Memory Addresses and Load/Store Semantics
 % ============================================================
-\sectiondivider{Section 01}{Memory Addresses and Load/Store Semantics}
+\sectiondivider{Section 1}{Memory Addresses and Load/Store Semantics}
 
 % ============================================================
 % Slide 4
 % Slide Header: AArch64 Is a Load/Store Architecture
 % ============================================================
+
+
+% ============================================================
+% Slide 3
+% ============================================================
+
 \begin{frame}{AArch64 Is a Load/Store Architecture}
 \begin{block}{Separation of Memory Access and Computation}
 Arithmetic and logical instructions operate on register values. Dedicated load and store instructions transfer values between registers and memory.
@@ -173,6 +234,12 @@ Arithmetic and logical instructions operate on register values. Dedicated load a
 % Slide 5
 % Slide Header: Memory Is Byte Addressed
 % ============================================================
+
+
+% ============================================================
+% Slide 4
+% ============================================================
+
 \begin{frame}{Memory Is Byte Addressed}
 \begin{columns}[T,onlytextwidth]
 \column{0.56\textwidth}
@@ -209,6 +276,12 @@ A 64-bit value beginning at \hex{1000} occupies byte addresses \hex{1000} throug
 % Slide 6
 % Slide Header: Bracket Notation Means Memory Access
 % ============================================================
+
+
+% ============================================================
+% Slide 5
+% ============================================================
+
 \begin{frame}{Bracket Notation Means Memory Access}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -244,6 +317,12 @@ The value in \code{x1} is the address. The bytes stored at that address are the 
 % Slide 7
 % Slide Header: Load Register
 % ============================================================
+
+
+% ============================================================
+% Slide 6
+% ============================================================
+
 \begin{frame}{Loading Data with \code{ldr}}
 \begin{block}{64-Bit Load}
 \large
@@ -266,6 +345,12 @@ The value in \code{x1} is the address. The bytes stored at that address are the 
 % Slide 8
 % Slide Header: Store Register
 % ============================================================
+
+
+% ============================================================
+% Slide 7
+% ============================================================
+
 \begin{frame}{Storing Data with \code{str}}
 \begin{block}{64-Bit Store}
 \large
@@ -288,12 +373,18 @@ The value in \code{x1} is the address. The bytes stored at that address are the 
 % Slide 9
 % Slide Header: Transfer Width and Extension
 % ============================================================
-\sectiondivider{Section 02}{Transfer Width and Extension}
+\sectiondivider{Section 2}{Transfer Width and Extension}
 
 % ============================================================
 % Slide 10
 % Slide Header: Load Width Determines Bytes Read
 % ============================================================
+
+
+% ============================================================
+% Slide 8
+% ============================================================
+
 \begin{frame}{Load Width Determines Bytes Read}
 \begin{center}
 \small
@@ -331,6 +422,12 @@ A memory address does not carry a type. The load/store instruction determines th
 % Slide 11
 % Slide Header: Signed Loads Preserve Negative Values
 % ============================================================
+
+
+% ============================================================
+% Slide 9
+% ============================================================
+
 \begin{frame}{Signed Loads Preserve Negative Values}
 \begin{block}{Sign Extension}
 A signed load copies the sign bit of the narrow source into the new upper bits so the two's-complement value is preserved.
@@ -368,6 +465,12 @@ If memory contains the byte \hex{ff}, \code{ldrb} interprets the transferred bit
 % Slide 12
 % Slide Header: Load Width and Extension Example
 % ============================================================
+
+
+% ============================================================
+% Slide 10
+% ============================================================
+
 \begin{frame}{Load Width and Extension Example}
 Assume memory at \hex{2000} contains the byte \hex{80}.
 \vspace{0.25cm}
@@ -405,12 +508,18 @@ Assume memory at \hex{2000} contains the byte \hex{80}.
 % Slide 13
 % Slide Header: AArch64 Addressing Modes
 % ============================================================
-\sectiondivider{Section 03}{AArch64 Addressing Modes}
+\sectiondivider{Section 3}{AArch64 Addressing Modes}
 
 % ============================================================
 % Slide 14
 % Slide Header: Effective Address
 % ============================================================
+
+
+% ============================================================
+% Slide 11
+% ============================================================
+
 \begin{frame}{The Effective Address}
 \begin{block}{Definition}
 The effective address is the memory address computed for a particular load or store instruction.
@@ -431,6 +540,12 @@ AArch64 memory operands normally use a 64-bit general-purpose register or \code{
 % Slide 15
 % Slide Header: Base Register Addressing
 % ============================================================
+
+
+% ============================================================
+% Slide 12
+% ============================================================
+
 \begin{frame}{Base Register Addressing}
 \begin{block}{Syntax}
 \large
@@ -453,6 +568,12 @@ If \code{x1} represents pointer \code{p}, then the memory operand \code{[x1]} co
 % Slide 16
 % Slide Header: Immediate Offset Addressing
 % ============================================================
+
+
+% ============================================================
+% Slide 13
+% ============================================================
+
 \begin{frame}{Immediate Offset Addressing}
 \begin{block}{Example}
 \large
@@ -475,6 +596,12 @@ A64 has more than one load/store immediate encoding. Common unsigned offsets are
 % Slide 17
 % Slide Header: Register Offset Addressing
 % ============================================================
+
+
+% ============================================================
+% Slide 14
+% ============================================================
+
 \begin{frame}{Register Offset Addressing}
 \begin{block}{Unscaled Register Offset}
 \large
@@ -499,6 +626,12 @@ Register-offset forms are well suited to array indexing because the index can be
 % Slide 18
 % Slide Header: 32-Bit Index with Extension
 % ============================================================
+
+
+% ============================================================
+% Slide 15
+% ============================================================
+
 \begin{frame}{Using a 32-Bit Index Register}
 AArch64 register-offset addressing can extend a 32-bit index while forming a 64-bit address.
 \vspace{0.25cm}
@@ -523,6 +656,12 @@ AArch64 register-offset addressing can extend a 32-bit index while forming a 64-
 % Slide 19
 % Slide Header: Pre-Indexed Addressing
 % ============================================================
+
+
+% ============================================================
+% Slide 16
+% ============================================================
+
 \begin{frame}{Pre-Indexed Addressing}
 \begin{block}{Example}
 \large
@@ -545,6 +684,12 @@ The exclamation mark indicates writeback. In A64, pre-indexed writeback uses an 
 % Slide 20
 % Slide Header: Post-Indexed Addressing
 % ============================================================
+
+
+% ============================================================
+% Slide 17
+% ============================================================
+
 \begin{frame}{Post-Indexed Addressing}
 \begin{block}{Example}
 \large
@@ -567,6 +712,12 @@ Post-indexing is useful when processing the current element and then advancing a
 % Slide 21
 % Slide Header: Addressing Mode Comparison
 % ============================================================
+
+
+% ============================================================
+% Slide 18
+% ============================================================
+
 \begin{frame}{Addressing Mode Comparison}
 \begin{center}
 \small
@@ -614,12 +765,18 @@ Offset addressing computes an access address without changing the base register;
 % Slide 22
 % Slide Header: Arrays, Pointers, and Byte Data
 % ============================================================
-\sectiondivider{Section 04}{Arrays, Pointers, and Byte Data}
+\sectiondivider{Section 4}{Arrays, Pointers, and Byte Data}
 
 % ============================================================
 % Slide 23
 % Slide Header: Array Address Calculation
 % ============================================================
+
+
+% ============================================================
+% Slide 19
+% ============================================================
+
 \begin{frame}{Array Address Calculation}
 For an array with element size $S$, element \code{A[i]} begins at:
 \[
@@ -645,6 +802,12 @@ If \code{x1} contains the array base and \code{x2} contains index \code{i}:
 % Slide 24
 % Slide Header: Traversing an Array with a Pointer
 % ============================================================
+
+
+% ============================================================
+% Slide 20
+% ============================================================
+
 \begin{frame}{Traversing an Array with a Pointer}
 Assume \code{x0} points to the current 64-bit array element.
 \vspace{0.25cm}
@@ -668,6 +831,12 @@ Post-index addressing combines the current access with advancement to the next e
 % Slide 25
 % Slide Header: Byte Arrays and Pointer Advancement
 % ============================================================
+
+
+% ============================================================
+% Slide 21
+% ============================================================
+
 \begin{frame}{Byte Arrays and Pointer Advancement}
 A C-style string is a byte array, so one character occupies one byte.
 \vspace{0.25cm}
@@ -691,12 +860,18 @@ This instruction demonstrates byte access and pointer movement only; the complet
 % Slide 26
 % Slide Header: Alignment and Pair Transfers
 % ============================================================
-\sectiondivider{Section 05}{Alignment and Pair Transfers}
+\sectiondivider{Section 5}{Alignment and Pair Transfers}
 
 % ============================================================
 % Slide 27
 % Slide Header: Natural Alignment
 % ============================================================
+
+
+% ============================================================
+% Slide 22
+% ============================================================
+
 \begin{frame}{Natural Alignment}
 \begin{block}{Natural Alignment Rule}
 An $n$-byte object is naturally aligned when its starting address is a multiple of $n$.
@@ -717,6 +892,12 @@ Many ordinary AArch64 loads and stores to normal memory permit unaligned address
 % Slide 28
 % Slide Header: Load and Store Pair
 % ============================================================
+
+
+% ============================================================
+% Slide 23
+% ============================================================
+
 \begin{frame}{Load and Store Pair: \code{ldp} and \code{stp}}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -750,12 +931,18 @@ A pair transfer is one architectural instruction, but it is not guaranteed to be
 % Slide 29
 % Slide Header: Summary and Self-Test
 % ============================================================
-\sectiondivider{Section 06}{Summary and Self-Test}
+\sectiondivider{Section 6}{Summary and Self-Test}
 
 % ============================================================
 % Slide 30
 % Slide Header: Topic 6 Summary
 % ============================================================
+
+
+% ============================================================
+% Slide 24
+% ============================================================
+
 \begin{frame}{Topic 6 Summary}
 \begin{itemize}
 \item AArch64 uses explicit load/store instructions to move values between registers and memory.
@@ -771,6 +958,12 @@ A pair transfer is one architectural instruction, but it is not guaranteed to be
 % Slide 31
 % Slide Header: Self-Test 1/2
 % ============================================================
+
+
+% ============================================================
+% Slide 25
+% ============================================================
+
 \begin{frame}{Self-Test 1/2}
 \begin{enumerate}
 \item What does the bracket notation in \code{ldr x0, [x1]} mean?
@@ -785,6 +978,12 @@ A pair transfer is one architectural instruction, but it is not guaranteed to be
 % Slide 32
 % Slide Header: Self-Test 2/2
 % ============================================================
+
+
+% ============================================================
+% Slide 26
+% ============================================================
+
 \begin{frame}{Self-Test 2/2}
 \begin{enumerate}
 \setcounter{enumi}{5}
@@ -800,6 +999,12 @@ A pair transfer is one architectural instruction, but it is not guaranteed to be
 % Slide 33
 % Slide Header: Next Topic
 % ============================================================
+
+
+% ============================================================
+% Slide 27
+% ============================================================
+
 \begin{frame}{Next Topic}
 \begin{block}{Branching and Iteration}
 Topic 7 develops the comparison, branching, and control-flow instructions used to implement decisions and repetition.

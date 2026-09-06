@@ -12,14 +12,14 @@
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
-    CSCI 2406 --- Computer Organization \& Architecture (AArch64 Reference)
+    CSCI 2406 --- Computer Organization \& Architecture
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
 
-\setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
@@ -77,16 +77,31 @@
 % ============================================================
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -104,27 +119,57 @@
 % Slide 1
 % Slide Header: Integer Arithmetic and Performance Basics
 % ============================================================
+
+
+% ============================================================
+% Slide 1
+% ============================================================
+
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.0cm}
-\begin{minipage}{0.9\textwidth}
-{\color{gold}\large\bfseries CSCI 2406: Topic 04\par}
-\vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries Integer Arithmetic and Performance Basics\par}
-\vspace{0.3cm}
-{\color{softgray}\normalsize Fixed-width arithmetic, condition flags, shifts, and CPU execution-time analysis\par}
-\vspace{0.6cm}
-{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad AArch64 Reference\par}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries
+CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 4
+\par}
+
+\vspace{0.25cm}
+
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+Integer Arithmetic and\\[0.08cm]Performance Basics
+\par}
+
+\vspace{0.35cm}
+
+{\color{white!80}\large
+Integer arithmetic, condition flags,\\clock rate, CPI, and execution time
+\par}
 \end{minipage}
+
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
 % ============================================================
 % Slide 2
 % Slide Header: Topic 4 Outline
 % ============================================================
+
+
+% ============================================================
+% Slide 2
+% ============================================================
+
 \begin{frame}{Topic 4 Outline}
 \begin{block}{Topic Objective}
 Understand how fixed-width integer arithmetic works at the machine level, how condition flags support later control flow, and how instruction count, CPI, and clock rate determine execution time.
@@ -143,12 +188,18 @@ Understand how fixed-width integer arithmetic works at the machine level, how co
 % Slide 3
 % Slide Header: Fixed-Width Integer Arithmetic
 % ============================================================
-\sectiondivider{Section 01}{Fixed-Width Integer Arithmetic}
+\sectiondivider{Section 1}{Fixed-Width Integer Arithmetic}
 
 % ============================================================
 % Slide 4
 % Slide Header: Why Integer Arithmetic Matters
 % ============================================================
+
+
+% ============================================================
+% Slide 3
+% ============================================================
+
 \begin{frame}{Why Integer Arithmetic Matters}
 \begin{block}{Integer Operations Are Everywhere}
 Integer arithmetic is not limited to explicit calculator-like expressions. It appears constantly in address calculation, loop control, array indexing, comparisons, and resource accounting.
@@ -180,6 +231,12 @@ Integer arithmetic is not limited to explicit calculator-like expressions. It ap
 % Slide 5
 % Slide Header: Arithmetic Operates on Bit Patterns
 % ============================================================
+
+
+% ============================================================
+% Slide 4
+% ============================================================
+
 \begin{frame}{Arithmetic Operates on Bit Patterns}
 \begin{block}{Core Principle}
 The ALU operates on finite-width bit patterns. Signedness is not a property of the adder itself; it is a property of how software interprets the bits and which branch conditions it later uses.
@@ -212,6 +269,12 @@ The ALU operates on finite-width bit patterns. Signedness is not a property of t
 % Slide 6
 % Slide Header: Binary Addition and Carry
 % ============================================================
+
+
+% ============================================================
+% Slide 5
+% ============================================================
+
 \begin{frame}{Binary Addition and Carry}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -244,6 +307,12 @@ An $n$-bit register keeps only $n$ result bits. Extra information may be reflect
 % Slide 7
 % Slide Header: Unsigned Ranges
 % ============================================================
+
+
+% ============================================================
+% Slide 6
+% ============================================================
+
 \begin{frame}{Unsigned Ranges}
 \begin{block}{Range Formula}
 An $n$-bit unsigned integer represents values from $0$ to $2^n-1$.
@@ -279,6 +348,12 @@ If unsigned addition produces a carry out of the most-significant bit, the desti
 % Slide 8
 % Slide Header: Two's-Complement Subtraction
 % ============================================================
+
+
+% ============================================================
+% Slide 7
+% ============================================================
+
 \begin{frame}{Two's-Complement Subtraction}
 \begin{block}{Hardware Idea}
 Subtraction can reuse the same adder by adding the two's-complement negation of the second operand.
@@ -314,6 +389,12 @@ A-B=A+(\sim B)+1
 % Slide 9
 % Slide Header: Signed vs. Unsigned Interpretation
 % ============================================================
+
+
+% ============================================================
+% Slide 8
+% ============================================================
+
 \begin{frame}{Signed vs. Unsigned Interpretation}
 \begin{block}{Same Bits, Different Values}
 The same bit pattern can have different numeric meanings depending on whether software treats it as unsigned or signed two's complement.
@@ -349,12 +430,18 @@ The instruction result is a bit pattern. The choice of signed or unsigned branch
 % Slide 10
 % Slide Header: Condition Flags and Comparisons
 % ============================================================
-\sectiondivider{Section 02}{Condition Flags and Comparisons}
+\sectiondivider{Section 2}{Condition Flags and Comparisons}
 
 % ============================================================
 % Slide 11
 % Slide Header: Why Condition Flags?
 % ============================================================
+
+
+% ============================================================
+% Slide 9
+% ============================================================
+
 \begin{frame}{Why Condition Flags?}
 \begin{block}{Arithmetic Produces More Than a Result}
 A fixed-width arithmetic operation produces a register result, but later instructions may also need to know whether that result was zero, negative, produced a carry-out, or caused signed overflow.
@@ -376,6 +463,12 @@ NZCV connects arithmetic to decisions such as equality, signed ordering, and uns
 % Slide 12
 % Slide Header: NZCV Condition Flags
 % ============================================================
+
+
+% ============================================================
+% Slide 10
+% ============================================================
+
 \begin{frame}{NZCV Condition Flags}
 \vspace{-0.25cm}
 \begin{block}{Processor Status}
@@ -415,6 +508,12 @@ When NZCV is accessed as a system-register value, the four flags occupy bits 31-
 % Slide 13
 % Slide Header: Flag-Setting Arithmetic
 % ============================================================
+
+
+% ============================================================
+% Slide 11
+% ============================================================
+
 \begin{frame}{Flag-Setting Arithmetic}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -450,6 +549,12 @@ Flag updates are provided by specific instruction forms such as \code{adds} and 
 % Slide 14
 % Slide Header: N: Negative Flag
 % ============================================================
+
+
+% ============================================================
+% Slide 12
+% ============================================================
+
 \begin{frame}{N: Negative Flag}
 \begin{block}{When N Is Set}
 For a flag-setting arithmetic operation, \code{N=1} when the most-significant bit of the destination-width result is 1.
@@ -488,6 +593,12 @@ Signed less-than uses \code{N} together with \code{V}; \code{N} alone is not suf
 % Slide 15
 % Slide Header: Z: Zero Flag
 % ============================================================
+
+
+% ============================================================
+% Slide 13
+% ============================================================
+
 \begin{frame}{Z: Zero Flag}
 \begin{block}{When Z Is Set}
 \code{Z=1} when every bit of the destination-width result is zero.
@@ -526,6 +637,12 @@ After a comparison, \code{b.eq} tests \code{Z=1}; \code{b.ne} tests \code{Z=0}.
 % Slide 16
 % Slide Header: C: Carry Flag
 % ============================================================
+
+
+% ============================================================
+% Slide 14
+% ============================================================
+
 \begin{frame}{C: Carry Flag}
 \begin{block}{Addition}
 For addition, \code{C=1} when the fixed-width addition produces a carry out of the most-significant bit. Only the low $n$ result bits are stored in an $n$-bit destination.
@@ -565,6 +682,12 @@ A-B=A+(\sim B)+1
 % Slide 17
 % Slide Header: C After Subtraction
 % ============================================================
+
+
+% ============================================================
+% Slide 15
+% ============================================================
+
 \begin{frame}{C After Subtraction}
 \begin{block}{Unsigned Interpretation}
 For the subtraction $A-B$, the carry flag provides information about the unsigned relationship between the two operands.
@@ -602,6 +725,12 @@ After \code{cmp x0, x1}, \code{C=1} corresponds to \code{x0 >= x1} for unsigned 
 % Slide 18
 % Slide Header: V: Signed Overflow Flag
 % ============================================================
+
+
+% ============================================================
+% Slide 16
+% ============================================================
+
 \begin{frame}{V: Signed Overflow Flag}
 \begin{block}{Signed Addition Rule}
 For signed addition, overflow occurs when two operands with the same sign produce a result with the opposite sign.
@@ -641,6 +770,12 @@ Adding operands with opposite signs does not produce signed overflow in addition
 % Slide 19
 % Slide Header: Signed Overflow in Subtraction
 % ============================================================
+
+
+% ============================================================
+% Slide 17
+% ============================================================
+
 \begin{frame}{Signed Overflow in Subtraction}
 \begin{block}{Subtraction Rule}
 For signed subtraction \code{A - B}, overflow can occur only when \code{A} and \code{B} have opposite signs and the result sign differs from the sign of \code{A}.
@@ -666,6 +801,12 @@ A negative value minus a positive value should become more negative. If the fixe
 % Slide 20
 % Slide Header: Comparison with CMP
 % ============================================================
+
+
+% ============================================================
+% Slide 18
+% ============================================================
+
 \begin{frame}{Comparison with \code{cmp}}
 \begin{block}{\code{cmp} Is Flag-Setting Subtraction}
 \large
@@ -690,12 +831,18 @@ A negative value minus a positive value should become more negative. If the fixe
 % Slide 22
 % Slide Header: Multiplication, Division, and Shifts
 % ============================================================
-\sectiondivider{Section 03}{Multiplication, Division, and Shifts}
+\sectiondivider{Section 3}{Multiplication, Division, and Shifts}
 
 % ============================================================
 % Slide 23
 % Slide Header: Multiplication and Division Basics
 % ============================================================
+
+
+% ============================================================
+% Slide 19
+% ============================================================
+
 \begin{frame}{Multiplication and Division Basics}
 \begin{block}{Architectural Category}
 Multiply and divide read registers and write register results; latency is implementation-dependent.
@@ -732,6 +879,12 @@ Multiply and divide read registers and write register results; latency is implem
 % Slide 24
 % Slide Header: Shifts and Powers of Two
 % ============================================================
+
+
+% ============================================================
+% Slide 20
+% ============================================================
+
 \begin{frame}{Shifts and Powers of Two}
 \begin{center}
 \small
@@ -773,6 +926,12 @@ bit manipulation, not division \\
 % Slide 25
 % Slide Header: Shift Example
 % ============================================================
+
+
+% ============================================================
+% Slide 21
+% ============================================================
+
 \begin{frame}{Shift Example}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -808,12 +967,18 @@ Shifts can resemble multiplication or division by powers of two, but finite widt
 % Slide 26
 % Slide Header: Processor Performance Basics
 % ============================================================
-\sectiondivider{Section 04}{Processor Performance Basics}
+\sectiondivider{Section 4}{Processor Performance Basics}
 
 % ============================================================
 % Slide 27
 % Slide Header: Execution Time and Performance
 % ============================================================
+
+
+% ============================================================
+% Slide 22
+% ============================================================
+
 \begin{frame}{Execution Time and Performance}
 \begin{block}{Primary Metric}
 For a fixed workload, performance is the inverse of execution time.
@@ -846,6 +1011,12 @@ For a fixed workload, performance is the inverse of execution time.
 % Slide 28
 % Slide Header: The Iron Law of Processor Performance
 % ============================================================
+
+
+% ============================================================
+% Slide 23
+% ============================================================
+
 \begin{frame}{The Iron Law of Processor Performance}
 \begin{block}{CPU Execution-Time Equation}
 \[
@@ -889,6 +1060,12 @@ circuit timing, clock frequency \\
 % Slide 29
 % Slide Header: Instruction Count Is Dynamic
 % ============================================================
+
+
+% ============================================================
+% Slide 24
+% ============================================================
+
 \begin{frame}{Instruction Count Is Dynamic}
 \begin{block}{Dynamic Instruction Count}
 Dynamic instruction count is the number of instructions actually executed, not merely the number of instructions visible in a source or assembly listing.
@@ -910,6 +1087,12 @@ A three-instruction loop body executed $N$ times contributes approximately $3N$ 
 % Slide 30
 % Slide Header: CPI and IPC
 % ============================================================
+
+
+% ============================================================
+% Slide 25
+% ============================================================
+
 \begin{frame}{CPI and IPC}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -949,6 +1132,12 @@ Instruction latency and throughput are microarchitecture-dependent, not fixed by
 % Slide 31
 % Slide Header: Average CPI from an Instruction Mix
 % ============================================================
+
+
+% ============================================================
+% Slide 26
+% ============================================================
+
 \begin{frame}{Average CPI from an Instruction Mix}
 \begin{block}{Weighted Average}
 When instruction classes have different average costs, overall CPI depends on the dynamic instruction mix.
@@ -997,6 +1186,12 @@ C & 20\% & 4 & 0.80 \\
 % Slide 32
 % Slide Header: Clock Frequency Is Not Performance
 % ============================================================
+
+
+% ============================================================
+% Slide 27
+% ============================================================
+
 \begin{frame}{Clock Frequency Is Not Performance}
 \begin{block}{Common Mistake}
 A higher clock rate does not automatically mean a shorter runtime. Instruction count and CPI matter just as much.
@@ -1032,6 +1227,12 @@ Processor B has a lower frequency, but each instruction takes fewer cycles on av
 % Slide 33
 % Slide Header: Worked Performance Example
 % ============================================================
+
+
+% ============================================================
+% Slide 28
+% ============================================================
+
 \begin{frame}{Worked Performance Example}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -1083,12 +1284,18 @@ T_B
 % Slide 34
 % Slide Header: Summary and Self-Test
 % ============================================================
-\sectiondivider{Section 05}{Summary and Self-Test}
+\sectiondivider{Section 5}{Summary and Self-Test}
 
 % ============================================================
 % Slide 35
 % Slide Header: Topic 4 Summary
 % ============================================================
+
+
+% ============================================================
+% Slide 29
+% ============================================================
+
 \begin{frame}{Topic 4 Summary}
 \begin{itemize}
 \item Integer arithmetic operates on fixed-width bit patterns.
@@ -1107,6 +1314,12 @@ T_B
 % Slide 36
 % Slide Header: Self-Test 1/2
 % ============================================================
+
+
+% ============================================================
+% Slide 30
+% ============================================================
+
 \begin{frame}{Self-Test 1/2}
 \begin{enumerate}
 \item Why do \code{add} and \code{sub} not by themselves determine signedness?
@@ -1122,6 +1335,12 @@ T_B
 % Slide 37
 % Slide Header: Self-Test 2/2
 % ============================================================
+
+
+% ============================================================
+% Slide 31
+% ============================================================
+
 \begin{frame}{Self-Test 2/2}
 \begin{enumerate}
 \setcounter{enumi}{6}
@@ -1138,6 +1357,12 @@ T_B
 % Slide 38
 % Slide Header: Wrap-Up and Next Steps
 % ============================================================
+
+
+% ============================================================
+% Slide 32
+% ============================================================
+
 \begin{frame}{Wrap-Up and Next Steps}
 \begin{block}{Next Topic: AArch64 Arithmetic, Logic, Shifts, and Flags}
 The next lecture moves from arithmetic foundations to concrete AArch64 instruction forms and bit-level manipulation patterns.

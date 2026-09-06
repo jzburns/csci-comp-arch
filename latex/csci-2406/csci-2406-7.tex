@@ -17,7 +17,17 @@
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
-\setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
+    CSCI 2406 --- Computer Organization \& Architecture
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
@@ -80,16 +90,31 @@
 % ============================================================
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -107,27 +132,57 @@
 % Slide 1
 % Slide Header: Branching and Iteration
 % ============================================================
+
+
+% ============================================================
+% Slide 1
+% ============================================================
+
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.0cm}
-\begin{minipage}{0.9\textwidth}
-{\color{gold}\large\bfseries CSCI 2406: Topic 07\par}
-\vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries Branching and Iteration\par}
-\vspace{0.3cm}
-{\color{softgray}\normalsize Comparisons, branches, selection, iteration, and control-flow translation\par}
-\vspace{0.6cm}
-{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad AArch64 Reference\par}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries
+CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 7
+\par}
+
+\vspace{0.25cm}
+
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+Branching and Iteration
+\par}
+
+\vspace{0.35cm}
+
+{\color{white!80}\large
+Comparisons, branches, loops,\\and high-level control-flow translation
+\par}
 \end{minipage}
+
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
 % ============================================================
 % Slide 2
 % Slide Header: Topic 7 Outline
 % ============================================================
+
+
+% ============================================================
+% Slide 2
+% ============================================================
+
 \begin{frame}{Topic 7 Outline}
 \begin{block}{Topic Objective}
 Explain how AArch64 changes program execution order using comparisons, condition flags, branches, and loop patterns.
@@ -147,12 +202,18 @@ Explain how AArch64 changes program execution order using comparisons, condition
 % Slide 3
 % Slide Header: Sequential Execution and Branch Targets
 % ============================================================
-\sectiondivider{Section 01}{Sequential Execution and Branch Targets}
+\sectiondivider{Section 1}{Sequential Execution and Branch Targets}
 
 % ============================================================
 % Slide 4
 % Slide Header: The Program Counter Controls Instruction Order
 % ============================================================
+
+
+% ============================================================
+% Slide 3
+% ============================================================
+
 \begin{frame}{The Program Counter Controls Instruction Order}
 \begin{block}{Program Counter}
 The program counter identifies the instruction address associated with the current control-flow position. In AArch64, it is not an ordinary general-purpose register.
@@ -173,6 +234,12 @@ Because A64 instructions are 4 bytes wide, the next sequential instruction addre
 % Slide 5
 % Slide Header: Labels Name Instruction Addresses
 % ============================================================
+
+
+% ============================================================
+% Slide 4
+% ============================================================
+
 \begin{frame}{Labels Name Instruction Addresses}
 \begin{block}{Assembler Labels}
 A label is a symbolic name for an instruction address. The assembler and linker toolchain resolve symbolic branch targets into the addresses required by the program.
@@ -202,6 +269,12 @@ A label is a symbolic name for an instruction address. The assembler and linker 
 % Slide 6
 % Slide Header: Control Flow Changes the Instruction Stream
 % ============================================================
+
+
+% ============================================================
+% Slide 5
+% ============================================================
+
 \begin{frame}{Control Flow Changes the Instruction Stream}
 \begin{center}
 \begin{tikzpicture}[
@@ -273,12 +346,18 @@ A conditional branch either transfers control to its target or falls through to 
 % Slide 7
 % Slide Header: Comparisons and Condition Flags
 % ============================================================
-\sectiondivider{Section 02}{Comparisons and Condition Flags}
+\sectiondivider{Section 2}{Comparisons and Condition Flags}
 
 % ============================================================
 % Slide 8
 % Slide Header: cmp Updates Flags by Subtraction
 % ============================================================
+
+
+% ============================================================
+% Slide 6
+% ============================================================
+
 \begin{frame}{\code{cmp} Updates Flags by Subtraction}
 \begin{block}{Underlying Operation}
 \code{cmp x0, x1} performs a subtraction for flags and discards the numeric result.
@@ -301,6 +380,12 @@ A conditional branch either transfers control to its target or falls through to 
 % Slide 9
 % Slide Header: The NZCV Flags Used by Branches
 % ============================================================
+
+
+% ============================================================
+% Slide 7
+% ============================================================
+
 \begin{frame}{The NZCV Flags Used by Branches}
 \begin{center}
 \begin{tikzpicture}[
@@ -332,6 +417,12 @@ A conditional branch either transfers control to its target or falls through to 
 % Slide 10
 % Slide Header: Equality Branches
 % ============================================================
+
+
+% ============================================================
+% Slide 8
+% ============================================================
+
 \begin{frame}{Equality Branches}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -368,6 +459,12 @@ A conditional branch either transfers control to its target or falls through to 
 % Slide 11
 % Slide Header: Signed and Unsigned Ordering
 % ============================================================
+
+
+% ============================================================
+% Slide 9
+% ============================================================
+
 \begin{frame}{Signed and Unsigned Ordering}
 \begin{center}
 \small
@@ -409,6 +506,12 @@ Do not use signed and unsigned branch mnemonics interchangeably. They inspect di
 % Slide 12
 % Slide Header: Same cmp, Different Meaning
 % ============================================================
+
+
+% ============================================================
+% Slide 10
+% ============================================================
+
 \begin{frame}{Same \code{cmp}, Different Meaning}
 \begin{block}{Example Bit Patterns}
 For 8-bit intuition, compare \code{0xff} with \code{0x01}. The bit patterns are the same, but the numerical interpretation changes.
@@ -442,12 +545,18 @@ After the same comparison, \code{b.lo} and \code{b.lt} may lead to different con
 % Slide 13
 % Slide Header: Branch Instructions
 % ============================================================
-\sectiondivider{Section 03}{Branch Instructions}
+\sectiondivider{Section 3}{Branch Instructions}
 
 % ============================================================
 % Slide 14
 % Slide Header: Unconditional Branch
 % ============================================================
+
+
+% ============================================================
+% Slide 11
+% ============================================================
+
 \begin{frame}{Unconditional Branch}
 \begin{block}{Branch Always}
 \code{b label} transfers control to the target label without testing NZCV flags.
@@ -470,6 +579,12 @@ After the same comparison, \code{b.lo} and \code{b.lt} may lead to different con
 % Slide 15
 % Slide Header: Conditional Branch Pattern
 % ============================================================
+
+
+% ============================================================
+% Slide 12
+% ============================================================
+
 \begin{frame}{Conditional Branch Pattern}
 \begin{block}{Two-Step Decision}
 A common AArch64 decision first sets flags, then uses a branch instruction to test those flags.
@@ -505,6 +620,12 @@ A common AArch64 decision first sets flags, then uses a branch instruction to te
 % Slide 16
 % Slide Header: Common Conditional Branch Mnemonics
 % ============================================================
+
+
+% ============================================================
+% Slide 13
+% ============================================================
+
 \begin{frame}{Common Conditional Branch Mnemonics}
 \begin{center}
 \small
@@ -547,6 +668,12 @@ The comparison operation may be identical, but the branch mnemonic determines ho
 % Slide 17
 % Slide Header: Compare and Branch on Zero
 % ============================================================
+
+
+% ============================================================
+% Slide 14
+% ============================================================
+
 \begin{frame}{Compare and Branch on Zero}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -582,6 +709,12 @@ These instructions test a register directly. Existing NZCV values are left uncha
 % Slide 18
 % Slide Header: Test Bit and Branch
 % ============================================================
+
+
+% ============================================================
+% Slide 15
+% ============================================================
+
 \begin{frame}{Test Bit and Branch}
 \begin{block}{Bit-Specific Control Flow}
 \code{tbz} and \code{tbnz} test a selected bit and branch according to whether that bit is zero or nonzero.
@@ -617,6 +750,12 @@ These instructions test a register directly. Existing NZCV values are left uncha
 % Slide 19
 % Slide Header: Branches and Flags
 % ============================================================
+
+
+% ============================================================
+% Slide 16
+% ============================================================
+
 \begin{frame}{Branches and Flags}
 \begin{center}
 \small
@@ -658,12 +797,18 @@ Use \code{b.cond} when NZCV already contains the needed comparison. Use a direct
 % Slide 20
 % Slide Header: Selection Structures
 % ============================================================
-\sectiondivider{Section 04}{Selection Structures}
+\sectiondivider{Section 4}{Selection Structures}
 
 % ============================================================
 % Slide 21
 % Slide Header: Translating an if Statement
 % ============================================================
+
+
+% ============================================================
+% Slide 17
+% ============================================================
+
 \begin{frame}{Translating an \code{if} Statement}
 \begin{columns}[T,onlytextwidth]
 \column{0.43\textwidth}
@@ -694,6 +839,12 @@ The branch often tests the opposite of the high-level condition so execution can
 % Slide 22
 % Slide Header: Translating if-else
 % ============================================================
+
+
+% ============================================================
+% Slide 18
+% ============================================================
+
 \begin{frame}{Translating \code{if}-\code{else}}
 \begin{columns}[T,onlytextwidth]
 \column{0.43\textwidth}
@@ -727,12 +878,18 @@ The unconditional branch after the true block prevents fall-through into the fal
 % Slide 23
 % Slide Header: Loops and Applied Traversal
 % ============================================================
-\sectiondivider{Section 05}{Loops and Applied Traversal}
+\sectiondivider{Section 5}{Loops and Applied Traversal}
 
 % ============================================================
 % Slide 24
 % Slide Header: Translating a while Loop
 % ============================================================
+
+
+% ============================================================
+% Slide 19
+% ============================================================
+
 \begin{frame}{Translating a \code{while} Loop}
 \begin{columns}[T,onlytextwidth]
 \column{0.43\textwidth}
@@ -765,6 +922,12 @@ A \code{while} loop checks its condition before executing the body, so the body 
 % Slide 25
 % Slide Header: Translating a do-while Loop
 % ============================================================
+
+
+% ============================================================
+% Slide 20
+% ============================================================
+
 \begin{frame}{Translating a \code{do}-\code{while} Loop}
 \begin{columns}[T,onlytextwidth]
 \column{0.43\textwidth}
@@ -793,6 +956,12 @@ A \code{do}-\code{while} loop executes the body once before its first condition 
 % Slide 26
 % Slide Header: Counted Loop with subs
 % ============================================================
+
+
+% ============================================================
+% Slide 21
+% ============================================================
+
 \begin{frame}{Counted Loop with \code{subs}}
 \begin{block}{Decrement and Test}
 A decrementing loop can combine counter update and flag update using \code{subs}.
@@ -816,6 +985,12 @@ A decrementing loop can combine counter update and flag update using \code{subs}
 % Slide 27
 % Slide Header: Array Traversal Loop
 % ============================================================
+
+
+% ============================================================
+% Slide 22
+% ============================================================
+
 \begin{frame}{Array Traversal Loop}
 \begin{block}{Example}
 Sum \code{n} 64-bit integers. Let \code{x0} hold the base pointer, \code{x1} hold \code{n}, and \code{x2} hold the running sum.
@@ -840,6 +1015,12 @@ Sum \code{n} 64-bit integers. Let \code{x0} hold the base pointer, \code{x1} hol
 % Slide 28
 % Slide Header: String Traversal Loop
 % ============================================================
+
+
+% ============================================================
+% Slide 23
+% ============================================================
+
 \begin{frame}{String Traversal Loop}
 \begin{block}{Null-Terminated Strings}
 A C string ends with a zero byte. Byte loads are used so the loop tests one character at a time.
@@ -864,6 +1045,12 @@ A C string ends with a zero byte. Byte loads are used so the loop tests one char
 % Slide 29
 % Slide Header: Common Branching Mistakes
 % ============================================================
+
+
+% ============================================================
+% Slide 24
+% ============================================================
+
 \begin{frame}{Common Branching Mistakes}
 \begin{itemize}
 \item Using \code{b.lt} for an unsigned comparison that should use \code{b.lo}.
@@ -882,12 +1069,18 @@ Trace the values, then trace the flags, then trace the branch target. Avoid gues
 % Slide 30
 % Slide Header: Summary and Self-Test
 % ============================================================
-\sectiondivider{Section 06}{Summary and Self-Test}
+\sectiondivider{Section 6}{Summary and Self-Test}
 
 % ============================================================
 % Slide 31
 % Slide Header: Topic 7 Summary
 % ============================================================
+
+
+% ============================================================
+% Slide 25
+% ============================================================
+
 \begin{frame}{Topic 7 Summary}
 \begin{itemize}
 \item The program counter determines the current control-flow position, but it is not an ordinary AArch64 general-purpose register.
@@ -902,6 +1095,12 @@ Trace the values, then trace the flags, then trace the branch target. Avoid gues
 % Slide 32
 % Slide Header: Self-Test 1/2
 % ============================================================
+
+
+% ============================================================
+% Slide 26
+% ============================================================
+
 \begin{frame}{Self-Test 1/2}
 \begin{enumerate}
 \item What does \code{cmp x0, x1} compute internally, and where is the result stored?
@@ -916,6 +1115,12 @@ Trace the values, then trace the flags, then trace the branch target. Avoid gues
 % Slide 33
 % Slide Header: Self-Test 2/2
 % ============================================================
+
+
+% ============================================================
+% Slide 27
+% ============================================================
+
 \begin{frame}{Self-Test 2/2}
 \begin{enumerate}
 \setcounter{enumi}{5}
@@ -931,6 +1136,12 @@ Trace the values, then trace the flags, then trace the branch target. Avoid gues
 % Slide 34
 % Slide Header: Review Exercise
 % ============================================================
+
+
+% ============================================================
+% Slide 28
+% ============================================================
+
 \begin{frame}{Review Exercise}
 \begin{block}{Classify the Branch Behavior}
 For each instruction, state whether it reads NZCV, updates NZCV, directly tests a register, or branches unconditionally.
@@ -964,6 +1175,12 @@ For each instruction, state whether it reads NZCV, updates NZCV, directly tests 
 % Slide 35
 % Slide Header: Next Topic
 % ============================================================
+
+
+% ============================================================
+% Slide 29
+% ============================================================
+
 \begin{frame}{Next Topic}
 \begin{block}{Procedures and the Stack}
 Topic 8 develops the conventions and memory organization needed for reliable procedure calls.

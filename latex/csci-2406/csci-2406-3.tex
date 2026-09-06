@@ -14,20 +14,17 @@
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
   \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
-    CSCI 2406 --- Computer Organization \& Architecture (ARM64 / AArch64 Reference)
+    CSCI 2406 --- Computer Organization \& Architecture
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
 
-\setbeamersize{
-  text margin left=0.65cm,
-  text margin right=0.65cm
-}
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
 
-\setbeamerfont{frametitle}{size=\large, series=\bfseries}
-\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
 % Block vertical padding adjustments
@@ -96,16 +93,31 @@
 % Section divider macro
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -135,24 +147,54 @@
 \begin{document}
 
 % --- Slide 1: Title Slide ---
+
+
+% ============================================================
+% Slide 1
+% ============================================================
+
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.0cm}
-\begin{minipage}{0.9\textwidth}
-{\color{gold}\large\bfseries CSCI 2406: Topic 03\par}
-\vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries Machine-Level Data Representation\par}
-\vspace{0.3cm}
-{\color{lightblue}\normalsize Binary/Hex representation, signed vs unsigned, two's complement, and memory endianness / alignment in AArch64\par}
-\vspace{0.6cm}
-{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad Topic 3\par}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries
+CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 3
+\par}
+
+\vspace{0.25cm}
+
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+Machine-Level Data\\[0.08cm]Representation
+\par}
+
+\vspace{0.35cm}
+
+{\color{white!80}\large
+Binary and hexadecimal representation, signed values,\\two's complement, endianness, and alignment
+\par}
 \end{minipage}
+
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
 % --- Slide 2: Topic Outline ---
+
+
+% ============================================================
+% Slide 2
+% ============================================================
+
 \begin{frame}{Topic 3 Outline}
 \begin{block}{Topic Objective}
 Analysis of how machine-level information is encoded, interpreted, and organized across fixed-width registers and byte-addressed memory structures.
@@ -172,9 +214,15 @@ Analysis of how machine-level information is encoded, interpreted, and organized
 % SECTION 1
 % ============================================================
 
-\sectiondivider{Section 01}{Bits, Bytes, Words, and\\Base Conversions}
+\sectiondivider{Section 1}{Bits, Bytes, Words, and\\Base Conversions}
 
 % --- Slide 4: Why Data Representation Matters ---
+
+
+% ============================================================
+% Slide 3
+% ============================================================
+
 \begin{frame}{Why Data Representation Matters}
 All machine-level information is stored as fixed-width bit patterns:
 \vspace{0.2em}
@@ -187,6 +235,12 @@ All machine-level information is stored as fixed-width bit patterns:
 \end{frame}
 
 % --- Slide 5: Bits, Bytes, and Words ---
+
+
+% ============================================================
+% Slide 4
+% ============================================================
+
 \begin{frame}{Data Units in Memory and Registers}
 \begin{block}{Hierarchical Units of Storage}
 \begin{itemize}
@@ -204,6 +258,12 @@ One AArch64 register width = $64$ bits = $8$ bytes.
 \end{frame}
 
 % --- Slide 6: Binary Number System ---
+
+
+% ============================================================
+% Slide 5
+% ============================================================
+
 \begin{frame}{The Binary Number System (Base 2)}
 Binary maps directly to physical dual-state digital hardware:
 \vspace{0.2em}
@@ -231,6 +291,12 @@ Binary maps directly to physical dual-state digital hardware:
 \end{frame}
 
 % --- Slide 7: Converting Binary and Decimal ---
+
+
+% ============================================================
+% Slide 6
+% ============================================================
+
 \begin{frame}{Base Conversion Mechanics}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
@@ -261,9 +327,15 @@ Binary maps directly to physical dual-state digital hardware:
 % SECTION 2
 % ============================================================
 
-\sectiondivider{Section 02}{Binary and Hexadecimal Representation}
+\sectiondivider{Section 2}{Binary and Hexadecimal Representation}
 
 % --- Slide 9: Hexadecimal Number System ---
+
+
+% ============================================================
+% Slide 7
+% ============================================================
+
 \begin{frame}{The Hexadecimal Number System (Base 16)}
 Hexadecimal provides a compact, readable shorthand for machine-level data:
 \vspace{0.2em}
@@ -287,6 +359,12 @@ Hexadecimal provides a compact, readable shorthand for machine-level data:
 \end{frame}
 
 % --- Slide 10: Binary-Hexadecimal Conversion ---
+
+
+% ============================================================
+% Slide 8
+% ============================================================
+
 \begin{frame}{Direct Binary-Hexadecimal Conversion}
 Converting between binary and hex requires no intermediate decimal math:
 \vspace{0.3em}
@@ -315,6 +393,12 @@ Converting between binary and hex requires no intermediate decimal math:
 \end{frame}
 
 % --- Slide 11: AArch64 Registers and Data Widths ---
+
+
+% ============================================================
+% Slide 9
+% ============================================================
+
 \begin{frame}{AArch64 Registers and Data Widths}
 AArch64 general-purpose registers are 64 bits wide, supporting flexible data sizing:
 \vspace{0.2em}
@@ -334,9 +418,15 @@ $18,446,744,073,709,551,615$ or the signed integer $-1$.
 % SECTION 3
 % ============================================================
 
-\sectiondivider{Section 03}{Unsigned and Signed Integer Representations}
+\sectiondivider{Section 3}{Unsigned and Signed Integer Representations}
 
 % --- Slide 13: Unsigned Integer Representation ---
+
+
+% ============================================================
+% Slide 10
+% ============================================================
+
 \begin{frame}{Unsigned Integer Representation}
 Unsigned integers represent only non-negative values ($0$ and positive integers):
 \vspace{0.2em}
@@ -356,6 +446,12 @@ Unsigned integers represent only non-negative values ($0$ and positive integers)
 \end{frame}
 
 % --- Slide 14: Unsigned Arithmetic Overflow ---
+
+
+% ============================================================
+% Slide 11
+% ============================================================
+
 \begin{frame}{Unsigned Arithmetic and Fixed-Width Limits}
 Unsigned operations are evaluated modulo $2^n$ for an $n$-bit container:
 \vspace{0.2em}
@@ -381,6 +477,12 @@ with a carry out.
 \end{frame}
 
 % --- Slide 15: Signed Integer Representation & Sign-Magnitude Flaws ---
+
+
+% ============================================================
+% Slide 12
+% ============================================================
+
 \begin{frame}{Signed Integer Challenges \& Sign-Magnitude Failure}
 Signed integers require encoding both positive and negative values:
 \vspace{0.2em}
@@ -402,9 +504,15 @@ Modern general-purpose processors use \key{two's-complement representation} for 
 % SECTION 4
 % ============================================================
 
-\sectiondivider{Section 04}{Two's Complement Representation\\and Arithmetic Behavior}
+\sectiondivider{Section 4}{Two's Complement Representation\\and Arithmetic Behavior}
 
 % --- Slide 17: Two's Complement Solution ---
+
+
+% ============================================================
+% Slide 13
+% ============================================================
+
 \begin{frame}{Two's Complement Representation}
 \begin{block}{Core Design Objective}
 Two's complement allows signed addition and subtraction to use the same fixed-width binary-adder structure used for unsigned arithmetic, while maintaining a single representation for zero.
@@ -425,6 +533,12 @@ $0000\,0101 \rightarrow 1111\,1010 \rightarrow 1111\,1011$.
 \end{frame}
 
 % --- Slide 18: Two's Complement Adder Execution ---
+
+
+% ============================================================
+% Slide 14
+% ============================================================
+
 \begin{frame}{Two's Complement in Action: $-9 + 6$}
 Standard fixed-width binary addition produces the correct two's-complement result:
 \vspace{0.2em}
@@ -490,6 +604,12 @@ Standard fixed-width binary addition produces the correct two's-complement resul
 \end{frame}
 
 % --- Slide 19: Two's Complement Range ---
+
+
+% ============================================================
+% Slide 15
+% ============================================================
+
 \begin{frame}{Two's Complement Numeric Range}
 An $n$-bit container under two's-complement encoding spans asymmetric bounds:
 \vspace{0.2em}
@@ -509,6 +629,12 @@ An $n$-bit container under two's-complement encoding spans asymmetric bounds:
 \end{frame}
 
 % --- Slide 20: Signed Overflow Detection ---
+
+
+% ============================================================
+% Slide 16
+% ============================================================
+
 \begin{frame}{Signed Arithmetic Overflow}
 \begin{block}{Definition of Signed Overflow}
 Signed overflow occurs when a mathematical signed result lies outside the representable range of the destination width.
@@ -525,6 +651,12 @@ The bit pattern represents $-128$, so signed overflow occurred.
 \end{frame}
 
 % --- Slide 21: Interpreting Carry and Overflow Flags ---
+
+
+% ============================================================
+% Slide 17
+% ============================================================
+
 \begin{frame}{Do Carry and Overflow Represent Error Conditions?}
 \begin{block}{Status Flags vs. Hardware Errors}
 The \textbf{C} and \textbf{V} flags are arithmetic indicators, not automatic exceptions.
@@ -548,9 +680,15 @@ indicates that a signed arithmetic result cannot be represented in the selected 
 % SECTION 5
 % ============================================================
 
-\sectiondivider{Section 05}{Memory Endianness and\\Data Alignment in AArch64}
+\sectiondivider{Section 5}{Memory Endianness and\\Data Alignment in AArch64}
 
 % --- Slide 23: Memory as a Byte-Addressed Structure ---
+
+
+% ============================================================
+% Slide 18
+% ============================================================
+
 \begin{frame}{Memory as a Byte-Addressed Structure}
 AArch64 memory is organized as a byte-addressed structure:
 \vspace{0.2em}
@@ -568,6 +706,12 @@ A 64-bit value beginning at address \hex{1000} occupies byte addresses
 \end{frame}
 
 % --- Slide 24: Endianness Definition ---
+
+
+% ============================================================
+% Slide 19
+% ============================================================
+
 \begin{frame}{Endianness: Ordering Multi-Byte Values}
 \begin{block}{Definition}
 \key{Endianness} defines the ordering of bytes when a multi-byte value is stored across consecutive memory addresses.
@@ -594,6 +738,12 @@ A 64-bit value beginning at address \hex{1000} occupies byte addresses
 \end{frame}
 
 % --- Slide 25: Endianness in AArch64 ---
+
+
+% ============================================================
+% Slide 20
+% ============================================================
+
 \begin{frame}{Little-Endian Layout in AArch64 Practice}
 AArch64 implementations commonly operate with little-endian data accesses:
 \vspace{0.2em}
@@ -634,6 +784,12 @@ Storing the 64-bit value \hex{1234567890ABCDEF} beginning at address \hex{2000} 
 \end{frame}
 
 % --- Slide 26: Data Alignment in AArch64 ---
+
+
+% ============================================================
+% Slide 21
+% ============================================================
+
 \begin{frame}{Data Alignment in AArch64}
 \begin{block}{Natural Alignment}
 An object is naturally aligned when its starting address is a multiple of its size in bytes.
@@ -652,9 +808,15 @@ An object is naturally aligned when its starting address is a multiple of its si
 % SECTION 6
 % ============================================================
 
-\sectiondivider{Section 06}{Summary \& Self-Test}
+\sectiondivider{Section 6}{Summary \& Self-Test}
 
 % --- Slide 28: Topic Summary ---
+
+
+% ============================================================
+% Slide 22
+% ============================================================
+
 \begin{frame}{Topic 3 Comprehensive Summary}
 \begin{itemize}
 \item \key{Fixed-Width Representation}: Information is stored as bit patterns whose meaning depends on interpretation and context.
@@ -666,6 +828,12 @@ An object is naturally aligned when its starting address is a multiple of its si
 \end{frame}
 
 % --- Slide 29: Self-Test: Questions 1 & 2 ---
+
+
+% ============================================================
+% Slide 23
+% ============================================================
+
 \begin{frame}{Self-Test: Questions 1 \& 2}
 \begin{block}{Question 1: Bits, Words, and Bases}
 What is the relationship between bits, bytes, words, and 64-bit AArch64 registers?
@@ -679,6 +847,12 @@ What happens when an 8-bit unsigned value of $255$ has $1$ added to it?
 \end{frame}
 
 % --- Slide 30: Self-Test: Solutions 1 & 2 ---
+
+
+% ============================================================
+% Slide 24
+% ============================================================
+
 \begin{frame}{Self-Test: Solutions 1 \& 2}
 \begin{block}{Solution 1}
 A bit is one binary digit; a byte contains 8 bits; in AArch64 terminology a word is 32 bits, while the \code{x} general-purpose register view is 64 bits.
@@ -692,6 +866,12 @@ For 8 bits, $255 + 1$ produces a low 8-bit result of $0$ modulo $256$, with carr
 \end{frame}
 
 % --- Slide 31: Self-Test: Questions 3 & 4 ---
+
+
+% ============================================================
+% Slide 25
+% ============================================================
+
 \begin{frame}{Self-Test: Questions 3 \& 4}
 \begin{block}{Question 3: Two's Complement Negation}
 How do you form the two's-complement negative of a positive binary number?
@@ -704,6 +884,12 @@ How can the same 32-bit pattern represent different numerical values when interp
 \end{frame}
 
 % --- Slide 32: Self-Test: Solutions 3 & 4 ---
+
+
+% ============================================================
+% Slide 26
+% ============================================================
+
 \begin{frame}{Self-Test: Solutions 3 \& 4}
 \begin{block}{Solution 3}
 To form the two's-complement negative of a representable positive value, invert every bit and add $1$.
@@ -719,6 +905,12 @@ Thus \hex{FFFFFFFF} represents $4,294,967,295$ unsigned but $-1$ signed.
 \end{frame}
 
 % --- Slide 33: Self-Test: Questions 5 & 6 ---
+
+
+% ============================================================
+% Slide 27
+% ============================================================
+
 \begin{frame}{Self-Test: Questions 5 \& 6}
 \begin{block}{Question 5: Endianness in Memory}
 What is the difference between little-endian and big-endian byte ordering?
@@ -731,6 +923,12 @@ What does natural alignment mean, and why can alignment matter to a memory syste
 \end{frame}
 
 % --- Slide 34: Self-Test: Solutions 5 & 6 ---
+
+
+% ============================================================
+% Slide 28
+% ============================================================
+
 \begin{frame}{Self-Test: Solutions 5 \& 6}
 \begin{block}{Solution 5}
 Little-endian places the least significant byte at the lowest address.
@@ -745,6 +943,12 @@ Aligned accesses are generally easier for memory hardware to handle efficiently,
 \end{frame}
 
 % --- Slide 35: Review & Concept Verification ---
+
+
+% ============================================================
+% Slide 29
+% ============================================================
+
 \begin{frame}{Review: Summary Table of Data Types}
 \begin{table}
 \centering
@@ -788,6 +992,12 @@ Byte-ordering rule
 \end{frame}
 
 % --- Slide 36: Wrap-Up & Transition to Topic 4 ---
+
+
+% ============================================================
+% Slide 30
+% ============================================================
+
 \begin{frame}{Wrap-Up and Next Steps}
 \begin{block}{Transition to Topic 4}
 \begin{itemize}
@@ -801,6 +1011,12 @@ Byte-ordering rule
 \end{frame}
 
 % --- Slide 37: Additional Source Verification ---
+
+
+% ============================================================
+% Slide 31
+% ============================================================
+
 \begin{frame}{Topic 3 Source Notes}
 \begin{block}{Source Reference Verification}
 \begin{itemize}

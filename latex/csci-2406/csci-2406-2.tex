@@ -13,39 +13,19 @@
 
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
-  \begin{beamercolorbox}[
-    wd=.82\paperwidth,
-    ht=2.5ex,
-    dp=1.0ex,
-    leftskip=.8em
-  ]{author in head/foot}
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
     CSCI 2406 --- Computer Organization \& Architecture
-    (AArch64 Reference)
   \end{beamercolorbox}%
-  \begin{beamercolorbox}[
-    wd=.18\paperwidth,
-    ht=2.5ex,
-    dp=1.0ex,
-    rightskip=.8em
-  ]{date in head/foot}
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
 
-\setbeamersize{
-  text margin left=0.65cm,
-  text margin right=0.65cm
-}
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
 
-\setbeamerfont{frametitle}{
-  size=\large,
-  series=\bfseries
-}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 
-\setbeamerfont{block title}{
-  size=\normalsize,
-  series=\bfseries
-}
+\setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
@@ -180,36 +160,28 @@
 \begin{frame}[plain]
 
 \begin{tikzpicture}[remember picture,overlay]
-\fill[navy]
-  (current page.south west)
-  rectangle
-  (current page.north east);
-
-\fill[gold]
-  (current page.south west)
-  rectangle
-  ([yshift=.15cm]current page.south east);
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
-\vspace{1.5cm}
+\vspace*{\fill}
 
-\begin{minipage}{0.85\textwidth}
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
 
-{\color{gold}
- \large
- \bfseries
- #1
- \par}
+{\color{gold}\large\bfseries #1\par}
 
 \vspace{0.3cm}
 
-{\color{white}
- \fontsize{22}{26}\selectfont
- \bfseries
- #2
- \par}
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
 
 \end{minipage}
+
+\vspace*{\fill}
 
 \end{frame}
 }
@@ -241,67 +213,51 @@
 
 \begin{document}
 
+
+
 % ============================================================
-% Slide: Title Slide
+% Slide 1
 % ============================================================
 
 \begin{frame}[plain]
-
 \begin{tikzpicture}[remember picture,overlay]
-\fill[navy]
-  (current page.south west)
-  rectangle
-  (current page.north east);
-
-\fill[gold]
-  (current page.south west)
-  rectangle
-  ([yshift=.18cm]current page.south east);
+\fill[navy] (current page.south west) rectangle (current page.north east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
-\vspace{1.0cm}
+\vspace*{\fill}
 
-\begin{minipage}{0.9\textwidth}
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries
+CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 2
+\par}
 
-{\color{gold}
- \large
- \bfseries
- CSCI 2406: Topic 02
- \par}
+\vspace{0.25cm}
 
-\vspace{0.3cm}
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+RISC Principles and\\[0.08cm]ARM Architecture
+\par}
 
-{\color{white}
- \fontsize{20}{24}\selectfont
- \bfseries
- RISC Principles and ARM Architecture
- \par}
+\vspace{0.35cm}
 
-\vspace{0.3cm}
-
-{\color{softgray}
- \normalsize
- RISC Design Principles,
- AArch64 Architectural Overview,\\
- Registers and Programmer-Visible State,
- and Instruction Classes
- \par}
-
-\vspace{0.6cm}
-
-{\color{softgray}
- \small
- Computer Organization \& Architecture
- \quad\textbar\quad
- AArch64 Reference
- \par}
-
+{\color{white!80}\large
+RISC design principles, ARM architectural context,\\registers, state, and instruction classes
+\par}
 \end{minipage}
 
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Topic 2 Outline
+% Slide 2
 % ============================================================
 
 \begin{frame}{Topic 2 Outline}
@@ -333,12 +289,14 @@ in AArch64.
 % SECTION 1
 % ============================================================
 
-\sectiondivider{Section 01}{
+\sectiondivider{Section 1}{
   RISC Design Principles
 }
 
+
+
 % ============================================================
-% Slide: What Does RISC Mean?
+% Slide 3
 % ============================================================
 
 \begin{frame}{What Does RISC Mean?}
@@ -366,8 +324,10 @@ and memory access.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Foundational RISC Design Principles
+% Slide 4
 % ============================================================
 
 \begin{frame}{Foundational RISC Design Principles}
@@ -407,8 +367,10 @@ and pipelined implementation.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: The Load/Store Architectural Model
+% Slide 5
 % ============================================================
 
 \begin{frame}{The Load/Store Architectural Model}
@@ -459,8 +421,10 @@ instructions.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Load--Compute--Store in AArch64
+% Slide 6
 % ============================================================
 
 \begin{frame}{Load--Compute--Store in AArch64}
@@ -517,8 +481,10 @@ or modify a memory operand.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Visualizing Load/Store Separation
+% Slide 7
 % ============================================================
 
 \begin{frame}{Visualizing Load/Store Separation}
@@ -680,8 +646,10 @@ arithmetic instructions operate on register operands.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: RISC and CISC: Different Design Traditions
+% Slide 8
 % ============================================================
 
 \begin{frame}{RISC and CISC: Different Design Traditions}
@@ -757,8 +725,10 @@ not simple measures of modern processor complexity.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: AArch64 vs. x86-64: Instruction Length
+% Slide 9
 % ============================================================
 
 \begin{frame}{AArch64 vs. x86-64: Instruction Length}
@@ -847,8 +817,10 @@ Five instructions of different lengths.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Why x86 Instruction Decode Is More Irregular
+% Slide 10
 % ============================================================
 
 \begin{frame}{Why x86 Instruction Decode Is More Irregular}
@@ -978,8 +950,10 @@ and ends.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: How RISC Simplicity Shapes the Hardware
+% Slide 11
 % ============================================================
 
 \begin{frame}{How RISC Simplicity Shapes the Hardware}
@@ -1030,8 +1004,10 @@ Modern AArch64 cores may still contain:
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Why AArch64 Fits Mobile and Energy-Constrained Systems
+% Slide 12
 % ============================================================
 
 \begin{frame}{Why AArch64 Fits Mobile and Energy-Constrained Systems}
@@ -1081,8 +1057,10 @@ clock frequency, voltage, caches, and workload.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Same Operation, Different ISA Style
+% Slide 13
 % ============================================================
 
 \begin{frame}{Same Operation, Different ISA Style}
@@ -1145,12 +1123,14 @@ are represented by separate instructions.
 % SECTION 2
 % ============================================================
 
-\sectiondivider{Section 02}{
+\sectiondivider{Section 2}{
   AArch64 Architectural Overview
 }
 
+
+
 % ============================================================
-% Slide: ARM and AArch64
+% Slide 14
 % ============================================================
 
 \begin{frame}{ARM and AArch64}
@@ -1180,8 +1160,10 @@ and servers.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: AArch64 and A64 Terminology
+% Slide 15
 % ============================================================
 
 \begin{frame}{AArch64 and A64 Terminology}
@@ -1225,8 +1207,10 @@ to the instruction set encoding.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Key Characteristics of AArch64
+% Slide 16
 % ============================================================
 
 \begin{frame}{Key Characteristics of AArch64}
@@ -1263,8 +1247,10 @@ to the instruction set encoding.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: A64 Instruction Format Characteristics
+% Slide 17
 % ============================================================
 
 \begin{frame}{A64 Instruction Format Characteristics}
@@ -1347,8 +1333,10 @@ in the instruction-encoding topic.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Dual Register Views: X and W
+% Slide 18
 % ============================================================
 
 \begin{frame}{Dual Register Views: \code{X} and \code{W}}
@@ -1426,8 +1414,10 @@ of the corresponding \code{xn} register.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Example: 32-Bit Write Clears Upper Bits
+% Slide 19
 % ============================================================
 
 \begin{frame}{Example: 32-Bit Write Clears Upper Bits}
@@ -1476,12 +1466,14 @@ of the corresponding \code{xn} register.
 % SECTION 3
 % ============================================================
 
-\sectiondivider{Section 03}{
+\sectiondivider{Section 3}{
   Registers and Programmer-Visible State
 }
 
+
+
 % ============================================================
-% Slide: AArch64 General-Purpose Registers
+% Slide 20
 % ============================================================
 
 \begin{frame}{AArch64 General-Purpose Registers}
@@ -1552,8 +1544,10 @@ additional roles during procedure calls.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: The Zero Register
+% Slide 21
 % ============================================================
 
 \begin{frame}{The Zero Register}
@@ -1617,8 +1611,10 @@ and like a discard destination when written.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: The Stack Pointer
+% Slide 22
 % ============================================================
 
 \begin{frame}{The Stack Pointer}
@@ -1651,8 +1647,10 @@ and has dedicated architectural semantics.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Encoding Note: Register Number 31
+% Slide 23
 % ============================================================
 
 \begin{frame}{Encoding Note: Register Number 31}
@@ -1705,8 +1703,10 @@ determines the meaning.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: The Program Counter
+% Slide 24
 % ============================================================
 
 \begin{frame}{The Program Counter}
@@ -1736,8 +1736,10 @@ of execution.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Condition Flags: NZCV
+% Slide 25
 % ============================================================
 
 \begin{frame}{Condition Flags: NZCV}
@@ -1812,8 +1814,10 @@ used by later operations.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Programmer-Visible State: Summary
+% Slide 26
 % ============================================================
 
 \begin{frame}{Programmer-Visible State: Summary}
@@ -1883,12 +1887,14 @@ by flag-setting and conditional operations
 % SECTION 4
 % ============================================================
 
-\sectiondivider{Section 04}{
+\sectiondivider{Section 4}{
   Core AArch64 Instruction Classes
 }
 
+
+
 % ============================================================
-% Slide: Three Core Instruction Classes
+% Slide 27
 % ============================================================
 
 \begin{frame}{Three Core Instruction Classes}
@@ -1953,8 +1959,10 @@ are grouped into three broad functional classes.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Class 1: Data Processing
+% Slide 28
 % ============================================================
 
 \begin{frame}{Class 1: Data Processing}
@@ -2030,8 +2038,10 @@ read or write a memory operand.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Class 2: Memory Access
+% Slide 29
 % ============================================================
 
 \begin{frame}{Class 2: Memory Access}
@@ -2088,8 +2098,10 @@ the address contained in
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Class 3: Control Flow
+% Slide 30
 % ============================================================
 
 \begin{frame}{Class 3: Control Flow}
@@ -2131,8 +2143,10 @@ change which instruction executes next.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Comparison and Branching
+% Slide 31
 % ============================================================
 
 \begin{frame}{Comparison and Branching}
@@ -2161,8 +2175,10 @@ change which instruction executes next.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: How the Instruction Classes Work Together
+% Slide 32
 % ============================================================
 
 \begin{frame}{How the Instruction Classes Work Together}
@@ -2240,8 +2256,10 @@ from register computation.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Instruction Classification Exercise
+% Slide 33
 % ============================================================
 
 \begin{frame}{Instruction Classification Exercise}
@@ -2309,12 +2327,14 @@ or
 % SECTION 5
 % ============================================================
 
-\sectiondivider{Section 05}{
+\sectiondivider{Section 5}{
   Summary \& Self-Test
 }
 
+
+
 % ============================================================
-% Slide: Topic 2 Summary
+% Slide 34
 % ============================================================
 
 \begin{frame}{Topic 2 Summary}
@@ -2345,8 +2365,10 @@ or
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Self-Test 1/3
+% Slide 35
 % ============================================================
 
 \begin{frame}{Self-Test 1/3}
@@ -2366,8 +2388,10 @@ or
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Self-Test 2/3
+% Slide 36
 % ============================================================
 
 \begin{frame}{Self-Test 2/3}
@@ -2394,8 +2418,10 @@ or
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Self-Test 3/3
+% Slide 37
 % ============================================================
 
 \begin{frame}{Self-Test 3/3}
@@ -2424,8 +2450,10 @@ than variable-length x86-64 instructions.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide: Wrap-Up and Next Steps
+% Slide 38
 % ============================================================
 
 \begin{frame}{Wrap-Up and Next Steps}

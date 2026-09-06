@@ -17,7 +17,17 @@
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
-\setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
+\setbeamertemplate{footline}{%
+  \leavevmode\hbox{%
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
+    CSCI 2406 --- Computer Organization \& Architecture
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
+    \hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize,series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
@@ -73,16 +83,31 @@
 % ============================================================
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -100,27 +125,57 @@
 % Slide 1
 % Slide Header: AArch64 Arithmetic and Logical Instructions
 % ============================================================
+
+
+% ============================================================
+% Slide 1
+% ============================================================
+
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.18cm]current page.south east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.0cm}
-\begin{minipage}{0.9\textwidth}
-{\color{gold}\large\bfseries CSCI 2406: Topic 05\par}
-\vspace{0.3cm}
-{\color{white}\fontsize{20}{24}\selectfont\bfseries AArch64 Arithmetic and Logical Instructions\par}
-\vspace{0.3cm}
-{\color{softgray}\normalsize Arithmetic instructions, logical and bitwise operations, shifts, and immediate constants\par}
-\vspace{0.6cm}
-{\color{softgray}\small Computer Organization \& Architecture \quad\textbar\quad AArch64 Reference\par}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries
+CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 5
+\par}
+
+\vspace{0.25cm}
+
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+AArch64 Arithmetic and\\[0.08cm]Logical Instructions
+\par}
+
+\vspace{0.35cm}
+
+{\color{white!80}\large
+Arithmetic, logical, shift, and immediate-value instructions\\in AArch64 assembly
+\par}
 \end{minipage}
+
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
 % ============================================================
 % Slide 2
 % Slide Header: Topic 5 Outline
 % ============================================================
+
+
+% ============================================================
+% Slide 2
+% ============================================================
+
 \begin{frame}{Topic 5 Outline}
 \begin{block}{Topic Objective}
 Use the main AArch64 data-processing instruction families to perform arithmetic, manipulate individual bits, shift register values, and work with immediate constants.
@@ -139,12 +194,18 @@ Use the main AArch64 data-processing instruction families to perform arithmetic,
 % Slide 3
 % Slide Header: Arithmetic Instructions
 % ============================================================
-\sectiondivider{Section 01}{Arithmetic Instructions}
+\sectiondivider{Section 1}{Arithmetic Instructions}
 
 % ============================================================
 % Slide 4
 % Slide Header: Data Processing in Registers
 % ============================================================
+
+
+% ============================================================
+% Slide 3
+% ============================================================
+
 \begin{frame}{Data Processing in Registers}
 \begin{block}{Load/Store Architecture}
 AArch64 arithmetic instructions operate primarily on values already held in registers. Memory access is handled separately by load and store instructions.
@@ -167,6 +228,12 @@ AArch64 arithmetic instructions operate primarily on values already held in regi
 % Slide 5
 % Slide Header: Addition and Subtraction
 % ============================================================
+
+
+% ============================================================
+% Slide 4
+% ============================================================
+
 \begin{frame}{Addition and Subtraction}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -202,6 +269,12 @@ Flag-setting forms such as \code{adds} and \code{subs} were covered with NZCV in
 % Slide 6
 % Slide Header: Register and Immediate Arithmetic
 % ============================================================
+
+
+% ============================================================
+% Slide 5
+% ============================================================
+
 \begin{frame}{Register and Immediate Arithmetic}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -233,6 +306,12 @@ Flag-setting forms such as \code{adds} and \code{subs} were covered with NZCV in
 % Slide 7
 % Slide Header: 32-Bit and 64-Bit Arithmetic
 % ============================================================
+
+
+% ============================================================
+% Slide 6
+% ============================================================
+
 \begin{frame}{32-Bit and 64-Bit Arithmetic}
 \begin{block}{Register Width Selects the Operation Width}
 The same instruction family is available for 32-bit \code{w} registers and 64-bit \code{x} registers.
@@ -255,6 +334,12 @@ The same instruction family is available for 32-bit \code{w} registers and 64-bi
 % Slide 8
 % Slide Header: Reusing a Source as the Destination
 % ============================================================
+
+
+% ============================================================
+% Slide 7
+% ============================================================
+
 \begin{frame}{Reusing a Source as the Destination}
 \begin{block}{In-Place Update}
 The destination register may also be one of the source registers.
@@ -277,6 +362,12 @@ The destination register may also be one of the source registers.
 % Slide 9
 % Slide Header: Multiplication
 % ============================================================
+
+
+% ============================================================
+% Slide 8
+% ============================================================
+
 \begin{frame}{Multiplication}
 \begin{block}{Basic Multiply}
 \large
@@ -300,6 +391,12 @@ If \code{x1 = 6} and \code{x2 = 7}, then \code{mul x0, x1, x2} leaves \code{x0 =
 % Slide 10
 % Slide Header: Signed and Unsigned Division
 % ============================================================
+
+
+% ============================================================
+% Slide 9
+% ============================================================
+
 \begin{frame}{Signed and Unsigned Division}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -333,6 +430,12 @@ Unlike \code{add} and \code{sub}, division must know whether the operands are si
 % Slide 11
 % Slide Header: Arithmetic Instruction Summary
 % ============================================================
+
+
+% ============================================================
+% Slide 10
+% ============================================================
+
 \begin{frame}{Arithmetic Instruction Summary}
 \begin{center}
 \small
@@ -358,12 +461,18 @@ Unlike \code{add} and \code{sub}, division must know whether the operands are si
 % Slide 12
 % Slide Header: Logical and Bitwise Instructions
 % ============================================================
-\sectiondivider{Section 02}{Logical and Bitwise Instructions}
+\sectiondivider{Section 2}{Logical and Bitwise Instructions}
 
 % ============================================================
 % Slide 13
 % Slide Header: Bitwise Operations
 % ============================================================
+
+
+% ============================================================
+% Slide 11
+% ============================================================
+
 \begin{frame}{Bitwise Operations}
 \begin{block}{Operate on Corresponding Bits}
 Logical instructions process each bit position independently. Signed and unsigned numeric interpretation is irrelevant to the bitwise operation itself.
@@ -387,6 +496,12 @@ Logical instructions process each bit position independently. Signed and unsigne
 % Slide 14
 % Slide Header: AND for Selecting Bits
 % ============================================================
+
+
+% ============================================================
+% Slide 12
+% ============================================================
+
 \begin{frame}{AND for Selecting Bits}
 \begin{block}{Masking}
 A bit mask uses 1s in positions that should be preserved and 0s in positions that should be cleared.
@@ -413,6 +528,12 @@ A bit mask uses 1s in positions that should be preserved and 0s in positions tha
 % Slide 15
 % Slide Header: ORR for Setting Bits
 % ============================================================
+
+
+% ============================================================
+% Slide 13
+% ============================================================
+
 \begin{frame}{ORR for Setting Bits}
 \begin{block}{Setting Selected Bits}
 A mask containing 1s can force selected result bits to 1 while leaving other positions unchanged.
@@ -439,6 +560,12 @@ A mask containing 1s can force selected result bits to 1 while leaving other pos
 % Slide 16
 % Slide Header: EOR for Toggling Bits
 % ============================================================
+
+
+% ============================================================
+% Slide 14
+% ============================================================
+
 \begin{frame}{EOR for Toggling Bits}
 \begin{block}{Toggle Selected Bits}
 XOR with 1 flips a bit; XOR with 0 leaves the bit unchanged.
@@ -465,6 +592,12 @@ XOR with 1 flips a bit; XOR with 0 leaves the bit unchanged.
 % Slide 17
 % Slide Header: Inverted-Operand Logical Forms
 % ============================================================
+
+
+% ============================================================
+% Slide 15
+% ============================================================
+
 \begin{frame}{Inverted-Operand Logical Forms}
 \begin{block}{Why These Instructions Exist}
 Some bit-mask operations need one operand inverted before AND, OR, or XOR. These forms combine the inversion with the logical operation.
@@ -501,6 +634,12 @@ Some bit-mask operations need one operand inverted before AND, OR, or XOR. These
 % Slide 18
 % Slide Header: Logical Instruction Patterns
 % ============================================================
+
+
+% ============================================================
+% Slide 16
+% ============================================================
+
 \begin{frame}{Logical Instruction Patterns}
 \begin{center}
 \small
@@ -528,12 +667,18 @@ Bit masks are common in device control, packed data, permission fields, status w
 % Slide 19
 % Slide Header: Shift Instructions
 % ============================================================
-\sectiondivider{Section 03}{Shift Instructions}
+\sectiondivider{Section 3}{Shift Instructions}
 
 % ============================================================
 % Slide 20
 % Slide Header: Four Common Shift and Rotate Operations
 % ============================================================
+
+
+% ============================================================
+% Slide 17
+% ============================================================
+
 \begin{frame}{Four Common Shift and Rotate Operations}
 \begin{center}
 \small
@@ -561,6 +706,12 @@ The shift amount specifies how many bit positions the value moves.
 % Slide 21
 % Slide Header: Logical Shift Left
 % ============================================================
+
+
+% ============================================================
+% Slide 18
+% ============================================================
+
 \begin{frame}{Logical Shift Left}
 \begin{block}{Operation}
 \large
@@ -584,6 +735,12 @@ The register does not become wider during the shift; only the destination-width 
 % Slide 22
 % Slide Header: Logical and Arithmetic Right Shift
 % ============================================================
+
+
+% ============================================================
+% Slide 19
+% ============================================================
+
 \begin{frame}{Logical and Arithmetic Right Shift}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -619,6 +776,12 @@ For values whose top bit is 1, \code{lsr} inserts 0s while \code{asr} inserts 1s
 % Slide 23
 % Slide Header: Rotate Right
 % ============================================================
+
+
+% ============================================================
+% Slide 20
+% ============================================================
+
 \begin{frame}{Rotate Right}
 \begin{block}{Operation}
 \large
@@ -642,6 +805,12 @@ Rotations appear in bit manipulation, hashing, cryptographic algorithms, and pac
 % Slide 24
 % Slide Header: Shifted Register Operands
 % ============================================================
+
+
+% ============================================================
+% Slide 21
+% ============================================================
+
 \begin{frame}{Shifted Register Operands}
 \begin{block}{Combine Shift and Operation}
 Many AArch64 data-processing register forms can shift one source operand as part of the same instruction.
@@ -663,12 +832,18 @@ Many AArch64 data-processing register forms can shift one source operand as part
 % Slide 25
 % Slide Header: Immediate Values and Constants
 % ============================================================
-\sectiondivider{Section 04}{Immediate Values and Constants}
+\sectiondivider{Section 4}{Immediate Values and Constants}
 
 % ============================================================
 % Slide 26
 % Slide Header: What Is an Immediate?
 % ============================================================
+
+
+% ============================================================
+% Slide 22
+% ============================================================
+
 \begin{frame}{What Is an Immediate?}
 \begin{block}{Constant Inside the Instruction}
 An immediate operand is a constant represented within the instruction itself rather than read from a source register.
@@ -690,6 +865,12 @@ An immediate operand is a constant represented within the instruction itself rat
 % Slide 27
 % Slide Header: Immediate Encodings Depend on the Instruction
 % ============================================================
+
+
+% ============================================================
+% Slide 23
+% ============================================================
+
 \begin{frame}{Immediate Encodings Depend on the Instruction}
 \begin{block}{No Universal Immediate Format}
 AArch64 does not have one common immediate field that works identically for every instruction class.
@@ -711,6 +892,12 @@ The exact bit fields are studied later in Topic 9. Here the important point is t
 % Slide 28
 % Slide Header: Logical Immediate Masks
 % ============================================================
+
+
+% ============================================================
+% Slide 24
+% ============================================================
+
 \begin{frame}{Logical Immediate Masks}
 \begin{block}{Useful but Restricted}
 Logical-immediate forms can encode many repeated bit-mask patterns directly, but not every arbitrary 32-bit or 64-bit constant.
@@ -732,6 +919,12 @@ Logical-immediate forms can encode many repeated bit-mask patterns directly, but
 % Slide 29
 % Slide Header: Building Constants with MOVZ and MOVK
 % ============================================================
+
+
+% ============================================================
+% Slide 25
+% ============================================================
+
 \begin{frame}{Building Constants with \code{movz} and \code{movk}}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -761,6 +954,12 @@ Several move-wide instructions can assemble a full 64-bit constant from 16-bit p
 % Slide 30
 % Slide Header: MOVN and MOV
 % ============================================================
+
+
+% ============================================================
+% Slide 26
+% ============================================================
+
 \begin{frame}{\code{movn} and \code{mov}}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -790,6 +989,12 @@ Several move-wide instructions can assemble a full 64-bit constant from 16-bit p
 % Slide 31
 % Slide Header: Constant Construction Example
 % ============================================================
+
+
+% ============================================================
+% Slide 27
+% ============================================================
+
 \begin{frame}{Constant Construction Example}
 \begin{block}{Construct \hex{123456789abcdef0}}
 A 64-bit constant can be built as four 16-bit pieces.
@@ -811,6 +1016,12 @@ After the sequence, \code{x0} contains \hex{123456789abcdef0}.
 % Slide 32
 % Slide Header: Choosing Between an Immediate and a Register
 % ============================================================
+
+
+% ============================================================
+% Slide 28
+% ============================================================
+
 \begin{frame}{Choosing Between an Immediate and a Register}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
@@ -840,6 +1051,12 @@ Compilers and assemblers choose among these forms to express the required operat
 % Slide 33
 % Slide Header: Combined Data-Processing Example
 % ============================================================
+
+
+% ============================================================
+% Slide 29
+% ============================================================
+
 \begin{frame}{Combined Data-Processing Example}
 \begin{block}{Goal}
 Scale a value by 8, add it to a base value, then keep only the low byte.
@@ -861,12 +1078,18 @@ Scale a value by 8, add it to a base value, then keep only the low byte.
 % Slide 34
 % Slide Header: Summary and Self-Test
 % ============================================================
-\sectiondivider{Section 05}{Summary and Self-Test}
+\sectiondivider{Section 5}{Summary and Self-Test}
 
 % ============================================================
 % Slide 35
 % Slide Header: Topic 5 Summary
 % ============================================================
+
+
+% ============================================================
+% Slide 30
+% ============================================================
+
 \begin{frame}{Topic 5 Summary}
 \begin{itemize}
 \item \code{add}, \code{sub}, \code{mul}, \code{sdiv}, and \code{udiv} provide the main arithmetic operations introduced here.
@@ -882,6 +1105,12 @@ Scale a value by 8, add it to a base value, then keep only the low byte.
 % Slide 36
 % Slide Header: Self-Test 1/2
 % ============================================================
+
+
+% ============================================================
+% Slide 31
+% ============================================================
+
 \begin{frame}{Self-Test 1/2}
 \begin{enumerate}
 \item What is the difference between \code{add x0, x1, x2} and \code{add x0, x1, \#8}?
@@ -896,6 +1125,12 @@ Scale a value by 8, add it to a base value, then keep only the low byte.
 % Slide 37
 % Slide Header: Self-Test 2/2
 % ============================================================
+
+
+% ============================================================
+% Slide 32
+% ============================================================
+
 \begin{frame}{Self-Test 2/2}
 \begin{enumerate}
 \setcounter{enumi}{5}
@@ -911,6 +1146,12 @@ Scale a value by 8, add it to a base value, then keep only the low byte.
 % Slide 38
 % Slide Header: Next Topic
 % ============================================================
+
+
+% ============================================================
+% Slide 33
+% ============================================================
+
 \begin{frame}{Next Topic}
 \begin{block}{Data Transfer and Addressing}
 Topic 6 moves from register data processing to the AArch64 instructions that transfer values between registers and memory.

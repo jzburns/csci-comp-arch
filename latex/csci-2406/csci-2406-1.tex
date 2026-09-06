@@ -13,29 +13,15 @@
 
 \setbeamertemplate{footline}{%
   \leavevmode\hbox{%
-  \begin{beamercolorbox}[
-    wd=.82\paperwidth,
-    ht=2.5ex,
-    dp=1.0ex,
-    leftskip=.8em
-  ]{author in head/foot}
+  \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=.8em]{author in head/foot}
     CSCI 2406 --- Computer Organization \& Architecture
-    (aarch64 / AArch64 Reference)
   \end{beamercolorbox}%
-  \begin{beamercolorbox}[
-    wd=.18\paperwidth,
-    ht=2.5ex,
-    dp=1.0ex,
-    rightskip=.8em
-  ]{date in head/foot}
+  \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1.0ex,rightskip=.8em]{date in head/foot}
     \hfill\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}
 }
 
-\setbeamersize{
-  text margin left=0.65cm,
-  text margin right=0.65cm
-}
+\setbeamersize{text margin left=0.7cm,text margin right=0.7cm}
 
 \setbeamerfont{frametitle}{
   size=\Large,
@@ -217,22 +203,21 @@
 
 \begin{document}
 
+
+
 % ============================================================
 % Slide 1
 % ============================================================
 
 \begin{frame}[plain]
-
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west)
-  rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
 \vspace*{\fill}
 
 \begin{minipage}{0.88\textwidth}
-
 {\color{gold}\normalsize\bfseries
 CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 1
 \par}
@@ -240,7 +225,8 @@ CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 1
 \vspace{0.25cm}
 
 {\color{white}\fontsize{24}{28}\selectfont\bfseries
-Computer Architecture \& \\ Organization Fundamentals
+Computer Architecture \& Organization\\[0.08cm]
+Fundamentals
 \par}
 
 \vspace{0.35cm}
@@ -249,7 +235,6 @@ Computer Architecture \& \\ Organization Fundamentals
 Architecture vs. Organization, ISA vs. Microarchitecture,\\
 Stored-Program Concept, and Memory Organization
 \par}
-
 \end{minipage}
 
 \vfill
@@ -259,8 +244,9 @@ Dr. J. Burns
 \par}
 
 \vspace*{\fill}
-
 \end{frame}
+
+
 % ============================================================
 % Slide 2
 % ============================================================
@@ -306,6 +292,8 @@ Dr. J. Burns
 \end{columns}
 
 \end{frame}
+
+
 
 % ============================================================
 % Slide 3
@@ -357,11 +345,15 @@ clarifies an architectural difference.
 
 \end{frame}
 
+
+
 % ============================================================
 % Slide 4
 % ============================================================
 
 \begin{frame}{Topic 1 Outline}
+
+\setbeamertemplate{enumerate item}{\arabic{enumi}.}
 
 \begin{block}{In this topic}
 Establish the distinction between
@@ -403,8 +395,10 @@ and instruction/data memory organization.
   Key Abstraction Layers
 }
 
+
+
 % ============================================================
-% Slide 6
+% Slide 5
 % ============================================================
 
 \begin{frame}{Key Levels of Computer Abstraction}
@@ -534,8 +528,10 @@ and
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 7
+% Slide 6
 % ============================================================
 
 \begin{frame}{Where Software Meets Hardware}
@@ -605,8 +601,10 @@ with very different internal organizations.
   Computer Organization
 }
 
+
+
 % ============================================================
-% Slide 9
+% Slide 7
 % ============================================================
 
 \begin{frame}{What is Computer Architecture?}
@@ -653,8 +651,10 @@ of the machine---the \key{what}.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 10
+% Slide 8
 % ============================================================
 
 \begin{frame}{What is Computer Organization?}
@@ -699,8 +699,10 @@ of the architecture---the \key{how}.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 11
+% Slide 9
 % ============================================================
 
 \begin{frame}{Architecture vs. Organization: Direct Contrast}
@@ -787,8 +789,10 @@ timing, physical implementation
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 12
+% Slide 10
 % ============================================================
 
 \begin{frame}{Architectural Stability and Hardware Evolution}
@@ -858,8 +862,10 @@ and cost.
   ISA versus Microarchitecture
 }
 
+
+
 % ============================================================
-% Slide 14
+% Slide 11
 % ============================================================
 
 \begin{frame}{The Instruction Set Architecture (ISA)}
@@ -902,8 +908,10 @@ or timing used to produce it.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 15
+% Slide 12
 % ============================================================
 
 \begin{frame}{One Possible Microarchitecture for \code{add x1, x2, x3}}
@@ -942,8 +950,10 @@ or timing used to produce it.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 16
+% Slide 13
 % ============================================================
 
 \begin{frame}{Visualizing the Microarchitectural Datapath}
@@ -1090,8 +1100,10 @@ or through overlapping pipeline stages.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 17
+% Slide 14
 % ============================================================
 
 \begin{frame}{One ISA --- Multiple Hardware Realizations}
@@ -1176,8 +1188,10 @@ internal organizations.
   The Stored-Program Concept
 }
 
+
+
 % ============================================================
-% Slide 19
+% Slide 15
 % ============================================================
 
 \begin{frame}{The Stored-Program Concept}
@@ -1220,8 +1234,10 @@ in a stored-program computer.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 20
+% Slide 16
 % ============================================================
 
 \begin{frame}{Memory as an Addressable Array}
@@ -1286,8 +1302,10 @@ occupies addresses
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 21
+% Slide 17
 % ============================================================
 
 \begin{frame}{What a Memory Access Must Specify}
@@ -1421,8 +1439,10 @@ more complex interconnects internally.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 22
+% Slide 18
 % ============================================================
 
 \begin{frame}{Context Determines the Meaning of Bits}
@@ -1490,8 +1510,10 @@ just like data.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 23
+% Slide 19
 % ============================================================
 
 \begin{frame}{Fetch, Decode, Execute}
@@ -1582,8 +1604,10 @@ just like data.
   Architectures
 }
 
+
+
 % ============================================================
-% Slide 25
+% Slide 20
 % ============================================================
 
 \begin{frame}{The von Neumann Architecture}
@@ -1680,8 +1704,10 @@ node[right=0.10cm,pathlabel]{shared instruction/\\data path}
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 26
+% Slide 21
 % ============================================================
 
 \begin{frame}{The Harvard Architecture}
@@ -1773,8 +1799,10 @@ node[right=0.10cm,pathlabel]{data path}
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 27
+% Slide 22
 % ============================================================
 
 \begin{frame}{Shared versus Separate Memory Paths}
@@ -1831,8 +1859,10 @@ and data access.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 28
+% Slide 23
 % ============================================================
 
 \begin{frame}{Many Modern Processors Use Modified Harvard Organization}
@@ -1972,8 +2002,10 @@ node[right]{\code{instructions}}
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 29
+% Slide 24
 % ============================================================
 
 \begin{frame}{Comparison Summary: Memory Organizations}
@@ -2057,8 +2089,10 @@ internal organization.
   Summary \& Self-Test
 }
 
+
+
 % ============================================================
-% Slide 31
+% Slide 25
 % ============================================================
 
 \begin{frame}{Topic Summary}
@@ -2095,8 +2129,10 @@ internal organization.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 32
+% Slide 26
 % ============================================================
 
 \begin{frame}{Self-Test: Questions 1--3}
@@ -2128,8 +2164,10 @@ to execute many different programs?
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 33
+% Slide 27
 % ============================================================
 
 \begin{frame}{Self-Test: Solutions 1--3}
@@ -2173,8 +2211,10 @@ without changing the physical hardware.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 34
+% Slide 28
 % ============================================================
 
 \begin{frame}{Self-Test: Questions 4--5}
@@ -2200,8 +2240,10 @@ with a unified lower memory system?
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 35
+% Slide 29
 % ============================================================
 
 \begin{frame}{Self-Test: Solutions 4--5}
@@ -2230,8 +2272,10 @@ within one unified address space.
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 36
+% Slide 30
 % ============================================================
 
 \begin{frame}{Next Topic: RISC Principles and ARM Architecture}
