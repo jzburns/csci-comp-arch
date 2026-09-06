@@ -97,16 +97,31 @@
 % Section divider macro
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -135,42 +150,63 @@
 
 \begin{document}
 
+
+
+
+
 % ============================================================
-% Slide 1: Title Slide
+% Slide 1
 % ============================================================
 
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
-\vspace{0.8cm}
+\vspace*{\fill}
+
 \begin{minipage}{0.88\textwidth}
-{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 5\par}
+
+{\color{gold}\normalsize\bfseries
+CSCI 6461 \;|\; Computer Systems Architecture \;|\; TOPIC 5
+\par}
+
 \vspace{0.25cm}
+
 {\color{white}\fontsize{24}{28}\selectfont\bfseries
- Memory Architecture\\[0.08cm]
- \& Addressing Principles
+Memory Architecture\\[0.08cm]\& Addressing Principles
 \par}
+
 \vspace{0.35cm}
+
 {\color{white!80}\large
- The load/store model, address computation, data sizing,\\
- and memory hierarchy interactions in AArch64
+The load/store model, address computation, data sizing,\\and memory hierarchy interactions in AArch64
 \par}
+
 \end{minipage}
 
 \vfill
-{\color{white}\normalsize Dr. J. Burns\par}
-{\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
-\vspace{0.35cm}
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
+
 \end{frame}
 
+
+
+
+
 % ============================================================
-% Slide 2: Module Overview
+% Slide 2
 % ============================================================
 
-\begin{frame}{Topic 5: High-Level Module Roadmap}
+\begin{frame}{Topic 5 Outline}
 
 \begin{enumerate}\setlength{\itemsep}{10pt}
   \item \key{The Memory/Compute Divide in Architecture}
@@ -206,11 +242,15 @@
 
 \sectiondivider{PART 1}{The Load/Store Architectural Boundary}
 
+
+
+
+
 % ============================================================
 % Slide 3
 % ============================================================
 
-\begin{frame}{The Fundamental Memory Challenge}
+\begin{frame}{The Memory Access Problem}
 \large
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item Register access is extremely fast, while off-chip DRAM access is much slower; exact latencies are implementation-dependent.
@@ -224,6 +264,10 @@
 ALU instructions process \emph{only} registers. Memory access is performed by load/store-family instructions.
 \end{block}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 4
@@ -265,6 +309,10 @@ ALU instructions process \emph{only} registers. Memory access is performed by lo
   \draw[{Latex}-{Latex}, thick, gold!80!black] (reg) -- (alu) node[midway, above, font=\tiny\bfseries] {Arithmetic};
 \end{tikzpicture}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 5
@@ -308,6 +356,10 @@ ALU instructions process \emph{only} registers. Memory access is performed by lo
 \key{Takeaway:} AArch64 exposes data movement through explicit load/store instructions, while x86-64 permits some architectural instructions to combine memory access with computation.
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 6
 % ============================================================
@@ -346,11 +398,15 @@ The base register (\bits{xn}) holds the 64-bit memory pointer enclosed in bracke
 
 \sectiondivider{PART 2}{Data Sizing \& Extension Rules}
 
+
+
+
+
 % ============================================================
 % Slide 7
 % ============================================================
 
-\begin{frame}{The Sub-Word Loading Problem}
+\begin{frame}{Sub-Word Loads}
 \large
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item Registers are 64 bits wide, but data items in memory are often 8 bits or 16 bits.
@@ -373,6 +429,10 @@ Replicate the sign bit to preserve negative values.
 \end{column}
 \end{columns}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 8
@@ -404,6 +464,10 @@ Replicate the sign bit to preserve negative values.
 \end{tabular}
 \end{block}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 9
@@ -437,6 +501,10 @@ Replicate the sign bit to preserve negative values.
 \end{block}
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 10
 % ============================================================
@@ -466,6 +534,10 @@ Replicate the sign bit to preserve negative values.
 Using \code{ldrb} on a signed negative variable results in a large positive number, causing if-statements and comparisons to fail unexpectedly.
 \end{block}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 11
@@ -505,6 +577,10 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
 
 \sectiondivider{PART 3}{AArch64 Addressing Modes}
 
+
+
+
+
 % ============================================================
 % Slide 12
 % ============================================================
@@ -522,6 +598,10 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
   \end{itemize}
 \end{itemize}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 13
@@ -553,6 +633,10 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
 \end{block}
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 14
 % ============================================================
@@ -574,6 +658,10 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
 For signed unscaled immediate offsets (which do not scale by operand size and can be negative), use \code{ldur xt, [xn, \#-8]}.
 \end{block}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 15
@@ -601,6 +689,10 @@ For signed unscaled immediate offsets (which do not scale by operand size and ca
 \end{block}
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 16
 % ============================================================
@@ -626,6 +718,10 @@ For signed unscaled immediate offsets (which do not scale by operand size and ca
 \text{\scriptsize Loads data from current address in x1, then automatically advances x1 to the next 8-byte element.}
 \end{block}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 17
@@ -656,6 +752,10 @@ For signed unscaled immediate offsets (which do not scale by operand size and ca
 \end{tabular}
 \end{block}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 18
@@ -691,6 +791,10 @@ Doubleword (\code{uint64})& \code{ldr  x0, [x1, x2, lsl \#3]} & $\text{EA} = x_1
 Directly implements high-level array access: \code{val = arr[i];}.
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 19
 % ============================================================
@@ -717,6 +821,10 @@ Directly implements high-level array access: \code{val = arr[i];}.
 \key{Benefit:} Eliminates separate instructions to convert \code{int} indices to 64-bit pointers.
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 20
 % ============================================================
@@ -742,6 +850,10 @@ Directly implements high-level array access: \code{val = arr[i];}.
 \normalsize
 The \code{adrp} instruction forms a page-relative address within its architectural range; the linker then resolves the page and low-offset relocation for the selected code model.
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 21
@@ -773,6 +885,10 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 
 \sectiondivider{PART 4}{Multi-Register Transfers, Alignment, \& Stack}
 
+
+
+
+
 % ============================================================
 % Slide 22
 % ============================================================
@@ -802,11 +918,15 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 \end{center}
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 23
 % ============================================================
 
-\begin{frame}{Why Paired Transfers Matter}
+\begin{frame}{Uses of Paired Transfers}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.48\textwidth}
 \begin{block}{Individual Transfers}
@@ -842,6 +962,10 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 \normalsize
 \key{Instruction-Count Impact:} For the shown pair of saves/restores, a paired transfer uses one memory instruction instead of two.
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 24
@@ -887,6 +1011,10 @@ May require additional internal accesses, especially when crossing cache-line or
 Many ordinary accesses to Normal memory can be unaligned, although boundary crossings may require extra internal work. Some access types or configured environments impose stricter alignment requirements.
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 25
 % ============================================================
@@ -909,6 +1037,10 @@ Many ordinary accesses to Normal memory can be unaligned, although boundary cros
 \end{tabular}
 \end{block}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 26
@@ -954,6 +1086,10 @@ my_func:
 \end{columns}
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 27
 % ============================================================
@@ -985,6 +1121,10 @@ my_func:
 Post-indexing avoids a separate pointer-update instruction such as \code{add x0, x0, \#8} inside the loop.
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 28
 % ============================================================
@@ -1009,6 +1149,10 @@ Post-indexing avoids a separate pointer-update instruction such as \code{add x0,
 \normalsize
 Combines index scaling and load into a single instruction without modifying the base pointer \bits{x0}.
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 29
@@ -1036,6 +1180,10 @@ Combines index scaling and load into a single instruction without modifying the 
 Copies 32 bytes using four paired load/store instructions.
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 30
 % ============================================================
@@ -1060,6 +1208,10 @@ Global Variable Reference     & PC-Relative Page Offset       & \code{adrp} $+$ 
 \end{center}
 \end{frame}
 
+
+
+
+
 % ============================================================
 % Slide 31
 % ============================================================
@@ -1077,6 +1229,10 @@ Global Variable Reference     & PC-Relative Page Offset       & \code{adrp} $+$ 
 Sequential access patterns usually make better use of spatial locality and hardware prefetching than scattered access patterns.
 \end{block}
 \end{frame}
+
+
+
+
 
 % ============================================================
 % Slide 32
@@ -1098,8 +1254,12 @@ Sequential access patterns usually make better use of spatial locality and hardw
 
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
+
+
+
+
 % ============================================================
-% Slide 33: Comprehensive Summary
+% Slide 33
 % ============================================================
 
 \begin{frame}{Topic 5: Comprehensive Summary}
@@ -1119,8 +1279,12 @@ Sequential access patterns usually make better use of spatial locality and hardw
 
 \end{frame}
 
+
+
+
+
 % ============================================================
-% Slide 34: Self-Test Questions (Part 1)
+% Slide 34
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Sizing \& Addressing Modes}
@@ -1144,8 +1308,12 @@ Sequential access patterns usually make better use of spatial locality and hardw
 
 \end{frame}
 
+
+
+
+
 % ============================================================
-% Slide 35: Self-Test Questions (Part 2)
+% Slide 35
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Stack Alignment \& Paired Transfers}
@@ -1164,6 +1332,14 @@ Sequential access patterns usually make better use of spatial locality and hardw
 
 % ============================================================
 % Looking Ahead
+% ============================================================
+
+
+
+
+
+% ============================================================
+% Slide 36
 % ============================================================
 
 \begin{frame}{Looking Ahead}
