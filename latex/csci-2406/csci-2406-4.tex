@@ -121,6 +121,12 @@
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -166,6 +172,12 @@ Dr. J. Burns
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 2
 % ============================================================
@@ -194,6 +206,12 @@ Understand how fixed-width integer arithmetic works at the machine level, how co
 % Slide 4
 % Slide Header: Why Integer Arithmetic Matters
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -231,6 +249,12 @@ Integer arithmetic is not limited to explicit calculator-like expressions. It ap
 % Slide 5
 % Slide Header: Arithmetic Operates on Bit Patterns
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -271,46 +295,104 @@ The ALU operates on finite-width bit patterns. Signedness is not a property of t
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 5
 % ============================================================
 
 \begin{frame}{Binary Addition and Carry}
+
+
+\vspace{-0.35cm}
 \begin{columns}[T,onlytextwidth]
+
 \column{0.48\textwidth}
 \begin{block}{Column Addition}
-Binary addition proceeds bit by bit, carrying into the next higher column when needed.
-\vspace{0.15cm}
-\large
-\hspace{1.8cm}\code{1111}\\[-0.02cm]
-\hspace{1.5cm}\code{+ 0001}\\[-0.02cm]
-\hspace{1.5cm}\code{------}\\[-0.02cm]
-\hspace{1.5cm}\code{1 0000}
-\normalsize
+Binary addition proceeds bit by bit. A carry-out from one column becomes the carry-in to the next column.
+
+\vspace{0.08cm}
+
+\begin{center}
+\setlength{\tabcolsep}{0.28em}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{rccccc}
+\multicolumn{1}{r}{} & \scriptsize carry: & \scriptsize 1 & \scriptsize 1 & \scriptsize 1 & \scriptsize 1 \\
+\multicolumn{1}{r}{} &              & 1 & 1 & 1 & 1 \\
+\multicolumn{1}{r}{$+$} &            & 0 & 0 & 0 & 1 \\
+\cline{3-6}
+\multicolumn{1}{r}{} & \scriptsize result: & 0 & 0 & 0 & 0 \\
+\multicolumn{1}{r}{} & \scriptsize carry-out: & \multicolumn{4}{c}{1}
+\end{tabular}
+\end{center}
+
 \end{block}
+
 \column{0.48\textwidth}
 \begin{block}{Unsigned Meaning}
 \begin{itemize}
 \item In 4 bits, only the lower \code{0000} remains.
-\item The extra leading bit is carry-out.
+\item The extra bit is the carry-out.
 \item For unsigned arithmetic, carry-out means the mathematical result exceeded the available range.
 \end{itemize}
 \end{block}
+
 \end{columns}
-\vspace{0.15cm}
-\begin{block}{Fixed-Width Result}
+
+\vspace{0.05cm}
+
+\begin{block}{Fixed-Width Result}\small
 An $n$-bit register keeps only $n$ result bits. Extra information may be reflected in condition flags.
 \end{block}
+
 \end{frame}
 
+
+
+% ============================================================
+% Slide 6
+% ============================================================
+
+\begin{frame}{Subtraction and Condition Flags}
+
+\begin{block}{Representation}
+Topic 3 showed how two's-complement values are represented and how 
+subtraction can be performed by adding a negated operand.
+\end{block}
+
+\vspace{0.25cm}
+
+\begin{block}{Focus in This Topic}
+Here the focus is not the representation method itself. The focus is what arithmetic does to a fixed-width result and which condition flags are set.
+\end{block}
+
+\vspace{0.25cm}
+
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item The register keeps the fixed-width result bits.
+  \item NZCV records selected facts about that result.
+  \item Signed and unsigned interpretations use different flags.
+\end{itemize}
+
+\end{frame}
 % ============================================================
 % Slide 7
 % Slide Header: Unsigned Ranges
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
-% Slide 6
+% Slide 7
 % ============================================================
 
 \begin{frame}{Unsigned Ranges}
@@ -350,45 +432,20 @@ If unsigned addition produces a carry out of the most-significant bit, the desti
 % ============================================================
 
 
-% ============================================================
-% Slide 7
-% ============================================================
 
-\begin{frame}{Two's-Complement Subtraction}
-\begin{block}{Hardware Idea}
-Subtraction can reuse the same adder by adding the two's-complement negation of the second operand.
-\[
-A-B=A+(\sim B)+1
-\]
-\end{block}
-\vspace{0.05cm}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{AArch64 Example}
-\large
-\hspace{1.6cm}\code{sub x0, x1, x2}
-\normalsize
-\begin{itemize}
-\item Computes \code{x1 - x2}.
-\item Writes the fixed-width result to \code{x0}.
-\item Does not update NZCV flags.
-\end{itemize}
-\end{block}
-\column{0.48\textwidth}
-\begin{block}{Important Interpretation}
-\begin{itemize}
-\item Negative values use two's-complement representation.
-\item The same adder can perform addition and subtraction.
-\item NZCV records facts needed for later signed and unsigned reasoning.
-\end{itemize}
-\end{block}
-\end{columns}
-\end{frame}
+
+
 
 % ============================================================
 % Slide 9
 % Slide Header: Signed vs. Unsigned Interpretation
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -438,6 +495,12 @@ The instruction result is a bit pattern. The choice of signed or unsigned branch
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 9
 % ============================================================
@@ -463,6 +526,12 @@ NZCV connects arithmetic to decisions such as equality, signed ordering, and uns
 % Slide 12
 % Slide Header: NZCV Condition Flags
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -510,6 +579,12 @@ When NZCV is accessed as a system-register value, the four flags occupy bits 31-
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 11
 % ============================================================
@@ -549,6 +624,12 @@ Flag updates are provided by specific instruction forms such as \code{adds} and 
 % Slide 14
 % Slide Header: N: Negative Flag
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -595,6 +676,12 @@ Signed less-than uses \code{N} together with \code{V}; \code{N} alone is not suf
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 13
 % ============================================================
@@ -637,6 +724,12 @@ After a comparison, \code{b.eq} tests \code{Z=1}; \code{b.ne} tests \code{Z=0}.
 % Slide 16
 % Slide Header: C: Carry Flag
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -684,6 +777,12 @@ A-B=A+(\sim B)+1
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 15
 % ============================================================
@@ -712,7 +811,7 @@ The fixed-width subtraction produces a carry out. \\
 \rowcolor{white}
 $A<B$ &
 \code{C=0} &
-The fixed-width subtraction produces no carry out. \\
+The fixed-width subtraction does not produce a carry out. \\
 \end{tabular}
 \end{center}
 \vspace{0.2cm}
@@ -725,6 +824,12 @@ After \code{cmp x0, x1}, \code{C=1} corresponds to \code{x0 >= x1} for unsigned 
 % Slide 18
 % Slide Header: V: Signed Overflow Flag
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -772,6 +877,12 @@ Adding operands with opposite signs does not produce signed overflow in addition
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 17
 % ============================================================
@@ -801,6 +912,12 @@ A negative value minus a positive value should become more negative. If the fixe
 % Slide 20
 % Slide Header: Comparison with CMP
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -837,6 +954,12 @@ A negative value minus a positive value should become more negative. If the fixe
 % Slide 23
 % Slide Header: Multiplication and Division Basics
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -879,6 +1002,12 @@ Multiply and divide read registers and write register results; latency is implem
 % Slide 24
 % Slide Header: Shifts and Powers of Two
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -928,6 +1057,12 @@ bit manipulation, not division \\
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 21
 % ============================================================
@@ -975,6 +1110,12 @@ Shifts can resemble multiplication or division by powers of two, but finite widt
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 22
 % ============================================================
@@ -1011,6 +1152,12 @@ For a fixed workload, performance is the inverse of execution time.
 % Slide 28
 % Slide Header: The Iron Law of Processor Performance
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -1062,6 +1209,12 @@ circuit timing, clock frequency \\
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 24
 % ============================================================
@@ -1087,6 +1240,12 @@ A three-instruction loop body executed $N$ times contributes approximately $3N$ 
 % Slide 30
 % Slide Header: CPI and IPC
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -1132,6 +1291,12 @@ Instruction latency and throughput are microarchitecture-dependent, not fixed by
 % Slide 31
 % Slide Header: Average CPI from an Instruction Mix
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -1188,6 +1353,12 @@ C & 20\% & 4 & 0.80 \\
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 27
 % ============================================================
@@ -1227,6 +1398,12 @@ Processor B has a lower frequency, but each instruction takes fewer cycles on av
 % Slide 33
 % Slide Header: Worked Performance Example
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -1292,6 +1469,12 @@ T_B
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 29
 % ============================================================
@@ -1316,6 +1499,12 @@ T_B
 % ============================================================
 
 
+
+
+
+
+
+
 % ============================================================
 % Slide 30
 % ============================================================
@@ -1335,6 +1524,12 @@ T_B
 % Slide 37
 % Slide Header: Self-Test 2/2
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
@@ -1357,6 +1552,12 @@ T_B
 % Slide 38
 % Slide Header: Wrap-Up and Next Steps
 % ============================================================
+
+
+
+
+
+
 
 
 % ============================================================
