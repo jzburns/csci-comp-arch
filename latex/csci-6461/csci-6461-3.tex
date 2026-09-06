@@ -152,6 +152,10 @@
 
 
 
+
+
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -198,11 +202,15 @@ Dr. J. Burns
 
 
 
+
+
+
+
 % ============================================================
 % Slide 2
 % ============================================================
 
-\begin{frame}{Topic 3: Module Topics}
+\begin{frame}{Topic 3 Outline}
 \vfill
 \begin{enumerate}\setlength{\itemsep}{7pt}
   \item \key{Architectural State \& The Hardware Contract}
@@ -225,7 +233,7 @@ Dr. J. Burns
 
   \item \key{Core Instruction Classes \& Execution Mechanics}
   \begin{itemize}
-    \item Instruction syntax, immediate construction, and explicit load/store memory access.
+    \item Instruction syntax, immediate construction, and the basic load/store model.
   \end{itemize}
 \end{enumerate}
 \vfill
@@ -236,6 +244,10 @@ Dr. J. Burns
 % ============================================================
 
 \sectiondivider{PART 1}{Architectural State \& Execution Model}
+
+
+
+
 
 
 
@@ -262,6 +274,10 @@ Dr. J. Burns
 \small Operating systems rely on architectural state to suspend and resume execution while preserving program behavior.
 \end{block}
 \end{frame}
+
+
+
+
 
 
 
@@ -304,6 +320,10 @@ Dr. J. Burns
 
 
 
+
+
+
+
 % ============================================================
 % Slide 5
 % ============================================================
@@ -322,6 +342,10 @@ Dr. J. Burns
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -417,6 +441,10 @@ Dr. J. Burns
 
 
 
+
+
+
+
 % ============================================================
 % Slide 7
 % ============================================================
@@ -444,6 +472,10 @@ Dr. J. Burns
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -481,6 +513,10 @@ Dr. J. Burns
 
 
 
+
+
+
+
 % ============================================================
 % Slide 9
 % ============================================================
@@ -509,6 +545,10 @@ Dr. J. Burns
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -551,6 +591,10 @@ Dr. J. Burns
 
 
 
+
+
+
+
 % ============================================================
 % Slide 11
 % ============================================================
@@ -590,6 +634,10 @@ Dr. J. Burns
 
 
 
+
+
+
+
 % ============================================================
 % Slide 12
 % ============================================================
@@ -597,7 +645,7 @@ Dr. J. Burns
 \begin{frame}{AArch64 Register File Overview}
 \vfill
 \begin{center}
-\scriptsize
+\small
 \renewcommand{\arraystretch}{0.92}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lll}
@@ -622,6 +670,10 @@ Dr. J. Burns
 
 
 
+
+
+
+
 % ============================================================
 % Slide 13
 % ============================================================
@@ -631,13 +683,13 @@ Dr. J. Burns
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item \bits{pstate} contains selected processor status fields visible to the architecture.
   \item One part of \bits{pstate} holds the condition flags used by conditional execution.
-  \item Topic 4 gives the full treatment of those flags when they are used for comparisons, branches, and conditional select.
+  \item Topic 4 explains those flags when they are used for comparisons, branches, and conditional select.
 \end{itemize}
 
 \vfill
 
-\begin{block}{Course Boundary}
-\small In this topic, \bits{pstate} is introduced as part of the programmer-visible state. The detailed interpretation of \bits{N}, \bits{Z}, \bits{C}, and \bits{V} belongs with AArch64 assembly control flow.
+\begin{block}{For This Topic}
+\small Here, \bits{pstate} is part of the programmer-visible state. Topic 4 explains how \bits{N}, \bits{Z}, \bits{C}, and \bits{V} are used in assembly control flow.
 \end{block}
 
 \vfill
@@ -647,6 +699,10 @@ Dr. J. Burns
 % ============================================================
 
 \sectiondivider{PART 3}{Memory Model, Alignment \& Endianness}
+
+
+
+
 
 
 
@@ -686,6 +742,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -730,6 +790,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -780,6 +844,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 
 
 
+
+
+
+
 % ============================================================
 % Slide 17
 % ============================================================
@@ -812,6 +880,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -859,6 +931,10 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 
 
 
+
+
+
+
 % ============================================================
 % Slide 19
 % ============================================================
@@ -898,112 +974,12 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 
 
 
-% ============================================================
-% Slide 20
-% ============================================================
-
-\begin{frame}{Addressing Modes: Base with Immediate Offset}
-\vfill
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\begin{block}{Mechanism ($\text{EA} = x_n + \text{offset}$)}
-\small
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Syntax: \code{ldr xt, [xn, \#offset]}
-  \item Accesses memory at $x_n + \text{offset}$.
-  \item \key{No side effects:} Base register $x_n$ remains unchanged post-execution.
-\end{itemize}
-\end{block}
-\end{column}
-
-\begin{column}{0.48\textwidth}
-\begin{block}{Code Examples}
-\small
-\begin{tabular}{ll}
-\code{ldr x1, [x0]}      & \text{\scriptsize Load $[x_0]$} \\
-\code{ldr x2, [x0, \#8]}  & \text{\scriptsize Load $[x_0 + 8]$} \\
-\code{str x2, [x0, \#16]} & \text{\scriptsize Store $[x_0 + 16]$} \\
-\end{tabular}
-\end{block}
-\end{column}
-\end{columns}
-
-\vfill
-\begin{block}{Hardware Offset Range}
-\small In the scaled unsigned-immediate form, a 12-bit offset field is multiplied by the access size. For 64-bit doublewords, the scale factor is 8, giving a maximum offset of $+32760$ bytes. Other load/store forms also support signed unscaled offsets.
-\end{block}
-\vfill
-\end{frame}
 
 
 
-% ============================================================
-% Slide 21
-% ============================================================
-
-\begin{frame}{Advanced Addressing: Pre- and Post-Indexed}
-\vfill
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\begin{block}{Pre-Indexed (\texttt{!})}
-\small
-$$\code{ldr xt, [xn, \#imm]!}$$
-\begin{enumerate}\setlength{\itemsep}{2pt}
-  \item Update base: $x_n \leftarrow x_n + \text{imm}$.
-  \item Load memory: $x_t \leftarrow \text{Mem}[x_n]$.
-\end{enumerate}
-Base update happens \emph{before} access.
-\end{block}
-\end{column}
-
-\begin{column}{0.48\textwidth}
-\begin{block}{Post-Indexed}
-\small
-$$\code{ldr xt, [xn], \#imm}$$
-\begin{enumerate}\setlength{\itemsep}{2pt}
-  \item Load memory: $x_t \leftarrow \text{Mem}[x_n]$.
-  \item Update base: $x_n \leftarrow x_n + \text{imm}$.
-\end{enumerate}
-Base update happens \emph{after} access.
-\end{block}
-\end{column}
-\end{columns}
-
-\vfill
-\begin{block}{Efficiency Impact}
-\small Pointer updates can be integrated directly into memory instructions, which can avoid a separate pointer-update instruction when traversing arrays or managing stack frames.
-\end{block}
-\vfill
-\end{frame}
 
 
 
-% ============================================================
-% Slide 22
-% ============================================================
-
-\begin{frame}[fragile]{Loading and Storing Pairs (\texttt{ldp} and \texttt{stp})}
-\vfill
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item \key{Core Purpose:} Transfer two adjacent 64-bit registers in a single instruction.
-  \item \key{Primary Use Case (Stack Management):}
-  \begin{itemize}\setlength{\itemsep}{2pt}
-    \item Encodes two adjacent register transfers in one architectural instruction.
-    \item Saves/restores Frame Pointer ($x_{29}$) and Link Register ($x_{30}$) efficiently during calls.
-  \end{itemize}
-  \item \key{Implementation Note:} The underlying memory transactions and timing are implementation-dependent; \code{ldp}/\code{stp} do not imply general 128-bit atomicity.
-\end{itemize}
-
-\vfill
-\begin{block}{Stack Frame Construction Example}
-\small
-\begin{verbatim}
-// Save FP and LR; decrement sp by 16 bytes
-stp x29, x30, [sp, #-16]! 
-\end{verbatim}
-\end{block}
-\vfill
-\end{frame}
 
 
 
@@ -1017,8 +993,12 @@ stp x29, x30, [sp, #-16]!
 
 
 
+
+
+
+
 % ============================================================
-% Slide 23
+% Slide 20
 % ============================================================
 
 \begin{frame}{Topic 3: Comprehensive Summary}
@@ -1029,15 +1009,19 @@ stp x29, x30, [sp, #-16]!
   \item \key{Register Structure:} The 64-bit \bits{x0}--\bits{x30} registers have corresponding 32-bit \bits{w0}--\bits{w30} views; writing a \bits{w} register clears the upper 32 bits of the corresponding \bits{x} register.
   \item \key{ABI Roles:} Register use is constrained by calling-convention rules, including argument/return registers and caller- vs.\ callee-saved registers.
   \item \key{Memory Model:} AArch64 exposes byte-addressed memory with alignment requirements and explicit load/store instructions.
-  \item \key{Instruction Conventions:} Assembly syntax, immediate construction, and basic memory-reference forms establish the notation used in later programming topics.
+  \item \key{Instruction Conventions:} Assembly syntax, immediate construction, and basic load/store notation prepare for the detailed addressing-mode treatment in Topic 5.
 \end{itemize}
 \vfill
 \end{frame}
 
 
 
+
+
+
+
 % ============================================================
-% Slide 24
+% Slide 21
 % ============================================================
 
 \begin{frame}{Self-Test Questions: State \& Register Mechanics}
@@ -1056,14 +1040,18 @@ stp x29, x30, [sp, #-16]!
 
 
 
+
+
+
+
 % ============================================================
-% Slide 25
+% Slide 22
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Memory \& Instruction Mechanics}
 \vfill
 \begin{enumerate}\setlength{\itemsep}{9pt}
-  \item \key{Memory Addressing Modes:} Explain the mechanical difference in address calculation and base-register updates between \code{ldr x1, [x0, \#16]}, \code{ldr x1, [x0, \#16]!}, and \code{ldr x1, [x0], \#16}.
+  \item \key{Memory Model:} Why does AArch64 use explicit load/store instructions rather than allowing most arithmetic instructions to read directly from memory?
 
   \item \key{Alignment:} Why can naturally aligned accesses be simpler for hardware than accesses that cross an alignment boundary?
 
@@ -1074,8 +1062,12 @@ stp x29, x30, [sp, #-16]!
 
 
 
+
+
+
+
 % ============================================================
-% Slide 26
+% Slide 23
 % ============================================================
 
 \begin{frame}{Looking Ahead}
