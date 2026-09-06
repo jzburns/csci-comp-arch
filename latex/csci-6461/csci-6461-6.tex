@@ -95,16 +95,31 @@
 % Section divider macro
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
-\vspace{1.5cm}
-\begin{minipage}{0.85\textwidth}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -133,40 +148,51 @@
 
 \begin{document}
 
+
+
 % ============================================================
-% Slide 1: Title Slide
+% Slide 1
 % ============================================================
 
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
-\vspace{0.8cm}
+\vspace*{\fill}
+
 \begin{minipage}{0.88\textwidth}
-{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 6\par}
+
+{\color{gold}\normalsize\bfseries
+CSCI 6461 \;|\; Computer Systems Architecture \;|\; TOPIC 6
+\par}
+
 \vspace{0.25cm}
+
 {\color{white}\fontsize{24}{28}\selectfont\bfseries
- Subroutines, Calling Conventions,\\[0.08cm]
- \& the Stack
+Subroutines, Calling Conventions,\\[0.08cm]\& the Stack
 \par}
+
 \vspace{0.35cm}
+
 {\color{white!80}\large
- Function linkage, register preservation rules, stack frame management,\\
- and AAPCS64 architectural compliance
+Function linkage, register preservation rules, stack frame management,\\and AAPCS64 architectural compliance
 \par}
+
 \end{minipage}
 
 \vfill
-{\color{white}\normalsize Dr. J. Burns\par}
-{\color{white!70}\small Computer Systems Architecture --- AArch64 Reference Platform\par}
-\vspace{0.35cm}
-\end{frame}
 
-% ============================================================
-% Slide 2: Module Overview
-% ============================================================
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
+
+\end{frame}
 
 
 
@@ -176,8 +202,10 @@
 
 \sectiondivider{PART 1}{Subroutine Linkage \& Control Flow}
 
+
+
 % ============================================================
-% Slide 3
+% Slide 2
 % ============================================================
 
 \begin{frame}{High-Level Function Execution Model}
@@ -195,8 +223,10 @@
 \end{itemize}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 4
+% Slide 3
 % ============================================================
 
 \begin{frame}{The Link Register (\texttt{x30}) and Branch-with-Link (\texttt{bl})}
@@ -224,8 +254,10 @@ The \code{bl} instruction encodes a signed 26-bit immediate offset, allowing dir
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 5
+% Slide 4
 % ============================================================
 
 \begin{frame}{Subroutine Return Mechanics (\texttt{ret})}
@@ -250,8 +282,10 @@ The \code{bl} instruction encodes a signed 26-bit immediate offset, allowing dir
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 6
+% Slide 5
 % ============================================================
 
 \begin{frame}{Leaf vs.\ Non-Leaf Functions}
@@ -281,8 +315,10 @@ If a function makes another call and must later return to its own caller, its in
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 7
+% Slide 6
 % ============================================================
 
 \begin{frame}{Indirect Subroutine Calls (\texttt{blr})}
@@ -307,8 +343,10 @@ If a function makes another call and must later return to its own caller, its in
 \code{blr x2}             \quad \text{\scriptsize // Call function indirectly via register x2}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 8
+% Slide 7
 % ============================================================
 
 \begin{frame}{Subroutine Call Execution Trace}
@@ -337,8 +375,10 @@ Control transfers from caller to callee and back using \bits{x30} to hold the re
 
 \sectiondivider{PART 2}{Procedure Call Standard \& Register Roles}
 
+
+
 % ============================================================
-% Slide 9
+% Slide 8
 % ============================================================
 
 \begin{frame}{Purpose of Procedure Call Standards (AAPCS64)}
@@ -355,8 +395,10 @@ Control transfers from caller to callee and back using \bits{x30} to hold the re
 \end{itemize}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 10
+% Slide 9
 % ============================================================
 
 \begin{frame}{Parameter Passing Registers (\texttt{x0}--\texttt{x7})}
@@ -385,8 +427,10 @@ Arguments not assigned to registers are placed in the stack argument area accord
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 11
+% Slide 10
 % ============================================================
 
 \begin{frame}{Return Value Registers}
@@ -414,8 +458,10 @@ Floating-point and SIMD return rules use the SIMD/FP register file and are outsi
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 12
+% Slide 11
 % ============================================================
 
 \begin{frame}{Caller-Saved Registers (\texttt{x0}--\texttt{x17})}
@@ -444,8 +490,10 @@ A caller that needs a value in these registers after a call must preserve that v
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 13
+% Slide 12
 % ============================================================
 
 \begin{frame}{Callee-Saved Registers (\texttt{x19}--\texttt{x28})}
@@ -478,8 +526,10 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 \end{columns}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 14
+% Slide 13
 % ============================================================
 
 \begin{frame}{Special-Purpose ABI Registers}
@@ -504,8 +554,10 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 \key{Takeaway:} Treat \bits{x18}, \bits{x29}, \bits{x30}, and \bits{sp} according to their ABI and linkage roles rather than as ordinary scratch registers.
 \end{frame}
 
+
+
 % ============================================================
-% Slide 15
+% Slide 14
 % ============================================================
 
 \begin{frame}{Register Responsibility Summary}
@@ -533,8 +585,10 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 
 \sectiondivider{PART 3}{The Runtime Stack \& Activation Frames}
 
+
+
 % ============================================================
-% Slide 16
+% Slide 15
 % ============================================================
 
 \begin{frame}{The Stack Memory Model}
@@ -558,8 +612,10 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 17
+% Slide 16
 % ============================================================
 
 \begin{frame}{What Is a Stack Frame?}
@@ -585,6 +641,12 @@ frame pointer while \bits{sp} continues to track the current stack position.
 \end{block}
 
 \end{frame}
+
+
+
+% ============================================================
+% Slide 17
+% ============================================================
 
 \begin{frame}{Example Activation Frame Structure}
 \begin{columns}[T,onlytextwidth]
@@ -613,6 +675,12 @@ frame pointer while \bits{sp} continues to track the current stack position.
 \end{columns}
 \end{frame}
 
+
+
+% ============================================================
+% Slide 18
+% ============================================================
+
 \begin{frame}{Frame Pointer (\texttt{x29}) and Frame Records}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
@@ -625,7 +693,6 @@ frame pointer while \bits{sp} continues to track the current stack position.
   \end{itemize}
 \end{itemize}
 
-\vspace{0.4cm}
 \centering
 \begin{tikzpicture}[scale=0.85, every node/.style={transform shape}]
   \node[draw=navy, fill=lightblue, rounded corners=2pt, minimum width=4.5cm, minimum height=0.7cm, font=\small\bfseries] (caller) {Caller Frame Record};
@@ -633,6 +700,8 @@ frame pointer while \bits{sp} continues to track the current stack position.
   \draw[-{Latex}, line width=1.2pt, gold!80!black] (callee.north) -- (caller.south) node[midway, right, font=\tiny\bfseries] {frame-record link};
 \end{tikzpicture}
 \end{frame}
+
+
 
 % ============================================================
 % Slide 19
@@ -661,6 +730,8 @@ my_func:
 \small
 Pre-indexed \code{stp} combines stack-pointer writeback with the paired store of \bits{x29}/\bits{x30}.
 \end{frame}
+
+
 
 % ============================================================
 % Slide 20
@@ -692,6 +763,8 @@ Pre-indexed \code{stp} combines stack-pointer writeback with the paired store of
 \normalsize
 Post-indexed \code{ldp} performs a paired architectural load and writeback in one instruction to restore \bits{x29}/\bits{x30} and deallocate 32 stack bytes.
 \end{frame}
+
+
 
 % ============================================================
 % Slide 21
@@ -734,6 +807,8 @@ process:
 Because this example is a leaf function, it does not need to save \bits{x30} solely for return linkage. The 16-byte local allocation preserves stack alignment.
 \end{frame}
 
+
+
 % ============================================================
 % Slide 22
 % ============================================================
@@ -771,6 +846,8 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 
 \sectiondivider{PART 4}{Worked Assembly Examples \& Patterns}
 
+
+
 % ============================================================
 % Slide 23
 % ============================================================
@@ -795,6 +872,8 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
   \item The function consists of three architectural instructions.
 \end{itemize}
 \end{frame}
+
+
 
 % ============================================================
 % Slide 24
@@ -822,15 +901,18 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 \end{block}
 \end{frame}
 
+
+
 % ============================================================
 % Slide 25
 % ============================================================
 
 \begin{frame}[fragile]{Worked Example 3: Recursive Factorial}
+\vspace{-0.2cm}
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.36\textwidth}
+\begin{column}{0.4\textwidth}
 \begin{block}{C Logic}
-\scriptsize
+\footnotesize
 \begin{verbatim}
 uint64_t factorial(uint64_t n) {
   if (n <= 1) return 1;
@@ -838,13 +920,13 @@ uint64_t factorial(uint64_t n) {
 }
 \end{verbatim}
 \end{block}
-\vspace{0.05cm}
-\scriptsize
+\vspace{0.07cm}
+\footnotesize
 Each invocation preserves its own return address and the current value of \code{n} across the recursive call.
 \end{column}
-\begin{column}{0.60\textwidth}
+\begin{column}{0.5\textwidth}
 \begin{block}{AArch64 Assembly}
-\tiny
+\scriptsize
 \begin{verbatim}
 factorial:
     cmp  x0, #1
@@ -870,6 +952,8 @@ factorial:
 \end{columns}
 \end{frame}
 
+
+
 % ============================================================
 % Slide 26
 % ============================================================
@@ -888,9 +972,7 @@ This example uses ten 64-bit integer arguments. Arguments 1--8 use \bits{x0}--\b
 mov  x9,  #100
 mov  x10, #200
 stp  x9, x10, [sp, #-16]!
-
 bl   func_with_10_args
-
 add  sp, sp, #16
 \end{verbatim}
 \end{block}
@@ -909,6 +991,8 @@ func_with_10_args:
 \end{column}
 \end{columns}
 \end{frame}
+
+
 
 % ============================================================
 % Slide 27
@@ -929,11 +1013,13 @@ func_with_10_args:
 
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
+
+
 % ============================================================
-% Slide 28: Comprehensive Summary
+% Slide 28
 % ============================================================
 
-\begin{frame}{Topic 6: Comprehensive Summary}
+\begin{frame}{Topic 6: Summary}
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item \key{Linkage Primitives:} \code{bl}/\code{blr} write the return address to \bits{x30}; \code{ret} normally returns through \bits{x30}.
   \item \key{AAPCS64 Register Contract:}
@@ -946,8 +1032,10 @@ func_with_10_args:
 \end{itemize}
 \end{frame}
 
+
+
 % ============================================================
-% Slide 29: Self-Test Questions (Part 1)
+% Slide 29
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Linkage \& AAPCS64}
@@ -962,8 +1050,10 @@ func_with_10_args:
 
 \end{frame}
 
+
+
 % ============================================================
-% Slide 30: Self-Test Questions (Part 2)
+% Slide 30
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Stack Frame Management}
@@ -987,6 +1077,12 @@ func_with_10_args:
 
 % ============================================================
 % Looking Ahead
+% ============================================================
+
+
+
+% ============================================================
+% Slide 31
 % ============================================================
 
 \begin{frame}{Looking Ahead}
