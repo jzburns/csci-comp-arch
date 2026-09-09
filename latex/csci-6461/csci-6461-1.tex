@@ -301,9 +301,7 @@ clarifies an architectural difference.
 Architecture Foundations \& Abstraction\par}
 
 \end{minipage}
-
 \vspace*{\fill}
-
 \end{frame}
 
 
@@ -1699,64 +1697,35 @@ T_{\text{clk}}
 
 \begin{frame}{The Iron Law of Processor Performance}
 
-\begin{block}{The Fundamental CPU Performance Equation}
+\begin{block}{Execution Time}
 \[
-T_{\text{CPU}}
+T_{\mathrm{cpu}}
 =
-\text{Instruction Count (IC)}
+N_{\mathrm{inst}}
 \times
-\text{CPI}
+\mathrm{CPI}
 \times
-T_{\text{clk}}
-=
-\frac{\text{IC}\times\text{CPI}}
-     {f_{\text{clk}}}
+T_{\mathrm{clk}}
 \]
 \end{block}
 
-\vfill
+\vspace{0.2cm}
 
-\begin{center}
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item $T_{\mathrm{cpu}}$ = CPU execution time for the program
+  \item $N_{\mathrm{inst}}$ = number of instructions executed
+  \item $\mathrm{CPI}$ = average cycles per instruction
+  \item $T_{\mathrm{clk}}$ = clock period
+\end{itemize}
 
-\footnotesize
+\vspace{0.2cm}
 
-\begin{tabular}{lll}
-\toprule
-Component & Influenced By & Examples \\
-\midrule
-\textbf{IC}
-&
-Algorithm, compiler, ISA
-&
-instruction selection, code structure
-\\
-\textbf{CPI}
-&
-Pipeline, dependencies, memory hierarchy
-&
-stalls, speculation, cache misses
-\\
-\textbf{$T_{\text{clk}}$}
-&
-Circuit paths, pipeline organization
-&
-critical-path delay, implementation choices
-\\
-\bottomrule
-\end{tabular}
-
-\end{center}
-
-\vfill
-
-\begin{block}{Important Trade-Offs}
-These factors are \key{not independent}. A design change that improves one factor can often worsen another (e.g., deeper pipelines increase clock speed but also increase stall CPI).
+\begin{block}{Performance}
+Reducing execution time requires reducing one or more of these three factors:
+instruction count, CPI, or clock period.
 \end{block}
 
 \end{frame}
-
-
-
 
 
 % ============================================================
