@@ -1133,25 +1133,36 @@ Programs rarely access memory randomly. They exhibit:
 % ============================================================
 
 \begin{frame}{The Memory Wall}
+\vspace{-0.2cm}
 
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item Processor execution capability has scaled much faster than off-chip DRAM latency.
-  \item A cache hierarchy attempts to keep the processor working on nearby copies of frequently used data.
-  \item When locality fails and a request travels down the hierarchy, dependent instructions may wait many cycles, although independent work can sometimes continue.
-  \item While memory bandwidth scales reasonably well, physical memory \emph{latency} remains a strict bottleneck.
+\begin{block}{Definition}
+The \key{memory wall} is the growing performance gap between processor
+execution speed and the time required to access main memory.
+\end{block}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Processor execution capability has improved much faster than off-chip DRAM latency.
+  \item A cache hierarchy attempts to keep the processor working on nearby copies of frequently used instructions and data.
+  \item When locality fails and a request must go farther down the hierarchy, execution may stall for many cycles.
 \end{itemize}
 
 \vspace{0.2cm}
 
 \begin{block}{Illustrative Latency Scale}
-Registers (1 cycle) $\rightarrow$ L1 Cache ($\sim$3 cycles) $\rightarrow$ Lower Caches (10--40 cycles) $\rightarrow$ DRAM (100+ cycles)
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item Registers: roughly a few pipeline resources away
+  \item L1 cache: typically only a few cycles
+  \item Lower-level caches: tens of cycles
+  \item DRAM: often hundreds of processor cycles
+\end{itemize}
 \end{block}
 
 \vspace{0.15cm}
 
 \small
 
-Exact latencies are implementation-dependent; the architectural lesson is the exponential gap between nearby and distant storage.
+Exact latencies are implementation-dependent; the architectural lesson is the
+large gap between nearby and distant storage.
 
 \end{frame}
 
