@@ -1734,95 +1734,65 @@ instruction count, CPI, or clock period.
 
 \begin{frame}{Iron Law: Comparative Evaluation Example}
 
+\vspace{-0.15cm}
+
 \begin{columns}[T,onlytextwidth]
 
 \column{0.48\textwidth}
-
 \begin{block}{Machine A}
-\begin{itemize}\setlength{\itemsep}{1pt}
-  \item $\text{IC} = 1.0 \times 10^9$
-  \item $\text{CPI} = 2.0$
-  \item $f_{\text{clk}} = 4.0\text{ GHz}$
-\end{itemize}
-
 \[
-T_A
-=
-\frac{1.0 \times 10^9 \times 2.0}
-     {4.0 \times 10^9}
-=
-\mathbf{0.50\text{ s}}
+\begin{aligned}
+N_{\mathrm{inst}} &= 1.0\times10^9 \\
+\mathrm{CPI} &= 2.0 \\
+f_{\mathrm{clk}} &= 4.0\text{ GHz}
+\end{aligned}
 \]
 
+\[
+T_{\mathrm{cpu}}
+=
+\frac{(1.0\times10^9)(2.0)}
+     {4.0\times10^9}
+=
+0.50\text{ s}
+\]
 \end{block}
 
 \column{0.48\textwidth}
-
 \begin{block}{Machine B}
-\begin{itemize}\setlength{\itemsep}{1pt}
-  \item $\text{IC} = 1.2 \times 10^9$
-  \item $\text{CPI} = 0.8$
-  \item $f_{\text{clk}} = 2.5\text{ GHz}$
-\end{itemize}
-
 \[
-T_B
-=
-\frac{1.2 \times 10^9 \times 0.8}
-     {2.5 \times 10^9}
-=
-\mathbf{0.384\text{ s}}
+\begin{aligned}
+N_{\mathrm{inst}} &= 1.0\times10^9 \\
+\mathrm{CPI} &= 1.0 \\
+f_{\mathrm{clk}} &= 4.0\text{ GHz}
+\end{aligned}
 \]
 
+\[
+T_{\mathrm{cpu}}
+=
+\frac{(1.0\times10^9)(1.0)}
+     {4.0\times10^9}
+=
+0.25\text{ s}
+\]
 \end{block}
 
 \end{columns}
 
-\vfill
+\vspace{0.1cm}
 
-\[
-\text{Speedup}
-=
-\frac{T_A}{T_B}
-=
-\frac{0.50}{0.384}
-\approx
-\mathbf{1.30\times}
-\]
+\begin{block}{Comparison}
+The machines execute the same number of instructions at the same clock rate.
+Machine B has half the CPI, so its execution time is also cut in half.
 
-\small
+\vspace{0.1cm}
 
-The Iron Law equation strictly compares measured assumptions; the numerical results alone do not prove which microarchitectural feature inherently caused the difference.
+\textbf{Main Point:} With instruction count and clock rate fixed,
+lower CPI directly reduces CPU execution time.
+\end{block}
 
 \end{frame}
-
-
-
-
-
-% ============================================================
-% Slide 33
-% ============================================================
-
-\begin{frame}{The Megahertz Myth and Speedup}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item A higher clock frequency does not guarantee better overall performance because IC and CPI heavily alter execution time.
-  \item Pure frequency scaling is largely constrained today by power dissipation limits (the end of Dennard scaling).
-  \item \key{Speedup} compares old and new execution times:
-  \begin{center}
-  $\text{Speedup} = \frac{T_{\text{old}}}{T_{\text{new}}} = \frac{\text{Performance}_{\text{new}}}{\text{Performance}_{\text{old}}}$
-  \end{center}
-  \item If runtime drops from $10\text{ s}$ to $4\text{ s}$:
-  \begin{center}
-  $\text{Speedup} = \frac{10}{4} = 2.5\times$
-  \end{center}
-\end{itemize}
-
-\end{frame}
-
-
-
 
 
 % ============================================================
@@ -1830,6 +1800,7 @@ The Iron Law equation strictly compares measured assumptions; the numerical resu
 % ============================================================
 
 \begin{frame}{Amdahl's Law: Why Partial Optimization Is Limited}
+\vspace{-0.1cm}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item Suppose only fraction $f$ of an application's execution time can be accelerated through architectural enhancements.
@@ -1880,10 +1851,6 @@ S_{\max}
 \end{columns}
 
 \end{frame}
-
-
-
-
 
 % ============================================================
 % Slide 35

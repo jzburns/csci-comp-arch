@@ -54,3 +54,39 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# latex
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+
+# Beamer / presentation extras
+*.xdv
+
+# Build directories
+build/
+out/
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# Optional: ignore generated PDFs
+# *.pdf
