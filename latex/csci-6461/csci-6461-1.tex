@@ -1029,12 +1029,7 @@ The stored-program model allows a machine to run different programs by changing 
   \draw[-{Latex}, thick, navy] (data) -- (sync);
   \draw[-{Latex}, thick, navy] (sync) -- (inst);
 \end{tikzpicture}
-
 \vfill
-
-\small
-
-The exact AArch64 cache-maintenance and barrier instructions are system-software details that we will revisit later. Without the required synchronization, instruction fetch may observe stale instructions rather than the newly generated code.
 
 \end{frame}
 
@@ -1824,7 +1819,7 @@ S_{\text{overall}}
 \]
 \end{block}
 
-\vfill
+\vspace{-0.3cm}
 
 \begin{columns}[T,onlytextwidth]
 
