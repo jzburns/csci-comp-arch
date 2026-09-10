@@ -1133,39 +1133,34 @@ Programs rarely access memory randomly. They exhibit:
 % ============================================================
 
 \begin{frame}{The Memory Wall}
+
 \vspace{-0.2cm}
 
 \begin{block}{Definition}
 The \key{memory wall} is the growing performance gap between processor
-execution speed and the time required to access main memory.
+execution speed and main-memory access time.
 \end{block}
 
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item Processor execution capability has improved much faster than off-chip DRAM latency.
-  \item A cache hierarchy attempts to keep the processor working on nearby copies of frequently used instructions and data.
-  \item When locality fails and a request must go farther down the hierarchy, execution may stall for many cycles.
+\vspace{0.1cm}
+
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Processor execution capability has improved much faster than DRAM latency.
+  \item Cache memory keeps frequently used instructions and data closer to the processor.
+  \item A cache miss that reaches DRAM can delay execution for many processor cycles.
 \end{itemize}
 
-\vspace{0.2cm}
+\vspace{0.1cm}
 
-\begin{block}{Illustrative Latency Scale}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item Registers: roughly a few pipeline resources away
-  \item L1 cache: typically only a few cycles
+\begin{block}{Typical Latency Scale}
+\begin{itemize}\setlength{\itemsep}{1pt}
+  \item Registers: very close to the processor
+  \item L1 cache: a few cycles
   \item Lower-level caches: tens of cycles
-  \item DRAM: often hundreds of processor cycles
+  \item DRAM: often hundreds of cycles
 \end{itemize}
 \end{block}
-
-\vspace{0.15cm}
-
-\small
-
-Exact latencies are implementation-dependent; the architectural lesson is the
-large gap between nearby and distant storage.
 
 \end{frame}
-
 % --- Section Divider 3 ---
 
 
