@@ -152,6 +152,10 @@
 
 
 
+
+
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -203,6 +207,10 @@ Dr. J. Burns
 
 
 
+
+
+
+
 % ============================================================
 % Slide 2
 % ============================================================
@@ -246,6 +254,10 @@ Dr. J. Burns
 
 
 
+
+
+
+
 % ============================================================
 % Slide 3
 % ============================================================
@@ -274,6 +286,10 @@ Dr. J. Burns
 A well-designed ISA survives decades of microarchitectural overhauls by maintaining this strict software contract while hardware implementation evolves underneath it.
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -309,6 +325,10 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 
 
 
+
+
+
+
 % ============================================================
 % Slide 5
 % ============================================================
@@ -328,6 +348,10 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -384,6 +408,10 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 
 
 
+
+
+
+
 % ============================================================
 % Slide 7
 % ============================================================
@@ -402,6 +430,10 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -426,6 +458,10 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -475,6 +511,10 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 
 
 
+
+
+
+
 % ============================================================
 % Slide 10
 % ============================================================
@@ -517,6 +557,10 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 
 
 
+
+
+
+
 % ============================================================
 % Slide 11
 % ============================================================
@@ -531,6 +575,10 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 \end{itemize}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -576,14 +624,19 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 
 
 
+
+
+
+
 % ============================================================
 % Slide 13
 % ============================================================
 
-\begin{frame}{Applying the Iron Law to ISA Trade-offs}
-\vfill
+\begin{frame}{Using the Iron Law for ISA Trade-offs}
 
-\begin{block}{Recall from Topic 1}
+\vspace{-0.25cm}
+
+\begin{block}{From Topic 1}
 \[
 T_{\text{CPU}}
 =
@@ -593,72 +646,77 @@ T_{\text{CPU}}
 \]
 \end{block}
 
-\vfill
+\vspace{0.05cm}
 
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item ISA design can change \key{dynamic instruction count} by changing how much work one instruction expresses.
-  \item ISA and implementation choices can also affect \key{CPI} through decode, scheduling, memory behavior, and pipeline effects.
-  \item Clock frequency is a property of the implementation, not a direct measure of ISA quality.
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+\begin{block}{Instruction Count}
+\small
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item CISC-style instructions may express more work per instruction.
+  \item RISC-style code may use more instructions for the same source-level operation.
 \end{itemize}
-
-\vfill
-
-\begin{block}{Use in This Topic}
-\small The Iron Law is used here as an evaluation tool: a lower instruction count is not automatically faster if CPI or clock period changes in the opposite direction.
 \end{block}
 
-\vfill
+\column{0.48\textwidth}
+\begin{block}{CPI and Clock Period}
+\small
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item Simpler instructions can make decode and control easier.
+  \item Complex instructions may require more internal steps or micro-operations.
+\end{itemize}
+\end{block}
+
+\end{columns}
+
+\vspace{0.1cm}
+
+\begin{block}{Main Point}
+\small
+An ISA choice can reduce one term while increasing another. Instruction count alone
+does not determine execution time.
+\end{block}
+
 \end{frame}
-
-
-
 
 
 % ============================================================
 % Slide 14
 % ============================================================
 
-\begin{frame}{Worked Performance Comparison}
-\vfill
-Workload evaluation across two competing microarchitectures:
+\begin{frame}{RISC and CISC Performance Trade-offs}
 
-\vfill
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.48\textwidth}
-\begin{block}{Machine A (RISC / AArch64)}
-\small
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item $\mathit{IC} = 1.4 \times 10^9$
-  \item $\mathit{CPI} = 1.10$
-  \item $f_{\text{clk}} = 3.0\text{ GHz}$
-\end{itemize}
-\vfill
-$$T_A = \frac{1.4 \times 10^9 \times 1.10}{3.0 \times 10^9} = \mathbf{0.513\text{ s}}$$
-\vfill
-\end{block}
-\end{column}
 
-\begin{column}{0.48\textwidth}
-\begin{block}{Machine B (CISC / x86-64)}
-\small
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item $\mathit{IC} = 1.0 \times 10^9$ (-28\% IC)
-  \item $\mathit{CPI} = 1.60$ (Higher CPI)
-  \item $f_{\text{clk}} = 3.0\text{ GHz}$
+\column{0.48\textwidth}
+\begin{block}{RISC-Style Effects}
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item May require more instructions for the same computation.
+  \item Simpler instructions can reduce decode and control complexity.
+  \item Regular operations can support lower CPI and efficient pipelining.
 \end{itemize}
-\vfill
-$$T_B = \frac{1.0 \times 10^9 \times 1.60}{3.0 \times 10^9} = \mathbf{0.533\text{ s}}$$
-\vfill
 \end{block}
-\end{column}
+
+\column{0.48\textwidth}
+\begin{block}{CISC-Style Effects}
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item May complete more work with fewer instructions.
+  \item Individual instructions may require more internal work.
+  \item More complex execution can increase CPI or implementation cost.
+\end{itemize}
+\end{block}
+
 \end{columns}
 
-\vfill
-Under these assumed instruction-count and CPI values, Machine A completes the workload about $1.04\times$ faster. The example illustrates the Iron Law; it does not imply that one ISA inherently guarantees a lower CPI.
-\vfill
+\vspace{0.2cm}
+
+\begin{block}{Performance}
+The Iron Law from Topic 1 still applies. A lower instruction count does not
+by itself guarantee lower execution time if CPI or clock period increases.
+\end{block}
+
 \end{frame}
-
-
 
 
 
@@ -699,6 +757,10 @@ $$\frac{\text{Workload Throughput}}{\text{Watts}}$$
 \end{block}
 \vfill
 \end{frame}
+
+
+
+
 
 
 
@@ -746,23 +808,32 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 
 
 
+
+
+
+
 % ============================================================
 % Slide 17
 % ============================================================
 
-\begin{frame}{Topic 2: Summary}
-\vfill
-\small
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{Complexity Redistribution:} ISA design influences how work is divided among compilers, instruction decoding, and processor implementation.
-  \item \key{CISC Trade-offs:} Variable-length encodings and register-memory operations can improve code density and preserve compatibility, while increasing front-end decode complexity.
-  \item \key{RISC Trade-offs:} Fixed-width encodings and load/store rules simplify instruction boundaries and operand handling, although performance still depends on the complete microarchitecture and workload.
-  \item \key{Microarchitectural Convergence:} Modern high-performance x86 and AArch64 processors use many similar techniques, including pipelining, speculation, register renaming, out-of-order execution, and caching.
-  \item \key{Evaluation Metrics:} Topic 1's Iron Law provides a quantitative way to evaluate ISA trade-offs alongside measured execution time and energy-efficiency metrics such as Performance-per-Watt.
-\end{itemize}
-\vfill
-\end{frame}
+\begin{frame}{Topic 2 Summary}
 
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item CISC tends to expose richer operations and can reduce instruction count.
+  \item RISC tends to expose more regular operations that simplify decoding and pipelining.
+  \item These choices can move instruction count, CPI, and clock period in different directions.
+  \item Modern processors blur the historical RISC/CISC boundary.
+  \item AArch64 provides a modern RISC case study for the rest of the course.
+\end{itemize}
+
+\vspace{0.2cm}
+
+\begin{block}{Main Point}
+Do not ask which philosophy is inherently faster. Ask what trade-offs the ISA
+creates and how those trade-offs affect the workload.
+\end{block}
+
+\end{frame}
 
 
 
@@ -787,25 +858,32 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 
 
 
+
+
+
+
 % ============================================================
 % Slide 19
 % ============================================================
 
-\begin{frame}{Self-Test Questions: Quantitative Analysis \& Power}
+\begin{frame}{Self-Test Questions: ISA Trade-offs \& Power}
 \vfill
 \begin{enumerate}\setlength{\itemsep}{12pt}
-  \item \key{Iron Law Calculation:} A RISC core executes $1.5 \times 10^9$ instructions at $\text{CPI} = 1.1$ on a 3.0\,GHz CPU. A CISC core executes $1.1 \times 10^9$ instructions at $\text{CPI} = 1.6$ on a 3.2\,GHz CPU. Which finishes faster?
-  
-  \item \key{Front-End Power Cost:} Why does instruction decoding consume a measurably higher percentage of core power in modern x86 processors than in modern AArch64 cores?
-  
-  \item \key{Performance-per-Watt:} Why has Performance-per-Watt superseded raw clock frequency as the primary architectural design metric in modern computing?
+  \item \key{ISA Trade-off:} Give one reason why a CISC-style instruction might reduce instruction count but still not reduce execution time.
+
+  \item \key{Front-End Power Cost:} Why can complex instruction decoding increase front-end power use?
+
+  \item \key{Performance-per-Watt:} Why is Performance-per-Watt often more useful than raw clock frequency when comparing modern processors?
 \end{enumerate}
 \vfill
 \end{frame}
-
 % ============================================================
 % Look Ahead to Topic 3 (Final Slide of Topic 2 Deck)
 % ============================================================
+
+
+
+
 
 
 
