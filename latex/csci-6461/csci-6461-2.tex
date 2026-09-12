@@ -726,38 +726,56 @@ by itself guarantee lower execution time if CPI or clock period increases.
 % ============================================================
 
 \begin{frame}{Energy, Thermal Limits \& Performance-per-Watt}
-\vfill
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.48\textwidth}
-\begin{block}{Dynamic Power Equation}
-\small
-$$P = C \cdot V_{\text{dd}}^2 \cdot f + P_{\text{static}}$$
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Complex decoders increase switching capacitance ($C$).
-  \item Higher operating voltages can enable higher frequency, but increase dynamic power quadratically through the $V_{\text{dd}}^2$ term.
-\end{itemize}
-\end{block}
-\end{column}
 
-\begin{column}{0.48\textwidth}
-\begin{block}{Performance-per-Watt}
-\small
-$$\frac{\text{Workload Throughput}}{\text{Watts}}$$
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Primary metric for mobile batteries and cloud data center racks.
-  \item Front-end organization, instruction encoding, cache behavior, and execution width all influence energy efficiency.
-\end{itemize}
+\vspace{-0.2cm}
+
+\begin{block}{Approximate Power Model}
+\[
+P
+=
+C \cdot V_{\mathrm{dd}}^{2} \cdot f
++
+P_{\mathrm{static}}
+\]
 \end{block}
-\end{column}
+
+\vspace{0.05cm}
+
+\begin{columns}[T,onlytextwidth]
+
+\column{0.48\textwidth}
+\small
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item $P$ = total processor power
+  \item $C$ = effective switching capacitance
+  \item $V_{\mathrm{dd}}$ = supply voltage
+\end{itemize}
+
+\column{0.48\textwidth}
+\small
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item $f$ = clock frequency
+  \item $P_{\mathrm{static}}$ = static or leakage power
+\end{itemize}
+
 \end{columns}
 
-\vfill
-\begin{block}{The Dark Silicon Era}
-\small Power-density and thermal constraints prevent all transistors from operating at maximum activity simultaneously, making energy efficiency a central constraint in modern multicore design.
-\end{block}
-\vfill
-\end{frame}
+\vspace{0.1cm}
 
+\begin{block}{Effect}
+\small
+Dynamic power grows approximately linearly with clock frequency and
+quadratically with supply voltage. Higher power increases heat and
+places practical limits on processor performance.
+\end{block}
+
+\vspace{0.1cm}
+
+\small
+\textbf{Performance-per-watt} measures how much useful computation is
+obtained for a given amount of power.
+
+\end{frame}
 
 
 
