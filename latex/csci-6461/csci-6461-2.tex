@@ -156,6 +156,8 @@
 
 
 
+
+
 % ============================================================
 % Slide 1
 % ============================================================
@@ -201,6 +203,8 @@ Dr. J. Burns
 \vspace*{\fill}
 
 \end{frame}
+
+
 
 
 
@@ -258,6 +262,8 @@ Dr. J. Burns
 
 
 
+
+
 % ============================================================
 % Slide 3
 % ============================================================
@@ -286,6 +292,8 @@ Dr. J. Burns
 A well-designed ISA survives decades of microarchitectural overhauls by maintaining this strict software contract while hardware implementation evolves underneath it.
 \vfill
 \end{frame}
+
+
 
 
 
@@ -329,6 +337,8 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 
 
 
+
+
 % ============================================================
 % Slide 5
 % ============================================================
@@ -348,6 +358,8 @@ A well-designed ISA survives decades of microarchitectural overhauls by maintain
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -412,6 +424,8 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 
 
 
+
+
 % ============================================================
 % Slide 7
 % ============================================================
@@ -430,6 +444,8 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -458,6 +474,8 @@ One architectural instruction may be decomposed into multiple internal micro-ope
 \end{block}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -515,6 +533,8 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 
 
 
+
+
 % ============================================================
 % Slide 10
 % ============================================================
@@ -561,6 +581,8 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 
 
 
+
+
 % ============================================================
 % Slide 11
 % ============================================================
@@ -575,6 +597,8 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 \end{itemize}
 \vfill
 \end{frame}
+
+
 
 
 
@@ -628,61 +652,10 @@ RISC explicitly uses 4 fixed-width instructions ($16\text{ bytes}$), while CISC 
 
 
 
+
+
 % ============================================================
 % Slide 13
-% ============================================================
-
-\begin{frame}{Using the Iron Law for ISA Trade-offs}
-
-\vspace{-0.25cm}
-
-\begin{block}{From Topic 1}
-\[
-T_{\text{CPU}}
-=
-\mathit{IC}\times\mathit{CPI}\times T_{\text{clk}}
-=
-\frac{\mathit{IC}\times\mathit{CPI}}{f_{\text{clk}}}
-\]
-\end{block}
-
-\vspace{0.05cm}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{Instruction Count}
-\small
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item CISC-style instructions may express more work per instruction.
-  \item RISC-style code may use more instructions for the same source-level operation.
-\end{itemize}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{CPI and Clock Period}
-\small
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Simpler instructions can make decode and control easier.
-  \item Complex instructions may require more internal steps or micro-operations.
-\end{itemize}
-\end{block}
-
-\end{columns}
-
-\vspace{0.1cm}
-
-\begin{block}{Main Point}
-\small
-An ISA choice can reduce one term while increasing another. Instruction count alone
-does not determine execution time.
-\end{block}
-
-\end{frame}
-
-
-% ============================================================
-% Slide 14
 % ============================================================
 
 \begin{frame}{RISC and CISC Performance Trade-offs}
@@ -721,60 +694,43 @@ by itself guarantee lower execution time if CPI or clock period increases.
 
 
 
+
+
 % ============================================================
-% Slide 15
+% Slide 14
 % ============================================================
 
 \begin{frame}{Energy, Thermal Limits \& Performance-per-Watt}
-
-\vspace{-0.2cm}
-
-\begin{block}{Approximate Power Model}
-\[
-P
-=
-C \cdot V_{\mathrm{dd}}^{2} \cdot f
-+
-P_{\mathrm{static}}
-\]
-\end{block}
-
-\vspace{0.05cm}
-
+\vfill
 \begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
+\begin{column}{0.48\textwidth}
+\begin{block}{Dynamic Power Equation}
 \small
+$$P = C \cdot V_{\text{dd}}^2 \cdot f + P_{\text{static}}$$
 \begin{itemize}\setlength{\itemsep}{3pt}
-  \item $P$ = total processor power
-  \item $C$ = effective switching capacitance
-  \item $V_{\mathrm{dd}}$ = supply voltage
+  \item Complex decoders increase switching capacitance ($C$).
+  \item Higher operating voltages can enable higher frequency, but increase dynamic power quadratically through the $V_{\text{dd}}^2$ term.
 \end{itemize}
+\end{block}
+\end{column}
 
-\column{0.48\textwidth}
+\begin{column}{0.48\textwidth}
+\begin{block}{Performance-per-Watt}
 \small
+$$\frac{\text{Workload Throughput}}{\text{Watts}}$$
 \begin{itemize}\setlength{\itemsep}{3pt}
-  \item $f$ = clock frequency
-  \item $P_{\mathrm{static}}$ = static or leakage power
+  \item Primary metric for mobile batteries and cloud data center racks.
+  \item Front-end organization, instruction encoding, cache behavior, and execution width all influence energy efficiency.
 \end{itemize}
-
+\end{block}
+\end{column}
 \end{columns}
 
-\vspace{0.1cm}
-
-\begin{block}{Effect}
-\small
-Dynamic power grows approximately linearly with clock frequency and
-quadratically with supply voltage. Higher power increases heat and
-places practical limits on processor performance.
+\vfill
+\begin{block}{The Dark Silicon Era}
+\small Power-density and thermal constraints prevent all transistors from operating at maximum activity simultaneously, making energy efficiency a central constraint in modern multicore design.
 \end{block}
-
-\vspace{0.1cm}
-
-\small
-\textbf{Performance-per-watt} measures how much useful computation is
-obtained for a given amount of power.
-
+\vfill
 \end{frame}
 
 
@@ -784,8 +740,11 @@ obtained for a given amount of power.
 
 
 
+
+
+
 % ============================================================
-% Slide 16
+% Slide 15
 % ============================================================
 
 \begin{frame}{Microarchitectural Convergence: Modern x86 Internals}
@@ -830,8 +789,10 @@ Modern x86 processors preserve the CISC ISA externally, while many architectural
 
 
 
+
+
 % ============================================================
-% Slide 17
+% Slide 16
 % ============================================================
 
 \begin{frame}{Topic 2 Summary}
@@ -856,8 +817,10 @@ creates and how those trade-offs affect the workload.
 
 
 
+
+
 % ============================================================
-% Slide 18
+% Slide 17
 % ============================================================
 
 \begin{frame}{Self-Test Questions: ISA Principles \& Mechanics}
@@ -880,8 +843,10 @@ creates and how those trade-offs affect the workload.
 
 
 
+
+
 % ============================================================
-% Slide 19
+% Slide 18
 % ============================================================
 
 \begin{frame}{Self-Test Questions: ISA Trade-offs \& Power}
@@ -907,8 +872,10 @@ creates and how those trade-offs affect the workload.
 
 
 
+
+
 % ============================================================
-% Slide 20
+% Slide 19
 % ============================================================
 
 \begin{frame}{Looking Ahead}
