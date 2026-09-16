@@ -427,60 +427,28 @@ instructions.
 % Slide 6
 % ============================================================
 
-\begin{frame}{Load--Compute--Store in AArch64}
+\begin{frame}[fragile]{Load--Compute--Store in AArch64}
 
-Suppose the address in \code{x0}
-identifies a 64-bit value in memory
+Suppose the address in \code{x0} identifies a 64-bit value in memory
 that must be increased by 5.
 
-\vspace{0.15cm}
+\vspace{0.25cm}
 
-\begin{center}
+\begin{block}{AArch64 Sequence}
+\begin{verbatim}
+ldr x1, [x0]      // load memory value into x1
+add x1, x1, #5    // compute using register operands
+str x1, [x0]      // store result back to memory
+\end{verbatim}
+\end{block}
 
-\begin{tikzpicture}[
-  node distance=0.35cm,
-  codebox/.style={
-    rectangle,
-    draw=navy,
-    fill=softgray,
-    text=darkgray,
-    font=\small\ttfamily,
-    text width=10.8cm,
-    align=left,
-    rounded corners=2pt,
-    minimum height=.5cm
-  }
-]
-
-\node[codebox] (a)
-{ldr x1, [x0] \hfill // load memory value into x1};
-
-\node[
-  codebox,
-  below=of a
-] (b)
-{add x1, x1, \#5 \hfill // compute using register operands};
-
-\node[
-  codebox,
-  below=of b
-] (c)
-{str x1, [x0] \hfill // store result back to memory};
-
-\end{tikzpicture}
-
-\end{center}
-
-\vspace{0.1cm}
+\vspace{0.2cm}
 
 \begin{block}{Architectural Rule}
-The \code{add} instruction
-does not directly read
-or modify a memory operand.
+The \code{add} instruction does not directly read or modify a memory operand.
 \end{block}
 
 \end{frame}
-
 
 
 % ============================================================
@@ -970,7 +938,7 @@ Modern AArch64 cores may still contain:
 \key{RISC reduces ISA irregularity, not necessarily total CPU complexity.}
 \end{center}
 
-\end{frame}
+\end{frame} 
 
 
 
