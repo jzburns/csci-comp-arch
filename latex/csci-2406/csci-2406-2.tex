@@ -823,133 +823,98 @@ Five instructions of different lengths.
 % Slide 10
 % ============================================================
 
-\begin{frame}{Why x86 Instruction Decode Is More Irregular}
+\begin{frame}{AArch64 vs. x86-64: Instruction Footprint}
 
-An x86-64 instruction may contain
-several optional or variable-size components.
-
-\vspace{0.15cm}
+\vspace{-0.2cm}
 
 \begin{center}
-
 \begin{tikzpicture}[
-  every node/.style={
-    draw=navy,
-    thick,
-    minimum height=.8cm,
-    align=center,
-    font=\scriptsize\bfseries
-  }
+  font=\scriptsize,
+  labelnode/.style={align=center}
 ]
 
-\node[
-  fill=navy,
-  text=white,
-  minimum width=1.7cm
-] (pre)
-{Prefix};
+% ------------------------------------------------------------
+% AArch64
+% ------------------------------------------------------------
+\node[font=\small\bfseries, text=navy] at (-3.6,2.2) {AArch64};
 
-\node[
-  fill=softgray,
-  text=navy,
-  minimum width=1.7cm,
-  right=0cm of pre
-] (op)
-{Opcode};
+% Two stacked 64-bit blocks
+\fill[gold!22] (-6.1,1.05) rectangle (-1.1,1.75);
+\fill[gold!22] (-6.1,0.05) rectangle (-1.1,0.75);
 
-\node[
-  fill=mediumgray,
-  text=navy,
-  minimum width=1.7cm,
-  right=0cm of op
-] (mod)
-{ModR/M};
+\draw[navy, line width=0.9pt]
+  (-6.1,1.05) rectangle (-1.1,1.75);
 
-\node[
-  fill=softgray,
-  text=navy,
-  minimum width=1.7cm,
-  right=0cm of mod
-] (sib)
-{SIB};
+\draw[navy, line width=0.9pt]
+  (-6.1,0.05) rectangle (-1.1,0.75);
 
-\node[
-  fill=mediumgray,
-  text=navy,
-  minimum width=2.3cm,
-  right=0cm of sib
-] (disp)
-{Displacement};
+% 32-bit boundaries
+\draw[navy, dashed, line width=0.8pt]
+  (-3.6,1.05) -- (-3.6,1.75);
 
-\node[
-  fill=gold!35,
-  text=navy,
-  minimum width=2.1cm,
-  right=0cm of disp
-] (imm)
-{Immediate};
+\draw[navy, dashed, line width=0.8pt]
+  (-3.6,0.05) -- (-3.6,0.75);
+
+\node[labelnode, text=navy] at (-4.85,1.40) {32-bit\\instruction};
+\node[labelnode, text=navy] at (-2.35,1.40) {32-bit\\instruction};
+\node[labelnode, text=navy] at (-4.85,0.40) {32-bit\\instruction};
+\node[labelnode, text=navy] at (-2.35,0.40) {32-bit\\instruction};
+
+\node[font=\scriptsize\bfseries, text=navy] at (-3.6,-0.40)
+  {4 instructions = 16 bytes};
+
+% ------------------------------------------------------------
+% x86-64
+% ------------------------------------------------------------
+\node[font=\small\bfseries, text=navy] at (3.5,2.2) {x86-64};
+
+% One 64-bit block
+\fill[blue!10] (0.9,0.55) rectangle (6.1,1.25);
+
+\draw[navy, line width=0.9pt]
+  (0.9,0.55) rectangle (6.1,1.25);
+
+% Unequal variable-length boundaries
+\draw[navy, dashed, line width=0.8pt]
+  (1.7,0.55) -- (1.7,1.25);
+
+\draw[navy, dashed, line width=0.8pt]
+  (3.0,0.55) -- (3.0,1.25);
+
+\draw[navy, dashed, line width=0.8pt]
+  (4.6,0.55) -- (4.6,1.25);
+
+\node[text=navy] at (1.3,0.90) {i1};
+\node[text=navy] at (2.35,0.90) {i2};
+\node[text=navy] at (3.8,0.90) {i3};
+\node[text=navy] at (5.35,0.90) {i4};
+
+\node[labelnode, font=\scriptsize\bfseries, text=navy] at (3.5,-0.40)
+  {4 variable-length instructions = 8 bytes};
 
 \end{tikzpicture}
-
 \end{center}
+
+\vspace{0.2cm}
+
+\begin{block}{Memory Footprint}
+\small
+Both examples contain four instructions. AArch64 requires
+\(4 \times 4 = 16\) bytes because every instruction is 4 bytes.
+The illustrated x86-64 sequence occupies 8 bytes.
 
 \vspace{0.1cm}
 
-\begin{center}
-\small
-Some fields are optional;
-some fields vary in size;
-the total instruction may be 1--15 bytes.
-\end{center}
-
-\vspace{0.15cm}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-
-\begin{block}{x86 Front-End Work}
-\begin{itemize}
-  \item Find instruction boundaries.
-  \item Interpret prefixes and opcode bytes.
-  \item Decode optional addressing fields.
-  \item Handle displacement and immediate lengths.
-\end{itemize}
+\textbf{In this example, the AArch64 instruction footprint is 2:1 relative to x86-64.}
 \end{block}
 
-\column{0.48\textwidth}
+\vspace{0.05cm}
 
-\begin{block}{A64 Front-End Starting Point}
-
-\begin{center}
-
-\begin{tikzpicture}
-
-\node[
-  draw=navy,
-  thick,
-  fill=softgray,
-  minimum width=4.2cm,
-  minimum height=0.8cm,
-  align=center,
-  font=\small\bfseries
-]
-{Exactly 32 bits\\One A64 Instruction};
-
-\end{tikzpicture}
-
-\end{center}
-
-The decoder already knows
-where the instruction begins
-and ends.
-
-\end{block}
-
-\end{columns}
+\scriptsize
+The x86-64 sizes are illustrative; actual instruction lengths depend on the
+specific instructions and operands.
 
 \end{frame}
-
 
 
 % ============================================================
