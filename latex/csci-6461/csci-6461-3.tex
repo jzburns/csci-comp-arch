@@ -359,109 +359,11 @@ Dr. J. Burns
 
 
 
-
-
-
-
-
-
-% ============================================================
-% Slide 6
-% ============================================================
-
-\begin{frame}{Privilege Levels (Exception Levels)}
-\vfill
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.46\textwidth}
-\centering
-\begin{tikzpicture}[
-  scale=0.80,
-  every node/.style={transform shape},
-  elbox/.style={
-    draw=navy,
-    fill=lightblue,
-    rounded corners=3pt,
-    font=\small\bfseries,
-    minimum width=5.2cm,
-    minimum height=0.80cm,
-    align=center
-  },
-  el3box/.style={
-    draw=gold!90!black,
-    fill=gold!25,
-    rounded corners=3pt,
-    font=\small\bfseries,
-    minimum width=5.2cm,
-    minimum height=0.80cm,
-    align=center
-  },
-  translabel/.style={
-    font=\tiny\bfseries,
-    text=deepblue,
-    fill=white,
-    inner sep=1.5pt,
-    rounded corners=1pt
-  }
-]
-  % Exception Level Nodes (Full vertical spacing)
-  \node[elbox] (el0) at (0, 4.2) {EL0: User Space / Apps};
-  \node[elbox] (el1) at (0, 2.8) {EL1: Operating System Kernel};
-  \node[elbox] (el2) at (0, 1.4) {EL2: Hypervisor (Virtualization)};
-  \node[el3box] (el3) at (0, 0.0) {EL3: Secure Monitor / Firmware};
-
-  % Escalation Paths (Traps, Syscalls, Exceptions)
-  \draw[-{Latex[length=2.5mm]}, thick, navy] ([xshift=-1.4cm]el0.south) -- ([xshift=-1.4cm]el1.north)
-    node[midway, translabel] {SVC};
-  \draw[-{Latex[length=2.5mm]}, thick, navy] ([xshift=-1.4cm]el1.south) -- ([xshift=-1.4cm]el2.north)
-    node[midway, translabel] {HVC};
-  \draw[-{Latex[length=2.5mm]}, thick, navy] ([xshift=-1.4cm]el2.south) -- ([xshift=-1.4cm]el3.north)
-    node[midway, translabel] {SMC};
-
-  % De-escalation Return Paths (ERET)
-  \draw[-{Latex[length=2.5mm]}, thick, deepblue!70, dashed] ([xshift=1.4cm]el1.north) -- ([xshift=1.4cm]el0.south)
-    node[midway, translabel] {ERET};
-  \draw[-{Latex[length=2.5mm]}, thick, deepblue!70, dashed] ([xshift=1.4cm]el2.north) -- ([xshift=1.4cm]el1.south)
-    node[midway, translabel] {ERET};
-  \draw[-{Latex[length=2.5mm]}, thick, deepblue!70, dashed] ([xshift=1.4cm]el3.north) -- ([xshift=1.4cm]el2.south)
-    node[midway, translabel] {ERET};
-
-  % Privilege Level Axis
-  \draw[-{Latex[length=3mm]}, line width=1.2pt, gold!90!black] (-3.1, 4.2) -- (-3.1, 0.0);
-  \node[rotate=90, font=\scriptsize\bfseries, text=navy] at (-3.4, 2.1) {Increasing Privilege ($\text{EL0} \to \text{EL3}$)};
-\end{tikzpicture}
-\begin{block}{CSCI 6461 Scope}
-\footnotesize Exception levels are included only for architectural context. CSCI 6461 focuses on the programmer-visible ISA, registers, instructions, addressing, and control flow.
-\end{block}
-\end{column}
-
-\begin{column}{0.52\textwidth}
-\small
-\footnotesize
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item \key{EL0 (Application):} Unprivileged user space executing application logic with private virtual address spaces.
-  \item \key{EL1 (OS Kernel):} Privileged kernel execution managing memory translation, drivers, and process scheduling
-  \item \key{EL2 (Hypervisor):} Non-secure virtualization layer enforcing second-stage address translation across guest OS instances
-  \item \key{EL3 (Secure Monitor):} Secure monitor / firmware execution level used for selected security-state transitions and platform firmware
-\end{itemize}
-
-\end{column}
-\end{columns}
-\vfill
-\end{frame}
-
 % ============================================================
 % Section 2 Divider
 % ============================================================
 
 \sectiondivider{PART 2}{AArch64 Register Architecture \& ABI}
-
-
-
-
-
-
-
-
 
 % ============================================================
 % Slide 7
