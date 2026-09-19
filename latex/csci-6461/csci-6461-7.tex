@@ -523,6 +523,49 @@ Conditional behavior remains, but the 4-bit condition field is no longer attache
 % Slide 11
 % ============================================================
 
+\begin{frame}{From AArch32 Predication to AArch64 Conditions}
+
+\small
+
+AArch32 ARM instructions usually reserved bits 31:28 for a condition field.
+That made most instructions conditionally executable.
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{tikzpicture}[x=0.285cm,y=1cm]
+
+  % AArch32 layout
+  \bfld{0}{0.95}{4}{\footnotesize cond}{gold!25}
+  \bfld{4}{0.95}{28}{\footnotesize operation and operands}{lightblue}
+
+  \node[font=\footnotesize, anchor=south] at (2,1.6) {31:28};
+
+  % AArch64 layout
+  \bfld{0}{-0.25}{11}{\footnotesize opcode / form}{gold!25}
+  \bfld{11}{-0.25}{5}{\footnotesize Rm}{lightblue}
+  \bfld{16}{-0.25}{6}{\footnotesize shift}{blue!8}
+  \bfld{22}{-0.25}{5}{\footnotesize Rn}{lightblue}
+  \bfld{27}{-0.25}{5}{\footnotesize Rd}{lightblue}
+
+  \node[font=\scriptsize, align=center] at (16,-0.95)
+    {AArch64 uses the 32-bit word for larger register fields\\and more specialized instruction formats};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.12cm}
+
+AArch64 no longer attaches a 4-bit condition field to most instructions.
+Conditional behavior is handled with conditional branches and selected
+conditional operations.
+
+\end{frame}
+
+% ============================================================
+% Slide 12
+% ============================================================
+
 \begin{frame}{Conditional Examples in AArch64}
 
 \small
@@ -531,9 +574,9 @@ AArch64 does not have a general \code{add.lt} form.
 
 \vspace{0.18cm}
 
-\begin{columns}[T,onlytextwidth]
-
-\column{0.49\textwidth}
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+\vspace{0pt}
 \begin{block}{Move if less than}
 \code{cmp x0, x1}\\[2pt]
 \code{csel x2, x3, x2, lt}
@@ -543,8 +586,10 @@ AArch64 does not have a general \code{add.lt} form.
 If \code{x0 < x1}, then \code{x2} gets \code{x3}; otherwise \code{x2}
 keeps its old value.
 \end{block}
-
-\column{0.49\textwidth}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\vspace{0pt}
 \begin{block}{Add if less than}
 \code{cmp x0, x1}\\[2pt]
 \code{b.ge skip}\\[2pt]
@@ -555,8 +600,7 @@ keeps its old value.
 
 The \code{add} executes only when \code{x0 < x1}.
 \end{block}
-
-\end{columns}
+\end{minipage}
 
 \vspace{0.12cm}
 
@@ -566,13 +610,13 @@ arithmetic instruction itself should be conditional.
 \end{frame}
 
 % ============================================================
-% Slide 12
+% Slide 13
 % ============================================================
 
 \sectiondivider{Topic 7}{Data-Processing Instruction Encodings}
 
 % ============================================================
-% Slide 13
+% Slide 14
 % ============================================================
 
 \begin{frame}{Data Processing: Register Form}
@@ -612,7 +656,7 @@ arithmetic instruction itself should be conditional.
 \end{frame}
 
 % ============================================================
-% Slide 14
+% Slide 15
 % ============================================================
 
 \begin{frame}{Encoding Example: \texttt{add x5, x6, x7}}
@@ -667,7 +711,7 @@ The complete encoding is
 \end{frame}
 
 % ============================================================
-% Slide 15
+% Slide 16
 % ============================================================
 
 \begin{frame}{Data Processing: Immediate Form}
@@ -706,7 +750,7 @@ The complete encoding is
 \end{frame}
 
 % ============================================================
-% Slide 16
+% Slide 17
 % ============================================================
 
 \begin{frame}{Encoding Example: \texttt{add x5, x6, \#24}}
@@ -752,7 +796,7 @@ The immediate value is part of the instruction word.
 \end{frame}
 
 % ============================================================
-% Slide 17
+% Slide 18
 % ============================================================
 
 \begin{frame}{AArch64 Immediate Encodings Are Specialized}
@@ -775,13 +819,13 @@ in the specific immediate field of the instruction being used.
 \end{frame}
 
 % ============================================================
-% Slide 18
+% Slide 19
 % ============================================================
 
 \sectiondivider{Topic 7}{Memory and PC-Relative Encodings}
 
 % ============================================================
-% Slide 19
+% Slide 20
 % ============================================================
 
 \begin{frame}{Load/Store Instruction Encoding}
@@ -819,7 +863,7 @@ in the specific immediate field of the instruction being used.
 \end{frame}
 
 % ============================================================
-% Slide 20
+% Slide 21
 % ============================================================
 
 \begin{frame}{Encoding Example: \texttt{ldr x5, [x6, \#16]}}
@@ -864,7 +908,7 @@ The instruction stores the scaled value, not the byte offset directly.
 \end{frame}
 
 % ============================================================
-% Slide 21
+% Slide 22
 % ============================================================
 
 \begin{frame}{Store Uses the Same Address Fields}
@@ -895,7 +939,7 @@ The instruction stores the scaled value, not the byte offset directly.
 \end{frame}
 
 % ============================================================
-% Slide 22
+% Slide 23
 % ============================================================
 
 \begin{frame}{Scaled Offsets Depend on Access Size}
@@ -931,7 +975,7 @@ Scaling lets a 12-bit field cover a larger byte range for naturally aligned acce
 \end{frame}
 
 % ============================================================
-% Slide 23
+% Slide 24
 % ============================================================
 
 \begin{frame}{PC-Relative Addresses in AArch64}
@@ -956,7 +1000,7 @@ Scaling lets a 12-bit field cover a larger byte range for naturally aligned acce
 \end{frame}
 
 % ============================================================
-% Slide 24
+% Slide 25
 % ============================================================
 
 \begin{frame}{Literal Loads in AArch64}
@@ -989,13 +1033,13 @@ A literal load reads a constant stored near the instruction stream using a PC-re
 \end{frame}
 
 % ============================================================
-% Slide 25
+% Slide 26
 % ============================================================
 
 \sectiondivider{Topic 7}{Branch Encodings}
 
 % ============================================================
-% Slide 26
+% Slide 27
 % ============================================================
 
 \begin{frame}{Conditional Branch Encoding}
@@ -1036,7 +1080,7 @@ A literal load reads a constant stored near the instruction stream using a PC-re
 \end{frame}
 
 % ============================================================
-% Slide 27
+% Slide 28
 % ============================================================
 
 \begin{frame}{Conditional Branch Example: \texttt{b.eq}}
@@ -1081,7 +1125,7 @@ The branch is taken when the Z flag is set.
 \end{frame}
 
 % ============================================================
-% Slide 28
+% Slide 29
 % ============================================================
 
 \begin{frame}{Unconditional Branch Encoding}
@@ -1124,7 +1168,7 @@ The branch is taken when the Z flag is set.
 \end{frame}
 
 % ============================================================
-% Slide 29
+% Slide 30
 % ============================================================
 
 \begin{frame}{Branch Example: Forward Target}
@@ -1171,13 +1215,13 @@ The branch is taken when the Z flag is set.
 \end{frame}
 
 % ============================================================
-% Slide 30
+% Slide 31
 % ============================================================
 
 \sectiondivider{Topic 7}{Decoding and Reverse Engineering Machine Code}
 
 % ============================================================
-% Slide 31
+% Slide 32
 % ============================================================
 
 \begin{frame}{Decoding Checklist}
@@ -1201,7 +1245,7 @@ Always identify the family before naming the fields.
 \end{frame}
 
 % ============================================================
-% Slide 32
+% Slide 33
 % ============================================================
 
 \begin{frame}{Reverse Engineering Example}
@@ -1242,7 +1286,7 @@ Always identify the family before naming the fields.
 \end{frame}
 
 % ============================================================
-% Slide 33
+% Slide 34
 % ============================================================
 
 \begin{frame}{Common Encoding Mistakes}
@@ -1264,7 +1308,7 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 \end{frame}
 
 % ============================================================
-% Slide 34
+% Slide 35
 % ============================================================
 
 \begin{frame}{Topic 7: Summary}
@@ -1282,7 +1326,7 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 \end{frame}
 
 % ============================================================
-% Slide 35
+% Slide 36
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Instruction Words}
@@ -1298,7 +1342,7 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 \end{frame}
 
 % ============================================================
-% Slide 36
+% Slide 37
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Memory and Branches}
@@ -1315,7 +1359,7 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 \end{frame}
 
 % ============================================================
-% Slide 37
+% Slide 38
 % ============================================================
 
 \begin{frame}{Looking Ahead}
