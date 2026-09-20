@@ -537,9 +537,6 @@ This is not a full AArch64 implementation. It is a small datapath that is large 
   \node[draw=none,inner sep=0pt] (imem) at (2.45,0) {\InstrMemSymbol[0.45]};
   \node[draw=none,inner sep=0pt] (rf) at (5.25,0) {\RegFileSymbol[0.40]};
   \node[draw=none,inner sep=0pt] (dmem) at (8.35,0) {\DataMemSymbol[0.37]};
-  \draw[arr] (pc)--(imem);
-  \draw[arr] (imem)--(rf);
-  \draw[arr] (rf)--(dmem);
 \end{tikzpicture}
 \end{center}
 \vspace{0.2cm}
@@ -597,10 +594,9 @@ AArch64 instructions are 4 bytes, so the sequential PC value is \(PC+4\).
 \end{columns}
 \vspace{0.15cm}
 \begin{center}
-\begin{tikzpicture}[node distance=1.0cm,font=\small]
-  \node[draw=none,inner sep=0pt] (imm) {\ExtendSymbol[0.28]};
-  \node[draw=none,inner sep=0pt,right=1.2cm of imm] (alu) {\ALUSymbol[0.26]};
-  \draw[arr] (imm.east)--node[above,font=\scriptsize]{ExtImm}(alu.west);
+\begin{tikzpicture}[font=\small]
+  \node[draw=none,inner sep=0pt] (imm) at (0,0) {\ExtendSymbol[0.55]};
+  \node[draw=none,inner sep=0pt] (alu) at (4.2,0.1) {\ALUSymbol[0.43]};
 \end{tikzpicture}
 \end{center}
 \end{frame}
