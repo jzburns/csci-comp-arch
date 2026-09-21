@@ -1,4 +1,4 @@
-\documentclass[aspectratio=169,11pt,t]{beamer}
+\documentclass[aspectratio=169,11pt,t,xcolor=table]{beamer}
 
 % ============================================================
 % Theme and typography
@@ -68,6 +68,7 @@
 \definecolor{softgray}{RGB}{245,247,250}
 \definecolor{darkgray}{RGB}{25,28,32}
 \definecolor{gold}{RGB}{200,145,35}
+\definecolor{tablerow}{RGB}{242,246,251}
 
 \setbeamercolor{palette primary}{bg=navy,fg=white}
 \setbeamercolor{palette secondary}{bg=deepblue,fg=white}
@@ -274,7 +275,7 @@ Dr. J. Burns
     \item General-Purpose Registers (\bits{x0}--\bits{x30}).
     \item Program Counter (\bits{pc}) and Stack Pointer (\bits{sp}).
     \item Processor state (\bits{pstate}), including the architectural location of condition flags.
-    \item System control and configuration registers (e.g., $\text{TTBR0\_EL1}$, $\text{SCTLR\_EL1}$ for memory management).
+    \item System control and configuration registers.
     \item Architecturally visible memory state associated with the executing program.
   \end{itemize}
 \end{itemize}
@@ -324,9 +325,8 @@ Dr. J. Burns
 \end{columns}
 
 \vfill
-\begin{block}{The Execution Boundary}
-\small Hardware may execute instructions out of order internally, but retirement must preserve the architectural behavior required by program order.
-\end{block}
+\small
+\textbf{Execution boundary.} Hardware may execute instructions out of order internally, but retirement must preserve the architectural behavior required by program order.
 \vfill
 \end{frame}
 
@@ -461,8 +461,10 @@ Dr. J. Burns
 \toprule
 \textbf{Assembly Instruction} & \textbf{Equivalent Operation} & \textbf{Purpose} \\
 \midrule
+\rowcolor{tablerow}
 \code{mov x0, xzr}            & $x_0 \leftarrow 0$            & Clear register $x_0$ to zero \\
 \code{subs xzr, x1, x2}       & Evaluate $x_1 - x_2 \to \text{flags}$ & Compare $x_1$ and $x_2$ (alias: \code{cmp x1, x2}) \\
+\rowcolor{tablerow}
 \code{str xzr, [x1]}          & $\text{Mem}[x_1] \leftarrow 0$ & Zero out a 64-bit memory word \\
 \bottomrule
 \end{tabular}
@@ -510,9 +512,8 @@ Dr. J. Burns
 \end{columns}
 
 \vfill
-\begin{block}{Link Register (\texttt{x30} / \texttt{lr})}
-\footnotesize \bits{x30} is a general-purpose register conventionally used as the link register. \code{bl} and \code{blr} place the return address in \bits{x30}; \code{ret} normally returns through it.
-\end{block}
+\footnotesize
+\textbf{Link register (\texttt{x30} / \texttt{lr}).} \bits{x30} is a general-purpose register conventionally used as the link register. \code{bl} and \code{blr} place the return address in \bits{x30}; \code{ret} normally returns through it.
 \end{frame}
 
 
@@ -554,9 +555,8 @@ Dr. J. Burns
 \end{columns}
 
 \vfill
-\begin{block}{The Efficiency Trade-off}
-\small Balancing caller- and callee-saved registers across the ABI minimizes memory traffic and stack spilling during nested subroutine calls.
-\end{block}
+\small
+\textbf{Efficiency trade-off.} Balancing caller- and callee-saved registers across the ABI minimizes memory traffic and stack spilling during nested subroutine calls.
 \vfill
 \end{frame}
 
@@ -576,25 +576,31 @@ Dr. J. Burns
 \vfill
 \begin{center}
 \small
-\renewcommand{\arraystretch}{0.92}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lll}
+\renewcommand{\arraystretch}{1.08}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{ll}
 \toprule
-\textbf{Register} & \textbf{Architectural Role} & \textbf{Preserved Across Calls? (ABI)} \\
+\textbf{Register(s)} & \textbf{Main Role} \\
 \midrule
-\bits{x0}--\bits{x7}   & Function arguments \& return values                     & No (Caller-saved / Scratch) \\
-\bits{x8}              & Indirect result location (struct return pointer)        & No (Caller-saved) \\
-\bits{x9}--\bits{x15}  & Temporary / Scratch registers                           & No (Caller-saved) \\
-\bits{x16}--\bits{x17} & Intra-procedure-call temporary registers (IP0, IP1)     & No (Caller-saved) \\
-\bits{x18}             & Platform register (reserved for OS / TLS)               & Platform-dependent \\
-\bits{x19}--\bits{x28} & Callee-saved registers                                  & \key{Yes (Callee-saved)} \\
-\bits{x29} (\bits{fp}) & Frame pointer (base of current stack frame)             & \key{Yes (Callee-saved)} \\
-\bits{x30} (\bits{lr}) & Link register (subroutine return address)               & No (Caller-saved) \\
-\bits{sp}              & Stack pointer; ABI alignment must be maintained        & ABI invariant \\
-\bits{xzr}             & Dedicated zero register (constant 0, writes discarded) & N/A (Hardware constant) \\
+\rowcolor{tablerow}
+\bits{x0}--\bits{x7}   & Function arguments and return values \\
+\bits{x9}--\bits{x17}  & Temporary registers used within short instruction sequences \\
+\rowcolor{tablerow}
+\bits{x19}--\bits{x28} & Long-lived values that must survive subroutine calls \\
+\bits{x29} / \bits{fp} & Frame pointer for stack frames \\
+\rowcolor{tablerow}
+\bits{x30} / \bits{lr} & Link register: holds a subroutine return address \\
+\bits{sp}              & Stack pointer \\
+\rowcolor{tablerow}
+\bits{pc}              & Program counter: address of the next instruction \\
+\bits{xzr}             & Zero register: reads as 0; writes are discarded \\
 \bottomrule
 \end{tabular}
 \end{center}
+
+\vfill
+\small
+Know which registers hold data, which support subroutine control, and which special registers appear in common assembly examples. Full ABI preservation rules are developed later when subroutines and the stack are introduced.
 \vfill
 \end{frame}
 
@@ -661,10 +667,13 @@ Dr. J. Burns
 \toprule
 \textbf{Data Type} & \textbf{Size (Bytes)} & \textbf{Size (Bits)} & \textbf{AArch64 Architecture Term} \\
 \midrule
+\rowcolor{tablerow}
 Byte         & 1  & 8-bit  & Byte (\code{b}) \\
 Halfword     & 2  & 16-bit & Halfword (\code{h}) \\
+\rowcolor{tablerow}
 Word         & 4  & 32-bit & Word (\code{w}) \\
 Doubleword   & 8  & 64-bit & Doubleword (\code{x}) \\
+\rowcolor{tablerow}
 Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \bottomrule
 \end{tabular}
@@ -721,9 +730,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \end{columns}
 
 \vfill
-\begin{block}{Alignment Penalties}
-\small Many ordinary accesses to Normal memory can be unaligned, although an unaligned access may require additional memory transactions or cycles. Some access types, memory attributes, or configured environments require alignment and can generate an alignment fault.
-\end{block}
+\small
+\textbf{Alignment penalties.} Many ordinary accesses to Normal memory can be unaligned, although an unaligned access may require additional memory transactions or cycles. Some access types, memory attributes, or configured environments require alignment and can generate an alignment fault.
 \vfill
 \end{frame}
 
@@ -781,152 +789,146 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
 \sectiondivider{PART 4}{Foundational Instruction Classes}
 
 
-
-
-
-
-
-
-
 % ============================================================
 % Slide 17
 % ============================================================
 
-\begin{frame}{Instruction Syntax Conventions}
+\begin{frame}{Data Processing: Register and Immediate Operands}
 \vfill
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item Many AArch64 data-processing instructions use the form: \code{mnemonic  dst, src1, src2\_or\_imm}
-  \item \key{Three-Operand Format:} Computation preserves source registers without overwriting them.
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item AArch64 data-processing instructions usually name the \key{destination} and source operands explicitly.
+  \item Operands may be registers or \key{immediate constants}; \bits{x} and \bits{w} register names select 64-bit and 32-bit views.
 \end{itemize}
 
 \vfill
 \begin{center}
 \small
-\renewcommand{\arraystretch}{0.98}
-\begin{tabular}{lll}
+\renewcommand{\arraystretch}{1.05}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{ll}
 \toprule
-\textbf{Assembly Example} & \textbf{RTL Operation} & \textbf{Description} \\
+\textbf{Example} & \textbf{Purpose} \\
 \midrule
-\code{add x0, x1, x2}     & $x_0 \leftarrow x_1 + x_2$             & 64-bit register addition \\
-\code{add w0, w1, w2}     & $w_0 \leftarrow w_1 + w_2$             & 32-bit addition (clears upper 32 bits of $x_0$) \\
-\code{add x0, x1, \#16}   & $x_0 \leftarrow x_1 + 16$              & Addition with immediate constant \\
+\rowcolor{tablerow}
+\code{add x0, x1, x2}   & Add two 64-bit register values \\
+\code{sub w3, w4, w5}   & Subtract using 32-bit register views \\
+\rowcolor{tablerow}
+\code{add x0, x1, \#16} & Add an immediate constant \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \vfill
-\begin{block}{Explicit Destination Operand}
-\small Many AArch64 data-processing instructions use a separate destination register, so source registers need not be overwritten. This differs from traditional two-operand scalar x86 forms, while newer x86 vector extensions also support three-operand forms.
+\begin{block}{Architectural View}
+\small These instructions read architectural register state, perform an operation, and write a result back to a destination register.
 \end{block}
 \vfill
 \end{frame}
-
-
-
-
-
-
-
-
-
-
-
 
 
 % ============================================================
 % Slide 18
 % ============================================================
 
-\begin{frame}{Loading Immediate Constants: \texttt{movz}, \texttt{movk}, \texttt{movn}}
+\begin{frame}{Immediate Constants: Building Values in Registers}
 \vfill
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item A fixed 32-bit instruction cannot fit an arbitrary 64-bit constant.
-  \item AArch64 constructs large constants in 16-bit chunks using \key{wide-immediate instructions}:
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Every AArch64 instruction is 32 bits wide, so an arbitrary 64-bit constant cannot always be encoded directly in one instruction.
+  \item AArch64 can build larger constants from smaller pieces using instructions such as \code{movz} and \code{movk}.
+  \item The detailed immediate encodings are not important yet; the key point is that \key{large constants may require multiple instructions}.
 \end{itemize}
 
 \vfill
-\begin{center}
-\footnotesize
-\renewcommand{\arraystretch}{0.95}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lll}
-\toprule
-\textbf{Instruction} & \textbf{Operation Name} & \textbf{Semantic Action} \\
-\midrule
-\code{movz xd, imm, lsl s} & Move Wide with Zero & Places 16-bit immediate at shift $s$; others zero \\
-\code{movk xd, imm, lsl s} & Move Wide with Keep & Replaces 16 bits at shift $s$; preserves others \\
-\code{movn xd, imm, lsl s} & Move Wide with NOT  & NOT of shifted 16-bit immediate forms destination \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vfill
-\begin{block}{Constructing a 32-bit Value (\hex{1234abcd})}
-\scriptsize
+\begin{block}{Example: Constructing \hex{1234abcd}}
+\small
 \begin{tabular}{ll}
-\code{movz x0, \#0xabcd} & $x_0 = \hex{000000000000abcd}$ \\
-\code{movk x0, \#0x1234, lsl \#16} & $x_0 = \hex{000000001234abcd}$ \\
+\rowcolor{tablerow}
+\code{movz x0, \#0xabcd} & start with the low 16 bits \\
+\code{movk x0, \#0x1234, lsl \#16} & insert the next 16-bit portion \\
 \end{tabular}
 \end{block}
+
+\vfill
+\small
+\textbf{Architectural constraint.} Immediate values are part of the instruction itself. Their size and placement are therefore constrained by the fixed instruction width, unlike values already stored in registers or memory.
 \vfill
 \end{frame}
-
-
-
-
-
-
-
 
 
 % ============================================================
 % Slide 19
 % ============================================================
 
-\begin{frame}{Memory Access: Basic Load/Store Architecture}
+\begin{frame}{Memory Access: Loads and Stores}
 \vfill
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item Ordinary integer memory access uses explicit load and store instructions such as \code{ldr} and \code{str}.
-  \item The instruction form and destination/source register width determine the transfer size:
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item AArch64 is a \key{load/store architecture}: arithmetic and logic operate primarily on registers, while memory is accessed explicitly.
+  \item \code{ldr} copies a value from memory into a register; \code{str} copies a register value to memory.
+  \item Brackets identify a register being used as a memory address, as in \code{[x1]}.
 \end{itemize}
 
 \vfill
 \begin{center}
-\footnotesize
-\renewcommand{\arraystretch}{0.95}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{llll}
+\small
+\renewcommand{\arraystretch}{1.05}
+\setlength{\tabcolsep}{7pt}
+\begin{tabular}{lll}
 \toprule
-\textbf{Instruction} & \textbf{Register} & \textbf{Transfer Width} & \textbf{Action} \\
+\textbf{Example} & \textbf{Transfer} & \textbf{Meaning} \\
 \midrule
-\code{ldr  xt, [xn]} & 64-bit (\bits{xt}) & 8 Bytes (Doubleword) & $x_t \leftarrow \text{Mem}_8[x_n]$ \\
-\code{str  xt, [xn]} & 64-bit (\bits{xt}) & 8 Bytes (Doubleword) & $\text{Mem}_8[x_n] \leftarrow x_t$ \\
-\code{ldr  wt, [xn]} & 32-bit (\bits{wt}) & 4 Bytes (Word)       & $w_t \leftarrow \text{Mem}_4[x_n]$ (Zero-extended) \\
-\code{str  wt, [xn]} & 32-bit (\bits{wt}) & 4 Bytes (Word)       & $\text{Mem}_4[x_n] \leftarrow w_t$ \\
-\code{ldrb wt, [xn]} & 8-bit  (\bits{wt}) & 1 Byte               & $w_t \leftarrow \text{Mem}_1[x_n]$ (Zero-extended) \\
-\code{strb wt, [xn]} & 8-bit  (\bits{wt}) & 1 Byte               & $\text{Mem}_1[x_n] \leftarrow w_t[7:0]$ \\
+\rowcolor{tablerow}
+\code{ldr x0, [x1]}  & 64 bits & load from the address in \bits{x1} \\
+\code{str x0, [x1]}  & 64 bits & store to the address in \bits{x1} \\
+\rowcolor{tablerow}
+\code{ldr w0, [x1]}  & 32 bits & load a 32-bit value into \bits{w0} \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \vfill
-\begin{block}{Pointer Referencing}
-\small The base register ($x_n$) holds the 64-bit memory pointer, explicitly enclosed in brackets \code{[xn]} to denote architectural indirection.
+\begin{block}{Later Detail}
+\small Topic 5 develops offsets, indexed forms, writeback, transfer sizes, and the main AArch64 addressing modes used for memory access. Here, the goal is simply to recognize explicit register--memory transfers.
 \end{block}
 \vfill
 \end{frame}
 
 
+% ============================================================
+% Slide 20
+% ============================================================
 
+\begin{frame}{Branching and Control Flow}
+\vfill
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Normally, execution advances to the next instruction; a \key{branch} changes the address used for the next instruction.
+  \item Branches provide the basic mechanism for decisions, loops, function calls, and returns.
+\end{itemize}
 
+\vfill
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.08}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{ll}
+\toprule
+\textbf{Example} & \textbf{Role} \\
+\midrule
+\rowcolor{tablerow}
+\code{b loop}            & unconditional branch \\
+\code{b.eq done}         & conditional branch \\
+\rowcolor{tablerow}
+\code{bl function}       & function call \\
+\code{ret}               & return from a function \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-
-
-
-
-
-
-
+\vfill
+\begin{block}{Connection to Architectural State}
+\small A taken branch changes the next \bits{pc}; conditional control flow may also depend on condition flags or a tested register value. Topic 4 develops these mechanisms in detail.
+\end{block}
+\vfill
+\end{frame}
 
 
 % ============================================================
@@ -950,7 +952,7 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
   \item \key{Register Structure:} The 64-bit \bits{x0}--\bits{x30} registers have corresponding 32-bit \bits{w0}--\bits{w30} views; writing a \bits{w} register clears the upper 32 bits of the corresponding \bits{x} register.
   \item \key{ABI Roles:} Register use is constrained by calling-convention rules, including argument/return registers and caller- vs.\ callee-saved registers.
   \item \key{Memory Model:} AArch64 exposes byte-addressed memory with alignment requirements and explicit load/store instructions.
-  \item \key{Instruction Conventions:} Assembly syntax, immediate construction, and basic load/store notation prepare for the detailed addressing-mode treatment in Topic 5.
+  \item \key{Instruction Classes:} Basic data processing, immediate construction, explicit loads/stores, and branching illustrate how AArch64 instructions transform architectural state.
 \end{itemize}
 \vfill
 \end{frame}
@@ -1001,6 +1003,8 @@ Quadword     & 16 & 128-bit& Quadword / Vector element (\code{q}) \\
   \item \key{Alignment:} Why can naturally aligned accesses be simpler for hardware than accesses that cross an alignment boundary?
 
   \item \key{Immediate Construction:} Why may a 64-bit constant require more than one AArch64 instruction using \code{movz}/\code{movk}?
+
+  \item \key{Branching:} What programmer-visible state determines which instruction executes next, and how does a taken branch change it?
 \end{enumerate}
 \vfill
 \end{frame}
