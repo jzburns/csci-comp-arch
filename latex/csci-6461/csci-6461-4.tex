@@ -387,46 +387,13 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 \vspace{0.25cm}
 \normalsize
 \begin{block}{Bit Clear (\texttt{bic}) Idiom}
-\code{bic x0, x1, x2} sets bits to \bits{0} in $x_1$ wherever the mask in $x_2$ has \bits{1}s.
+\code{bic x0, x1, x2} sets bits to \bits{0} in $x_1$ wherever the mask in $x_2$ has \bits{1}s. A common use is clearing a flag or disabling an option stored in one bit, without disturbing the other settings packed into the same value.
 \end{block}
 \end{frame}
 
 
 
 
-
-% ============================================================
-% Slide 7
-% ============================================================
-
-\begin{frame}{Bitfield Extraction: \texttt{ubfx}}
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item AArch64 provides bitfield instructions that extract packed fields without explicit mask-and-shift sequences.
-  \item \code{ubfx xd, xn, \#lsb, \#width}: unsigned bitfield extract.
-\end{itemize}
-
-\vspace{0.12cm}
-\begin{center}
-\begin{tikzpicture}[scale=0.82,every node/.style={transform shape}]
-\draw[fill=lightblue,draw=navy] (0,0) rectangle (7,0.55);
-\draw[fill=gold!30,draw=navy] (3.0,0) rectangle (5.0,0.55);
-\node[font=\tiny\bfseries] at (0.15,0.85) {Bit 63};
-\node[font=\tiny\bfseries] at (3.0,0.85) {Bit (lsb + width - 1)};
-\node[font=\tiny\bfseries] at (5.0,0.85) {Bit lsb};
-\node[font=\tiny\bfseries] at (6.85,0.85) {Bit 0};
-\node[font=\small\bfseries] at (4.0,0.28) {Extracted Field};
-\end{tikzpicture}
-\end{center}
-
-\vspace{0.15cm}
-\begin{block}{Example: Extract 8-bit Field Starting at Bit 16}
-\footnotesize
-\begin{tabular}{ll}
-\textbf{Mask + shift:} & \code{lsr x0, x1, \#16} $\to$ \code{and x0, x0, \#0xff} \\
-\textbf{Bitfield extract:} & \code{ubfx x0, x1, \#16, \#8} \\
-\end{tabular}
-\end{block}
-\end{frame}
 
 % ============================================================
 % Section 2 Divider
@@ -483,7 +450,8 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 
 \begin{frame}{Comparison Instructions: \texttt{cmp}, \texttt{cmn}, and \texttt{tst}}
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Comparison aliases set NZCV flags and discard the computed result; later branches interpret those flags.
+  \item Comparison instructions are assembler aliases for ordinary flag-setting operations.
+  \item \code{cmp x0, x1} is really \code{subs xzr, x0, x1}: subtract, update NZCV, and discard the result in the zero register.
 \end{itemize}
 
 \vspace{0.10cm}
