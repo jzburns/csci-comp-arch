@@ -1,3 +1,4 @@
+\PassOptionsToPackage{table}{xcolor}
 \documentclass[aspectratio=169,11pt,t]{beamer}
 
 % ============================================================
@@ -214,12 +215,12 @@ Dr. J. Burns
   \item \key{ALU Operations: Arithmetic, Shifting, \& Bitwise Logic}
   \begin{itemize}
     \item Addition, subtraction, multiplication, division, and shifted-register operands.
-    \item Bitwise logic (\code{and}, \code{orr}, \code{eor}, \code{bic}) and bitfield extraction (\code{ubfx}).
+    \item Bitwise logic (\code{and}, \code{orr}, \code{eor}, \code{bic}) and common bit-manipulation idioms.
   \end{itemize}
 
   \item \key{Condition Flags \& Comparisons}
   \begin{itemize}
-    \item NZCV flags, comparison instructions (\code{cmp}, \code{cmn}, \code{tst}), and signed vs.\ unsigned branches.
+    \item NZCV flags, comparison instructions (\code{cmp}, \code{tst}), and signed vs.\ unsigned branches.
   \end{itemize}
 
   \item \key{Control Flow: Branches \& Branchless Selection}
@@ -247,33 +248,30 @@ Dr. J. Burns
 % ============================================================
 
 \begin{frame}{Arithmetic Primitives: Addition \& Subtraction}
-\normalsize
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item Many AArch64 data-processing instructions use a \key{3-operand non-destructive format}. Flag-setting forms such as \code{adds} and \code{subs} update NZCV; \code{add} and \code{sub} do not.
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Arithmetic instructions compute integer results in registers.
+  \item Some arithmetic instructions can also update \key{condition flags}: processor-state bits that record properties of the result for later comparisons and branches.
 \end{itemize}
 
-\vspace{0.08cm}
+\vspace{0.15cm}
 \begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{lll}
 \toprule
-\textbf{Instruction} & \textbf{Operation} & \textbf{Flags Updated?} \\
+\textbf{Instruction} & \textbf{Operation} & \textbf{Sets condition flags?} \\
 \midrule
 \code{add  x0, x1, x2}  & $x_0 \leftarrow x_1 + x_2$ & No \\
-\code{adds x0, x1, x2}  & $x_0 \leftarrow x_1 + x_2$ & \key{Yes (NZCV)} \\
+\code{adds x0, x1, x2}  & $x_0 \leftarrow x_1 + x_2$ & \key{Yes} \\
 \code{sub  x0, x1, x2}  & $x_0 \leftarrow x_1 - x_2$ & No \\
-\code{subs x0, x1, x2}  & $x_0 \leftarrow x_1 - x_2$ & \key{Yes (NZCV)} \\
-\code{neg  x0, x1}      & $x_0 \leftarrow 0 - x_1$   & No; alias of \code{sub x0, xzr, x1} \\
+\code{subs x0, x1, x2}  & $x_0 \leftarrow x_1 - x_2$ & \key{Yes} \\
+\code{neg  x0, x1}      & $x_0 \leftarrow 0 - x_1$   & No; alias for \code{sub x0, xzr, x1} \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{center}
-
-\vspace{0.08cm}
-\begin{block}{Immediate Constant Arithmetic}
-\small
-\code{add x0, x1, \#42} uses a 12-bit immediate. The add/sub immediate form can also shift that field left by 12 bits. The corresponding \bits{w}-register form performs 32-bit arithmetic.
-\end{block}
 \end{frame}
 
 
@@ -294,6 +292,7 @@ Dr. J. Burns
 \begin{center}
 \scriptsize
 \setlength{\tabcolsep}{4pt}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{p{0.22\textwidth}p{0.15\textwidth}p{0.55\textwidth}}
 \toprule
 \textbf{Shift Type} & \textbf{Mnemonic} & \textbf{Operation Meaning} \\
@@ -308,10 +307,12 @@ Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift; the sign 
 \vspace{0.10cm}
 \begin{block}{Integrated Shift-Add Examples}
 \footnotesize
+\rowcolors{1}{}{}
 \begin{tabular}{ll}
 \code{add x0, x1, x2, lsl \#3} & $x_0 \leftarrow x_1 + (x_2 \times 8)$ \\
 \code{sub x0, x1, x2, lsr \#1} & $x_0 \leftarrow x_1 - \lfloor x_2/2 \rfloor$ for unsigned $x_2$ \\
 \end{tabular}
+\rowcolors{1}{}{}
 \end{block}
 \end{frame}
 
@@ -326,31 +327,30 @@ Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift; the sign 
 \begin{frame}{Integer Multiplication \& Division}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item AArch64 defines instructions for integer multiplication and division, leaving the underlying microarchitectural execution units implementation-dependent.
+  \item AArch64 provides separate integer instructions for multiplication and division.
+  \item Division instructions return an integer quotient; any remainder is discarded.
 \end{itemize}
 
-\vspace{0.15cm}
+\vspace{0.18cm}
 \begin{center}
 \small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lll}
+\setlength{\tabcolsep}{8pt}
+\rowcolors{2}{softgray}{white}
+\begin{tabular}{ll}
 \toprule
-\textbf{Instruction} & \textbf{RTL Semantic Action} & \textbf{Description} \\
+\textbf{Instruction} & \textbf{Purpose} \\
 \midrule
-\code{mul  x0, x1, x2}        & $x_0 \leftarrow x_1 \times x_2$         & Lower 64 bits of the product \\
-\code{madd x0, x1, x2, x3}    & $x_0 \leftarrow x_3 + (x_1 \times x_2)$ & Multiply-Add \\
-\code{msub x0, x1, x2, x3}    & $x_0 \leftarrow x_3 - (x_1 \times x_2)$ & Multiply-Subtract \\
-\code{sdiv x0, x1, x2}        & $x_0 \leftarrow x_1 / x_2$             & Signed division \\
-\code{udiv x0, x1, x2}        & $x_0 \leftarrow x_1 / x_2$             & Unsigned division \\
+\code{mul  x0, x1, x2}     & Multiply two registers; keep the low 64 bits. \\
+\code{madd x0, x1, x2, x3} & Multiply and add in one instruction. \\
+\code{sdiv x0, x1, x2}     & Signed integer division. \\
+\code{udiv x0, x1, x2}     & Unsigned integer division. \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \vspace{0.25cm}
 \normalsize
-\begin{block}{Division by Zero}
-AArch64 integer division by zero does \textbf{not} raise an exception; it returns \bits{0} in the destination register. For signed division, the overflow case $\mathrm{INT64\_MIN}/(-1)$ also does not trap; the destination receives the architecturally defined 64-bit result.
-\end{block}
+Choose \code{sdiv} or \code{udiv} based on how the operands should be interpreted: signed values use \code{sdiv}; unsigned counts, sizes, and addresses usually use \code{udiv}.
 \end{frame}
 
 
@@ -371,6 +371,7 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 \begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{lll}
 \toprule
 \textbf{Instruction} & \textbf{Operation} & \textbf{Bitwise RTL Formula} \\
@@ -421,6 +422,7 @@ AArch64 integer division by zero does \textbf{not} raise an exception; it return
 \begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{cll}
 \toprule
 \textbf{Flag} & \textbf{Name} & \textbf{Condition Set to 1} \\
@@ -448,9 +450,44 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 % Slide 9
 % ============================================================
 
-\begin{frame}{Comparison Instructions: \texttt{cmp}, \texttt{cmn}, and \texttt{tst}}
+\begin{frame}{Reading NZCV After Arithmetic}
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item Comparison instructions are assembler aliases for ordinary flag-setting operations.
+  \item The flags describe the result of the most recent flag-setting operation.
+  \item For \code{cmp x0, x1}, read the flags as if the processor computed \code{x0 - x1} and then discarded the result.
+\end{itemize}
+
+\vspace{0.10cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{5pt}
+\rowcolors{2}{softgray}{white}
+\begin{tabular}{p{0.10\textwidth}p{0.39\textwidth}p{0.42\textwidth}}
+\toprule
+\textbf{Flag} & \textbf{Meaning} & \textbf{Example} \\
+\midrule
+\key{N} & Result sign bit is 1. & \code{0 - 1} produces a negative result. \\
+\key{Z} & Result is exactly zero. & \code{5 - 5} produces zero. \\
+\key{C} & Unsigned carry, or no borrow in subtraction. & \code{5 - 3} sets C; \code{3 - 5} clears C. \\
+\key{V} & Signed mathematical result does not fit. & 32-bit \code{0x7fffffff + 1} cannot be represented, so V is set. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.12cm}
+Signed branch conditions often combine flags. For example, after \code{cmp}, \code{b.lt} tests $\text{N} \neq \text{V}$ because signed overflow can make the raw sign bit misleading.
+\end{frame}
+
+
+
+
+
+% ============================================================
+% Slide 10
+% ============================================================
+
+\begin{frame}{Comparison Instructions: \texttt{cmp} and \texttt{tst}}
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item Comparison and test instructions are assembler aliases for ordinary flag-setting operations.
   \item \code{cmp x0, x1} is really \code{subs xzr, x0, x1}: subtract, update NZCV, and discard the result in the zero register.
 \end{itemize}
 
@@ -458,12 +495,12 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \begin{center}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{p{0.17\textwidth}p{0.31\textwidth}p{0.44\textwidth}}
 \toprule
 \textbf{Instruction} & \textbf{Equivalent Operation} & \textbf{Flags Set} \\
 \midrule
 \code{cmp x0, x1} & \code{subs xzr, x0, x1} & NZCV from $x_0-x_1$ \\
-\code{cmn x0, x1} & \code{adds xzr, x0, x1} & NZCV from $x_0+x_1$ \\
 \code{tst x0, x1} & \code{ands xzr, x0, x1} & N/Z from the AND result; C/V cleared \\
 \bottomrule
 \end{tabular}
@@ -485,7 +522,7 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 
 
 % ============================================================
-% Slide 10
+% Slide 11
 % ============================================================
 
 \begin{frame}{Condition Codes: Signed vs.\ Unsigned Branches}
@@ -493,6 +530,7 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
   \begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{llll}
 \toprule
 \textbf{Branch} & \textbf{Meaning} & \textbf{Flag Condition} & \textbf{Comparison Context} \\
@@ -545,20 +583,24 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 \begin{column}{0.48\textwidth}
 \begin{block}{Null Pointer Validation}
 \footnotesize
+\rowcolors{1}{}{}
 \begin{tabular}{ll}
 \code{cbz x0, .Lnull} & \text{\scriptsize // branch if null} \\
 \code{ldr x1, [x0]}   & \text{\scriptsize // dereference} \\
 \end{tabular}
+\rowcolors{1}{}{}
 \end{block}
 \end{column}
 \begin{column}{0.48\textwidth}
 \begin{block}{Loop Counter Decrement}
 \footnotesize
+\rowcolors{1}{}{}
 \begin{tabular}{ll}
 \code{.Lloop:} & \\
 \code{sub  x1, x1, \#1} & \text{\scriptsize // count--} \\
 \code{cbnz x1, .Lloop} & \text{\scriptsize // repeat if nonzero} \\
 \end{tabular}
+\rowcolors{1}{}{}
 \end{block}
 \end{column}
 \end{columns}
@@ -594,6 +636,7 @@ if (x > y) {
 \begin{column}{0.52\textwidth}
 \begin{block}{AArch64 Assembly Mapping}
 \small
+\rowcolors{1}{}{}
 \begin{tabular}{ll}
 \multicolumn{2}{l}{\textit{// Assume: x, y are signed int64\_t}} \\
 \multicolumn{2}{l}{\textit{// x0=x, x1=y, x2=result}} \\
@@ -605,6 +648,7 @@ if (x > y) {
 \code{sub  x2, x1, x0}    & \text{\scriptsize // Else-body: result = y - x} \\
 \code{.Lend:}             & \\
 \end{tabular}
+\rowcolors{1}{}{}
 \end{block}
 \end{column}
 \end{columns}
@@ -640,8 +684,9 @@ while (i < n) {
 \end{column}
 
 \begin{column}{0.52\textwidth}
-\begin{block}{Bottom-Tested AArch64 Loop}
+\begin{block}{AArch64 Loop with Test at the End}
 \small
+\rowcolors{1}{}{}
 \begin{tabular}{ll}
 \multicolumn{2}{l}{\textit{// x0=arr, x1=n, x2=i, x3=sum}} \\
 \code{mov  x2, xzr}       & \text{\scriptsize // i = 0} \\
@@ -655,13 +700,14 @@ while (i < n) {
 \code{cmp  x2, x1}        & \text{\scriptsize // i < n?} \\
 \code{b.lt .Lbody}        & \text{\scriptsize // Loop if true} \\
 \end{tabular}
+\rowcolors{1}{}{}
 \end{block}
 \end{column}
 \end{columns}
 
 \vspace{0.25cm}
 \normalsize
-\key{Common Loop Layout:} Placing the test at the bottom gives the steady-state loop body one loop-closing conditional branch.
+\key{Common Loop Layout:} After the first jump to the test, each repeat runs the body and then checks whether to loop again.
 \end{frame}
 
 
@@ -683,17 +729,17 @@ while (i < n) {
 \vspace{0.08cm}
 \begin{block}{Signed Maximum: $\code{result} = (x_1 > x_2) \mathbin{?} x_1 : x_2$}
 \footnotesize
+\rowcolors{1}{}{}
 \begin{tabular}{ll}
 \code{cmp  x1, x2}          & \text{\scriptsize // set NZCV from x1 - x2} \\
 \code{csel x0, x1, x2, gt}  & \text{\scriptsize // signed max; use hi for unsigned} \\
 \end{tabular}
+\rowcolors{1}{}{}
 \end{block}
 
-\vspace{0.08cm}
-\begin{block}{Related Forms}
+\vspace{0.16cm}
 \footnotesize
-\code{cset w0, eq} sets 0 or 1 from a condition; \code{cinc x0, x1, eq} conditionally increments \bits{x1}.
-\end{block}
+\key{Related forms:} \code{cset w0, eq} sets 0 or 1 from a condition; \code{cinc x0, x1, eq} conditionally increments \bits{x1}.
 \end{frame}
 
 % ============================================================
@@ -714,7 +760,7 @@ while (i < n) {
 \small
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item \key{Arithmetic \& Shifts:} Regular register and immediate arithmetic includes shifted-register operands in many data-processing instructions.
-  \item \key{Bitwise Operations:} \code{and}, \code{orr}, \code{eor}, \code{bic}, and bitfield instructions operate directly on packed binary data.
+  \item \key{Bitwise Operations:} \code{and}, \code{orr}, \code{eor}, and \code{bic} operate directly on packed binary data.
   \item \key{NZCV Flags:} Flag-setting arithmetic and aliases such as \code{cmp} and \code{tst} support signed and unsigned conditions.
   \item \key{Control Flow:} Compilers commonly arrange one path as fall-through and use bottom-tested loops where appropriate.
   \item \key{Conditional Selection:} \code{csel} and related forms can replace short conditional branches when data-dependent selection is preferable.
@@ -755,7 +801,7 @@ while (i < n) {
 \begin{frame}{Self-Test Questions: Control Flow \& Selection}
 
 \begin{enumerate}\setlength{\itemsep}{7pt}
-  \item \key{Bottom-Tested Loop Layout:} Why do compilers often place the conditional loop branch at the bottom of the loop body rather than at the top?
+  \item \key{Loop Test Placement:} Why do compilers often place the conditional branch after the loop body rather than before it?
 
   \item \key{Branchless Translation:} Write an equivalent 3-instruction branchless AArch64 sequence using \code{cmp}, \code{neg}, and \code{csel} to implement:
   $$\code{int64\_t abs\_val = (val < 0) ? -val : val;}$$
