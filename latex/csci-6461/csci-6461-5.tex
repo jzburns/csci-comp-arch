@@ -505,26 +505,26 @@ Storing a byte or halfword modifies \emph{only} the targeted memory locations; n
   \item The resulting address is the \key{effective address}: the actual byte address used by the load or store.
 \end{itemize}
 
-\vspace{0.2cm}
+\vspace{0.18cm}
 \begin{center}
-\small
-\setlength{\tabcolsep}{7pt}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
 \rowcolors{2}{softgray}{white}
-\begin{tabular}{lll}
+\begin{tabular}{llll}
 \toprule
 \rowcolor{white}
-\textbf{Access Pattern} & \textbf{Addressing Form} & \textbf{Typical Use} \\
+\textbf{Access Pattern} & \textbf{Addressing Form} & \textbf{C Pointer Pattern} & \textbf{Typical Use} \\
 \midrule
-Fixed offset from a base pointer & \code{[xn, \#imm]} & Struct fields, known offsets \\
-Step through consecutive elements & \code{[xn], \#imm} & Array traversal \\
-Base plus scaled index & \code{[xn, xm, lsl \#k]} & \code{arr[i]} access \\
+Fixed offset from a base pointer & \code{[xn, \#imm]} & \code{*(ptr + k)} & Struct fields, known offsets \\
+Step through consecutive elements & \code{[xn], \#imm} & \code{*ptr++} & Array traversal \\
+Base plus scaled index & \code{[xn, xm, lsl \#k]} & \code{arr[i]} & Indexed array access \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \vspace{0.18cm}
 \normalsize
-The key question is whether the offset is fixed, index-based, or part of a pointer update.
+C pointer notation describes the same idea: start from a base address, optionally add an offset or index, then dereference.
 \end{frame}
 
 
@@ -551,12 +551,13 @@ The key question is whether the offset is fixed, index-based, or part of a point
 \end{tikzpicture}
 
 \vspace{0.3cm}
-\begin{block}{Example: Reading Struct Fields}
+\begin{block}{Example: Reading Values at Fixed Offsets}
 \small
-\begin{tabular}{ll}
-\code{ldr x1, [x0, \#0]}  & \text{\scriptsize // Read field 1 at offset 0} \\
-\code{ldr x2, [x0, \#8]}  & \text{\scriptsize // Read field 2 at offset 8} \\
-\code{ldr w3, [x0, \#16]} & \text{\scriptsize // Read 32-bit field at offset 16} \\
+\begin{tabular}{lll}
+\textbf{Assembly} & \textbf{C-like pattern} & \textbf{Meaning} \\
+\code{ldr x1, [x0, \#0]}  & \code{*ptr}        & Read value at the base address \\
+\code{ldr x2, [x0, \#8]}  & \code{*(ptr + 1)}  & Read the next 64-bit element \\
+\code{ldr w3, [x0, \#16]} & \code{*(base + 16)} & Read a 32-bit value at byte offset 16 \\
 \end{tabular}
 \end{block}
 \end{frame}
@@ -580,7 +581,7 @@ The key question is whether the offset is fixed, index-based, or part of a point
 
 \vspace{0.25cm}
 \begin{block}{Conceptual Rule}
-The offset tells the instruction where the desired object is relative to the base pointer. The instruction width tells the processor how many bytes to transfer.
+The offset tells the instruction where the desired object is relative to the base pointer. In C terms, this is the same idea as \code{*(ptr + k)}, where \code{k} selects an element relative to the base pointer.
 \end{block}
 \end{frame}
 
@@ -610,8 +611,8 @@ The offset tells the instruction where the desired object is relative to the bas
 
 \vspace{0.25cm}
 \begin{block}{Primary Use Case: Access After Pointer Adjustment}
-\code{ldr x0, [x1, \#-8]!} \\
-\text{\scriptsize Moves the base pointer back by 8 bytes, then loads from the updated address.}
+\code{ldr x0, [x1, \#-8]!} \quad $\approx$ \quad \code{*\char45{}\char45{}ptr} \\
+\text{\scriptsize Moves the pointer first, then loads from the updated address.}
 \end{block}
 \end{frame}
 
@@ -640,8 +641,8 @@ The offset tells the instruction where the desired object is relative to the bas
 
 \vspace{0.25cm}
 \begin{block}{Primary Use Case: Array Stepping}
-\code{ldr x0, [x1], \#8} \\
-\text{\scriptsize Loads data from the current address in x1, then automatically advances x1 to the next 8-byte element.}
+\code{ldr x0, [x1], \#8} \quad $\approx$ \quad \code{*ptr++} \\
+\text{\scriptsize Loads from the current pointer, then advances the pointer to the next 8-byte element.}
 \end{block}
 \end{frame}
 
@@ -656,25 +657,27 @@ The offset tells the instruction where the desired object is relative to the bas
 \begin{frame}{Comparing the Three Offset Modes}
 \begin{center}
 \small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{llll}
+\setlength{\tabcolsep}{4pt}
+\rowcolors{2}{softgray}{white}
+\begin{tabular}{lllll}
 \toprule
-\textbf{Mode} & \textbf{Syntax Pattern} & \textbf{Address Accessed} & \textbf{Base Register After} \\
+\rowcolor{white}
+\textbf{Mode} & \textbf{Syntax} & \textbf{C Pattern} & \textbf{Address Accessed} & \textbf{Base After} \\
 \midrule
-\textbf{Standard Offset} & \code{[xn, \#8]}  & $x_n + 8$ & $x_n$ (Unchanged) \\
-\textbf{Pre-Indexed}     & \code{[xn, \#8]!} & $x_n + 8$ & $x_n + 8$ (Updated) \\
-\textbf{Post-Indexed}    & \code{[xn], \#8}  & $x_n$     & $x_n + 8$ (Updated) \\
+\textbf{Standard Offset} & \code{[xn, \#8]}  & \code{*(ptr + 1)} & $x_n + 8$ & Unchanged \\
+\textbf{Pre-Indexed}     & \code{[xn, \#8]!} & \code{*++ptr}     & $x_n + 8$ & Updated \\
+\textbf{Post-Indexed}    & \code{[xn], \#8}  & \code{*ptr++}     & $x_n$     & Updated \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.3cm}
+\vspace{0.25cm}
 \begin{block}{Assume \texttt{x1} = \hex{1000} Initially}
 \small
-\begin{tabular}{llll}
-\code{ldr x0, [x1, \#8]}  & $\implies$ Reads from \hex{1008}; & $x_1$ remains \hex{1000} \\
-\code{ldr x0, [x1, \#8]!} & $\implies$ Reads from \hex{1008}; & $x_1$ becomes \hex{1008} \\
-\code{ldr x0, [x1], \#8}  & $\implies$ Reads from \hex{1000}; & $x_1$ becomes \hex{1008} \\
+\begin{tabular}{lll}
+\code{ldr x0, [x1, \#8]}  & Reads from \hex{1008}; & $x_1$ remains \hex{1000} \\
+\code{ldr x0, [x1, \#8]!} & Reads from \hex{1008}; & $x_1$ becomes \hex{1008} \\
+\code{ldr x0, [x1], \#8}  & Reads from \hex{1000}; & $x_1$ becomes \hex{1008} \\
 \end{tabular}
 \end{block}
 \end{frame}
@@ -692,23 +695,24 @@ The offset tells the instruction where the desired object is relative to the bas
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item Uses an index register ($x_m$) multiplied by element size to access array items:
   $$\code{ldr xt, [xn, xm, lsl \#shift]}$$
-  \item The instruction encodes the scaled register offset directly, though implementation latency depends on the processor.
+  \item This directly corresponds to the C pattern \code{arr[i]}.
 \end{itemize}
 
 \vspace{0.2cm}
 \begin{center}
 \small
 \setlength{\tabcolsep}{8pt}
-\begin{tabular}{lll}
+\rowcolors{2}{softgray}{white}
+\begin{tabular}{llll}
 \toprule
-\textbf{Array Element Type} & \textbf{Assembly Instruction} & \textbf{Effective Address} \\
+\rowcolor{white}
+\textbf{Element Type} & \textbf{C Pattern} & \textbf{Assembly Instruction} & \textbf{Effective Address} \\
 \midrule
-Byte (\code{uint8})    & \code{ldrb w0, [x1, x2]}          & $\text{EA} = x_1 + x_2$ \\
-Halfword (\code{uint16})& \code{ldrh w0, [x1, x2, lsl \#1]} & $\text{EA} = x_1 + (x_2 \times 2)$ \\
-Word (\code{uint32})    & \code{ldr  w0, [x1, x2, lsl \#2]} & $\text{EA} = x_1 + (x_2 \times 4)$ \\
-Doubleword (\code{uint64})& \code{ldr  x0, [x1, x2, lsl \#3]} & $\text{EA} = x_1 + (x_2 \times 8)$ \\
+Byte      & \code{arr[i]} & \code{ldrb w0, [x1, x2]}          & $x_1 + x_2$ \\
+Halfword  & \code{arr[i]} & \code{ldrh w0, [x1, x2, lsl \#1]} & $x_1 + (x_2 \times 2)$ \\
+Word      & \code{arr[i]} & \code{ldr  w0, [x1, x2, lsl \#2]} & $x_1 + (x_2 \times 4)$ \\
+Doubleword& \code{arr[i]} & \code{ldr  x0, [x1, x2, lsl \#3]} & $x_1 + (x_2 \times 8)$ \\
 \bottomrule
-\tabularnewline
 \end{tabular}
 \end{center}
 
@@ -844,7 +848,7 @@ Paired transfers reduce instruction count when the program naturally works with 
 
 \begin{frame}[fragile]{Worked Pattern 1: Stepping Through an Array}
 \vspace{-0.2cm}
-\small \key{Goal:} Sum $N$ 64-bit Integers
+\small \key{Goal:} Sum $N$ 64-bit Integers \hfill \key{C pattern:} \code{sum += *ptr++}
 \vspace{-0.1cm}
 \begin{block}{AArch64 Implementation (Using Post-Indexed Addressing)}
 \small
@@ -866,7 +870,7 @@ Paired transfers reduce instruction count when the program naturally works with 
 
 \vspace{-0.15cm}
 \normalsize
-Post-indexing avoids a separate pointer-update instruction such as \code{add x0, x0, \#8} inside the loop.
+Post-indexing combines the load and pointer advance in one instruction.
 \end{frame}
 
 
@@ -878,7 +882,7 @@ Post-indexing avoids a separate pointer-update instruction such as \code{add x0,
 % ============================================================
 
 \begin{frame}[fragile]{Worked Pattern 2: Indexed Array Search}
-\small \key{Goal:} Check Element at Index $i$ in Array
+\small \key{Goal:} Check Element at Index $i$ in Array \hfill \key{C pattern:} \code{arr[i]}
 
 \vspace{0.1cm}
 \begin{block}{AArch64 Implementation (Using Scaled Register Offset)}
@@ -918,18 +922,22 @@ Combines index scaling and load into a single instruction without modifying the 
 
 
 \begin{frame}{Addressing Mode Selection Guide}
+\vspace{0.25cm}
 \begin{center}
 \small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lll}
+\renewcommand{\arraystretch}{1.22}
+\setlength{\tabcolsep}{5pt}
+\rowcolors{2}{softgray}{white}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.0cm} >{\raggedright\arraybackslash}p{2.35cm} >{\raggedright\arraybackslash}p{3.0cm} >{\raggedright\arraybackslash}p{4.2cm}}
 \toprule
-\textbf{Programming Scenario} & \textbf{Addressing Mode} & \textbf{Example Instruction} \\
+\rowcolor{white}
+\textbf{Programming Scenario} & \textbf{C Pattern} & \textbf{Addressing Mode} & \textbf{Example Instruction} \\
 \midrule
-Accessing a field at a fixed offset & Base + immediate offset & \code{ldr x1, [x0, \#8]} \\
-Loading the next array element      & Post-indexed update     & \code{ldr x2, [x0], \#8} \\
-Stepping backward through data      & Pre-indexed update      & \code{ldr x2, [x0, \#-8]!} \\
-Accessing \code{arr[i]}             & Scaled register offset  & \code{ldr x2, [x0, x1, lsl \#3]} \\
-Moving two adjacent values          & Paired transfer         & \code{ldp x2, x3, [x0]} \\
+Accessing a known offset & \code{*(ptr + k)} & Base + immediate offset & \code{ldr x1, [x0, \#8]} \\
+Loading the next element & \code{*ptr++} & Post-indexed update & \code{ldr x2, [x0], \#8} \\
+Stepping backward through data & \code{*\char45{}\char45{}ptr} & Pre-indexed update & \code{ldr x2, [x0, \#-8]!} \\
+Accessing an indexed element & \code{arr[i]} & Scaled register offset & \code{ldr x2, [x0, x1, lsl \#3]} \\
+Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp x2, x3, [x0]} \\
 \bottomrule
 \end{tabular}
 \end{center}
