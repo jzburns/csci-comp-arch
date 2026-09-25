@@ -50,6 +50,7 @@
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{colortbl}
 \usepackage{tikz}
 
 \usetikzlibrary{
@@ -194,37 +195,38 @@
 % Slide 2
 % ============================================================
 
-\begin{frame}{Topic 5 Outline}
 
+\begin{frame}{Topic 5 Outline}
 
 \setbeamertemplate{enumerate item}{\arabic{enumi}.}
 \begin{enumerate}\setlength{\itemsep}{10pt}
   \item \key{Memory Access and Computation}
   \begin{itemize}
-    \item Why RISC separates memory transfers from arithmetic operations.
-    \item Bridging register speed with memory capacity.
+    \item Why AArch64 separates memory transfers from arithmetic operations.
+    \item How values move between memory and the register file.
   \end{itemize}
 
   \item \key{Data Types, Widths, and Conversions}
   \begin{itemize}
     \item Handling bytes, halfwords, words, and doublewords cleanly.
-    \item Understanding when sign-extension matters vs.\ zero-extension.
+    \item Choosing zero-extension or sign-extension when loading sub-word data.
   \end{itemize}
 
   \item \key{Address Calculation}
   \begin{itemize}
-    \item Offsets, array indexing, and pointer increment patterns.
-    \item Position-independent memory references for global variables.
+    \item Immediate offsets, pre/post-indexing, and scaled array indexing.
+    \item How each addressing form changes, or does not change, the base register.
   \end{itemize}
 
-  \item \key{Memory Performance and Alignment}
+  \item \key{Applied Access Patterns}
   \begin{itemize}
-    \item Moving double-word pairs efficiently with \code{ldp} and \code{stp}.
-    \item Alignment rules and stack-related memory accesses.
+    \item Practical array traversal and indexed-array access patterns.
+    \item Choosing the addressing form that matches the data-access pattern.
   \end{itemize}
 \end{enumerate}
 
 \end{frame}
+
 
 
 % ============================================================
@@ -241,20 +243,21 @@
 % Slide 3
 % ============================================================
 
+
 \begin{frame}{The Fundamental Memory Challenge}
 \large
 \begin{itemize}\setlength{\itemsep}{7pt}
-  \item Register access is extremely fast, while off-chip DRAM access is much slower; exact latencies are implementation-dependent.
+  \item Registers are fast but limited in number; memory holds much more data but is accessed through explicit transfer instructions.
   \item \key{Architectural Question:} How should the instruction set organize data movement between memory and the register file?
-  \item AArch64 uses a strict \key{load/store discipline}: ALU instructions operate on registers, while explicit load/store instructions access memory.
-  \item Caches, prefetching, speculation, and out-of-order execution are microarchitectural techniques used to reduce the impact of memory latency.
+  \item AArch64 uses a strict \key{load/store discipline}: ALU instructions operate on registers, while load/store instructions access memory.
 \end{itemize}
 
-\vspace{0.3cm}
+\vspace{0.35cm}
 \begin{block}{The Architectural Rule}
-ALU instructions process \emph{only} registers. Memory access is performed by load/store-family instructions.
+ALU instructions process \emph{only} register operands. Memory access is performed by load/store-family instructions.
 \end{block}
 \end{frame}
+
 
 
 
@@ -264,25 +267,26 @@ ALU instructions process \emph{only} registers. Memory access is performed by lo
 % Slide 4
 % ============================================================
 
+
 \begin{frame}{Separating Computation from Data Movement}
 
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.48\textwidth}
-\begin{block}{The Pipeline Contract}
+\begin{block}{Architectural Separation}
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item Arithmetic instructions do not directly access data memory.
-  \item Simplifies datapath organization and operand handling.
-  \item Makes memory operations explicit for scheduling and dependency analysis.
+  \item Load instructions copy values from memory into registers.
+  \item Store instructions copy register values back to memory.
 \end{itemize}
 \end{block}
 \end{column}
 
 \begin{column}{0.48\textwidth}
-\begin{block}{Three-Step Execution Cycle}
+\begin{block}{Typical Data Flow}
 \begin{enumerate}\setlength{\itemsep}{3pt}
-  \item \key{Load:} Fetch data into registers.
-  \item \key{Compute:} Perform ALU operations.
-  \item \key{Store:} Write result back if needed.
+  \item \key{Load:} bring data into registers.
+  \item \key{Compute:} operate on register values.
+  \item \key{Store:} write the result back if needed.
 \end{enumerate}
 \end{block}
 \end{column}
@@ -291,7 +295,7 @@ ALU instructions process \emph{only} registers. Memory access is performed by lo
 \vspace{0.4cm}
 \centering
 \begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
-  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small\bfseries, minimum width=3.2cm, minimum height=0.6cm] (mem) {Memory / Cache};
+  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small\bfseries, minimum width=3.2cm, minimum height=0.6cm] (mem) {Memory};
   \node[draw=navy, fill=deepblue, text=white, rounded corners=3pt, font=\small\bfseries, right=1.4cm of mem, minimum width=3.2cm, minimum height=0.6cm] (reg) {Register File};
   \node[draw=gold!80!black, fill=gold!20, line width=1pt, rounded corners=3pt, font=\small\bfseries, right=1.4cm of reg, minimum width=2.4cm, minimum height=0.6cm] (alu) {ALU};
 
@@ -305,47 +309,12 @@ ALU instructions process \emph{only} registers. Memory access is performed by lo
 
 
 
+
 % ============================================================
 % Slide 5
 % ============================================================
 
-\begin{frame}{Comparing Memory Models: RISC vs.\ CISC}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.48\textwidth}
-\begin{block}{AArch64 (Explicit Load/Store)}
-\small
-\begin{tabular}{ll}
-\code{ldr x1, [x0]}   & \text{\scriptsize // Load from address in x0} \\
-\code{add x2, x2, x1} & \text{\scriptsize // Compute in registers} \\
-\code{str x2, [x0]}   & \text{\scriptsize // Write result back} \\
-\end{tabular}
-\vspace{0.15cm}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item 3 simple, orthogonal instructions.
-  \item Compiler can schedule other work during memory load latency.
-\end{itemize}
-\end{block}
-\end{column}
 
-\begin{column}{0.48\textwidth}
-\begin{block}{x86-64 (Register-Memory CISC)}
-\small
-\begin{tabular}{ll}
-\code{add [rdi], rax} & \text{\scriptsize // Memory Read-Modify-Write} \\
-\end{tabular}
-\vspace{0.15cm}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item 1 complex instruction.
-  \item Hardware decoder may decode into one or more internal micro-operations depending on implementation.
-\end{itemize}
-\end{block}
-\end{column}
-\end{columns}
-
-\vspace{0.35cm}
-\normalsize
-\key{Takeaway:} AArch64 exposes data movement through explicit load/store instructions, while x86-64 permits some architectural instructions to combine memory access with computation.
-\end{frame}
 
 
 
@@ -355,10 +324,11 @@ ALU instructions process \emph{only} registers. Memory access is performed by lo
 % Slide 6
 % ============================================================
 
+
 \begin{frame}{Addressing Memory: Bytes, Words, and Doublewords}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Memory is a linear sequence of \key{8-bit bytes}, accessed via 64-bit virtual addresses (though implemented virtual/physical address widths are smaller).
+  \item Memory is a linear sequence of \key{8-bit bytes}; each byte has its own address.
   \item The instruction/access size determines the transfer width:
 \end{itemize}
 
@@ -380,8 +350,9 @@ Doubleword   & 64-bit  & \code{ldr  xt, [xn]} & \code{str  xt, [xn]} \\
 
 \vspace{0.25cm}
 \normalsize
-The base register (\bits{xn}) holds the 64-bit memory pointer enclosed in brackets: \code{[xn]}.
+The base register (\bits{xn}) holds the memory pointer enclosed in brackets: \code{[xn]}.
 \end{frame}
+
 
 % ============================================================
 % Section 2 Divider
@@ -397,25 +368,26 @@ The base register (\bits{xn}) holds the 64-bit memory pointer enclosed in bracke
 % Slide 7
 % ============================================================
 
-\begin{frame}{The Sub-Word Loading Problem}
+
+\begin{frame}{Sub-Word Loads and Extension}
 \large
 \begin{itemize}\setlength{\itemsep}{7pt}
-  \item Registers are 64 bits wide, but data items in memory are often 8 bits or 16 bits.
-  \item When an 8-bit byte is loaded into a 64-bit register, \key{what happens to the remaining 56 bits?}
-  \item The answer depends on whether the data is \key{unsigned} (e.g., characters, raw bytes) or \key{signed} (e.g., small integers).
+  \item Registers are 64 bits wide, but memory values may be only 8, 16, or 32 bits.
+  \item When a smaller value is loaded, the processor must fill the remaining upper bits.
+  \item The correct choice depends on whether the memory value should be treated as \key{unsigned} or \key{signed}.
 \end{itemize}
 
-\vspace{0.3cm}
+\vspace{0.25cm}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.48\textwidth}
-\begin{block}{Unsigned Data (Zero-Extension)}
-Fill all upper bits with \bits{0}s to preserve magnitude.
+\begin{block}{Zero-Extension}
+Use for unsigned data. Upper bits are filled with \bits{0}s.
 \end{block}
 \end{column}
 
 \begin{column}{0.48\textwidth}
-\begin{block}{Signed Data (Sign-Extension)}
-Replicate the sign bit to preserve negative values.
+\begin{block}{Sign-Extension}
+Use for signed data. The sign bit is copied into the upper bits.
 \end{block}
 \end{column}
 \end{columns}
@@ -425,36 +397,12 @@ Replicate the sign bit to preserve negative values.
 
 
 
+
 % ============================================================
 % Slide 8
 % ============================================================
 
-\begin{frame}{Byte, Halfword, and 32-Bit Word Loads}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Byte and halfword loads such as \code{ldrb} and \code{ldrh} zero-extend into \code{wt}; a 32-bit \code{ldr wt} writes \code{wt}, which clears the upper 32 bits of \code{xt}.
-\end{itemize}
 
-\vspace{0.2cm}
-\centering
-\begin{tikzpicture}[scale=0.92, every node/.style={transform shape}]
-  \draw[fill=softgray, draw=navy, dashed] (0,0) rectangle (10.5,0.65);
-  \node at (5.25, 0.325) {\small\textbf{Automatically Cleared to Zeros (Bits 63:8)}};
-  \draw[fill=lightblue, draw=navy, thick] (10.4,0) rectangle (12.0,0.65);
-  \node at (11.2, 0.325) {\footnotesize\textbf{Byte (7:0)}};
-  \node[anchor=south, font=\tiny\bfseries] at (0.2, 0.65) {Bit 63};
-  \node[anchor=south, font=\tiny\bfseries] at (10.5, 0.65) {Bit 8};
-  \node[anchor=south, font=\tiny\bfseries] at (11.9, 0.65) {Bit 0};
-\end{tikzpicture}
-
-\vspace{0.3cm}
-\begin{block}{Example: Loading Byte \hex{80}}
-\small
-\begin{tabular}{lll}
-\code{ldrb w0, [x1]} & $\implies x_0 = \hex{00000000\_00000080} = +128_{10}$ & (Unsigned integer) \\
-\end{tabular}
-\end{block}
-\end{frame}
 
 
 
@@ -464,33 +412,7 @@ Replicate the sign bit to preserve negative values.
 % Slide 9
 % ============================================================
 
-\begin{frame}{Signed Loads: Sign-Extension (\texttt{ldrsb}, \texttt{ldrsh}, \texttt{ldrsw})}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item The \code{ldrsb}, \code{ldrsh}, and \code{ldrsw} variants load a smaller signed value and sign-extend it to the destination width.
-  \item Sign extension copies the source sign bit across the upper destination bits.
-\end{itemize}
 
-\vspace{0.2cm}
-\centering
-\begin{tikzpicture}[scale=0.92, every node/.style={transform shape}]
-  \draw[fill=gold!25, draw=navy] (0,0) rectangle (10.5,0.65);
-  \node at (5.25, 0.325) {\small\textbf{Sign Bit Replicated (All 1s if negative)}};
-  \draw[fill=lightblue, draw=navy, thick] (10.5,0) rectangle (12.0,0.65);
-  \node at (11.25, 0.325) {\small\textbf{Byte (7:0)}};
-  \node[anchor=south, font=\tiny\bfseries] at (0.2, 0.65) {Bit 63};
-  \node[anchor=south, font=\tiny\bfseries] at (10.5, 0.65) {Bit 8};
-  \node[anchor=south, font=\tiny\bfseries] at (11.9, 0.65) {Bit 0};
-\end{tikzpicture}
-
-\vspace{0.3cm}
-\begin{block}{Example: Loading Byte \hex{80} ($-128$ in 8-bit signed)}
-\small
-\begin{tabular}{lll}
-\code{ldrsb x0, [x1]} & $\implies x_0 = \hex{ffffffff\_ffffff80} = -128_{10}$ & (Sign preserved in 64 bits) \\
-\end{tabular}
-\end{block}
-\end{frame}
 
 
 
@@ -500,31 +422,31 @@ Replicate the sign bit to preserve negative values.
 % Slide 10
 % ============================================================
 
+
 \begin{frame}{Sign vs.\ Zero Extension: Side-by-Side}
 \begin{block}{Memory Byte at Address \texttt{x1} = \hex{80} (Binary: \texttt{1000 0000})}
+The same 8-bit pattern means either unsigned \(128\) or signed \(-128\), depending on the load instruction.
 \end{block}
 
 \vspace{0.15cm}
 \begin{center}
 \footnotesize
 \setlength{\tabcolsep}{6pt}
-\begin{tabular}{ll>{\raggedright\arraybackslash}p{5.5cm}}
+\begin{tabular}{ll>{\raggedright\arraybackslash}p{5.8cm}}
 \toprule
-\textbf{Executed Instruction} & \textbf{64-bit Hex in \texttt{x0}} & \textbf{Decimal Value and Meaning} \\
+\textbf{Instruction} & \textbf{Value in \texttt{x0}} & \textbf{Meaning} \\
 \midrule
-\code{ldrb  w0, [x1]} & \texttt{0x00000000\_00000080} & $+128$ (Unsigned zero-extension) \\[0.3em]
-\code{ldrsb w0, [x1]} & \texttt{0x00000000\_ffffff80} & $-128$ (Sign-extended to 32b, upper zeroed) \\[0.3em]
-\code{ldrsb x0, [x1]} & \texttt{0xffffffff\_ffffff80} & $-128$ (Sign-extended to full 64b) \\
+\code{ldrb  w0, [x1]} & \texttt{0x00000000\_00000080} & Zero-extends the byte; interpreted as unsigned \(+128\). \\
+\code{ldrsb x0, [x1]} & \texttt{0xffffffff\_ffffff80} & Sign-extends the byte; preserves signed value \(-128\). \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \vspace{0.25cm}
 \normalsize
-\begin{block}{Common Bug}
-Using \code{ldrb} on a signed negative variable results in a large positive number, causing if-statements and comparisons to fail unexpectedly.
-\end{block}
+Using a zero-extending load for signed negative data can turn a negative value into a large positive one.
 \end{frame}
+
 
 
 
@@ -559,7 +481,7 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
 
 \vspace{0.25cm}
 \normalsize
-\key{Takeaway:} Storing a byte or halfword modifies \emph{only} the targeted memory locations without overwriting neighboring bytes.
+Storing a byte or halfword modifies \emph{only} the targeted memory locations; neighboring bytes are left unchanged.
 \end{frame}
 
 % ============================================================
@@ -576,18 +498,33 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
 % Slide 12
 % ============================================================
 
-\begin{frame}{What Is an Addressing Mode?}
+\begin{frame}{Addressing Modes}
 \large
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item An \key{addressing mode} is the method used by an instruction to compute the \key{Effective Address (EA)} of a data operand in memory.
-  \item Different data structures require different address calculations:
-  \begin{itemize}\setlength{\itemsep}{4pt}
-    \item Fixed struct members $\to$ \key{Base + Constant Offset}
-    \item Sequential arrays $\to$ \key{Auto-Incrementing Pointers}
-    \item Array indexing (\code{arr[i]}) $\to$ \key{Base + Scaled Register Index}
-    \item Global variables $\to$ \key{PC-Relative Page Addressing}
-  \end{itemize}
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item An \key{addressing mode} is how a load/store instruction forms the memory address it will access.
+  \item The resulting address is the \key{effective address}: the actual byte address used by the load or store.
 \end{itemize}
+
+\vspace{0.2cm}
+\begin{center}
+\small
+\setlength{\tabcolsep}{7pt}
+\rowcolors{2}{softgray}{white}
+\begin{tabular}{lll}
+\toprule
+\rowcolor{white}
+\textbf{Access Pattern} & \textbf{Addressing Form} & \textbf{Typical Use} \\
+\midrule
+Fixed offset from a base pointer & \code{[xn, \#imm]} & Struct fields, known offsets \\
+Step through consecutive elements & \code{[xn], \#imm} & Array traversal \\
+Base plus scaled index & \code{[xn, xm, lsl \#k]} & \code{arr[i]} access \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.18cm}
+\normalsize
+The key question is whether the offset is fixed, index-based, or part of a pointer update.
 \end{frame}
 
 
@@ -632,23 +569,21 @@ Using \code{ldrb} on a signed negative variable results in a large positive numb
 % Slide 14
 % ============================================================
 
-\begin{frame}{Unsigned Scaled Immediate Offsets}
+
+\begin{frame}{Scaled Immediate Offsets}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item In 32-bit instructions, immediate fields have limited bit width.
-  \item In the unsigned scaled-immediate form, AArch64 scales the 12-bit offset by the access size:
-  \begin{itemize}\setlength{\itemsep}{3pt}
-    \item 64-bit loads scale offsets by $\times 8$ ($0, 8, 16, \dots, 32760$).
-    \item 32-bit loads scale offsets by $\times 4$ ($0, 4, 8, \dots, 16380$).
-  \end{itemize}
-  \item Allows instructions to reach up to $\approx 32\text{ KB}$ from a base pointer using only 12 encoding bits.
+  \item Some load/store offsets are scaled by the size of the access.
+  \item For a 64-bit load, an offset of \code{\#8} means one doubleword past the base address.
+  \item For a 32-bit load, an offset of \code{\#4} means one word past the base address.
 \end{itemize}
 
 \vspace{0.25cm}
-\begin{block}{Signed Unscaled Offsets (\texttt{ldur}/\texttt{stur})}
-For signed unscaled immediate offsets (which do not scale by operand size and can be negative), use \code{ldur xt, [xn, \#-8]}.
+\begin{block}{Conceptual Rule}
+The offset tells the instruction where the desired object is relative to the base pointer. The instruction width tells the processor how many bytes to transfer.
 \end{block}
 \end{frame}
+
 
 
 
@@ -674,9 +609,9 @@ For signed unscaled immediate offsets (which do not scale by operand size and ca
 \end{block}
 
 \vspace{0.25cm}
-\begin{block}{Primary Use Case: Stack Push}
-\code{str x30, [sp, \#-16]!} \\
-\text{\scriptsize Moves the stack pointer down by 16 bytes, then writes register x30 to the new top of stack.}
+\begin{block}{Primary Use Case: Access After Pointer Adjustment}
+\code{ldr x0, [x1, \#-8]!} \\
+\text{\scriptsize Moves the base pointer back by 8 bytes, then loads from the updated address.}
 \end{block}
 \end{frame}
 
@@ -704,9 +639,9 @@ For signed unscaled immediate offsets (which do not scale by operand size and ca
 \end{block}
 
 \vspace{0.25cm}
-\begin{block}{Primary Use Case: Array Stepping \& Stack Pop}
+\begin{block}{Primary Use Case: Array Stepping}
 \code{ldr x0, [x1], \#8} \\
-\text{\scriptsize Loads data from current address in x1, then automatically advances x1 to the next 8-byte element.}
+\text{\scriptsize Loads data from the current address in x1, then automatically advances x1 to the next 8-byte element.}
 \end{block}
 \end{frame}
 
@@ -790,27 +725,7 @@ Directly implements high-level array access: \code{val = arr[i];}.
 % Slide 19
 % ============================================================
 
-\begin{frame}{Mixing 32-bit Indices with 64-bit Pointers}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item In C code, loop counter variables are frequently 32-bit integers (\code{int i}).
-  \item AArch64 address calculations use 64-bit general-purpose registers.
-  \item AArch64 can extend and scale a 32-bit index register in one step:
-\end{itemize}
 
-\vspace{0.2cm}
-\begin{block}{Signed vs.\ Unsigned Indexing}
-\small
-\begin{tabular}{ll}
-\code{ldr x0, [x1, w2, sxtw \#3]} & \text{\scriptsize // Sign-extend 32-bit index w2, multiply by 8, add to x1} \\
-\code{ldr x0, [x1, w2, uxtw \#3]} & \text{\scriptsize // Zero-extend 32-bit index w2, multiply by 8, add to x1} \\
-\end{tabular}
-\end{block}
-
-\vspace{0.25cm}
-\normalsize
-\key{Benefit:} Eliminates separate instructions to convert \code{int} indices to 64-bit pointers.
-\end{frame}
 
 
 
@@ -820,27 +735,7 @@ Directly implements high-level array access: \code{val = arr[i];}.
 % Slide 20
 % ============================================================
 
-\begin{frame}{Mode 5: PC-Relative Global Variable Access}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Position-Independent Code (PIC) allows code to load anywhere in memory.
-  \item Global variables are often addressed relative to the current \key{Program Counter (\bits{pc})}, though GOT-based sequences may also be used.
-  \item A common page-relative pattern involves a two-step sequence:
-\end{itemize}
 
-\vspace{0.2cm}
-\begin{block}{Loading a Global Variable (Common Pattern)}
-\small
-\begin{tabular}{ll}
-\texttt{adrp x0, my\_global}              & \text{\scriptsize // Step 1: Form base address of the 4KB page} \\
-\texttt{ldr  x1, [x0, \#:lo12:my\_global]} & \text{\scriptsize // Step 2: Add page offset and load value} \\
-\end{tabular}
-\end{block}
-
-\vspace{0.25cm}
-\normalsize
-The \code{adrp} instruction forms a page-relative address within its architectural range; the linker then resolves the page and low-offset relocation for the selected code model.
-\end{frame}
 
 
 
@@ -850,31 +745,13 @@ The \code{adrp} instruction forms a page-relative address within its architectur
 % Slide 21
 % ============================================================
 
-\begin{frame}{PC-Relative Literal Pools}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item How do we load arbitrary 64-bit constants that cannot fit in an instruction?
-  \item \code{ldr x0, =constant} is an assembler pseudo-instruction; the assembler may choose a literal pool or another constant-materialization sequence.
-\end{itemize}
 
-\vspace{0.2cm}
-\begin{block}{Assembly Syntax}
-\small
-\begin{tabular}{ll}
-\code{ldr x0, =0x0123456789abcdef} & \text{\scriptsize // Pseudo-instruction: assembler generates constant loading sequence} \\
-\end{tabular}
-\end{block}
-
-\vspace{0.25cm}
-\normalsize
-If a literal pool is selected, the instruction performs a PC-relative load from the nearby constant.
-\end{frame}
 
 % ============================================================
 % Section 4 Divider
 % ============================================================
 
-\sectiondivider{PART 4}{Multi-Register Transfers, Alignment, \& Stack}
+\sectiondivider{PART 4}{Multi-Register Transfers \& Applied Access Patterns}
 
 
 
@@ -884,30 +761,34 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 % Slide 22
 % ============================================================
 
+
 \begin{frame}{Paired Transfers: \texttt{ldp} and \texttt{stp}}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item AArch64 provides dedicated instructions to transfer \key{two registers with one architectural instruction}:
-  $$\code{ldp\quad x0,\; x1,\; [x2]} \qquad \code{stp\quad x0,\; x1,\; [x2]}$$
-  \item Reduces instruction count by handling two registers per memory transfer instruction.
+  \item \code{ldp} and \code{stp} transfer \key{two adjacent registers} with one architectural instruction.
+  \item They are useful when nearby values are loaded or stored together.
 \end{itemize}
 
 \vspace{0.2cm}
 \begin{center}
 \small
-\setlength{\tabcolsep}{8pt}
+\setlength{\tabcolsep}{7pt}
 \begin{tabular}{lll}
 \toprule
-\textbf{Instruction} & \textbf{Action} & \textbf{Primary Use Case} \\
+\textbf{Instruction} & \textbf{Action} & \textbf{Typical Use} \\
 \midrule
-\code{stp x29, x30, [sp, \#-16]!} & Push Frame Pointer \& Link Register & Function entry (prologue) \\
-\code{ldp x29, x30, [sp], \#16}   & Restore FP \& LR, adjust stack      & Function exit (epilogue) \\
-\code{ldp x0, x1, [x2]}           & Load two 64-bit values into x0, x1  & Adjacent-value or buffer access \\
+\code{ldp x0, x1, [x2]} & Load two 64-bit values & Adjacent data values \\
+\code{stp x0, x1, [x2]} & Store two 64-bit values & Adjacent output values \\
+\code{ldp x2, x3, [x1, \#16]} & Load pair at an offset & Copying or scanning data \\
 \bottomrule
-\tabularnewline
 \end{tabular}
 \end{center}
+
+\vspace{0.2cm}
+\normalsize
+Paired transfers reduce instruction count when the program naturally works with adjacent values.
 \end{frame}
+
 
 
 
@@ -917,42 +798,7 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 % Slide 23
 % ============================================================
 
-\begin{frame}{Why Paired Transfers Matter}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.48\textwidth}
-\begin{block}{Individual Transfers}
-\small
-\begin{tabular}{l}
-\code{str x29, [sp, \#-8]!} \\
-\code{str x30, [sp, \#-8]!} \\
-\end{tabular}
-\vspace{0.15cm}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item Requires 2 separate instructions.
-  \item Higher instruction footprint.
-\end{itemize}
-\end{block}
-\end{column}
 
-\begin{column}{0.48\textwidth}
-\begin{block}{Paired Transfer}
-\small
-\begin{tabular}{l}
-\code{stp x29, x30, [sp, \#-16]!} \\
-\end{tabular}
-\vspace{0.15cm}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item Uses a single instruction.
-  \item Stores two registers with one instruction.
-\end{itemize}
-\end{block}
-\end{column}
-\end{columns}
-
-\vspace{0.35cm}
-\normalsize
-\key{Instruction-Count Impact:} For the shown pair of saves/restores, a paired transfer uses one memory instruction instead of two.
-\end{frame}
 
 
 
@@ -962,45 +808,11 @@ If a literal pool is selected, the instruction performs a PC-relative load from 
 % Slide 24
 % ============================================================
 
-\begin{frame}{Memory Alignment Principles}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item An access is \key{naturally aligned} if its memory address is an exact multiple of the data size:
-  $$\text{Address} \pmod{\text{Data Size}} = 0$$
-\end{itemize}
 
-\vspace{0.2cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.48\textwidth}
-\begin{block}{Aligned Access}
-\centering
-\vspace{0.1cm}
-\begin{tikzpicture}[scale=0.75]
-  \draw[fill=lightblue, draw=navy] (0,0) rectangle (5,0.6) node[midway, font=\footnotesize] {64-bit Word [Bytes 0--7]};
-\end{tikzpicture}
-\vspace{0.1cm}
-Typically maps cleanly to memory access structures without boundary crossing.
-\end{block}
-\end{column}
 
-\begin{column}{0.48\textwidth}
-\begin{block}{Unaligned Access}
-\centering
-\vspace{0.1cm}
-\begin{tikzpicture}[scale=0.75]
-  \draw[fill=softgray, draw=navy] (0,0) rectangle (2,0.6) node[midway, font=\tiny] {Cache Line 1};
-  \draw[fill=gold!30, draw=navy] (2,0) rectangle (4,0.6) node[midway, font=\tiny] {Cache Line 2};
-\end{tikzpicture}
-\vspace{0.1cm}
-May require additional internal accesses, especially when crossing cache-line or page boundaries.
-\end{block}
-\end{column}
-\end{columns}
 
-\vspace{0.2cm}
-\small
-Many ordinary accesses to Normal memory can be unaligned, although boundary crossings may require extra internal work. Some access types or configured environments impose stricter alignment requirements.
-\end{frame}
+
+
 
 
 
@@ -1010,24 +822,7 @@ Many ordinary accesses to Normal memory can be unaligned, although boundary cros
 % Slide 25
 % ============================================================
 
-\begin{frame}{Stack Alignment: An AAPCS64 ABI Requirement}
-\large
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item The standard AArch64 procedure call standard (AAPCS64) mandates a strict \key{16-byte alignment rule for the Stack Pointer (\bits{sp})} as a core ABI requirement.
-  \item Violating the 16-byte alignment rule breaks the ABI contract and can cause incorrect interaction with code that assumes a conforming stack layout.
-  \item When allocating local variables or saving registers, stack-frame allocation is normally rounded to a multiple of 16 bytes.
-\end{itemize}
 
-\vspace{0.3cm}
-\begin{block}{Correct Stack Adjustment Example}
-\small
-\begin{tabular}{lll}
-\code{sub sp, sp, \#16} & \text{\scriptsize // Correct: 16-byte multiple} \\
-\code{sub sp, sp, \#32} & \text{\scriptsize // Correct: 32-byte multiple} \\
-\code{sub sp, sp, \#8}  & \text{\scriptsize // Violation of AAPCS64 16-byte ABI requirement} \\
-\end{tabular}
-\end{block}
-\end{frame}
 
 
 
@@ -1037,45 +832,7 @@ Many ordinary accesses to Normal memory can be unaligned, although boundary cros
 % Slide 26
 % ============================================================
 
-\begin{frame}[fragile]{Standard Function Stack Frame Layout}
-\vspace{-0.5cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.55\textwidth}
-\begin{block}{Function Code}
-\small
-\begin{verbatim}
-my_func:
-    // 1. Save Frame Pointer & Link Reg
-    // Allocate 32 bytes total
-    stp  x29, x30, [sp, #-32]!
-    mov  x29, sp
 
-    // 2. Save callee-saved register
-    str  x19, [sp, #16]
-
-    // ... Function body ...
-
-    // 3. Restore and return
-    ldr  x19, [sp, #16]
-    ldp  x29, x30, [sp], #32
-    ret
-\end{verbatim}
-\end{block}
-\end{column}
-
-\begin{column}{0.44\textwidth}
-\centering
-\begin{tikzpicture}[scale=0.78, every node/.style={transform shape}]
-  \draw[fill=softgray, draw=navy, dashed] (0,3.6) rectangle (4.2,4.4) node[midway, font=\small] {Padding / Unused ($+24$ to $+31$)};
-  \draw[fill=softgray, draw=navy] (0,2.8) rectangle (4.2,3.6) node[midway, font=\small\bfseries] {Saved Callee (\bits{x19}, $+16$)} ;
-  \draw[fill=lightblue, draw=navy] (0,2.0) rectangle (4.2,2.8) node[midway, font=\small\bfseries] {Saved LR (\bits{x30}, $+8$)};
-  \draw[fill=lightblue, draw=navy] (0,1.2) rectangle (4.2,2.0) node[midway, font=\small\bfseries] {Saved FP (\bits{x29}, $+0$)};
-  \node[anchor=east, font=\scriptsize\bfseries] at (0,4.4) {High Addr ($+32$)};
-  \node[anchor=east, font=\scriptsize\bfseries] at (0,1.2) {Stack Top (\bits{sp}, $+0$)};
-\end{tikzpicture}
-\end{column}
-\end{columns}
-\end{frame}
 
 
 
@@ -1149,27 +906,7 @@ Combines index scaling and load into a single instruction without modifying the 
 % Slide 29
 % ============================================================
 
-\begin{frame}[fragile]{Worked Pattern 3: Copying a Data Block}
-\small \key{Goal:} Copy 32 Bytes from Source to Destination
 
-\vspace{0.1cm}
-\begin{block}{AArch64 Implementation (Using Paired Transfers)}
-\small
-\begin{tabular}{lll}
-\multicolumn{3}{l}{\textit{// x0 = destination pointer, x1 = source pointer}} \\
-\code{copy\_32\_bytes:} & & \\
-    & \code{ldp  x2, x3, [x1]}       & \text{\scriptsize // Load first 16 bytes (two doublewords)} \\
-    & \code{ldp  x4, x5, [x1, \#16]} & \text{\scriptsize // Load next 16 bytes} \\
-    & \code{stp  x2, x3, [x0]}       & \text{\scriptsize // Store first 16 bytes} \\
-    & \code{stp  x4, x5, [x0, \#16]} & \text{\scriptsize // Store next 16 bytes} \\
-    & \code{ret}                     & \\
-\end{tabular}
-\end{block}
-
-\vspace{0.25cm}
-\normalsize
-Copies 32 bytes using four paired load/store instructions.
-\end{frame}
 
 
 
@@ -1179,25 +916,25 @@ Copies 32 bytes using four paired load/store instructions.
 % Slide 30
 % ============================================================
 
+
 \begin{frame}{Addressing Mode Selection Guide}
 \begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{lll}
 \toprule
-\textbf{Programming Scenario} & \textbf{Best Addressing Mode} & \textbf{Example Instruction} \\
+\textbf{Programming Scenario} & \textbf{Addressing Mode} & \textbf{Example Instruction} \\
 \midrule
-Accessing Struct Field        & Base + Immediate Offset       & \code{ldr x1, [x0, \#8]} \\
-Pushing to Stack              & Pre-Indexed Auto-Update       & \code{str x30, [sp, \#-16]!} \\
-Popping from Stack            & Post-Indexed Auto-Update      & \code{ldr x30, [sp], \#16} \\
-Sequential Array Stepping     & Post-Indexed Auto-Update      & \code{ldr x2, [x0], \#8} \\
-Random Array Index (\code{a[i]})& Scaled Register Offset     & \code{ldr x2, [x0, x1, lsl \#3]} \\
-Global Variable Reference     & PC-Relative Page Offset       & \code{adrp} $+$ \code{ldr} \\
+Accessing a field at a fixed offset & Base + immediate offset & \code{ldr x1, [x0, \#8]} \\
+Loading the next array element      & Post-indexed update     & \code{ldr x2, [x0], \#8} \\
+Stepping backward through data      & Pre-indexed update      & \code{ldr x2, [x0, \#-8]!} \\
+Accessing \code{arr[i]}             & Scaled register offset  & \code{ldr x2, [x0, x1, lsl \#3]} \\
+Moving two adjacent values          & Paired transfer         & \code{ldp x2, x3, [x0]} \\
 \bottomrule
-\tabularnewline
 \end{tabular}
 \end{center}
 \end{frame}
+
 
 
 
@@ -1207,19 +944,7 @@ Global Variable Reference     & PC-Relative Page Offset       & \code{adrp} $+$ 
 % Slide 31
 % ============================================================
 
-\begin{frame}{Hardware Memory Access: The Cache Line View}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Hardware fetches memory in blocks known as \key{Cache Lines} (implementation-dependent; 64 bytes is common).
-  \item \key{Spatial Locality:} Accessing contiguous memory (e.g., sequential array stepping) often improves spatial locality and prefetch effectiveness.
-  \item Choosing sequential addressing modes helps processor hardware prefetchers predict memory access patterns accurately.
-\end{itemize}
 
-\vspace{0.25cm}
-\begin{block}{Performance Insight}
-Sequential access patterns usually make better use of spatial locality and hardware prefetching than scattered access patterns.
-\end{block}
-\end{frame}
 
 
 
@@ -1229,15 +954,17 @@ Sequential access patterns usually make better use of spatial locality and hardw
 % Slide 32
 % ============================================================
 
+
 \begin{frame}{Common Memory Access Mistakes}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Wrong Sizing:} Using \code{ldr} (64-bit) instead of \code{ldr wt} (32-bit) on an array of integers reads unintended adjacent bytes as part of the value.
-  \item \key{Missing Sign Extension:} Using \code{ldrb} instead of \code{ldrsb} on negative numbers corrupts signed comparisons.
-  \item \key{Incorrect Shift Scale:} Using \code{lsl \#2} instead of \code{lsl \#3} on an array of 64-bit pointers accesses the wrong memory location.
-  \item \key{Stack Misalignment:} Violating AAPCS64 16-byte stack alignment conventions can lead to compliance or runtime issues.
+  \item \key{Wrong Sizing:} Using \code{ldr xt} instead of \code{ldr wt} on an array of 32-bit integers reads too many bytes.
+  \item \key{Missing Sign Extension:} Using \code{ldrb} instead of \code{ldrsb} on signed byte data changes negative values into positive ones.
+  \item \key{Incorrect Shift Scale:} Using \code{lsl \#2} instead of \code{lsl \#3} on an array of 64-bit values computes the wrong address.
+  \item \key{Accidental Base Update:} Using pre-indexed or post-indexed addressing when the original pointer still needs to be preserved.
 \end{itemize}
 \end{frame}
+
 
 % ============================================================
 % Section 5 Divider
@@ -1253,22 +980,24 @@ Sequential access patterns usually make better use of spatial locality and hardw
 % Slide 33
 % ============================================================
 
-\begin{frame}{Topic 5:Summary}
+
+\begin{frame}{Topic 5 Summary}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{Load/Store Discipline:} ALU instructions operate on registers, while load/store-family instructions perform memory transfers.
-  \item \key{Data Widths \& Extensions:} Sub-word loads zero-extend by default; signed data requires explicit \code{ldrsb}, \code{ldrsh}, or \code{ldrsw} to preserve negative values.
+  \item \key{Load/Store Discipline:} ALU instructions operate on registers; load/store-family instructions move data between registers and memory.
+  \item \key{Data Widths \& Extensions:} The instruction width controls how many bytes are transferred; signed sub-word data needs sign-extension.
   \item \key{Core Addressing Modes:}
   \begin{itemize}\setlength{\itemsep}{1.5pt}
-    \item Standard offset (\code{[xn, \#imm]}): Base remains unchanged.
-    \item Pre-indexed (\code{[xn, \#imm]!}): Base updated before access (push).
-    \item Post-indexed (\code{[xn], \#imm}): Base updated after access (pop / loop step).
-    \item Scaled register offset (\code{[xn, xm, lsl \#3]}): base-plus-scaled-index addressing in one instruction.
+    \item Standard offset (\code{[xn, \#imm]}): base register is unchanged.
+    \item Pre-indexed (\code{[xn, \#imm]!}): base updated before the access.
+    \item Post-indexed (\code{[xn], \#imm}): base updated after the access.
+    \item Scaled register offset (\code{[xn, xm, lsl \#3]}): base plus scaled index for arrays.
   \end{itemize}
-  \item \key{Paired Transfers \& Stack Layout:} \code{ldp}/\code{stp} reduce instruction count for multi-register transfers; AAPCS64 mandates 16-byte stack alignment.
+  \item \key{Applied Access Patterns:} Sequential traversal often uses post-indexing; indexed array access often uses a scaled register offset.
 \end{itemize}
 
 \end{frame}
+
 
 
 
@@ -1307,31 +1036,25 @@ Sequential access patterns usually make better use of spatial locality and hardw
 % Slide 35
 % ============================================================
 
-\begin{frame}{Self-Test Questions: Stack Alignment \& Paired Transfers}
+
+
+
+
+% ============================================================
+% Slide 35
+% ============================================================
+
+\begin{frame}{Self-Test Questions: Applied Addressing Patterns}
 
 \begin{enumerate}\setlength{\itemsep}{7pt}
-  \item \key{Paired Stack Operation:} Explain what happens during the instruction:
-  $$\code{stp x29, x30, [sp, \#-16]!}$$
-  How does \bits{sp} change, and where are \bits{x29} and \bits{x30} stored?
+  \item \key{Sequential Traversal:} Register \bits{x0} points to the current element of a 64-bit array. Write one load instruction that reads the current element into \bits{x2} and then advances \bits{x0} to the next element.
 
-  \item \key{Stack Alignment Enforcement:} Why does the AAPCS64 ABI require the stack pointer to be 16-byte aligned even when storing a single 8-byte register?
+  \item \key{Scaled Indexing:} Register \bits{x0} holds the base address of a 32-bit integer array and \bits{x1} holds index \(i\). Write one instruction that loads \code{arr[i]} into \bits{w2}.
 
-  \item \key{Position-Independent References:} Why are \code{adrp} and offset/GOT sequences commonly used for position-independent global references in AArch64?
+  \item \key{Mode Selection:} Which addressing form best matches each case: a fixed struct field, sequential traversal, and \code{arr[i]} access?
 \end{enumerate}
 
 \end{frame}
-
-% ============================================================
-% Looking Ahead
-% ============================================================
-
-
-
-
-
-% ============================================================
-% Slide 36
-% ============================================================
 
 \begin{frame}{Looking Ahead}
 
@@ -1345,10 +1068,11 @@ AArch64 Subroutines, Calling Conventions, \& the Stack
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item \key{Subroutine Calls:} Using \code{bl}, \code{blr}, and \code{ret}.
   \item \key{Calling Convention:} Passing arguments, returning values, and preserving registers.
-  \item \key{Stack Frames:} Building and restoring function stack frames using AAPCS64 conventions.
+  \item \key{Stack Frames:} Applying stack alignment, saved registers, and frame layout in real subroutines.
 \end{itemize}
 
 \vfill
 \end{frame}
+
 
 \end{document}

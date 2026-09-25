@@ -209,28 +209,28 @@ Dr. J. Burns
 
 \begin{frame}{Topic 4 Outline}
 
-
 \setbeamertemplate{enumerate item}{\arabic{enumi}.}
 \begin{enumerate}\setlength{\itemsep}{12pt}
   \item \key{ALU Operations: Arithmetic, Shifting, \& Bitwise Logic}
   \begin{itemize}
     \item Addition, subtraction, multiplication, division, and shifted-register operands.
-    \item Bitwise logic (\code{and}, \code{orr}, \code{eor}, \code{bic}) and common bit-manipulation idioms.
+    \item Bitwise logic with \code{and}, \code{orr}, \code{eor}, and \code{bic}.
   \end{itemize}
 
   \item \key{Condition Flags \& Comparisons}
   \begin{itemize}
-    \item NZCV flags, comparison instructions (\code{cmp}, \code{tst}), and signed vs.\ unsigned branches.
+    \item NZCV flags, \code{cmp}, and the signed vs.\ unsigned branch distinction.
   \end{itemize}
 
-  \item \key{Control Flow: Branches \& Branchless Selection}
+  \item \key{Control Flow: Branches \& Selection}
   \begin{itemize}
-    \item Translating loops and \code{if-else} structures; branch-and-test (\code{cbz}/\code{cbnz}).
-    \item Branch penalties and branchless conditional selection (\code{csel}, \code{cset}).
+    \item Translating \code{if-else} structures and loops.
+    \item Register zero tests with \code{cbz}/\code{cbnz} and conditional selection with \code{csel}.
   \end{itemize}
 \end{enumerate}
 
 \end{frame}
+
 
 
 % ============================================================
@@ -283,9 +283,9 @@ Dr. J. Burns
 % ============================================================
 
 \begin{frame}{Shifted-Register Operands and Shift Operations}
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item Many AArch64 data-processing instructions can encode a shifted register operand directly in the instruction.
-  \item Execution latency for shifted operands is implementation-dependent.
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Many AArch64 arithmetic instructions can apply a shift to one register operand as part of the operation.
+  \item This is useful for simple scaling, such as multiplying an index by a power of two.
 \end{itemize}
 
 \vspace{0.12cm}
@@ -297,11 +297,12 @@ Dr. J. Burns
 \toprule
 \textbf{Shift Type} & \textbf{Mnemonic} & \textbf{Operation Meaning} \\
 \midrule
-Logical Shift Left & \code{lsl \#k} & Multiply by $2^k$ modulo the register width; zeros enter the low bits. \\
-Logical Shift Right & \code{lsr \#k} & Unsigned floor division by $2^k$; zeros enter the high bits. \\
-Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift; the sign bit is replicated into the high bits. \\
+Logical Shift Left & \code{lsl \#k} & Multiply by $2^k$ modulo the register width. \\
+Logical Shift Right & \code{lsr \#k} & Unsigned division by $2^k$; zeros enter the high bits. \\
+Arithmetic Shift Right & \code{asr \#k} & Signed right shift; the sign bit is copied into the high bits. \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{center}
 
 \vspace{0.10cm}
@@ -315,6 +316,7 @@ Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift; the sign 
 \rowcolors{1}{}{}
 \end{block}
 \end{frame}
+
 
 
 
@@ -340,18 +342,19 @@ Arithmetic Shift Right & \code{asr \#k} & Sign-preserving right shift; the sign 
 \toprule
 \textbf{Instruction} & \textbf{Purpose} \\
 \midrule
-\code{mul  x0, x1, x2}     & Multiply two registers; keep the low 64 bits. \\
-\code{madd x0, x1, x2, x3} & Multiply and add in one instruction. \\
-\code{sdiv x0, x1, x2}     & Signed integer division. \\
-\code{udiv x0, x1, x2}     & Unsigned integer division. \\
+\code{mul  x0, x1, x2} & Multiply two registers; keep the low 64 bits. \\
+\code{sdiv x0, x1, x2} & Signed integer division. \\
+\code{udiv x0, x1, x2} & Unsigned integer division. \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{center}
 
 \vspace{0.25cm}
 \normalsize
 Choose \code{sdiv} or \code{udiv} based on how the operands should be interpreted: signed values use \code{sdiv}; unsigned counts, sizes, and addresses usually use \code{udiv}.
 \end{frame}
+
 
 
 
@@ -374,23 +377,24 @@ Choose \code{sdiv} or \code{udiv} based on how the operands should be interprete
 \rowcolors{2}{softgray}{white}
 \begin{tabular}{lll}
 \toprule
-\textbf{Instruction} & \textbf{Operation} & \textbf{Bitwise RTL Formula} \\
+\textbf{Instruction} & \textbf{Operation} & \textbf{Bitwise Formula} \\
 \midrule
 \code{and x0, x1, x2} & Bitwise AND & $x_0 \leftarrow x_1 \land x_2$ \\
 \code{orr x0, x1, x2} & Bitwise OR  & $x_0 \leftarrow x_1 \lor x_2$ \\
 \code{eor x0, x1, x2} & Bitwise XOR & $x_0 \leftarrow x_1 \oplus x_2$ \\
-\code{bic x0, x1, x2} & Bit Clear (AND NOT) & $x_0 \leftarrow x_1 \land (\sim x_2)$ \\
-\code{mvn x0, x1}     & Bitwise NOT & $x_0 \leftarrow \sim x_1$ \quad (Alias: \code{orn x0, xzr, x1}) \\
+\code{bic x0, x1, x2} & Bit Clear & $x_0 \leftarrow x_1 \land (\sim x_2)$ \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{center}
 
 \vspace{0.25cm}
 \normalsize
 \begin{block}{Bit Clear (\texttt{bic}) Idiom}
-\code{bic x0, x1, x2} sets bits to \bits{0} in $x_1$ wherever the mask in $x_2$ has \bits{1}s. A common use is clearing a flag or disabling an option stored in one bit, without disturbing the other settings packed into the same value.
+\code{bic x0, x1, x2} clears bits in $x_1$ wherever the mask in $x_2$ has \bits{1}s. A common use is clearing a flag or disabling an option stored in one bit, without disturbing the other settings packed into the same value.
 \end{block}
 \end{frame}
+
 
 
 
@@ -471,11 +475,10 @@ In AArch64 subtraction ($A - B$), $\text{C} = 1$ indicates $A \ge B$ (no borrow 
 \key{V} & Signed mathematical result does not fit. & 32-bit \code{0x7fffffff + 1} cannot be represented, so V is set. \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{center}
-
-\vspace{0.12cm}
-Signed branch conditions often combine flags. For example, after \code{cmp}, \code{b.lt} tests $\text{N} \neq \text{V}$ because signed overflow can make the raw sign bit misleading.
 \end{frame}
+
 
 
 
@@ -485,37 +488,32 @@ Signed branch conditions often combine flags. For example, after \code{cmp}, \co
 % Slide 10
 % ============================================================
 
-\begin{frame}{Comparison Instructions: \texttt{cmp} and \texttt{tst}}
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item Comparison and test instructions are assembler aliases for ordinary flag-setting operations.
-  \item \code{cmp x0, x1} is really \code{subs xzr, x0, x1}: subtract, update NZCV, and discard the result in the zero register.
+\begin{frame}{Comparison with \texttt{cmp}}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item \code{cmp} compares two operands by subtracting one from the other and updating the condition flags.
+  \item \code{cmp x0, x1} is really \code{subs xzr, x0, x1}: subtract, update NZCV, and discard the numerical result in the zero register.
 \end{itemize}
 
-\vspace{0.10cm}
+\vspace{0.20cm}
 \begin{center}
-\footnotesize
-\setlength{\tabcolsep}{4pt}
+\small
+\setlength{\tabcolsep}{6pt}
 \rowcolors{2}{softgray}{white}
-\begin{tabular}{p{0.17\textwidth}p{0.31\textwidth}p{0.44\textwidth}}
+\begin{tabular}{p{0.24\textwidth}p{0.35\textwidth}p{0.32\textwidth}}
 \toprule
-\textbf{Instruction} & \textbf{Equivalent Operation} & \textbf{Flags Set} \\
+\textbf{Instruction} & \textbf{Equivalent Operation} & \textbf{Meaning} \\
 \midrule
-\code{cmp x0, x1} & \code{subs xzr, x0, x1} & NZCV from $x_0-x_1$ \\
-\code{tst x0, x1} & \code{ands xzr, x0, x1} & N/Z from the AND result; C/V cleared \\
+\code{cmp x0, x1} & \code{subs xzr, x0, x1} & Compare $x_0$ with $x_1$. \\
+\code{cmp x0, \#0} & \code{subs xzr, x0, \#0} & Test whether $x_0$ is zero, negative, or positive. \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{center}
 
-\vspace{0.12cm}
-\begin{block}{Checking Flags After \texttt{cmp x0, x1}}
-\small
-\begin{itemize}\setlength{\itemsep}{1pt}
-  \item $x_0 == x_1$: \key{$Z=1$}.
-  \item $x_0 < x_1$ (signed): \key{$N \neq V$}.
-  \item $x_0 < x_1$ (unsigned): \key{$C=0$}.
-\end{itemize}
-\end{block}
+\vspace{0.18cm}
+After \code{cmp x0, x1}, a following conditional branch interprets the flags according to the intended signed or unsigned comparison.
 \end{frame}
+
 
 
 
@@ -527,7 +525,7 @@ Signed branch conditions often combine flags. For example, after \code{cmp}, \co
 
 \begin{frame}{Condition Codes: Signed vs.\ Unsigned Branches}
 \vspace{-0.35cm}
-  \begin{center}
+\begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
 \rowcolors{2}{softgray}{white}
@@ -549,6 +547,7 @@ Signed branch conditions often combine flags. For example, after \code{cmp}, \co
 \code{b.ls} & Unsigned Lower or Equal ($\le$) & $(\text{C} == 0) \lor (\text{Z} == 1)$ & \key{Unsigned} \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{center}
 
 \vspace{-0.35cm}
@@ -557,6 +556,7 @@ Signed branch conditions often combine flags. For example, after \code{cmp}, \co
 Unsigned conditions are appropriate when the program semantics treat the values as unsigned; they are also commonly used for address and range comparisons.
 \end{block}
 \end{frame}
+
 
 % ============================================================
 % Section 3 Divider
@@ -575,7 +575,7 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 \begin{frame}{Compare-and-Branch Instructions: \texttt{cbz} and \texttt{cbnz}}
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item \key{\code{cbz} / \code{cbnz}} test a register directly and do not alter NZCV.
-  \item They encode the zero test and branch in one architectural instruction instead of a separate compare and conditional branch.
+  \item They combine a zero test and branch in one architectural instruction.
 \end{itemize}
 
 \vspace{0.12cm}
@@ -604,11 +604,8 @@ Unsigned conditions are appropriate when the program semantics treat the values 
 \end{block}
 \end{column}
 \end{columns}
-
-\vspace{0.12cm}
-\small
-\key{Single-Bit Test:} \code{tbz x0, \#0, label} branches if bit 0 is zero.
 \end{frame}
+
 
 
 
@@ -718,29 +715,29 @@ while (i < n) {
 % Slide 14
 % ============================================================
 
-\begin{frame}{Branch Misprediction \& Conditional Selection (\texttt{csel})}
+\begin{frame}{Conditional Selection with \texttt{csel}}
 \small
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item A mispredicted conditional branch discards younger speculative work; the cost is implementation-dependent.
-  \item \key{\code{csel}} chooses between two register operands from NZCV without changing control flow.
-  \item \key{Trade-off:} Conditional selection avoids prediction for that decision but can extend a data-dependency chain.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item \code{csel} chooses between two register operands using the current condition flags.
+  \item It is useful for short value selections where both candidate values are already available in registers.
 \end{itemize}
 
-\vspace{0.08cm}
+\vspace{0.12cm}
 \begin{block}{Signed Maximum: $\code{result} = (x_1 > x_2) \mathbin{?} x_1 : x_2$}
 \footnotesize
 \rowcolors{1}{}{}
 \begin{tabular}{ll}
-\code{cmp  x1, x2}          & \text{\scriptsize // set NZCV from x1 - x2} \\
-\code{csel x0, x1, x2, gt}  & \text{\scriptsize // signed max; use hi for unsigned} \\
+\code{cmp  x1, x2}          & \text{\scriptsize // set flags from x1 - x2} \\
+\code{csel x0, x1, x2, gt}  & \text{\scriptsize // if x1 > x2, choose x1; else choose x2} \\
 \end{tabular}
 \rowcolors{1}{}{}
 \end{block}
 
 \vspace{0.16cm}
-\footnotesize
-\key{Related forms:} \code{cset w0, eq} sets 0 or 1 from a condition; \code{cinc x0, x1, eq} conditionally increments \bits{x1}.
+\normalsize
+The condition code on \code{csel} is interpreted the same way as a conditional branch condition.
 \end{frame}
+
 
 % ============================================================
 % Section 4 Divider
@@ -759,13 +756,14 @@ while (i < n) {
 \begin{frame}{Topic 4: Summary}
 \small
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item \key{Arithmetic \& Shifts:} Regular register and immediate arithmetic includes shifted-register operands in many data-processing instructions.
+  \item \key{Arithmetic \& Shifts:} AArch64 supports register arithmetic, flag-setting variants, and shifted-register operands.
   \item \key{Bitwise Operations:} \code{and}, \code{orr}, \code{eor}, and \code{bic} operate directly on packed binary data.
-  \item \key{NZCV Flags:} Flag-setting arithmetic and aliases such as \code{cmp} and \code{tst} support signed and unsigned conditions.
-  \item \key{Control Flow:} Compilers commonly arrange one path as fall-through and use bottom-tested loops where appropriate.
-  \item \key{Conditional Selection:} \code{csel} and related forms can replace short conditional branches when data-dependent selection is preferable.
+  \item \key{NZCV Flags:} Flag-setting instructions record result properties used by later comparisons and branches.
+  \item \key{Comparisons:} \code{cmp} subtracts, updates NZCV, and discards the numerical result.
+  \item \key{Control Flow:} Conditional branches, \code{cbz}/\code{cbnz}, and \code{csel} translate common decisions and loops.
 \end{itemize}
 \end{frame}
+
 
 
 
@@ -801,17 +799,18 @@ while (i < n) {
 \begin{frame}{Self-Test Questions: Control Flow \& Selection}
 
 \begin{enumerate}\setlength{\itemsep}{7pt}
-  \item \key{Loop Test Placement:} Why do compilers often place the conditional branch after the loop body rather than before it?
+  \item \key{Loop Translation:} In the loop example, why does the code jump to the test before the first iteration?
 
   \item \key{Branchless Translation:} Write an equivalent 3-instruction branchless AArch64 sequence using \code{cmp}, \code{neg}, and \code{csel} to implement:
   $$\code{int64\_t abs\_val = (val < 0) ? -val : val;}$$
 
   \item \key{Compare-and-Branch Instructions:} When should an assembly programmer use \code{cbz x0, label} instead of \code{cmp x0, \#0} followed by \code{b.eq label}?
 
-  \item \key{Branch Misprediction Trade-off:} What factors determine whether \code{csel} or a conditional branch is faster?
+  \item \key{Signed vs.\ Unsigned Branches:} Why are \code{b.lt} and \code{b.lo} not interchangeable after the same \code{cmp} instruction?
 \end{enumerate}
 
 \end{frame}
+
 
 
 % ============================================================
@@ -835,12 +834,13 @@ while (i < n) {
 
 \vfill
 \begin{itemize}\setlength{\itemsep}{7pt}
-  \item \key{Load/Store Addressing:} Examining scaled and unscaled immediate offsets, register offsets, and effective-address calculation.
-  \item \key{Indexed Addressing:} Using pre-indexed and post-indexed forms to combine memory access with base-register updates.
-  \item \key{Data Width \& Extension:} Working with byte, halfword, word, and doubleword transfers, including sign- and zero-extending loads.
-  \item \key{Paired Transfers \& Arrays:} Applying \code{ldp}/\code{stp}, pointer arithmetic, and addressing patterns used for arrays and structured data.
+  \item \key{Load/Store Discipline:} Moving values between registers and memory.
+  \item \key{Transfer Widths:} Working with byte, halfword, word, and doubleword data.
+  \item \key{Effective Addresses:} Forming addresses from base registers, offsets, and indexes.
+  \item \key{Arrays \& Pointers:} Applying addressing modes to common memory-access patterns.
 \end{itemize}
 \vfill
 \end{frame}
+
 
 \end{document}
