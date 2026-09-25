@@ -991,10 +991,12 @@ Shifts can resemble multiplication or division by powers of two, but finite widt
 
 \begin{frame}{Execution Time and Performance}
 \begin{block}{Primary Metric}
-For a fixed workload, performance is the inverse of execution time.
+For a fixed workload, performance is a completion rate: how many copies of that workload finish per second.
 \[
-\text{Performance}=\frac{1}{\text{Execution Time}}
+\text{Performance}=\frac{1\ \text{completed task}}{\text{Execution Time}}
+\quad [\text{tasks/s}]
 \]
+For example, if one program run takes $1$ second, performance is $1$ completed run per second.
 \end{block}
 \vspace{0.05cm}
 \begin{columns}[T,onlytextwidth]
@@ -1011,7 +1013,7 @@ For a fixed workload, performance is the inverse of execution time.
 \begin{itemize}
 \item Work completed per unit time.
 \item Important for pipelines and servers.
-\item Example: completed instructions per cycle.
+\item Example: completed tasks per second.
 \end{itemize}
 \end{block}
 \end{columns}
@@ -1029,6 +1031,38 @@ For a fixed workload, performance is the inverse of execution time.
 % ============================================================
 % Slide 22
 % ============================================================
+
+\begin{frame}{Instruction Count Is Dynamic}
+\begin{block}{Dynamic Instruction Count}
+Dynamic instruction count is the number of instructions actually executed, not merely the number of instructions visible in a source or assembly listing.
+\end{block}
+\vspace{0.2cm}
+\begin{itemize}
+\item Loops multiply the effect of a small instruction sequence.
+\item Branches choose which instructions execute.
+\item Function calls, recursion, and input data can change the count.
+\item Optimizing one program region may not matter if it rarely executes.
+\end{itemize}
+\vspace{0.15cm}
+\begin{block}{Simple Example}
+A three-instruction loop body executed $N$ times contributes approximately $3N$ dynamic instructions, before considering branch and loop-control instructions.
+\end{block}
+\end{frame}
+
+\begin{frame}{Cycles Per Instruction (CPI)}
+\begin{block}{Definition}
+CPI is the average number of clock cycles used per executed instruction for a particular workload.
+\[
+\text{CPI}=\frac{\text{total clock cycles}}{\text{dynamic instruction count}}
+\]
+\end{block}
+\vspace{0.15cm}
+\begin{itemize}
+\item A lower CPI usually means fewer cycles are needed per instruction.
+\item CPI is an average: stalls, cache misses, and branch penalties can increase it.
+\item CPI is not fixed by the ISA alone; it depends on the processor and workload.
+\end{itemize}
+\end{frame}
 
 \begin{frame}{The Iron Law of Processor Performance}
 \begin{block}{CPU Execution-Time Equation}
@@ -1064,87 +1098,13 @@ pipeline, memory, branches \\
 \rowcolor{softgray}
 $T_{\text{clk}}$ &
 seconds per cycle &
-circuit timing, clock frequency \\
+circuit timing \\
+\rowcolor{white}
+$f_{\text{clk}}$ &
+cycles per second (Hz) &
+clock frequency \\
 \end{tabular}
 \end{center}
-\end{frame}
-
-
-
-
-
-
-
-
-
-
-% ============================================================
-% Slide 23
-% ============================================================
-
-\begin{frame}{Instruction Count Is Dynamic}
-\begin{block}{Dynamic Instruction Count}
-Dynamic instruction count is the number of instructions actually executed, not merely the number of instructions visible in a source or assembly listing.
-\end{block}
-\vspace{0.2cm}
-\begin{itemize}
-\item Loops multiply the effect of a small instruction sequence.
-\item Branches choose which instructions execute.
-\item Function calls, recursion, and input data can change the count.
-\item Optimizing one program region may not matter if it rarely executes.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Simple Example}
-A three-instruction loop body executed $N$ times contributes approximately $3N$ dynamic instructions, before considering branch and loop-control instructions.
-\end{block}
-\end{frame}
-
-
-
-
-
-
-
-
-
-
-% ============================================================
-% Slide 24
-% ============================================================
-
-\begin{frame}{CPI and IPC}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Cycles Per Instruction}
-\[
-\text{CPI}=
-\frac{\text{cycles}}
-     {\text{instructions}}
-\]
-\begin{itemize}
-\item Average over a workload.
-\item Can include stalls and cache misses.
-\item Lower is usually better.
-\end{itemize}
-\end{block}
-\column{0.48\textwidth}
-\begin{block}{Instructions Per Cycle}
-\[
-\text{IPC}=
-\frac{\text{instructions}}
-     {\text{cycles}}
-\]
-\begin{itemize}
-\item Average completed instructions per cycle.
-\item Can exceed 1 on superscalar cores.
-\item Higher is usually better.
-\end{itemize}
-\end{block}
-\end{columns}
-\vspace{0.15cm}
-\begin{block}{No Universal Cycle Count}
-Instruction latency and throughput are microarchitecture-dependent, not fixed by the AArch64 ISA alone.
-\end{block}
 \end{frame}
 
 
