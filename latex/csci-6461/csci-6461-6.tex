@@ -1,3 +1,4 @@
+\PassOptionsToPackage{table}{xcolor}
 \documentclass[aspectratio=169,11pt,t]{beamer}
 
 % ============================================================
@@ -68,6 +69,7 @@
 \definecolor{softgray}{RGB}{245,247,250}
 \definecolor{darkgray}{RGB}{25,28,32}
 \definecolor{gold}{RGB}{200,145,35}
+\definecolor{tablealt}{RGB}{246,248,251}
 
 \setbeamercolor{palette primary}{bg=navy,fg=white}
 \setbeamercolor{palette secondary}{bg=deepblue,fg=white}
@@ -133,7 +135,7 @@
 
 \subtitle{
   Function linkage, register preservation rules, stack frame management,\\
-  and AAPCS64 architectural compliance
+  and AAPCS64 stack and register rules
 }
 
 \author{
@@ -181,7 +183,7 @@ Subroutines, Calling Conventions,\\[0.08cm]\& the Stack
 \vspace{0.35cm}
 
 {\color{white!80}\large
-Function linkage, register preservation rules, stack frame management,\\and AAPCS64 architectural compliance
+Function linkage, register preservation rules, stack frame management,\\and AAPCS64 stack and register rules
 \par}
 
 \end{minipage}
@@ -487,8 +489,10 @@ If a function makes another call and must later return to its own caller, its in
 \begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
+\rowcolors{2}{white}{tablealt}
 \begin{tabular}{cll}
 \toprule
+\rowcolor{lightblue}
 \textbf{Parameter Index} & \textbf{Register} & \textbf{C Language Example} \\
 \midrule
 1st Argument & \bits{x0} (\bits{w0}) & \code{int64\_t a} \\
@@ -497,6 +501,7 @@ If a function makes another call and must later return to its own caller, its in
 4th--8th Arguments & \bits{x3}--\bits{x7} & Additional scalar arguments \\
 \bottomrule
 \end{tabular}
+\rowcolors{2}{}{}
 \end{center}
 \vspace{0.15cm}
 \begin{block}{Additional Arguments}
@@ -514,27 +519,30 @@ Arguments not assigned to registers are placed in the stack argument area accord
 
 \begin{frame}{Return Value Registers}
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Many scalar return values are returned directly in registers.
+  \item Most integer and pointer results come back in \bits{x0}.
+  \item A 32-bit result uses the lower view, \bits{w0}.
+  \item Some larger register-sized results may use \bits{x0} and \bits{x1}.
 \end{itemize}
 \vspace{0.1cm}
 \begin{center}
 \footnotesize
 \renewcommand{\arraystretch}{1.15}
+\rowcolors{2}{white}{tablealt}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.28\textwidth} >{\raggedright\arraybackslash}p{0.18\textwidth} >{\raggedright\arraybackslash}p{0.40\textwidth}}
 \toprule
-\textbf{Return Data} & \textbf{Register(s)} & \textbf{Typical Rule} \\
+\rowcolor{lightblue}
+\textbf{Return Data} & \textbf{Register} & \textbf{Example} \\
 \midrule
-32-bit scalar integer / Boolean & \bits{w0} & Result returned in the lower 32-bit view. \\
-64-bit scalar integer / pointer & \bits{x0} & Result returned in register 0. \\
-Suitable integer-like aggregate up to 16 bytes & \bits{x0}, \bits{x1} & May use two general-purpose result registers. \\
-Larger or non-register aggregate & indirect via \bits{x8} & Caller supplies an indirect result location when required. \\
+32-bit integer & \bits{w0} & \code{int f(void)} \\
+64-bit integer or pointer & \bits{x0} & \code{int64\_t f(void)} \\
+Two-register result & \bits{x0}, \bits{x1} & ABI-dependent small aggregate cases \\
 \bottomrule
 \end{tabular}
+\rowcolors{2}{}{}
 \end{center}
 \vspace{0.15cm}
-\begin{block}{Scope Note}
-Floating-point and SIMD return rules use the SIMD/FP register file and are outside this lecture's focus.
-\end{block}
+\small
+Floating-point, SIMD, and large-structure return rules are separate cases; this lecture focuses on integer/pointer linkage.
 \end{frame}
 
 
@@ -554,8 +562,10 @@ Floating-point and SIMD return rules use the SIMD/FP register file and are outsi
 \begin{center}
 \footnotesize
 \renewcommand{\arraystretch}{1.12}
+\rowcolors{2}{white}{tablealt}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.40\textwidth} >{\raggedright\arraybackslash}p{0.30\textwidth}}
 \toprule
+\rowcolor{lightblue}
 \textbf{Registers} & \textbf{AAPCS64 Role} & \textbf{Preservation} \\
 \midrule
 \bits{x0}--\bits{x7} & Arguments and result registers & Caller-saved \\
@@ -564,6 +574,7 @@ Floating-point and SIMD return rules use the SIMD/FP register file and are outsi
 \bits{x16}--\bits{x17} & Intra-procedure-call temporaries (IP0/IP1) & Caller-saved \\
 \bottomrule
 \end{tabular}
+\rowcolors{2}{}{}
 \end{center}
 \vspace{0.15cm}
 \begin{block}{Caller Responsibility}
@@ -618,25 +629,18 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 % ============================================================
 
 \begin{frame}{Special-Purpose ABI Registers}
-\begin{center}
-\footnotesize
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.16\textwidth} >{\raggedright\arraybackslash}p{0.13\textwidth} >{\raggedright\arraybackslash}p{0.61\textwidth}}
-\toprule
-\textbf{Register} & \textbf{ABI Name} & \textbf{AAPCS64 / ABI Role} \\
-\midrule
-\bits{x8} & XR & Indirect result-location register when a return value is passed through memory. \\
-\bits{x16}, \bits{x17} & IP0, IP1 & Intra-procedure-call temporaries; linkers and veneers may use them. \\
-\bits{x18} & PR & Platform register; availability depends on the platform ABI. \\
-\bits{x29} & FP & Frame pointer when a frame record is maintained. \\
-\bits{x30} & LR & Link register; \code{bl}/\code{blr} write the return address here. \\
-\bits{sp} & SP & Stack pointer; must satisfy AAPCS64 alignment and stack-use rules. \\
-\bottomrule
-\end{tabular}
-\end{center}
-\vspace{0.12cm}
-\small
-\key{Takeaway:} Treat \bits{x18}, \bits{x29}, \bits{x30}, and \bits{sp} according to their ABI and linkage roles rather than as ordinary scratch registers.
+
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item \bits{x29} / \bits{fp}: frame pointer when a frame record is used.
+  \item \bits{x30} / \bits{lr}: link register; \code{bl} and \code{blr} write the return address here.
+  \item \bits{sp}: stack pointer; marks the active stack boundary and must stay properly aligned.
+  \item \bits{x18}: platform register; do not use it in hand-written examples unless the target platform says it is available.
+\end{itemize}
+
+\vfill
+\begin{block}{Course Convention}
+In hand-written examples for this topic, keep \bits{x29}, \bits{x30}, and \bits{sp} for their linkage and stack roles; use ordinary temporary registers for scratch values.
+\end{block}
 \end{frame}
 
 
@@ -651,8 +655,10 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 \begin{center}
 \footnotesize
 \renewcommand{\arraystretch}{1.12}
+\rowcolors{2}{white}{tablealt}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.18\textwidth} >{\raggedright\arraybackslash}p{0.34\textwidth} >{\raggedright\arraybackslash}p{0.39\textwidth}}
 \toprule
+\rowcolor{lightblue}
 \textbf{Registers} & \textbf{Role / Usage} & \textbf{Preservation Contract} \\
 \midrule
 \bits{x0}--\bits{x7} & Arguments and result values & Caller-saved \\
@@ -663,6 +669,7 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 \bits{sp} & Stack pointer & Must be restored to the required value before return and obey alignment rules \\
 \bottomrule
 \end{tabular}
+\rowcolors{2}{}{}
 \end{center}
 \end{frame}
 
@@ -684,7 +691,7 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item The runtime stack is a dynamic memory region allocated in process address space.
-  \item \key{Key Characteristics:}
+  \item \key{Stack behavior:}
   \begin{itemize}\setlength{\itemsep}{3pt}
     \item Grows \textbf{downward} from high memory addresses toward low memory addresses.
     \item Stack Pointer (\bits{sp}) points to the current \key{lowest active address} (top of stack).
@@ -692,11 +699,12 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
   \end{itemize}
 \end{itemize}
 
-\vspace{0.25cm}
+\vspace{0.22cm}
 \begin{block}{Allocation vs.\ Deallocation}
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item \key{Push / Allocate:} Subtract from \bits{sp} (\code{sub sp, sp, \#32}).
-  \item \key{Pop / Deallocate:} Add to \bits{sp} (\code{add sp, sp, \#32}).
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item \key{Allocate:} subtract from \bits{sp}, e.g., \code{sub sp, sp, \#32}.
+  \item Here \code{\#32} means \key{32 bytes}: room for four 64-bit \bits{x} register slots.
+  \item \key{Release:} add the same amount back, e.g., \code{add sp, sp, \#32}.
 \end{itemize}
 \end{block}
 \end{frame}
@@ -712,23 +720,20 @@ If a subroutine modifies any register in \bits{x19}--\bits{x28}, its incoming va
 \begin{frame}{What Is a Stack Frame?}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Each function call may reserve a region of the runtime stack called an
-        \key{activation frame} or \key{stack frame}.
+  \item Each function call may reserve a region of the runtime stack called an \key{activation frame} or \key{stack frame}.
   \item A frame can hold:
   \begin{itemize}\setlength{\itemsep}{3pt}
-    \item saved return and register state,
-    \item callee-saved registers,
+    \item a frame record (saved old \bits{x29} and saved \bits{x30}),
+    \item saved callee-saved registers below it,
     \item local variables, temporary storage, and alignment padding.
   \end{itemize}
-  \item The stack pointer (\bits{sp}) identifies the current stack boundary and
-        changes as stack storage is allocated or released.
+  \item The stack pointer (\bits{sp}) identifies the current stack boundary and changes as stack storage is allocated or released.
 \end{itemize}
 
 \vfill
 
 \begin{block}{Why a Frame Pointer?}
-When a stable reference within the frame is useful, \bits{x29} can serve as the
-frame pointer while \bits{sp} continues to track the current stack position.
+When a stable reference within the frame is useful, \bits{x29} can serve as the frame pointer while \bits{sp} continues to track the current stack position.
 \end{block}
 
 \end{frame}
@@ -746,11 +751,11 @@ frame pointer while \bits{sp} continues to track the current stack position.
 \begin{column}{0.52\textwidth}
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item An \key{activation frame} stores state associated with one function invocation.
-  \item Common elements include:
+  \item In the teaching layout used here:
   \begin{enumerate}\setlength{\itemsep}{2pt}
     \item saved link register (\bits{x30}) and frame pointer (\bits{x29}),
-    \item saved callee-saved registers,
-    \item local variables and buffers.
+    \item saved callee-saved registers come below it,
+    \item local variables and buffers extend farther downward.
   \end{enumerate}
 \end{itemize}
 \end{column}
@@ -778,22 +783,36 @@ frame pointer while \bits{sp} continues to track the current stack position.
 
 \begin{frame}{Frame Pointer (\texttt{x29}) and Frame Records}
 
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item The \key{Frame Pointer (\bits{x29} / \bits{fp})} can provide a fixed reference point within the activation frame for accessing arguments and local variables.
-  \item \key{Frame Pointer Conventions:}
+  \item When a frame record is used, \bits{x29} points to it.
+  \item The record has two 64-bit fields:
   \begin{itemize}\setlength{\itemsep}{2pt}
-    \item Under standard AAPCS64 profiles, functions may maintain a frame record linking saved \bits{x29} and \bits{x30}.
-    \item When used, this creates a traceable chain of stack frames to assist debuggers (e.g., GDB) with backtraces.
-    \item However, platform rules or optimization levels may permit omitting frame records or repurposing \bits{x29}.
+    \item \code{[x29]}: saved previous \bits{x29}
+    \item \code{[x29, \#8]}: saved \bits{x30}
   \end{itemize}
+  \item The saved previous \bits{x29} links this frame to the caller's frame.
 \end{itemize}
-
+\end{column}
+\begin{column}{0.4\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.85, every node/.style={transform shape}]
-  \node[draw=navy, fill=lightblue, rounded corners=2pt, minimum width=4.5cm, minimum height=0.7cm, font=\small\bfseries] (caller) {Caller Frame Record};
-  \node[draw=navy, fill=softgray, rounded corners=2pt, minimum width=4.5cm, minimum height=0.7cm, font=\small\bfseries, below=1.4cm of caller] (callee) {Callee Frame Record};
-  \draw[-{Latex}, line width=1.2pt, gold!80!black] (callee.north) -- (caller.south) node[midway, right, font=\tiny\bfseries] {frame-record link};
+\begin{tikzpicture}[scale=0.78, every node/.style={transform shape}]
+  \node[font=\scriptsize\bfseries, anchor=west] at (0,3.7) {higher addresses};
+  \draw[fill=lightblue, draw=navy] (0,2.8) rectangle (4.2,3.5) node[midway, font=\small\bfseries] {saved x30};
+  \draw[fill=lightblue, draw=navy] (0,2.1) rectangle (4.2,2.8) node[midway, font=\small\bfseries] {saved old x29};
+  \draw[fill=softgray, draw=navy, dashed] (0,1.0) rectangle (4.2,2.1) node[midway, font=\small] {rest of frame};
+  \node[font=\scriptsize\bfseries, anchor=west] at (0,0.6) {lower addresses};
+  \draw[-{Latex}, thick, gold!80!black] (-0.7,2.45) -- (0,2.45);
+  \node[anchor=east, font=\scriptsize\bfseries] at (-0.75,2.45) {x29};
 \end{tikzpicture}
+\end{column}
+\end{columns}
+
+\vfill
+\begin{block}{Course Convention}
+Compilers may omit frame records in optimized code. In this lecture, keeping them visible makes calls, returns, and stack frames easier to trace.
+\end{block}
 \end{frame}
 
 
@@ -806,26 +825,50 @@ frame pointer while \bits{sp} continues to track the current stack position.
 
 \begin{frame}[fragile]{Function Prologue Mechanics}
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item A \key{prologue} commonly allocates stack space and saves state needed by the function.
+  \item A prologue saves the frame record first, then grows the rest of the frame downward.
+  \item Here the \bits{x29}/\bits{x30} frame record stays at the high-address end of this function's frame.
 \end{itemize}
+
 \vspace{0.05cm}
-\begin{block}{Example Prologue Template}
-\small
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\begin{block}{Prologue Template}
+\footnotesize
 \begin{verbatim}
 my_func:
-    // Allocate 32 bytes and save FP/LR
-    stp    x29, x30, [sp, #-32]!
+    // save old FP and LR as frame record
+    stp    x29, x30, [sp, #-16]!
 
-    // x29 points to the frame record
+    // x29 anchors the frame record
     mov    x29, sp
 
-    // Save callee-saved register used by the body
-    str    x19, [sp, #16]
+    // save x19 below the frame record
+    str    x19, [sp, #-16]!
 \end{verbatim}
 \end{block}
-\vspace{0.1cm}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{block}{Stack Layout}
+\centering
+\begin{tikzpicture}[scale=0.74, every node/.style={transform shape}]
+  \node[font=\scriptsize\bfseries, anchor=west] at (0,4.6) {higher addresses};
+  \draw[fill=tablealt, draw=navy] (0,3.8) rectangle (4.4,4.45) node[midway, font=\scriptsize] {caller frame / old sp};
+  \draw[fill=lightblue, draw=navy] (0,3.15) rectangle (4.4,3.8) node[midway, font=\scriptsize\bfseries] {saved x30 (LR)};
+  \draw[fill=lightblue, draw=navy] (0,2.5) rectangle (4.4,3.15) node[midway, font=\scriptsize\bfseries] {saved old x29};
+  \draw[fill=tablealt, draw=navy] (0,1.85) rectangle (4.4,2.5) node[midway, font=\scriptsize] {alignment / available};
+  \draw[fill=tablealt, draw=navy] (0,1.2) rectangle (4.4,1.85) node[midway, font=\scriptsize\bfseries] {saved x19};
+  \node[anchor=east, font=\scriptsize\bfseries] at (0,2.82) {x29};
+  \node[anchor=east, font=\scriptsize\bfseries] at (0,1.52) {sp};
+  \node[font=\scriptsize\bfseries, anchor=west] at (0,0.8) {lower addresses};
+  \draw[-{Latex}, thick, gold!80!black] (5.0,4.1) -- (5.0,1.25) node[midway, right, font=\tiny\bfseries, rotate=-90, anchor=south] {stack grows};
+\end{tikzpicture}
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.04cm}
 \small
-Pre-indexed \code{stp} combines stack-pointer writeback with the paired store of \bits{x29}/\bits{x30}.
+The second 16-byte allocation uses 8 bytes for \bits{x19}; the other 8-byte slot is alignment/available space.
 \end{frame}
 
 
@@ -839,28 +882,27 @@ Pre-indexed \code{stp} combines stack-pointer writeback with the paired store of
 \begin{frame}[fragile]{Function Epilogue Mechanics}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item The \key{Epilogue} tears down the frame and restores state before returning.
-  \item Reverses the exact sequence performed by the prologue:
+  \item The epilogue restores state in the reverse order and releases the stack frame.
+  \item Restore any saved callee registers before restoring the frame record and returning.
 \end{itemize}
 
 \vspace{0.15cm}
-\begin{block}{Standard Epilogue Template}
+\begin{block}{Epilogue Template}
 \small
 \begin{verbatim}
-    // 1. Restore saved callee registers
-    ldr    x19, [sp, #16]
+    // 1. Restore saved callee register; release its slot
+    ldr    x19, [sp], #16
 
-    // 2. Restore original FP and LR; release stack frame
-    ldp    x29, x30, [sp], #32
+    // 2. Restore original FP and LR; release frame record
+    ldp    x29, x30, [sp], #16
 
     // 3. Return to caller
     ret
 \end{verbatim}
 \end{block}
 
-\vspace{0.2cm}
-\normalsize
-Post-indexed \code{ldp} performs a paired architectural load and writeback in one instruction to restore \bits{x29}/\bits{x30} and deallocate 32 stack bytes.
+\small
+The post-indexed \code{ldr} and \code{ldp} restore values first, then move \bits{sp} upward. This exactly reverses the prologue's two downward allocations.
 \end{frame}
 
 
@@ -931,8 +973,10 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 \begin{center}
 \footnotesize
 \renewcommand{\arraystretch}{1.12}
+\rowcolors{2}{white}{tablealt}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.31\textwidth} >{\raggedright\arraybackslash}p{0.22\textwidth} >{\raggedright\arraybackslash}p{0.34\textwidth}}
 \toprule
+\rowcolor{lightblue}
 \textbf{Required Space} & \textbf{Frame Size} & \textbf{Example Allocation} \\
 \midrule
 16B saved FP/LR & 16 bytes & \code{stp x29, x30, [sp, \#-16]!} \\
@@ -940,6 +984,7 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 16B saved FP/LR + 32B locals & 48 bytes & allocate a 48-byte frame \\
 \bottomrule
 \end{tabular}
+\rowcolors{2}{}{}
 \end{center}
 \end{frame}
 
