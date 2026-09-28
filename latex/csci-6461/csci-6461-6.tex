@@ -308,12 +308,11 @@ The \code{bl} instruction encodes a signed 26-bit immediate offset, allowing dir
 \begin{frame}{Subroutine Return Mechanics (\texttt{ret})}
 \large
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item \key{Return from Subroutine (\code{ret}):} Branches to the address held in a register. With no explicit operand, \code{ret} uses the link register \bits{x30}:
-  $$\text{PC} \leftarrow x_{30}$$
+  \item \key{Return from Subroutine (\code{ret}):} Branches to the address held in a register. With no explicit operand, \code{ret} uses the link register: $\text{PC} \leftarrow x_{30}$.
   \item A normal \code{bl} / \code{ret} pair therefore resumes at the instruction following the original call.
 \end{itemize}
 
-\vspace{0.15cm}
+\vspace{-0.05cm}
 \begin{block}{Example: Minimal Leaf Return Sequence}
 \small
 \begin{tabular}{ll}
@@ -372,24 +371,15 @@ If a function makes another call and must later return to its own caller, its in
 
 \begin{frame}{Indirect Subroutine Calls (\texttt{blr})}
 \large
-\begin{itemize}\setlength{\itemsep}{6pt}
+\begin{itemize}\setlength{\itemsep}{7pt}
   \item When the target function address is determined dynamically at runtime, use \key{Branch with Link to Register (\code{blr xn})}.
   \item Saves return address ($\text{PC} + 4$) into \bits{x30} and jumps to address held in register \bits{xn}.
+  \item \key{Typical uses:} C function pointers and callbacks, C++ virtual method tables, and shared-library veneers.
+  \item \key{Example:}
 \end{itemize}
-
-\vspace{0.2cm}
-\begin{block}{Primary Applications}
-\begin{itemize}\setlength{\itemsep}{3pt}
-  \item \key{C Function Pointers:} \code{void (*func\_ptr)(int) = my\_callback;}
-  \item \key{Virtual Method Tables (vtables):} C++ polymorphism and object dispatch.
-  \item \key{Shared Library Veneers:} Dynamic linking and Symbol Jump Tables.
-\end{itemize}
-\end{block}
-
-\vspace{0.2cm}
-\small
-\code{ldr x2, [x0, \#8]} \quad \text{\scriptsize // Load function pointer from vtable} \\
-\code{blr x2}             \quad \text{\scriptsize // Call function indirectly via register x2}
+\vspace{-0.05cm}
+\hspace*{2.3em}\code{ldr x2, [x0, \#8]}\hspace{0.7em}// load function address\\[3pt]
+\hspace*{2.3em}\code{blr x2}\hspace{0.7em}// call through register \bits{x2}
 \end{frame}
 
 
@@ -677,7 +667,7 @@ In hand-written examples for this topic, keep \bits{x29}, \bits{x30}, and \bits{
 % Section 3 Divider
 % ============================================================
 
-\sectiondivider{PART 3}{The Runtime Stack \& Activation Frames}
+\sectiondivider{PART 3}{The Runtime Stack \& Stack Frames}
 
 
 
@@ -720,8 +710,8 @@ In hand-written examples for this topic, keep \bits{x29}, \bits{x30}, and \bits{
 \begin{frame}{What Is a Stack Frame?}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item Each function call may reserve a region of the runtime stack called an \key{activation frame} or \key{stack frame}.
-  \item A frame can hold:
+  \item Each function call may reserve a region of the runtime stack called a \key{stack frame}.
+  \item A stack frame can hold:
   \begin{itemize}\setlength{\itemsep}{3pt}
     \item a frame record (saved old \bits{x29} and saved \bits{x30}),
     \item saved callee-saved registers below it,
@@ -733,7 +723,7 @@ In hand-written examples for this topic, keep \bits{x29}, \bits{x30}, and \bits{
 \vfill
 
 \begin{block}{Why a Frame Pointer?}
-When a stable reference within the frame is useful, \bits{x29} can serve as the frame pointer while \bits{sp} continues to track the current stack position.
+When a stable reference within the stack frame is useful, \bits{x29} can serve as the frame pointer while \bits{sp} continues to track the current stack position.
 \end{block}
 
 \end{frame}
@@ -746,11 +736,11 @@ When a stable reference within the frame is useful, \bits{x29} can serve as the 
 % Slide 18
 % ============================================================
 
-\begin{frame}{Example Activation Frame Structure}
+\begin{frame}{Example Stack Frame Structure}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.52\textwidth}
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item An \key{activation frame} stores state associated with one function invocation.
+  \item A \key{stack frame} stores the stack-resident state associated with one function invocation.
   \item In the teaching layout used here:
   \begin{enumerate}\setlength{\itemsep}{2pt}
     \item saved link register (\bits{x30}) and frame pointer (\bits{x29}),
@@ -792,7 +782,7 @@ When a stable reference within the frame is useful, \bits{x29} can serve as the 
     \item \code{[x29]}: saved previous \bits{x29}
     \item \code{[x29, \#8]}: saved \bits{x30}
   \end{itemize}
-  \item The saved previous \bits{x29} links this frame to the caller's frame.
+  \item The saved previous \bits{x29} links this stack frame to the caller's stack frame.
 \end{itemize}
 \end{column}
 \begin{column}{0.4\textwidth}
@@ -801,7 +791,7 @@ When a stable reference within the frame is useful, \bits{x29} can serve as the 
   \node[font=\scriptsize\bfseries, anchor=west] at (0,3.7) {higher addresses};
   \draw[fill=lightblue, draw=navy] (0,2.8) rectangle (4.2,3.5) node[midway, font=\small\bfseries] {saved x30};
   \draw[fill=lightblue, draw=navy] (0,2.1) rectangle (4.2,2.8) node[midway, font=\small\bfseries] {saved old x29};
-  \draw[fill=softgray, draw=navy, dashed] (0,1.0) rectangle (4.2,2.1) node[midway, font=\small] {rest of frame};
+  \draw[fill=softgray, draw=navy, dashed] (0,1.0) rectangle (4.2,2.1) node[midway, font=\small] {rest of stack frame};
   \node[font=\scriptsize\bfseries, anchor=west] at (0,0.6) {lower addresses};
   \draw[-{Latex}, thick, gold!80!black] (-0.7,2.45) -- (0,2.45);
   \node[anchor=east, font=\scriptsize\bfseries] at (-0.75,2.45) {x29};
@@ -824,9 +814,10 @@ Compilers may omit frame records in optimized code. In this lecture, keeping the
 % ============================================================
 
 \begin{frame}[fragile]{Function Prologue Mechanics}
-\begin{itemize}\setlength{\itemsep}{4pt}
+\begin{itemize}\setlength{\itemsep}{3pt}
   \item A prologue saves the frame record first, then grows the rest of the frame downward.
-  \item Here the \bits{x29}/\bits{x30} frame record stays at the high-address end of this function's frame.
+  \item Here the \bits{x29}/\bits{x30} frame record stays at the high-address end of this function's stack frame.
+  \item Saving one 8-byte \bits{x} register still reserves 16 bytes so \bits{sp} remains aligned.
 \end{itemize}
 
 \vspace{0.05cm}
@@ -852,7 +843,7 @@ my_func:
 \centering
 \begin{tikzpicture}[scale=0.74, every node/.style={transform shape}]
   \node[font=\scriptsize\bfseries, anchor=west] at (0,4.6) {higher addresses};
-  \draw[fill=tablealt, draw=navy] (0,3.8) rectangle (4.4,4.45) node[midway, font=\scriptsize] {caller frame / old sp};
+  \draw[fill=tablealt, draw=navy] (0,3.8) rectangle (4.4,4.45) node[midway, font=\scriptsize] {caller stack frame / old sp};
   \draw[fill=lightblue, draw=navy] (0,3.15) rectangle (4.4,3.8) node[midway, font=\scriptsize\bfseries] {saved x30 (LR)};
   \draw[fill=lightblue, draw=navy] (0,2.5) rectangle (4.4,3.15) node[midway, font=\scriptsize\bfseries] {saved old x29};
   \draw[fill=tablealt, draw=navy] (0,1.85) rectangle (4.4,2.5) node[midway, font=\scriptsize] {alignment / available};
@@ -866,9 +857,6 @@ my_func:
 \end{column}
 \end{columns}
 
-\vspace{0.04cm}
-\small
-The second 16-byte allocation uses 8 bytes for \bits{x19}; the other 8-byte slot is alignment/available space.
 \end{frame}
 
 
@@ -958,15 +946,77 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 % Slide 23
 % ============================================================
 
+\begin{frame}[fragile]{Local Declarations and Stack Layout}
+\vspace*{-0.30cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.43\textwidth}
+\begin{block}{C Source Order}
+\small
+\begin{verbatim}
+void f(void) {
+    char a;
+    char b;
+    int  x;
+    char c;
+}
+\end{verbatim}
+\end{block}
+\vspace{0.02cm}
+\small
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item These are independent local variables.
+  \item C source order does not define stack offsets.
+  \item The compiler may reorder, pack, keep in registers, or remove them.
+\end{itemize}
+\end{column}
+\begin{column}{0.53\textwidth}
+\textbf{\large One Possible 16-Byte Local Area}
+\vspace{0.06cm}
+
+\footnotesize
+\renewcommand{\arraystretch}{1.12}
+\rowcolors{2}{white}{tablealt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.34\linewidth} >{\raggedright\arraybackslash}p{0.56\linewidth}}
+\toprule
+\rowcolor{lightblue}
+\textbf{Offset} & \textbf{Contents} \\
+\midrule
+local + 0  & \code{x} uses 4 bytes \\
+local + 4  & \code{a} uses 1 byte \\
+local + 5  & \code{b} uses 1 byte \\
+local + 6  & \code{c} uses 1 byte \\
+local + 7--15 & padding / available space \\
+\bottomrule
+\end{tabular}
+\rowcolors{2}{}{}
+\vspace{0.14cm}
+
+\small
+The chosen layout must satisfy each object's alignment requirement and preserve the program's observable behavior.
+\end{column}
+\end{columns}
+\vspace{0.05cm}
+\footnotesize
+Exception: array elements remain contiguous, and structure members keep declaration order.
+\end{frame}
+
+
+
+
+
+% ============================================================
+% Slide 24
+% ============================================================
+
 \begin{frame}{Stack Alignment and Padding Rules}
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item AAPCS64 requires \bits{sp} to satisfy 16-byte alignment at public interfaces and when used for stack memory accesses.
-  \item Frame allocation therefore rounds the required stack space up to a multiple of 16 bytes.
+  \item Stack-frame allocation therefore rounds the required stack space up to a multiple of 16 bytes.
 \end{itemize}
 \vspace{0.1cm}
-\begin{block}{Calculating Frame Size}
+\begin{block}{Calculating Stack-Frame Size}
 \[
-\text{Frame Size} = \text{align}_{16}(\text{saved state} + \text{local storage})
+\text{Stack Frame Size} = \text{align}_{16}(\text{saved state} + \text{local storage})
 \]
 \end{block}
 \vspace{0.1cm}
@@ -977,11 +1027,11 @@ Because this example is a leaf function, it does not need to save \bits{x30} sol
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.31\textwidth} >{\raggedright\arraybackslash}p{0.22\textwidth} >{\raggedright\arraybackslash}p{0.34\textwidth}}
 \toprule
 \rowcolor{lightblue}
-\textbf{Required Space} & \textbf{Frame Size} & \textbf{Example Allocation} \\
+\textbf{Required Space} & \textbf{Stack Frame Size} & \textbf{Example Allocation} \\
 \midrule
 16B saved FP/LR & 16 bytes & \code{stp x29, x30, [sp, \#-16]!} \\
-16B saved FP/LR + 20B locals & 48 bytes & allocate a 48-byte frame and place saved state/locals within it \\
-16B saved FP/LR + 32B locals & 48 bytes & allocate a 48-byte frame \\
+16B saved FP/LR + 20B locals & 48 bytes & allocate a 48-byte stack frame and place saved state/locals within it \\
+16B saved FP/LR + 32B locals & 48 bytes & allocate a 48-byte stack frame \\
 \bottomrule
 \end{tabular}
 \rowcolors{2}{}{}
@@ -1187,7 +1237,7 @@ func_with_10_args:
     \item Scalar arguments commonly begin in \bits{x0}--\bits{x7}; most scalar results return in \bits{x0}.
     \item \bits{x0}--\bits{x17} are caller-saved; \bits{x19}--\bits{x28} are callee-saved.
   \end{itemize}
-  \item \key{Activation Frames:} Stack frames hold saved linkage state, preserved registers, and local storage while maintaining required alignment.
+  \item \key{Stack Frames:} A stack frame holds saved linkage state, preserved registers, and local storage while maintaining required alignment.
   \item \key{Prologue/Epilogue:} Paired \code{stp}/\code{ldp} instructions commonly save and restore \bits{x29}/\bits{x30} while updating \bits{sp}.
 \end{itemize}
 \end{frame}
@@ -1223,7 +1273,7 @@ func_with_10_args:
 \begin{frame}{Self-Test Questions: Stack Frame Management}
 
 \begin{enumerate}\setlength{\itemsep}{6pt}
-  \item \key{Stack Allocation Alignment:} A non-leaf function saves \bits{x29}/\bits{x30} (16 bytes) and needs 20 bytes of local buffer space. What is the minimum frame size it must allocate on the stack to maintain AAPCS64 compliance?
+  \item \key{Stack Allocation Alignment:} A non-leaf function saves \bits{x29}/\bits{x30} (16 bytes) and needs 20 bytes of local buffer space. What is the minimum stack-frame size it must allocate to maintain AAPCS64 compliance?
 
   \item \key{Prologue/Epilogue Verification:} Identify the bug in the following epilogue:
   \small
