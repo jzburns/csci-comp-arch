@@ -401,41 +401,32 @@ address, it must save \code{x30} before the nested call.
 % ============================================================
 
 \begin{frame}{Integer Argument Registers}
-\begin{block}{AArch64 Procedure Call Standard}
-The first eight ordinary integer or pointer arguments use
-\code{x0}--\code{x7}; 32-bit values use the corresponding
-\code{w0}--\code{w7} views.
+\begin{block}{First Eight Integer or Pointer Arguments}
+Under AAPCS64, the first eight ordinary integer or pointer arguments are passed in \code{x0}--\code{x7}. Smaller integer values use the corresponding \code{w} registers.
 \end{block}
-\vspace{0.1cm}
+\vspace{0.18cm}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.08}
+\renewcommand{\arraystretch}{1.12}
 \begin{tabular}{
-  >{\raggedright\arraybackslash}m{2.3cm}
-  >{\raggedright\arraybackslash}m{8.1cm}
+  >{\raggedright\arraybackslash}m{2.8cm}
+  >{\raggedright\arraybackslash}m{7.7cm}
 }
 \rowcolor{navy}
-{\color{white}\bfseries Register} &
-{\color{white}\bfseries Common role at a function call} \\
+{\color{white}\bfseries Register(s)} &
+{\color{white}\bfseries Role at a call boundary} \\
 \rowcolor{softgray}
-\code{x0}--\code{x7} &
-Integer/pointer arguments; \code{x0} also holds a common return value. \\
+\code{x0}--\code{x7} & First eight 64-bit integer or pointer arguments. \\
 \rowcolor{white}
-\code{x8} &
-Indirect result location in some ABI-defined cases. \\
+\code{w0}--\code{w7} & First eight 32-bit integer arguments. \\
 \rowcolor{softgray}
-\code{x9}--\code{x15} &
-Temporary registers available for general use. \\
-\rowcolor{white}
-\code{x16}, \code{x17} &
-Intra-procedure-call scratch registers used by veneers/linker-generated
-code. \\
-\rowcolor{softgray}
-\code{x18} &
-Platform register; portable code should not treat it as an ordinary
-temporary. \\
+\code{x0}/\code{w0} & Common location for an integer or pointer return value. \\
 \end{tabular}
 \end{center}
+\vspace{0.2cm}
+\begin{block}{Scope}
+This slide is only about argument and return-value placement. Caller-saved and callee-saved responsibilities are introduced separately.
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -695,56 +686,6 @@ must be restored by the function that changes them.
 % Slide 15
 % ============================================================
 
-\begin{frame}{A libc Call Uses the Same AAPCS64 Contract}
-\key{C call with nine total arguments:}\quad
-\code{printf(format, v1, v2, \ldots, v8);}
-\vspace{0.15cm}
-\begin{columns}[T,onlytextwidth]
-\column{0.43\textwidth}
-\begin{block}{AAPCS64 Placement}
-\small
-\renewcommand{\arraystretch}{1.10}
-\begin{tabular}{
-  >{\raggedright\arraybackslash}m{1.50cm}
-  >{\raggedright\arraybackslash}m{3.00cm}
-}
-\rowcolor{navy}
-{\color{white}\bfseries Location} &
-{\color{white}\bfseries Arg. or result} \\
-\rowcolor{softgray}
-\code{x0} &
-address of \code{format} \\
-\rowcolor{white}
-\code{x1}--\code{x7} &
-values \code{v1}--\code{v7} \\
-\rowcolor{softgray}
-\code{[sp]} &
-\code{v8}: ninth total argument \\
-\rowcolor{white}
-\code{w0} &
-characters printed on return \\
-\end{tabular}
-\end{block}
-\column{0.53\textwidth}
-\begin{block}{Caller Setup}
-\small
-\code{// x19 = format; x20--x27 = v1--v8}\\[0.06cm]
-\code{sub sp, sp, \#16}\\[0.045cm]
-\code{str x27, [sp]}\quad\code{// v8}\\[0.045cm]
-\code{mov x0, x19}\quad\code{// format}\\[0.045cm]
-\code{mov x1, x20}\quad\code{// v1}\\[0.045cm]
-\code{// repeat through x7 = v7}\\[0.045cm]
-\code{bl printf}\\[0.045cm]
-\code{add sp, sp, \#16}
-\end{block}
-\end{columns}
-\vspace{0.08cm}
-\small
-\key{Why it works:} libc finds every argument because both sides
-follow AAPCS64. The surrounding non-leaf function preserves
-\code{x30} separately.
-\end{frame}
-
 % ============================================================
 % Slide 17.b
 % Slide Header: Caller-Saved Example
@@ -816,46 +757,6 @@ returns as before the call began.
 % ============================================================
 % Slide 18
 % ============================================================
-
-\begin{frame}{Common Register Roles}
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.03}
-\begin{tabular}{
-  >{\raggedright\arraybackslash}m{2.6cm}
-  >{\raggedright\arraybackslash}m{8.5cm}
-}
-\rowcolor{navy}
-{\color{white}\bfseries Register(s)} &
-{\color{white}\bfseries Typical ABI role} \\
-\rowcolor{softgray}
-\code{x0}--\code{x7} &
-Integer/pointer arguments and return values. \\
-\rowcolor{white}
-\code{x9}--\code{x15} &
-Temporary caller-saved registers. \\
-\rowcolor{softgray}
-\code{x16}, \code{x17} &
-Intra-procedure-call temporaries; veneers may overwrite them. \\
-\rowcolor{white}
-\code{x18} &
-Platform register with platform-specific use. \\
-\rowcolor{softgray}
-\code{x19}--\code{x28} &
-Callee-saved registers. \\
-\rowcolor{white}
-\code{x29} &
-Frame pointer, when a frame pointer is used. \\
-\rowcolor{softgray}
-\code{x30} &
-Link register, holding a return address after \code{bl}. \\
-\rowcolor{white}
-\code{sp} &
-Stack pointer; 16-byte aligned at public interfaces and when used for
-memory access. \\
-\end{tabular}
-\end{center}
-\end{frame}
 
 % ============================================================
 % Slide 20

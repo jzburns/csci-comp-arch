@@ -358,59 +358,24 @@ A conditional branch either transfers control to its target or falls through to 
 % Slide 6
 % ============================================================
 
-\begin{frame}{\code{cmp} Updates Flags by Subtraction}
-\begin{block}{Underlying Operation}
-\code{cmp x0, x1} performs a subtraction for flags and discards the numeric result.
-\end{block}
-\vspace{0.25cm}
+\begin{frame}{Comparison Recap from Topic 4}
+\begin{block}{What \code{cmp} Does}
 \large
-\hspace{3.8cm}\code{cmp x0, x1}\\[0.15cm]
+\hspace{3.8cm}\code{cmp x0, x1}\\[0.12cm]
 \hspace{3.8cm}\code{subs xzr, x0, x1}
 \normalsize
-\vspace{0.25cm}
+\end{block}
+\vspace{0.22cm}
 \begin{itemize}
-\item The computed value \code{x0 - x1} is not kept as a data result.
-\item NZCV is updated from the subtraction.
-\item Later conditional branches inspect those flags.
-\item This connects comparison directly to the flag-setting arithmetic from Topic 5.
+\item \code{cmp} sets NZCV from the subtraction \code{x0 - x1}.
+\item The numerical subtraction result is discarded.
+\item The branch condition determines how those flags are interpreted.
+\item Topic 7 uses this comparison result to choose control-flow paths.
 \end{itemize}
-\end{frame}
-
-% ============================================================
-% Slide 9
-% Slide Header: The NZCV Flags Used by Branches
-% ============================================================
-
-
-% ============================================================
-% Slide 7
-% ============================================================
-
-\begin{frame}{The NZCV Flags Used by Branches}
-\begin{center}
-\begin{tikzpicture}[
-  fld/.style={
-    draw=navy,
-    thick,
-    minimum width=2.2cm,
-    minimum height=1.0cm,
-    align=center,
-    font=\bfseries
-  }
-]
-\node[fld,fill=navy,text=white] (n) {N\\Negative};
-\node[fld,fill=deepblue,text=white,right=.15cm of n] (z) {Z\\Zero};
-\node[fld,fill=gold!35,text=navy,right=.15cm of z] (c) {C\\Carry};
-\node[fld,fill=softgray,text=navy,right=.15cm of c] (v) {V\\Overflow};
-\end{tikzpicture}
-\end{center}
-\vspace{0.25cm}
-\begin{itemize}
-\item \key{Z}: equality after a compare.
-\item \key{N} and \key{V}: signed ordering after subtraction.
-\item \key{C}: unsigned ordering after subtraction; \code{C=1} means no unsigned borrow.
-\item The same compare can support signed or unsigned branch decisions.
-\end{itemize}
+\vspace{0.15cm}
+\begin{block}{Boundary}
+Topic 4 covered what NZCV means; this topic focuses on branch instructions and high-level control-flow patterns.
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -511,35 +476,6 @@ Do not use signed and unsigned branch mnemonics interchangeably. They inspect di
 % ============================================================
 % Slide 10
 % ============================================================
-
-\begin{frame}{Same \code{cmp}, Different Meaning}
-\begin{block}{Example Bit Patterns}
-For 8-bit intuition, compare \code{0xff} with \code{0x01}. The bit patterns are the same, but the numerical interpretation changes.
-\end{block}
-\vspace{0.15cm}
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.18}
-\begin{tabular}{
-  >{\raggedright\arraybackslash}m{3.2cm}
-  >{\raggedright\arraybackslash}m{3.5cm}
-  >{\raggedright\arraybackslash}m{4.2cm}
-}
-\rowcolor{navy}
-{\color{white}\bfseries Interpretation} &
-{\color{white}\bfseries Values} &
-{\color{white}\bfseries Correct ordering} \\
-\rowcolor{softgray}
-Unsigned & $255$ and $1$ & $255 > 1$ \\
-\rowcolor{white}
-Signed two's complement & $-1$ and $1$ & $-1 < 1$ \\
-\end{tabular}
-\end{center}
-\vspace{0.25cm}
-\begin{block}{AArch64 Consequence}
-After the same comparison, \code{b.lo} and \code{b.lt} may lead to different control-flow paths.
-\end{block}
-\end{frame}
 
 % ============================================================
 % Slide 13
