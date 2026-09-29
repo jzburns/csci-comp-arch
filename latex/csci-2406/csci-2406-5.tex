@@ -114,8 +114,8 @@
 % ============================================================
 % Metadata
 % ============================================================
-\title[Topic 5]{AArch64 Arithmetic and Logical Instructions}
-\subtitle{Arithmetic instructions, logical and bitwise operations, shifts, and immediate constants}
+\title[Topic 5]{AArch64 Data-Processing Instructions}
+\subtitle{Operand forms, bitwise operations, shifted registers, and immediate constants}
 \author{Computer Organization \& Architecture}
 \date{Topic 5}
 
@@ -123,7 +123,7 @@
 
 % ============================================================
 % Slide 1
-% Slide Header: AArch64 Arithmetic and Logical Instructions
+% Slide Header: AArch64 Data-Processing Instructions
 % ============================================================
 
 
@@ -147,13 +147,13 @@ CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 5
 \vspace{0.25cm}
 
 {\color{white}\fontsize{24}{28}\selectfont\bfseries
-AArch64 Arithmetic and\\[0.08cm]Logical Instructions
+AArch64 Data-Processing\\[0.08cm]Instructions
 \par}
 
 \vspace{0.35cm}
 
 {\color{white!80}\large
-Arithmetic, logical, shift, and immediate-value instructions\\in AArch64 assembly
+Operand forms, bitwise operations, shifted registers,\\and immediate constants in AArch64 assembly
 \par}
 \end{minipage}
 
@@ -176,16 +176,17 @@ Dr. J. Burns
 % Slide 2
 % ============================================================
 
+
 \begin{frame}{Topic 5 Outline}
 \begin{block}{Topic Objective}
-Use the main AArch64 data-processing instruction families to perform arithmetic, manipulate individual bits, shift register values, and work with immediate constants.
+Use AArch64 data-processing instruction forms to combine register operands, immediate constants, bit masks, and shifted source values.
 \end{block}
 \vspace{0.25cm}
 \begin{itemize}
-\item \key{Section 1}: Arithmetic instructions
+\item \key{Section 1}: Data-processing instruction forms
 \item \key{Section 2}: Logical and bitwise instructions
-\item \key{Section 3}: Shift instructions
-\item \key{Section 4}: Immediate values and constants
+\item \key{Section 3}: Shifted register operands
+\item \key{Section 4}: Immediate encodings and constant construction
 \item \key{Section 5}: Summary and self-test
 \end{itemize}
 \end{frame}
@@ -194,7 +195,7 @@ Use the main AArch64 data-processing instruction families to perform arithmetic,
 % Slide 3
 % Slide Header: Arithmetic Instructions
 % ============================================================
-\sectiondivider{Section 1}{Arithmetic Instructions}
+\sectiondivider{Section 1}{Data-Processing Instruction Forms}
 
 % ============================================================
 % Slide 4
@@ -206,21 +207,22 @@ Use the main AArch64 data-processing instruction families to perform arithmetic,
 % Slide 3
 % ============================================================
 
+
 \begin{frame}{Data Processing in Registers}
-\begin{block}{Load/Store Architecture}
-AArch64 arithmetic instructions operate primarily on values already held in registers. Memory access is handled separately by load and store instructions.
+\begin{block}{From Topic 4 to Topic 5}
+Topic 4 covered what arithmetic results and shifts mean. Topic 5 focuses on how AArch64 expresses data-processing operations using registers, immediates, masks, and shifted operands.
 \end{block}
 \vspace{0.2cm}
 \begin{center}
 \large
-\hspace{0.5cm}\code{add x0, x1, x2}\qquad\code{sub x3, x4, x5}
+\hspace{0.5cm}\code{add x0, x1, x2}\qquad\code{and x3, x4, x5}
 \end{center}
 \vspace{0.2cm}
 \begin{itemize}
 \item The first operand is the destination register.
 \item The remaining operands provide the values used by the operation.
 \item The result replaces the previous contents of the destination register.
-\item Register operands make the data path regular and predictable.
+\item Memory access remains separate: loads and stores move values between memory and registers.
 \end{itemize}
 \end{frame}
 
@@ -234,36 +236,8 @@ AArch64 arithmetic instructions operate primarily on values already held in regi
 % Slide 4
 % ============================================================
 
-\begin{frame}{Addition and Subtraction}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Addition}
-\large
-\hspace{1.35cm}\code{add x0, x1, x2}
-\normalsize
-\begin{itemize}
-\item Computes \code{x1 + x2}.
-\item Stores the result in \code{x0}.
-\item Operands remain unchanged unless reused as the destination.
-\end{itemize}
-\end{block}
-\column{0.48\textwidth}
-\begin{block}{Subtraction}
-\large
-\hspace{1.35cm}\code{sub x0, x1, x2}
-\normalsize
-\begin{itemize}
-\item Computes \code{x1 - x2}.
-\item Stores the result in \code{x0}.
-\item Uses the same fixed-width register datapath.
-\end{itemize}
-\end{block}
-\end{columns}
-\vspace{0.2cm}
-\begin{block}{Connection to Topic 4}
-Flag-setting forms such as \code{adds} and \code{subs} were covered with NZCV in Topic 4. Here the focus is instruction use and operand forms.
-\end{block}
-\end{frame}
+
+
 
 % ============================================================
 % Slide 6
@@ -368,24 +342,8 @@ The destination register may also be one of the source registers.
 % Slide 8
 % ============================================================
 
-\begin{frame}{Multiplication}
-\begin{block}{Basic Multiply}
-\large
-\hspace{3.7cm}\code{mul x0, x1, x2}
-\normalsize
-\end{block}
-\vspace{0.2cm}
-\begin{itemize}
-\item Multiplies the two source registers and writes the low 64 bits to the destination.
-\item The 32-bit form uses \code{w} registers and writes a 32-bit result.
-\item Multiplication is architecturally a register data-processing operation.
-\item Its execution latency is a microarchitectural property, not fixed by the ISA.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Example}
-If \code{x1 = 6} and \code{x2 = 7}, then \code{mul x0, x1, x2} leaves \code{x0 = 42}.
-\end{block}
-\end{frame}
+
+
 
 % ============================================================
 % Slide 10
@@ -397,34 +355,8 @@ If \code{x1 = 6} and \code{x2 = 7}, then \code{mul x0, x1, x2} leaves \code{x0 =
 % Slide 9
 % ============================================================
 
-\begin{frame}{Signed and Unsigned Division}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Unsigned Division}
-\large
-\hspace{1.2cm}\code{udiv x0, x1, x2}
-\normalsize
-\begin{itemize}
-\item Interprets the operands as unsigned integers.
-\item Quotient is truncated toward zero.
-\end{itemize}
-\end{block}
-\column{0.48\textwidth}
-\begin{block}{Signed Division}
-\large
-\hspace{1.2cm}\code{sdiv x0, x1, x2}
-\normalsize
-\begin{itemize}
-\item Interprets the operands as signed two's-complement integers.
-\item Quotient is truncated toward zero.
-\end{itemize}
-\end{block}
-\end{columns}
-\vspace{0.2cm}
-\begin{block}{Why Two Instructions?}
-Unlike \code{add} and \code{sub}, division must know whether the operands are signed or unsigned because the quotient depends on that interpretation.
-\end{block}
-\end{frame}
+
+
 
 % ============================================================
 % Slide 11
@@ -436,25 +368,33 @@ Unlike \code{add} and \code{sub}, division must know whether the operands are si
 % Slide 10
 % ============================================================
 
-\begin{frame}{Arithmetic Instruction Summary}
+
+
+\begin{frame}{Arithmetic Forms Recap from Topic 4}
+\begin{block}{Purpose of This Recap}
+These operations were introduced in Topic 4. Here they are placed in the AArch64 data-processing family so the later operand forms make sense.
+\end{block}
+\vspace{0.12cm}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{>{\raggedright\arraybackslash}m{2.3cm}>{\raggedright\arraybackslash}m{4.1cm}>{\raggedright\arraybackslash}m{4.7cm}}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{>{\raggedright\arraybackslash}m{3.0cm}>{\raggedright\arraybackslash}m{4.0cm}>{\raggedright\arraybackslash}m{4.0cm}}
 \rowcolor{navy}
-{\color{white}\bfseries Instruction} & {\color{white}\bfseries Operation} & {\color{white}\bfseries Example} \\
+{\color{white}\bfseries Form} & {\color{white}\bfseries Example} & {\color{white}\bfseries Point for Topic 5} \\
 \rowcolor{softgray}
-\code{add} & addition & \code{add x0, x1, x2} \\
+register arithmetic & \code{add x0, x1, x2} & both source values are registers \\
 \rowcolor{white}
-\code{sub} & subtraction & \code{sub x0, x1, \#8} \\
+immediate arithmetic & \code{add x0, x1, \#24} & one source value is encoded in the instruction \\
 \rowcolor{softgray}
-\code{mul} & multiplication & \code{mul x0, x1, x2} \\
+multiply & \code{mul x0, x1, x2} & register-only source operands \\
 \rowcolor{white}
-\code{udiv} & unsigned division & \code{udiv x0, x1, x2} \\
-\rowcolor{softgray}
-\code{sdiv} & signed division & \code{sdiv x0, x1, x2} \\
+signed / unsigned divide & \code{sdiv} / \code{udiv} & signedness is part of the instruction choice \\
 \end{tabular}
 \end{center}
+\vspace{0.10cm}
+\begin{itemize}
+\item The arithmetic meaning is review; the new focus is how operands are written and encoded.
+\end{itemize}
 \end{frame}
 
 % ============================================================
@@ -667,7 +607,7 @@ Bit masks are common in device control, packed data, permission fields, status w
 % Slide 19
 % Slide Header: Shift Instructions
 % ============================================================
-\sectiondivider{Section 3}{Shift Instructions}
+\sectiondivider{Section 3}{Shifted Register Operands}
 
 % ============================================================
 % Slide 20
@@ -679,26 +619,31 @@ Bit masks are common in device control, packed data, permission fields, status w
 % Slide 17
 % ============================================================
 
-\begin{frame}{Four Common Shift and Rotate Operations}
+
+\begin{frame}{Shifts: Brief Recall from Topic 4}
+\begin{block}{Why This Is Only a Recall}
+Topic 4 covered the bit movement. This topic uses shift names as part of larger AArch64 data-processing instructions.
+\end{block}
+\vspace{0.15cm}
 \begin{center}
 \small
 \renewcommand{\arraystretch}{1.15}
-\begin{tabular}{>{\raggedright\arraybackslash}m{2.1cm}>{\raggedright\arraybackslash}m{4.4cm}>{\raggedright\arraybackslash}m{4.8cm}}
+\begin{tabular}{>{\raggedright\arraybackslash}m{2.2cm}>{\raggedright\arraybackslash}m{4.4cm}>{\raggedright\arraybackslash}m{4.8cm}}
 \rowcolor{navy}
-{\color{white}\bfseries Instruction} & {\color{white}\bfseries Bit movement} & {\color{white}\bfseries Typical use} \\
+{\color{white}\bfseries Shift} & {\color{white}\bfseries Bit movement} & {\color{white}\bfseries Typical meaning} \\
 \rowcolor{softgray}
-\code{lsl} & left; zeros enter on right & scale by powers of two when high bits are not lost \\
+\code{lsl} & left; zeros enter on right & scaling by powers of two when bits are not lost \\
 \rowcolor{white}
 \code{lsr} & right; zeros enter on left & unsigned right shift \\
 \rowcolor{softgray}
 \code{asr} & right; sign bit replicated & signed right shift \\
 \rowcolor{white}
-\code{ror} & right; outgoing bits re-enter left & rotate a bit pattern \\
+\code{ror} & outgoing bits re-enter at the other end & rotate a bit pattern \\
 \end{tabular}
 \end{center}
-\vspace{0.2cm}
-\begin{block}{Shift Amount}
-The shift amount specifies how many bit positions the value moves.
+\vspace{0.15cm}
+\begin{block}{New Focus}
+AArch64 can attach a shift to a source register inside another operation.
 \end{block}
 \end{frame}
 
@@ -712,24 +657,8 @@ The shift amount specifies how many bit positions the value moves.
 % Slide 18
 % ============================================================
 
-\begin{frame}{Logical Shift Left}
-\begin{block}{Operation}
-\large
-\hspace{3.4cm}\code{lsl x0, x1, \#3}
-\normalsize
-\end{block}
-\vspace{0.2cm}
-\begin{itemize}
-\item Moves every bit in \code{x1} three positions toward the most-significant end.
-\item Zeros enter the three vacated low-order bit positions.
-\item Bits shifted beyond the register width are discarded.
-\item When no significant high bits are lost, shifting left by 3 corresponds to multiplication by 8.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Finite Width}
-The register does not become wider during the shift; only the destination-width bits remain.
-\end{block}
-\end{frame}
+
+
 
 % ============================================================
 % Slide 22
@@ -741,36 +670,8 @@ The register does not become wider during the shift; only the destination-width 
 % Slide 19
 % ============================================================
 
-\begin{frame}{Logical and Arithmetic Right Shift}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Logical Right Shift}
-\large
-\hspace{1.1cm}\code{lsr x0, x1, \#1}
-\normalsize
-\begin{itemize}
-\item Moves bits right by one.
-\item Inserts 0 into the top bit.
-\item Appropriate for unsigned bit patterns.
-\end{itemize}
-\end{block}
-\column{0.48\textwidth}
-\begin{block}{Arithmetic Right Shift}
-\large
-\hspace{1.1cm}\code{asr x0, x1, \#1}
-\normalsize
-\begin{itemize}
-\item Moves bits right by one.
-\item Replicates the original sign bit.
-\item Preserves signed two's-complement interpretation.
-\end{itemize}
-\end{block}
-\end{columns}
-\vspace{0.15cm}
-\begin{block}{Difference}
-For values whose top bit is 1, \code{lsr} inserts 0s while \code{asr} inserts 1s.
-\end{block}
-\end{frame}
+
+
 
 % ============================================================
 % Slide 23
@@ -782,24 +683,8 @@ For values whose top bit is 1, \code{lsr} inserts 0s while \code{asr} inserts 1s
 % Slide 20
 % ============================================================
 
-\begin{frame}{Rotate Right}
-\begin{block}{Operation}
-\large
-\hspace{3.5cm}\code{ror x0, x1, \#8}
-\normalsize
-\end{block}
-\vspace{0.2cm}
-\begin{itemize}
-\item Bits move toward lower-order positions.
-\item Bits leaving the right end re-enter at the left end.
-\item No bit positions are replaced by zeros or replicated sign bits.
-\item Rotation is therefore different from both logical and arithmetic shifting.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Typical Uses}
-Rotations appear in bit manipulation, hashing, cryptographic algorithms, and packed-data transformations.
-\end{block}
-\end{frame}
+
+
 
 % ============================================================
 % Slide 24
@@ -810,6 +695,7 @@ Rotations appear in bit manipulation, hashing, cryptographic algorithms, and pac
 % ============================================================
 % Slide 21
 % ============================================================
+
 
 \begin{frame}{Shifted Register Operands}
 \begin{block}{Combine Shift and Operation}
@@ -824,7 +710,8 @@ Many AArch64 data-processing register forms can shift one source operand as part
 \begin{itemize}
 \item The shift applies to the final source register before the main operation.
 \item The source register itself is not modified.
-\item This can combine scaling and arithmetic or bit manipulation in one architectural instruction.
+\item This is not a separate shift instruction followed by a second operation.
+\item It combines scaling or bit positioning with the main operation in one instruction.
 \end{itemize}
 \end{frame}
 
@@ -844,20 +731,24 @@ Many AArch64 data-processing register forms can shift one source operand as part
 % Slide 22
 % ============================================================
 
-\begin{frame}{What Is an Immediate?}
+
+
+\begin{frame}{Immediate Operands Have Encoding Limits}
 \begin{block}{Constant Inside the Instruction}
-An immediate operand is a constant represented within the instruction itself rather than read from a source register.
+An immediate operand is a constant represented inside the instruction rather than read from a source register.
 \end{block}
-\vspace{0.2cm}
+\vspace{0.12cm}
 \large
-\hspace{3.2cm}\code{add x0, x1, \#5}\\[0.14cm]
-\hspace{3.2cm}\code{sub x2, x2, \#32}
+\hspace{3.1cm}\code{add x0, x1, \#5}\\[0.10cm]
+\hspace{3.1cm}\code{sub x2, x2, \#32}
 \normalsize
-\vspace{0.25cm}
+\vspace{0.18cm}
 \begin{itemize}
 \item The \code{\#} prefix identifies an immediate constant in AArch64 assembly syntax.
-\item Immediate forms are convenient for fixed constants known when the program is assembled.
-\item The constant must fit the encoding permitted by that particular instruction form.
+\item Immediate forms are compact because no extra source register is needed.
+\item The constant must fit the immediate format for that instruction family.
+\item Arithmetic, logical, shift, and move-wide instructions do not all use the same immediate encoding.
+\item Exact bit fields are studied later; here the point is that immediate availability is instruction-specific.
 \end{itemize}
 \end{frame}
 
@@ -871,22 +762,8 @@ An immediate operand is a constant represented within the instruction itself rat
 % Slide 23
 % ============================================================
 
-\begin{frame}{Immediate Encodings Depend on the Instruction}
-\begin{block}{No Universal Immediate Format}
-AArch64 does not have one common immediate field that works identically for every instruction class.
-\end{block}
-\vspace{0.18cm}
-\begin{itemize}
-\item \code{add} and \code{sub} use an arithmetic-immediate form designed for common small constants.
-\item Logical instructions use a specialized bit-mask immediate representation.
-\item Shift instructions encode the shift amount according to their operation width.
-\item Move-wide instructions place 16-bit pieces into selected portions of a register.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Encoding Boundary}
-The exact bit fields are studied later in Topic 9. Here the important point is that immediate availability is instruction-specific.
-\end{block}
-\end{frame}
+
+
 
 % ============================================================
 % Slide 28
@@ -1090,13 +967,14 @@ Scale a value by 8, add it to a base value, then keep only the low byte.
 % Slide 30
 % ============================================================
 
+
 \begin{frame}{Topic 5 Summary}
 \begin{itemize}
-\item \code{add}, \code{sub}, \code{mul}, \code{sdiv}, and \code{udiv} provide the main arithmetic operations introduced here.
-\item \code{and}, \code{orr}, \code{eor}, and \code{bic} manipulate selected bit positions.
-\item \code{lsl}, \code{lsr}, \code{asr}, and \code{ror} rearrange bits in different ways.
-\item Many AArch64 data-processing instructions can combine a shifted register operand with the main operation.
-\item Immediate constants are encoded according to instruction-specific rules.
+\item AArch64 data-processing instructions operate on register values, with some forms accepting immediate constants.
+\item \code{w} registers select 32-bit operations; writing a \code{w} register clears the upper 32 bits of the corresponding \code{x} register.
+\item \code{and}, \code{orr}, \code{eor}, and \code{bic} manipulate selected bit positions using masks.
+\item Shifted register operands combine a shift with another register operation.
+\item Immediate constants are limited by the encoding rules of each instruction family.
 \item \code{movz}, \code{movk}, and \code{movn} help construct constants that do not fit a simple immediate form.
 \end{itemize}
 \end{frame}
@@ -1111,11 +989,12 @@ Scale a value by 8, add it to a base value, then keep only the low byte.
 % Slide 31
 % ============================================================
 
+
 \begin{frame}{Self-Test 1/2}
 \begin{enumerate}
 \item What is the difference between \code{add x0, x1, x2} and \code{add x0, x1, \#8}?
 \item What happens to the upper 32 bits of \code{x0} after writing \code{w0}?
-\item Why are separate \code{sdiv} and \code{udiv} instructions required?
+\item Why can the destination register also be one of the source registers?
 \item Which logical instruction is useful for keeping only selected bits?
 \item How can \code{eor} be used to toggle selected bits?
 \end{enumerate}
@@ -1131,14 +1010,15 @@ Scale a value by 8, add it to a base value, then keep only the low byte.
 % Slide 32
 % ============================================================
 
+
 \begin{frame}{Self-Test 2/2}
 \begin{enumerate}
 \setcounter{enumi}{5}
-\item What is the difference between \code{lsr} and \code{asr}?
-\item Why is \code{ror} not equivalent to a right shift?
 \item What does the shifted operand mean in \code{add x0, x1, x2, lsl \#3}?
+\item Why is a shifted operand not the same thing as modifying the source register?
 \item Why can an immediate operand not represent every possible 64-bit constant?
 \item What roles do \code{movz} and \code{movk} play when constructing a 64-bit constant?
+\item Why might assembler syntax such as \code{mov x0, \#42} not correspond to one single hardware encoding?
 \end{enumerate}
 \end{frame}
 
