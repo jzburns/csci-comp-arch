@@ -270,7 +270,7 @@ Topic 4 covered what arithmetic results and shifts mean. Topic 5 focuses on how 
 \normalsize
 \begin{itemize}
 \item One source value is encoded in the instruction.
-\item Useful for small fixed constants.
+\item \code{add}/\code{sub} immediate: 12-bit unsigned value, range 0--4095 (\code{0x000}--\code{0xfff}).
 \end{itemize}
 \end{block}
 \end{columns}
@@ -299,8 +299,9 @@ The same instruction family is available for 32-bit \code{w} registers and 64-bi
 \begin{itemize}
 \item \code{w0}--\code{w30} operate on 32-bit values.
 \item \code{x0}--\code{x30} operate on 64-bit values.
-\item Writing a \code{w} register clears the upper 32 bits of the corresponding \code{x} register.
-\item Operand widths must match the instruction form.
+\item Writing a \code{w} register zero-extends into the corresponding \code{x} register.
+\item The upper 32 bits are cleared even when the 32-bit value represents a negative signed integer.
+\item Use sign extension, such as \code{sxtw}, when a signed 32-bit value must become signed 64-bit.
 \end{itemize}
 \end{frame}
 
@@ -426,9 +427,9 @@ Logical instructions process each bit position independently. Signed and unsigne
 \end{center}
 \vspace{0.2cm}
 \begin{itemize}
-\item \code{and}: output bit is 1 only when both input bits are 1.
-\item \code{orr}: output bit is 1 when either input bit is 1.
-\item \code{eor}: output bit is 1 when the input bits differ.
+\item \code{and}: output bit is 1 only when both input bits are 1; commonly used to select or test fields.
+\item \code{orr}: output bit is 1 when either input bit is 1; commonly used to set fields.
+\item \code{eor}: output bit is 1 when the input bits differ; commonly used to toggle fields.
 \end{itemize}
 \end{frame}
 
@@ -457,10 +458,14 @@ A bit mask uses 1s in positions that should be preserved and 0s in positions tha
 \normalsize
 \end{center}
 \vspace{0.15cm}
-\begin{block}{AArch64 Example}
+\begin{block}{Instruction Pattern and Use}
 \large
 \hspace{3.5cm}\code{and x0, x1, x2}
 \normalsize
+\vspace{0.08cm}
+\begin{itemize}
+\item Keeps only the bits selected by the mask in \code{x2}; useful for isolating a field or testing selected status bits.
+\end{itemize}
 \end{block}
 \end{frame}
 
@@ -489,10 +494,14 @@ A mask containing 1s can force selected result bits to 1 while leaving other pos
 \normalsize
 \end{center}
 \vspace{0.15cm}
-\begin{block}{AArch64 Example}
+\begin{block}{Instruction Pattern and Use}
 \large
 \hspace{3.5cm}\code{orr x0, x1, x2}
 \normalsize
+\vspace{0.08cm}
+\begin{itemize}
+\item Sets the bits selected by the mask in \code{x2}; useful for enabling selected flags while leaving other bits unchanged.
+\end{itemize}
 \end{block}
 \end{frame}
 
@@ -521,10 +530,14 @@ XOR with 1 flips a bit; XOR with 0 leaves the bit unchanged.
 \normalsize
 \end{center}
 \vspace{0.15cm}
-\begin{block}{AArch64 Example}
+\begin{block}{Instruction Pattern and Use}
 \large
 \hspace{3.5cm}\code{eor x0, x1, x2}
 \normalsize
+\vspace{0.08cm}
+\begin{itemize}
+\item Flips the bits selected by the mask in \code{x2}; useful for toggling selected flags or marking changed bit positions.
+\end{itemize}
 \end{block}
 \end{frame}
 
