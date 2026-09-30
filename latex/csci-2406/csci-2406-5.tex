@@ -287,21 +287,24 @@ Topic 4 covered what arithmetic results and shifts mean. Topic 5 focuses on how 
 % ============================================================
 
 \begin{frame}{32-Bit and 64-Bit Arithmetic}
-\begin{block}{Register Width Selects the Operation Width}
-The same instruction family is available for 32-bit \code{w} registers and 64-bit \code{x} registers.
+\begin{block}{Register Widths Must Match}
+Basic arithmetic uses one register width per instruction: all \code{w} or all \code{x}.
 \end{block}
-\vspace{0.2cm}
+\vspace{0.06cm}
 \begin{center}
-\large
-\hspace{0.6cm}\code{add w0, w1, w2}\qquad\code{add x0, x1, x2}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}l l@{}}
+\code{add w0, w1, w2} & \code{// valid 32-bit} \\
+\code{add x0, x1, x2} & \code{// valid 64-bit} \\
+\code{add x0, x1, w2} & \code{// assembler error: mixed widths} \\
+\end{tabular}
 \end{center}
-\vspace{0.2cm}
+\vspace{0.03cm}
 \begin{itemize}
-\item \code{w0}--\code{w30} operate on 32-bit values.
-\item \code{x0}--\code{x30} operate on 64-bit values.
-\item Writing a \code{w} register zero-extends into the corresponding \code{x} register.
-\item The upper 32 bits are cleared even when the 32-bit value represents a negative signed integer.
-\item Use sign extension, such as \code{sxtw}, when a signed 32-bit value must become signed 64-bit.
+\item \code{w} forms compute 32-bit results; \code{x} forms compute 64-bit results.
+\item Any write to \code{wN} zeroes \code{xN[63:32]}, even if \code{wN} represents a negative number.
+\item For signed widening, use \code{sxtw}: \code{w1 = 0xffffffff}; \code{sxtw x0, w1} gives \code{x0 = 0xffffffffffffffff}.
 \end{itemize}
 \end{frame}
 
