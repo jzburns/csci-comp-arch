@@ -445,32 +445,88 @@ AArch64 offsets are byte counts. C pointer arithmetic scales by the size of the 
 % Slide 13
 % ============================================================
 
+% ============================================================
+% Mode 1: Base Register with Immediate Offset
+% ============================================================
+
 \begin{frame}{Mode 1: Base Register with Immediate Offset}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Adds a fixed constant to a base pointer without modifying the base register.
-  \item \key{Syntax:} \code{ldr xt, [xn, \#offset]} $\implies \text{EA} = x_n + \text{offset}$.
+  \item Adds a fixed byte offset to a base address without modifying the base register.
+  \item \key{Syntax:} \code{ldr xt, [xn, \#offset]}
+        \quad $\Rightarrow$ \quad
+        $\text{EA} = x_n + \text{offset}$.
 \end{itemize}
 
-\vspace{0.2cm}
+\vspace{0.15cm}
+
 \centering
 \begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
-  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small, minimum width=3.0cm, minimum height=0.6cm] (base) {Base Address (\bits{x0})};
-  \node[draw=navy, fill=gold!30, rounded corners=3pt, font=\small, right=0.3cm of base, minimum width=1.5cm, minimum height=0.6cm] (off) {$+ \text{Offset}$};
-  \draw[-{Latex}, thick, navy] (off.east) -- ++(1.5,0) node[right, font=\small\bfseries] {Target Memory Address};
+  \node[
+    draw=navy,
+    fill=lightblue,
+    rounded corners=3pt,
+    font=\small,
+    minimum width=3.0cm,
+    minimum height=0.6cm
+  ] (base) {Base Address (\bits{x0})};
+
+  \node[
+    draw=navy,
+    fill=gold!30,
+    rounded corners=3pt,
+    font=\small,
+    right=0.3cm of base,
+    minimum width=1.5cm,
+    minimum height=0.6cm
+  ] (off) {$+ \text{Offset}$};
+
+  \draw[-{Latex}, thick, navy]
+    (off.east) -- ++(1.5,0)
+    node[right, font=\small\bfseries] {Effective Address};
 \end{tikzpicture}
 
-\vspace{0.3cm}
-\begin{block}{Example: Reading Values at Fixed Offsets}
-\scriptsize
+\vspace{0.25cm}
+
+\raggedright
+\small\textbf{Example: Reading Values at Fixed Offsets}
+
+\vspace{0.1cm}
+
+\begin{center}
+\footnotesize
+\renewcommand{\arraystretch}{1.18}
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{>{\raggedright\arraybackslash}p{3.1cm} >{\raggedright\arraybackslash}p{4.6cm} >{\raggedright\arraybackslash}p{4.5cm}}
-\textbf{Assembly} & \textbf{C-like pattern} & \textbf{Meaning} \\
-\code{ldr x1, [x0, \#0]}  & \code{*ptr} for \code{uint64\_t *ptr} & 64-bit value at base \\
-\code{ldr x2, [x0, \#8]}  & \code{*(ptr + 1)} for \code{uint64\_t *ptr} & next 64-bit element \\
-\code{ldr w3, [x0, \#16]} & byte offset \code{+16} & reads a 32-bit value starting at \code{x0+16}; for \code{int32\_t *p}, this is \code{p[4]}. \\
-\end{tabular}
-\end{block}
+
+\begin{tabular*}{0.98\textwidth}{
+  @{\extracolsep{\fill}}
+  >{\raggedright\arraybackslash}p{3.2cm}
+  >{\raggedright\arraybackslash}p{2.2cm}
+  >{\raggedright\arraybackslash}p{7.1cm}
+  @{}
+}
+\toprule
+\textbf{Assembly} &
+\textbf{C-like Pattern} &
+\textbf{Meaning} \\
+\midrule
+
+\code{ldr x1, [x0, \#0]} &
+\code{*ptr} &
+64-bit value starting at \code{x0}. \\
+
+\code{ldr x2, [x0, \#8]} &
+\code{*(ptr + 1)} &
+For a 64-bit pointer, reads the next element, 8 bytes from \code{x0}. \\
+
+\code{ldr w3, [x0, \#16]} &
+\code{p[4]} &
+For \code{int32\_t *p}, reads the 32-bit value starting 16 bytes from \code{x0}: four 32-bit elements from the base. \\
+
+\bottomrule
+\end{tabular*}
+\end{center}
+
 \end{frame}
 
 % ============================================================
@@ -493,19 +549,32 @@ Assume the same byte offset, \code{\#8}, in each instruction:
 
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.2}
-\setlength{\tabcolsep}{10pt}
+\renewcommand{\arraystretch}{1.18}
+\setlength{\tabcolsep}{5pt}
 
-\begin{tabular*}{0.94\textwidth}{@{\extracolsep{\fill}}ll@{}}
+\begin{tabular}{
+  >{\raggedright\arraybackslash}p{4.4cm}
+  >{\raggedright\arraybackslash}p{5.2cm}
+}
 \toprule
-\textbf{Instruction} & \textbf{Meaning of the 8-byte offset} \\
+\textbf{Instruction} &
+\textbf{Meaning of the 8-byte offset} \\
 \midrule
-\code{ldrb w3, [x0, \#8]} & 8 byte-sized elements from \code{x0} \\
-\code{ldrh w3, [x0, \#8]} & 4 halfword-sized elements from \code{x0} \\
-\code{ldr w3, [x0, \#8]}  & 2 word-sized elements from \code{x0} \\
-\code{ldr x3, [x0, \#8]}  & 1 doubleword-sized element from \code{x0} \\
+
+\code{ldrb w3, [x0, \#8]} &
+8 byte-sized elements from \code{x0} \\
+
+\code{ldrh w3, [x0, \#8]} &
+4 halfword-sized elements from \code{x0} \\
+
+\code{ldr w3, [x0, \#8]} &
+2 word-sized elements from \code{x0} \\
+
+\code{ldr x3, [x0, \#8]} &
+1 doubleword-sized element from \code{x0} \\
+
 \bottomrule
-\end{tabular*}
+\end{tabular}
 \end{center}
 
 \vspace{0.25cm}
