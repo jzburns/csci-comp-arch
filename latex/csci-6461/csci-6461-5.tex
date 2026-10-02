@@ -30,11 +30,9 @@
 \setbeamerfont{block title}{size=\normalsize, series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
-% Block vertical padding adjustments
 \addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
 \addtobeamertemplate{block end}{}{\vspace{0.2em}}
 
-% Base list item separation
 \setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
 \setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
 
@@ -95,7 +93,6 @@
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 
-% Section divider macro
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
 
@@ -195,19 +192,16 @@
     \item Why AArch64 separates memory transfers from arithmetic operations.
     \item How values move between memory and the register file.
   \end{itemize}
-
   \item \key{Data Types, Widths, and Conversions}
   \begin{itemize}
     \item Handling bytes, halfwords, words, and doublewords cleanly.
     \item Choosing zero-extension or sign-extension when loading sub-word data.
   \end{itemize}
-
   \item \key{Address Calculation}
   \begin{itemize}
     \item Immediate offsets, pre/post-indexing, and scaled array indexing.
     \item How each addressing form changes, or does not change, the base register.
   \end{itemize}
-
   \item \key{Applied Access Patterns}
   \begin{itemize}
     \item Practical array traversal and indexed-array access patterns.
@@ -283,10 +277,6 @@ ALU instructions process \emph{only} register operands. Memory access is perform
 \end{frame}
 
 % ============================================================
-% Slide 5
-% ============================================================
-
-% ============================================================
 % Slide 6
 % ============================================================
 
@@ -351,14 +341,6 @@ Use for signed data. The sign bit is copied into the upper bits.
 \end{column}
 \end{columns}
 \end{frame}
-
-% ============================================================
-% Slide 8
-% ============================================================
-
-% ============================================================
-% Slide 9
-% ============================================================
 
 % ============================================================
 % Slide 10
@@ -492,36 +474,89 @@ AArch64 offsets are byte counts. C pointer arithmetic scales by the size of the 
 \end{frame}
 
 % ============================================================
-% Slide 14
+% Scaled Immediate Offsets -- Concept
 % ============================================================
 
-\begin{frame}{Scaled Immediate Offsets}
-\begin{block}{Access Size Is in the Register Name}
-The load/store width is selected by the destination or source register name, not by the offset.
+\begin{frame}{Scaled Immediate Offsets: What Does ``Scaled'' Mean?}
+
+\begin{block}{The Key Idea}
+The offset written in the instruction is a \key{byte offset}.  
+The transfer size determines how that byte offset relates to the data being accessed.
 \end{block}
 
+\vspace{0.2cm}
+
+\small
+Assume the same byte offset, \code{\#8}, in each instruction:
+
 \vspace{0.15cm}
+
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.16}
-\begin{tabular}{>{\raggedright\arraybackslash}m{4.2cm}>{\raggedright\arraybackslash}m{6.5cm}}
-\rowcolor{navy}
-{\color{white}\bfseries Instruction} & {\color{white}\bfseries Meaning} \\
-\rowcolor{softgray}
-\code{ldr w3, [x0, \#4]} & load a 32-bit word from byte offset 4 \\
-\rowcolor{white}
-\code{ldr x3, [x0, \#8]} & load a 64-bit doubleword from byte offset 8 \\
-\end{tabular}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{10pt}
+
+\begin{tabular*}{0.94\textwidth}{@{\extracolsep{\fill}}ll@{}}
+\toprule
+\textbf{Instruction} & \textbf{Meaning of the 8-byte offset} \\
+\midrule
+\code{ldrb w3, [x0, \#8]} & 8 byte-sized elements from \code{x0} \\
+\code{ldrh w3, [x0, \#8]} & 4 halfword-sized elements from \code{x0} \\
+\code{ldr w3, [x0, \#8]}  & 2 word-sized elements from \code{x0} \\
+\code{ldr x3, [x0, \#8]}  & 1 doubleword-sized element from \code{x0} \\
+\bottomrule
+\end{tabular*}
 \end{center}
 
-\vspace{0.16cm}
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item \code{w3} reads 32 bits; \code{x3} reads 64 bits.
-  \item The immediate offset is still a byte displacement from the base address.
-  \item In C, \code{ptr + k} scales by element size; in assembly, write the byte offset explicitly.
-\end{itemize}
+\vspace{0.25cm}
+
+\centering
+\textbf{All four instructions access memory starting at \code{x0 + 8}.}
+
 \end{frame}
 
+% ============================================================
+% Scaled Immediate Offsets -- Transfer Size
+% ============================================================
+
+\begin{frame}{Transfer Size Determines the Scale}
+
+\small
+
+The transfer size comes from the \key{instruction form}, not simply from the register name.
+
+\vspace{0.2cm}
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{9pt}
+
+\begin{tabular*}{0.96\textwidth}{@{\extracolsep{\fill}}llll@{}}
+\toprule
+\textbf{Load} &
+\textbf{Store} &
+\textbf{Transfer Size} &
+\textbf{Scale} \\
+\midrule
+\code{ldrb w3, [...]} & \code{strb w3, [...]} & 1 byte  & $\times 1$ \\
+\code{ldrh w3, [...]} & \code{strh w3, [...]} & 2 bytes & $\times 2$ \\
+\code{ldr w3, [...]}  & \code{str w3, [...]}  & 4 bytes & $\times 4$ \\
+\code{ldr x3, [...]}  & \code{str x3, [...]}  & 8 bytes & $\times 8$ \\
+\bottomrule
+\end{tabular*}
+\end{center}
+
+\vspace{0.3cm}
+
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \code{ldrb w3} and \code{ldrh w3} both use \code{w3}, but transfer different amounts of memory.
+  \item \code{ldr w3} / \code{str w3} transfer 4 bytes.
+  \item \code{ldr x3} / \code{str x3} transfer 8 bytes.
+  \item The same scaling rule applies to both \key{loads and stores}.
+\end{itemize}
+
+\end{frame}
 % ============================================================
 % Slide 15
 % ============================================================
@@ -582,6 +617,7 @@ The load/store width is selected by the destination or source register name, not
 \vspace{-0.1cm}
 \small\key{Assumption:} the C pointer refers to 64-bit elements, so one C element step equals 8 bytes.
 \vspace{0.08cm}
+
 \begin{center}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -645,18 +681,6 @@ Directly implements high-level array access: \code{val = arr[i];}.
 \end{frame}
 
 % ============================================================
-% Slide 19
-% ============================================================
-
-% ============================================================
-% Slide 20
-% ============================================================
-
-% ============================================================
-% Slide 21
-% ============================================================
-
-% ============================================================
 % Section 4 Divider
 % ============================================================
 
@@ -694,22 +718,6 @@ Paired transfers reduce instruction count when the program naturally works with 
 \end{frame}
 
 % ============================================================
-% Slide 23
-% ============================================================
-
-% ============================================================
-% Slide 24
-% ============================================================
-
-% ============================================================
-% Slide 25
-% ============================================================
-
-% ============================================================
-% Slide 26
-% ============================================================
-
-% ============================================================
 % Slide 27
 % ============================================================
 
@@ -717,20 +725,21 @@ Paired transfers reduce instruction count when the program naturally works with 
 \vspace{-0.2cm}
 \small \key{Goal:} Sum $N$ 64-bit integers \hfill \key{C pattern:} \code{sum += *ptr++} with \code{uint64\_t *ptr}
 \vspace{-0.1cm}
+
 \begin{block}{AArch64 Implementation (Using Post-Indexed Addressing)}
 \small
 \begin{tabular}{lll}
 \multicolumn{3}{l}{\textit{// x0 = array pointer, x1 = count n}} \\
 \code{sum\_loop:} & & \\
     & \code{mov  x2, xzr}           & \text{\scriptsize // sum = 0} \\
-    & \code{cbz  x1, .Ldone}        & \text{\scriptsize // Exit if count == 0} \\
+    & \code{cbz  x1, .Ldone}        & \text{\scriptsize // exit if count == 0} \\
 \code{.Lbody:} & & \\
-    & \code{ldr  x3, [x0], \#8}     & \text{\scriptsize // Load element AND increment pointer by 8} \\
+    & \code{ldr  x3, [x0], \#8}     & \text{\scriptsize // load element and advance by 8 bytes} \\
     & \code{add  x2, x2, x3}        & \text{\scriptsize // sum += element} \\
-    & \code{sub  x1, x1, \#1}       & \text{\scriptsize // count-- (flags not needed)} \\
-    & \code{cbnz x1, .Lbody}        & \text{\scriptsize // Loop if count != 0} \\
+    & \code{sub  x1, x1, \#1}       & \text{\scriptsize // count--} \\
+    & \code{cbnz x1, .Lbody}        & \text{\scriptsize // loop if count != 0} \\
 \code{.Ldone:} & & \\
-    & \code{mov  x0, x2}           & \text{\scriptsize // Return sum in x0} \\
+    & \code{mov  x0, x2}            & \text{\scriptsize // return sum in x0} \\
     & \code{ret}                    & \\
 \end{tabular}
 \end{block}
@@ -753,10 +762,10 @@ Post-indexing combines the load and pointer advance in one instruction.
 \begin{tabular}{lll}
 \multicolumn{3}{l}{\textit{// x0 = array pointer, x1 = index i, x2 = target value}} \\
 \code{find\_element:} & & \\
-    & \code{ldr  x3, [x0, x1, lsl \#3]} & \text{\scriptsize // Load arr[i] using Base + (i * 8)} \\
-    & \code{cmp  x3, x2}                & \text{\scriptsize // Compare arr[i] with target} \\
-    & \code{cset w0, eq}                & \text{\scriptsize // w0 = 1 if match, else 0} \\
-    & \code{ret}                        & \\
+    & \code{ldr  x3, [x0, x1, lsl \#3]} & \text{\scriptsize // load arr[i] using base + (i * 8)} \\
+    & \code{cmp  x3, x2}                 & \text{\scriptsize // compare arr[i] with target} \\
+    & \code{cset w0, eq}                 & \text{\scriptsize // w0 = 1 if match, else 0} \\
+    & \code{ret}                         & \\
 \end{tabular}
 \end{block}
 
@@ -764,10 +773,6 @@ Post-indexing combines the load and pointer advance in one instruction.
 \normalsize
 Combines index scaling and load into a single instruction without modifying the base pointer \bits{x0}.
 \end{frame}
-
-% ============================================================
-% Slide 29
-% ============================================================
 
 % ============================================================
 % Slide 30
@@ -780,7 +785,10 @@ Combines index scaling and load into a single instruction without modifying the 
 \renewcommand{\arraystretch}{1.22}
 \setlength{\tabcolsep}{5pt}
 \rowcolors{2}{softgray}{white}
-\begin{tabular}{>{\raggedright\arraybackslash}p{3.0cm} >{\raggedright\arraybackslash}p{2.35cm} >{\raggedright\arraybackslash}p{3.0cm} >{\raggedright\arraybackslash}p{4.2cm}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.0cm}
+                >{\raggedright\arraybackslash}p{2.35cm}
+                >{\raggedright\arraybackslash}p{3.0cm}
+                >{\raggedright\arraybackslash}p{4.2cm}}
 \toprule
 \rowcolor{white}
 \textbf{Programming Scenario} & \textbf{C Pattern} & \textbf{Addressing Mode} & \textbf{Example Instruction} \\
@@ -794,10 +802,6 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
 \end{tabular}
 \end{center}
 \end{frame}
-
-% ============================================================
-% Slide 31
-% ============================================================
 
 % ============================================================
 % Slide 32
@@ -835,7 +839,7 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
     \item Post-indexed (\code{[xn], \#imm}): byte offset applied after access.
     \item Scaled register offset (\code{[xn, xm, lsl \#3]}): base plus scaled index for arrays.
   \end{itemize}
-  \item \key{C vs. Assembly:} C pointer arithmetic is element-scaled; AArch64 immediate offsets are byte displacements.
+  \item \key{C vs.\ Assembly:} C pointer arithmetic is element-scaled; AArch64 immediate offsets are byte displacements.
 \end{itemize}
 
 \end{frame}
@@ -860,14 +864,10 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
     \item \code{ldr x0, [x1], \#8}
   \end{itemize}
 
-  \item \key{Array Element Indexing:} Given base array pointer in \bits{x0} and index $i$ in \bits{x1}, write a single instruction to load a 32-bit integer \texttt{arr[i]} into \bits{w2}.
+  \item \key{Array Element Indexing:} Given base array pointer in \bits{x0} and index $i$ in \bits{x1}, write a single instruction to load a 32-bit integer \code{arr[i]} into \bits{w2}.
 \end{enumerate}
 
 \end{frame}
-
-% ============================================================
-% Slide 35
-% ============================================================
 
 % ============================================================
 % Slide 35
@@ -884,6 +884,10 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
 \end{enumerate}
 
 \end{frame}
+
+% ============================================================
+% Looking Ahead
+% ============================================================
 
 \begin{frame}{Looking Ahead}
 
