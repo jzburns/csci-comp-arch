@@ -530,103 +530,6 @@ For \code{int32\_t *p}, reads the 32-bit value starting 16 bytes from \code{x0}:
 \end{frame}
 
 % ============================================================
-% Scaled Immediate Offsets -- Concept
-% ============================================================
-
-\begin{frame}{Scaled Immediate Offsets: What Does ``Scaled'' Mean?}
-
-\begin{block}{The Key Idea}
-The offset written in the instruction is a \key{byte offset}.  
-The transfer size determines how that byte offset relates to the data being accessed.
-\end{block}
-
-\vspace{0.2cm}
-
-\small
-Assume the same byte offset, \code{\#8}, in each instruction:
-
-\vspace{0.15cm}
-
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.18}
-\setlength{\tabcolsep}{5pt}
-
-\begin{tabular}{
-  >{\raggedright\arraybackslash}p{4.4cm}
-  >{\raggedright\arraybackslash}p{5.2cm}
-}
-\toprule
-\textbf{Instruction} &
-\textbf{Meaning of the 8-byte offset} \\
-\midrule
-
-\code{ldrb w3, [x0, \#8]} &
-8 byte-sized elements from \code{x0} \\
-
-\code{ldrh w3, [x0, \#8]} &
-4 halfword-sized elements from \code{x0} \\
-
-\code{ldr w3, [x0, \#8]} &
-2 word-sized elements from \code{x0} \\
-
-\code{ldr x3, [x0, \#8]} &
-1 doubleword-sized element from \code{x0} \\
-
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.25cm}
-
-\centering
-\textbf{All four instructions access memory starting at \code{x0 + 8}.}
-
-\end{frame}
-
-% ============================================================
-% Scaled Immediate Offsets -- Transfer Size
-% ============================================================
-
-\begin{frame}{Transfer Size Determines the Scale}
-
-\small
-
-The transfer size comes from the \key{instruction form}, not simply from the register name.
-
-\vspace{0.2cm}
-
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.15}
-\setlength{\tabcolsep}{9pt}
-
-\begin{tabular*}{0.96\textwidth}{@{\extracolsep{\fill}}llll@{}}
-\toprule
-\textbf{Load} &
-\textbf{Store} &
-\textbf{Transfer Size} &
-\textbf{Scale} \\
-\midrule
-\code{ldrb w3, [...]} & \code{strb w3, [...]} & 1 byte  & $\times 1$ \\
-\code{ldrh w3, [...]} & \code{strh w3, [...]} & 2 bytes & $\times 2$ \\
-\code{ldr w3, [...]}  & \code{str w3, [...]}  & 4 bytes & $\times 4$ \\
-\code{ldr x3, [...]}  & \code{str x3, [...]}  & 8 bytes & $\times 8$ \\
-\bottomrule
-\end{tabular*}
-\end{center}
-
-\vspace{0.3cm}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \code{ldrb w3} and \code{ldrh w3} both use \code{w3}, but transfer different amounts of memory.
-  \item \code{ldr w3} / \code{str w3} transfer 4 bytes.
-  \item \code{ldr x3} / \code{str x3} transfer 8 bytes.
-  \item The same scaling rule applies to both \key{loads and stores}.
-\end{itemize}
-
-\end{frame}
-% ============================================================
 % Slide 15
 % ============================================================
 
@@ -718,35 +621,48 @@ The transfer size comes from the \key{instruction form}, not simply from the reg
 % Slide 18
 % ============================================================
 
-\begin{frame}{Mode 4: Register Offset with Scaling}
+
+
+\begin{frame}{Mode 4: Register Offset with a Scaled Index}
+
+\vspace{-0.3cm}
+
+\small
+\begin{block}{Purpose}
+Use a base address plus an index register to access \code{arr[i]}; the index is explicitly scaled by the element size.
+\end{block}
+
+\begin{center}
 \large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Uses an index register ($x_m$) multiplied by element size to access array items:
-  $$\code{ldr xt, [xn, xm, lsl \#shift]}$$
-  \item This directly corresponds to the C pattern \code{arr[i]}.
+\code{ldr x0, [x1, x2, lsl \#3]}
+\end{center}
+
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item \code{x1}: base address; \code{x2}: element index.
+  \item \code{lsl \#3}: multiply the index by 8 for 64-bit elements.
+  \item Effective address: $x_1 + (x_2 \times 8)$.
 \end{itemize}
 
-\vspace{0.2cm}
 \begin{center}
-\small
-\setlength{\tabcolsep}{8pt}
+\scriptsize
+\renewcommand{\arraystretch}{1.08}
+\setlength{\tabcolsep}{4pt}
 \rowcolors{2}{softgray}{white}
 \begin{tabular}{llll}
 \toprule
 \rowcolor{white}
-\textbf{Element Type} & \textbf{C Pattern} & \textbf{Assembly Instruction} & \textbf{Effective Address} \\
+\textbf{Element Type} & \textbf{Element Size} & \textbf{Index Scale} & \textbf{Example Load} \\
 \midrule
-Byte      & \code{arr[i]} & \code{ldrb w0, [x1, x2]}          & $x_1 + x_2$ \\
-Halfword  & \code{arr[i]} & \code{ldrh w0, [x1, x2, lsl \#1]} & $x_1 + (x_2 \times 2)$ \\
-Word      & \code{arr[i]} & \code{ldr  w0, [x1, x2, lsl \#2]} & $x_1 + (x_2 \times 4)$ \\
-Doubleword& \code{arr[i]} & \code{ldr  x0, [x1, x2, lsl \#3]} & $x_1 + (x_2 \times 8)$ \\
+Byte       & 1 byte  & none          & \code{ldrb w0, [x1, x2]} \\
+Halfword   & 2 bytes & \code{lsl \#1} & \code{ldrh w0, [x1, x2, lsl \#1]} \\
+Word       & 4 bytes & \code{lsl \#2} & \code{ldr w0, [x1, x2, lsl \#2]} \\
+Doubleword & 8 bytes & \code{lsl \#3} & \code{ldr x0, [x1, x2, lsl \#3]} \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.2cm}
-\normalsize
-Directly implements high-level array access: \code{val = arr[i];}.
+\footnotesize
+Here, scaling is programmer-visible: scale the index by the element size, then add it to the base address.
 \end{frame}
 
 % ============================================================
