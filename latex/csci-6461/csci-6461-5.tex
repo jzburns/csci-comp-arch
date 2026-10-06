@@ -30,11 +30,9 @@
 \setbeamerfont{block title}{size=\normalsize, series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
-% Block vertical padding adjustments
 \addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
 \addtobeamertemplate{block end}{}{\vspace{0.2em}}
 
-% Base list item separation
 \setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
 \setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
 
@@ -95,7 +93,6 @@
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 
-% Section divider macro
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
 
@@ -151,10 +148,6 @@
 
 \begin{document}
 
-
-
-
-
 % ============================================================
 % Slide 1
 % ============================================================
@@ -186,15 +179,9 @@
 \vspace{0.35cm}
 \end{frame}
 
-
-
-
-
-
 % ============================================================
 % Slide 2
 % ============================================================
-
 
 \begin{frame}{Topic 5 Outline}
 
@@ -205,19 +192,16 @@
     \item Why AArch64 separates memory transfers from arithmetic operations.
     \item How values move between memory and the register file.
   \end{itemize}
-
   \item \key{Data Types, Widths, and Conversions}
   \begin{itemize}
     \item Handling bytes, halfwords, words, and doublewords cleanly.
     \item Choosing zero-extension or sign-extension when loading sub-word data.
   \end{itemize}
-
   \item \key{Address Calculation}
   \begin{itemize}
     \item Immediate offsets, pre/post-indexing, and scaled array indexing.
     \item How each addressing form changes, or does not change, the base register.
   \end{itemize}
-
   \item \key{Applied Access Patterns}
   \begin{itemize}
     \item Practical array traversal and indexed-array access patterns.
@@ -227,22 +211,15 @@
 
 \end{frame}
 
-
-
 % ============================================================
 % Section 1 Divider
 % ============================================================
 
 \sectiondivider{PART 1}{The Load/Store Architectural Boundary}
 
-
-
-
-
 % ============================================================
 % Slide 3
 % ============================================================
-
 
 \begin{frame}{The Fundamental Memory Challenge}
 \large
@@ -258,15 +235,9 @@ ALU instructions process \emph{only} register operands. Memory access is perform
 \end{block}
 \end{frame}
 
-
-
-
-
-
 % ============================================================
 % Slide 4
 % ============================================================
-
 
 \begin{frame}{Separating Computation from Data Movement}
 
@@ -305,25 +276,9 @@ ALU instructions process \emph{only} register operands. Memory access is perform
 \end{tikzpicture}
 \end{frame}
 
-
-
-
-
-
-% ============================================================
-% Slide 5
-% ============================================================
-
-
-
-
-
-
-
 % ============================================================
 % Slide 6
 % ============================================================
-
 
 \begin{frame}{Addressing Memory: Bytes, Words, and Doublewords}
 \large
@@ -353,21 +308,15 @@ Doubleword   & 64-bit  & \code{ldr  xt, [xn]} & \code{str  xt, [xn]} \\
 The base register (\bits{xn}) holds the memory pointer enclosed in brackets: \code{[xn]}.
 \end{frame}
 
-
 % ============================================================
 % Section 2 Divider
 % ============================================================
 
 \sectiondivider{PART 2}{Data Sizing \& Extension Rules}
 
-
-
-
-
 % ============================================================
 % Slide 7
 % ============================================================
-
 
 \begin{frame}{Sub-Word Loads and Extension}
 \large
@@ -393,35 +342,9 @@ Use for signed data. The sign bit is copied into the upper bits.
 \end{columns}
 \end{frame}
 
-
-
-
-
-
-% ============================================================
-% Slide 8
-% ============================================================
-
-
-
-
-
-
-
-% ============================================================
-% Slide 9
-% ============================================================
-
-
-
-
-
-
-
 % ============================================================
 % Slide 10
 % ============================================================
-
 
 \begin{frame}{Sign vs.\ Zero Extension: Side-by-Side}
 \begin{block}{Memory Byte at Address \texttt{x1} = \hex{80} (Binary: \texttt{1000 0000})}
@@ -446,11 +369,6 @@ The same 8-bit pattern means either unsigned \(128\) or signed \(-128\), dependi
 \normalsize
 Using a zero-extending load for signed negative data can turn a negative value into a large positive one.
 \end{frame}
-
-
-
-
-
 
 % ============================================================
 % Slide 11
@@ -490,10 +408,6 @@ Storing a byte or halfword modifies \emph{only} the targeted memory locations; n
 
 \sectiondivider{PART 3}{AArch64 Addressing Modes}
 
-
-
-
-
 % ============================================================
 % Slide 12
 % ============================================================
@@ -515,80 +429,105 @@ Storing a byte or halfword modifies \emph{only} the targeted memory locations; n
 \rowcolor{white}
 \textbf{Access Pattern} & \textbf{Addressing Form} & \textbf{C Pointer Pattern} & \textbf{Typical Use} \\
 \midrule
-Fixed offset from a base pointer & \code{[xn, \#imm]} & \code{*(ptr + k)} & Struct fields, known offsets \\
-Step through consecutive elements & \code{[xn], \#imm} & \code{*ptr++} & Array traversal \\
-Base plus scaled index & \code{[xn, xm, lsl \#k]} & \code{arr[i]} & Indexed array access \\
+Fixed byte offset from a base pointer & \code{[xn, \#imm]} & byte offset from \code{ptr} & Struct fields, known offsets \\
+Step through 64-bit elements & \code{[xn], \#8} & \code{*ptr++} for \code{uint64\_t *ptr} & Array traversal \\
+Base plus scaled index & \code{[xn, xm, lsl \#3]} & \code{arr[i]} for 64-bit elements & Indexed array access \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \vspace{0.18cm}
 \normalsize
-C pointer notation describes the same idea: start from a base address, optionally add an offset or index, then dereference.
+AArch64 offsets are byte counts. C pointer arithmetic scales by the size of the pointed-to type.
 \end{frame}
-
-
-
-
 
 % ============================================================
 % Slide 13
 % ============================================================
 
+% ============================================================
+% Mode 1: Base Register with Immediate Offset
+% ============================================================
+
 \begin{frame}{Mode 1: Base Register with Immediate Offset}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item Adds a fixed constant to a base pointer without modifying the base register.
-  \item \key{Syntax:} \code{ldr xt, [xn, \#offset]} $\implies \text{EA} = x_n + \text{offset}$.
+  \item Adds a fixed byte offset to a base address without modifying the base register.
+  \item \key{Syntax:} \code{ldr xt, [xn, \#offset]}
+        \quad $\Rightarrow$ \quad
+        $\text{EA} = x_n + \text{offset}$.
 \end{itemize}
 
-\vspace{0.2cm}
+\vspace{0.15cm}
+
 \centering
 \begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
-  \node[draw=navy, fill=lightblue, rounded corners=3pt, font=\small, minimum width=3.0cm, minimum height=0.6cm] (base) {Base Address (\bits{x0})};
-  \node[draw=navy, fill=gold!30, rounded corners=3pt, font=\small, right=0.3cm of base, minimum width=1.5cm, minimum height=0.6cm] (off) {$+ \text{Offset}$};
-  \draw[-{Latex}, thick, navy] (off.east) -- ++(1.5,0) node[right, font=\small\bfseries] {Target Memory Address};
+  \node[
+    draw=navy,
+    fill=lightblue,
+    rounded corners=3pt,
+    font=\small,
+    minimum width=3.0cm,
+    minimum height=0.6cm
+  ] (base) {Base Address (\bits{x0})};
+
+  \node[
+    draw=navy,
+    fill=gold!30,
+    rounded corners=3pt,
+    font=\small,
+    right=0.3cm of base,
+    minimum width=1.5cm,
+    minimum height=0.6cm
+  ] (off) {$+ \text{Offset}$};
+
+  \draw[-{Latex}, thick, navy]
+    (off.east) -- ++(1.5,0)
+    node[right, font=\small\bfseries] {Effective Address};
 \end{tikzpicture}
 
-\vspace{0.3cm}
-\begin{block}{Example: Reading Values at Fixed Offsets}
-\small
-\begin{tabular}{lll}
-\textbf{Assembly} & \textbf{C-like pattern} & \textbf{Meaning} \\
-\code{ldr x1, [x0, \#0]}  & \code{*ptr}        & Read value at the base address \\
-\code{ldr x2, [x0, \#8]}  & \code{*(ptr + 1)}  & Read the next 64-bit element \\
-\code{ldr w3, [x0, \#16]} & \code{*(base + 16)} & Read a 32-bit value at byte offset 16 \\
-\end{tabular}
-\end{block}
-\end{frame}
-
-
-
-
-
-% ============================================================
-% Slide 14
-% ============================================================
-
-
-\begin{frame}{Scaled Immediate Offsets}
-\large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Some load/store offsets are scaled by the size of the access.
-  \item For a 64-bit load, an offset of \code{\#8} means one doubleword past the base address.
-  \item For a 32-bit load, an offset of \code{\#4} means one word past the base address.
-\end{itemize}
-
 \vspace{0.25cm}
-\begin{block}{Conceptual Rule}
-The offset tells the instruction where the desired object is relative to the base pointer. In C terms, this is the same idea as \code{*(ptr + k)}, where \code{k} selects an element relative to the base pointer.
-\end{block}
+
+\raggedright
+\small\textbf{Example: Reading Values at Fixed Offsets}
+
+\vspace{0.1cm}
+
+\begin{center}
+\footnotesize
+\renewcommand{\arraystretch}{1.18}
+\setlength{\tabcolsep}{3pt}
+
+\begin{tabular*}{0.98\textwidth}{
+  @{\extracolsep{\fill}}
+  >{\raggedright\arraybackslash}p{3.2cm}
+  >{\raggedright\arraybackslash}p{2.2cm}
+  >{\raggedright\arraybackslash}p{7.1cm}
+  @{}
+}
+\toprule
+\textbf{Assembly} &
+\textbf{C-like Pattern} &
+\textbf{Meaning} \\
+\midrule
+
+\code{ldr x1, [x0, \#0]} &
+\code{*ptr} &
+64-bit value starting at \code{x0}. \\
+
+\code{ldr x2, [x0, \#8]} &
+\code{*(ptr + 1)} &
+For a 64-bit pointer, reads the next element, 8 bytes from \code{x0}. \\
+
+\code{ldr w3, [x0, \#16]} &
+\code{p[4]} &
+For \code{int32\_t *p}, reads the 32-bit value starting 16 bytes from \code{x0}: four 32-bit elements from the base. \\
+
+\bottomrule
+\end{tabular*}
+\end{center}
+
 \end{frame}
-
-
-
-
-
 
 % ============================================================
 % Slide 15
@@ -611,14 +550,10 @@ The offset tells the instruction where the desired object is relative to the bas
 
 \vspace{0.25cm}
 \begin{block}{Primary Use Case: Access After Pointer Adjustment}
-\code{ldr x0, [x1, \#-8]!} \quad $\approx$ \quad \code{*\char45{}\char45{}ptr} \\
-\text{\scriptsize Moves the pointer first, then loads from the updated address.}
+\code{ldr x0, [x1, \#-8]!} \quad $\approx$ \quad \code{*\char45{}\char45{}ptr} for \code{uint64\_t *ptr} \\
+\text{\scriptsize Subtracts 8 bytes first, then loads from the updated address.}
 \end{block}
 \end{frame}
-
-
-
-
 
 % ============================================================
 % Slide 16
@@ -641,20 +576,20 @@ The offset tells the instruction where the desired object is relative to the bas
 
 \vspace{0.25cm}
 \begin{block}{Primary Use Case: Array Stepping}
-\code{ldr x0, [x1], \#8} \quad $\approx$ \quad \code{*ptr++} \\
-\text{\scriptsize Loads from the current pointer, then advances the pointer to the next 8-byte element.}
+\code{ldr x0, [x1], \#8} \quad $\approx$ \quad \code{*ptr++} for \code{uint64\_t *ptr} \\
+\text{\scriptsize Loads from the current pointer, then advances by one 8-byte element.}
 \end{block}
 \end{frame}
-
-
-
-
 
 % ============================================================
 % Slide 17
 % ============================================================
 
 \begin{frame}{Comparing the Three Offset Modes}
+\vspace{-0.1cm}
+\small\key{Assumption:} the C pointer refers to 64-bit elements, so one C element step equals 8 bytes.
+\vspace{0.08cm}
+
 \begin{center}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -682,74 +617,53 @@ The offset tells the instruction where the desired object is relative to the bas
 \end{block}
 \end{frame}
 
-
-
-
-
 % ============================================================
 % Slide 18
 % ============================================================
 
-\begin{frame}{Mode 4: Register Offset with Scaling}
+
+
+\begin{frame}{Mode 4: Register Offset with a Scaled Index}
+
+\vspace{-0.3cm}
+
+\small
+\begin{block}{Purpose}
+Use a base address plus an index register to access \code{arr[i]}; the index is explicitly scaled by the element size.
+\end{block}
+
+\begin{center}
 \large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Uses an index register ($x_m$) multiplied by element size to access array items:
-  $$\code{ldr xt, [xn, xm, lsl \#shift]}$$
-  \item This directly corresponds to the C pattern \code{arr[i]}.
+\code{ldr x0, [x1, x2, lsl \#3]}
+\end{center}
+
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item \code{x1}: base address; \code{x2}: element index.
+  \item \code{lsl \#3}: multiply the index by 8 for 64-bit elements.
+  \item Effective address: $x_1 + (x_2 \times 8)$.
 \end{itemize}
 
-\vspace{0.2cm}
 \begin{center}
-\small
-\setlength{\tabcolsep}{8pt}
+\scriptsize
+\renewcommand{\arraystretch}{1.08}
+\setlength{\tabcolsep}{4pt}
 \rowcolors{2}{softgray}{white}
 \begin{tabular}{llll}
 \toprule
 \rowcolor{white}
-\textbf{Element Type} & \textbf{C Pattern} & \textbf{Assembly Instruction} & \textbf{Effective Address} \\
+\textbf{Element Type} & \textbf{Element Size} & \textbf{Index Scale} & \textbf{Example Load} \\
 \midrule
-Byte      & \code{arr[i]} & \code{ldrb w0, [x1, x2]}          & $x_1 + x_2$ \\
-Halfword  & \code{arr[i]} & \code{ldrh w0, [x1, x2, lsl \#1]} & $x_1 + (x_2 \times 2)$ \\
-Word      & \code{arr[i]} & \code{ldr  w0, [x1, x2, lsl \#2]} & $x_1 + (x_2 \times 4)$ \\
-Doubleword& \code{arr[i]} & \code{ldr  x0, [x1, x2, lsl \#3]} & $x_1 + (x_2 \times 8)$ \\
+Byte       & 1 byte  & none          & \code{ldrb w0, [x1, x2]} \\
+Halfword   & 2 bytes & \code{lsl \#1} & \code{ldrh w0, [x1, x2, lsl \#1]} \\
+Word       & 4 bytes & \code{lsl \#2} & \code{ldr w0, [x1, x2, lsl \#2]} \\
+Doubleword & 8 bytes & \code{lsl \#3} & \code{ldr x0, [x1, x2, lsl \#3]} \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.2cm}
-\normalsize
-Directly implements high-level array access: \code{val = arr[i];}.
+\footnotesize
+Here, scaling is programmer-visible: scale the index by the element size, then add it to the base address.
 \end{frame}
-
-
-
-
-
-% ============================================================
-% Slide 19
-% ============================================================
-
-
-
-
-
-
-
-% ============================================================
-% Slide 20
-% ============================================================
-
-
-
-
-
-
-
-% ============================================================
-% Slide 21
-% ============================================================
-
-
 
 % ============================================================
 % Section 4 Divider
@@ -757,14 +671,9 @@ Directly implements high-level array access: \code{val = arr[i];}.
 
 \sectiondivider{PART 4}{Multi-Register Transfers \& Applied Access Patterns}
 
-
-
-
-
 % ============================================================
 % Slide 22
 % ============================================================
-
 
 \begin{frame}{Paired Transfers: \texttt{ldp} and \texttt{stp}}
 \large
@@ -793,77 +702,29 @@ Directly implements high-level array access: \code{val = arr[i];}.
 Paired transfers reduce instruction count when the program naturally works with adjacent values.
 \end{frame}
 
-
-
-
-
-
-% ============================================================
-% Slide 23
-% ============================================================
-
-
-
-
-
-
-
-% ============================================================
-% Slide 24
-% ============================================================
-
-
-
-
-
-
-
-
-
-
-
-% ============================================================
-% Slide 25
-% ============================================================
-
-
-
-
-
-
-
-% ============================================================
-% Slide 26
-% ============================================================
-
-
-
-
-
-
-
 % ============================================================
 % Slide 27
 % ============================================================
 
 \begin{frame}[fragile]{Worked Pattern 1: Stepping Through an Array}
 \vspace{-0.2cm}
-\small \key{Goal:} Sum $N$ 64-bit Integers \hfill \key{C pattern:} \code{sum += *ptr++}
+\small \key{Goal:} Sum $N$ 64-bit integers \hfill \key{C pattern:} \code{sum += *ptr++} with \code{uint64\_t *ptr}
 \vspace{-0.1cm}
+
 \begin{block}{AArch64 Implementation (Using Post-Indexed Addressing)}
 \small
 \begin{tabular}{lll}
 \multicolumn{3}{l}{\textit{// x0 = array pointer, x1 = count n}} \\
 \code{sum\_loop:} & & \\
     & \code{mov  x2, xzr}           & \text{\scriptsize // sum = 0} \\
-    & \code{cbz  x1, .Ldone}        & \text{\scriptsize // Exit if count == 0} \\
+    & \code{cbz  x1, .Ldone}        & \text{\scriptsize // exit if count == 0} \\
 \code{.Lbody:} & & \\
-    & \code{ldr  x3, [x0], \#8}     & \text{\scriptsize // Load element AND increment pointer by 8} \\
+    & \code{ldr  x3, [x0], \#8}     & \text{\scriptsize // load element and advance by 8 bytes} \\
     & \code{add  x2, x2, x3}        & \text{\scriptsize // sum += element} \\
-    & \code{sub  x1, x1, \#1}       & \text{\scriptsize // count-- (flags not needed)} \\
-    & \code{cbnz x1, .Lbody}        & \text{\scriptsize // Loop if count != 0} \\
+    & \code{sub  x1, x1, \#1}       & \text{\scriptsize // count--} \\
+    & \code{cbnz x1, .Lbody}        & \text{\scriptsize // loop if count != 0} \\
 \code{.Ldone:} & & \\
-    & \code{mov  x0, x2}           & \text{\scriptsize // Return sum in x0} \\
+    & \code{mov  x0, x2}            & \text{\scriptsize // return sum in x0} \\
     & \code{ret}                    & \\
 \end{tabular}
 \end{block}
@@ -872,10 +733,6 @@ Paired transfers reduce instruction count when the program naturally works with 
 \normalsize
 Post-indexing combines the load and pointer advance in one instruction.
 \end{frame}
-
-
-
-
 
 % ============================================================
 % Slide 28
@@ -890,10 +747,10 @@ Post-indexing combines the load and pointer advance in one instruction.
 \begin{tabular}{lll}
 \multicolumn{3}{l}{\textit{// x0 = array pointer, x1 = index i, x2 = target value}} \\
 \code{find\_element:} & & \\
-    & \code{ldr  x3, [x0, x1, lsl \#3]} & \text{\scriptsize // Load arr[i] using Base + (i * 8)} \\
-    & \code{cmp  x3, x2}                & \text{\scriptsize // Compare arr[i] with target} \\
-    & \code{cset w0, eq}                & \text{\scriptsize // w0 = 1 if match, else 0} \\
-    & \code{ret}                        & \\
+    & \code{ldr  x3, [x0, x1, lsl \#3]} & \text{\scriptsize // load arr[i] using base + (i * 8)} \\
+    & \code{cmp  x3, x2}                 & \text{\scriptsize // compare arr[i] with target} \\
+    & \code{cset w0, eq}                 & \text{\scriptsize // w0 = 1 if match, else 0} \\
+    & \code{ret}                         & \\
 \end{tabular}
 \end{block}
 
@@ -902,24 +759,9 @@ Post-indexing combines the load and pointer advance in one instruction.
 Combines index scaling and load into a single instruction without modifying the base pointer \bits{x0}.
 \end{frame}
 
-
-
-
-
-% ============================================================
-% Slide 29
-% ============================================================
-
-
-
-
-
-
-
 % ============================================================
 % Slide 30
 % ============================================================
-
 
 \begin{frame}{Addressing Mode Selection Guide}
 \vspace{0.25cm}
@@ -928,40 +770,27 @@ Combines index scaling and load into a single instruction without modifying the 
 \renewcommand{\arraystretch}{1.22}
 \setlength{\tabcolsep}{5pt}
 \rowcolors{2}{softgray}{white}
-\begin{tabular}{>{\raggedright\arraybackslash}p{3.0cm} >{\raggedright\arraybackslash}p{2.35cm} >{\raggedright\arraybackslash}p{3.0cm} >{\raggedright\arraybackslash}p{4.2cm}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.0cm}
+                >{\raggedright\arraybackslash}p{2.35cm}
+                >{\raggedright\arraybackslash}p{3.0cm}
+                >{\raggedright\arraybackslash}p{4.2cm}}
 \toprule
 \rowcolor{white}
 \textbf{Programming Scenario} & \textbf{C Pattern} & \textbf{Addressing Mode} & \textbf{Example Instruction} \\
 \midrule
-Accessing a known offset & \code{*(ptr + k)} & Base + immediate offset & \code{ldr x1, [x0, \#8]} \\
-Loading the next element & \code{*ptr++} & Post-indexed update & \code{ldr x2, [x0], \#8} \\
-Stepping backward through data & \code{*\char45{}\char45{}ptr} & Pre-indexed update & \code{ldr x2, [x0, \#-8]!} \\
-Accessing an indexed element & \code{arr[i]} & Scaled register offset & \code{ldr x2, [x0, x1, lsl \#3]} \\
+Accessing a known byte offset & byte offset from base & Base + immediate offset & \code{ldr x1, [x0, \#8]} \\
+Loading next 64-bit element & \code{*ptr++} for \code{uint64\_t *ptr} & Post-indexed update & \code{ldr x2, [x0], \#8} \\
+Stepping backward 64-bit data & \code{*\char45{}\char45{}ptr} for \code{uint64\_t *ptr} & Pre-indexed update & \code{ldr x2, [x0, \#-8]!} \\
+Accessing a 64-bit indexed element & \code{arr[i]} & Scaled register offset & \code{ldr x2, [x0, x1, lsl \#3]} \\
 Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp x2, x3, [x0]} \\
 \bottomrule
 \end{tabular}
 \end{center}
 \end{frame}
 
-
-
-
-
-
-% ============================================================
-% Slide 31
-% ============================================================
-
-
-
-
-
-
-
 % ============================================================
 % Slide 32
 % ============================================================
-
 
 \begin{frame}{Common Memory Access Mistakes}
 \large
@@ -973,21 +802,15 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
 \end{itemize}
 \end{frame}
 
-
 % ============================================================
 % Section 5 Divider
 % ============================================================
 
 \sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
 
-
-
-
-
 % ============================================================
 % Slide 33
 % ============================================================
-
 
 \begin{frame}{Topic 5 Summary}
 
@@ -996,20 +819,15 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
   \item \key{Data Widths \& Extensions:} The instruction width controls how many bytes are transferred; signed sub-word data needs sign-extension.
   \item \key{Core Addressing Modes:}
   \begin{itemize}\setlength{\itemsep}{1.5pt}
-    \item Standard offset (\code{[xn, \#imm]}): base register is unchanged.
-    \item Pre-indexed (\code{[xn, \#imm]!}): base updated before the access.
-    \item Post-indexed (\code{[xn], \#imm}): base updated after the access.
+    \item Standard offset (\code{[xn, \#imm]}): byte offset, base unchanged.
+    \item Pre-indexed (\code{[xn, \#imm]!}): byte offset applied before access.
+    \item Post-indexed (\code{[xn], \#imm}): byte offset applied after access.
     \item Scaled register offset (\code{[xn, xm, lsl \#3]}): base plus scaled index for arrays.
   \end{itemize}
-  \item \key{Applied Access Patterns:} Sequential traversal often uses post-indexing; indexed array access often uses a scaled register offset.
+  \item \key{C vs.\ Assembly:} C pointer arithmetic is element-scaled; AArch64 immediate offsets are byte displacements.
 \end{itemize}
 
 \end{frame}
-
-
-
-
-
 
 % ============================================================
 % Slide 34
@@ -1031,22 +849,10 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
     \item \code{ldr x0, [x1], \#8}
   \end{itemize}
 
-  \item \key{Array Element Indexing:} Given base array pointer in \bits{x0} and index $i$ in \bits{x1}, write a single instruction to load a 32-bit integer \texttt{arr[i]} into \bits{w2}.
+  \item \key{Array Element Indexing:} Given base array pointer in \bits{x0} and index $i$ in \bits{x1}, write a single instruction to load a 32-bit integer \code{arr[i]} into \bits{w2}.
 \end{enumerate}
 
 \end{frame}
-
-
-
-
-
-% ============================================================
-% Slide 35
-% ============================================================
-
-
-
-
 
 % ============================================================
 % Slide 35
@@ -1063,6 +869,10 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
 \end{enumerate}
 
 \end{frame}
+
+% ============================================================
+% Looking Ahead
+% ============================================================
 
 \begin{frame}{Looking Ahead}
 
@@ -1081,6 +891,5 @@ AArch64 Subroutines, Calling Conventions, \& the Stack
 
 \vfill
 \end{frame}
-
 
 \end{document}
