@@ -555,22 +555,22 @@ XOR with 1 flips a bit; XOR with 0 leaves the bit unchanged.
 % ============================================================
 
 \begin{frame}{Inverted-Operand Logical Forms}
-\begin{block}{Why These Instructions Exist}
 Some bit-mask operations need one operand inverted before AND, OR, or XOR. These forms combine the inversion with the logical operation.
-\end{block}
 \vspace{0.12cm}
 \begin{center}
 \small
 \renewcommand{\arraystretch}{1.14}
-\begin{tabular}{>{\raggedright\arraybackslash}m{2.4cm}>{\raggedright\arraybackslash}m{4.2cm}>{\raggedright\arraybackslash}m{4.4cm}}
+\begin{tabular}{>{\raggedright\arraybackslash}m{1.4cm}>{\raggedright\arraybackslash}m{2.2cm}>{\raggedright\arraybackslash}m{7.4cm}}
 \rowcolor{navy}
 {\color{white}\bfseries Instruction} & {\color{white}\bfseries Operation} & {\color{white}\bfseries Typical use} \\
 \rowcolor{softgray}
 \code{bic} & $A \land \sim B$ & clear selected bits \\
 \rowcolor{white}
-\code{orn} & $A \lor \sim B$ & OR with an inverted operand \\
+\code{orn} & $A \lor \sim B$ & OR with an inverted operand. 
+Used for constructing masks that preserve bits outside a selected field while modifying bits within the field \\
 \rowcolor{softgray}
-\code{eon} & $A \oplus \sim B$ & XOR with an inverted operand \\
+\code{eon} & $A \oplus \sim B$ & XOR with an inverted operand 
+(produce 1s where two bit patterns are equal, and 0s where they differ)\\
 \end{tabular}
 \end{center}
 \vspace{0.12cm}
