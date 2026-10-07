@@ -818,7 +818,8 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item \key{Load/Store Discipline:} ALU instructions operate on registers; load/store-family instructions move data between registers and memory.
   \item \key{Data Widths \& Extensions:} The access width determines the bytes transferred. Loads use zero-extension or sign-extension to fill upper bits.
-  \item \key{Stores \& Paired Transfers:} Narrow stores write only the low bits. \code{ldp}/\code{stp} transfer two values at consecutive memory locations.
+  \item \key{Store Width:} Byte and halfword stores write the lowest 8 or 16 register bits.
+  \item \key{Paired Transfers:} \code{ldp}/\code{stp} load/store two values at consecutive addresses.
   \item \key{Core Addressing Modes:}
   \begin{itemize}\setlength{\itemsep}{1.5pt}
     \item Standard offset (\code{[xn, \#imm]}): byte offset, base unchanged.
@@ -826,7 +827,7 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
     \item Post-indexed (\code{[xn], \#imm}): access memory, then update base.
     \item Shifted register offset (\code{[xn, xm, lsl \#3]}): shift index to form a byte offset, then add to base. Base unchanged.
   \end{itemize}
-  \item \key{C vs.\ Assembly:} C pointer arithmetic is element-scaled; AArch64 immediate offsets are byte displacements.
+  \item \key{C vs.\ Assembly:} C pointer steps count elements. Immediate offsets count bytes.
 \end{itemize}
 
 \end{frame}
