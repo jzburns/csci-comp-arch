@@ -564,13 +564,13 @@ Some bit-mask operations need one operand inverted before AND, OR, or XOR. These
 \rowcolor{navy}
 {\color{white}\bfseries Instruction} & {\color{white}\bfseries Operation} & {\color{white}\bfseries Typical use} \\
 \rowcolor{softgray}
-\code{bic} & $A \land \sim B$ & clear selected bits \\
+\code{bic} & $A \land \sim B$ & Clear selected bits \\
 \rowcolor{white}
-\code{orn} & $A \lor \sim B$ & OR with an inverted operand. 
-Used for constructing masks that preserve bits outside a selected field while modifying bits within the field \\
+\code{orn} & $A \lor \sim B$ & For masks 
+that are a union of what we have and what we are allowed to have \\
 \rowcolor{softgray}
-\code{eon} & $A \oplus \sim B$ & XOR with an inverted operand 
-(produce 1s where two bit patterns are equal, and 0s where they differ)\\
+\code{eon} & $A \oplus \sim B$ & For masks 
+that produce 1s where two bit patterns are equal, and 0s where they differ\\
 \end{tabular}
 \end{center}
 \vspace{0.12cm}
