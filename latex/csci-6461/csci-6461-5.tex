@@ -708,7 +708,7 @@ Paired transfers reduce instruction count when the program naturally works with 
 
 \begin{frame}[fragile]{Worked Pattern 1: Stepping Through an Array}
 \vspace{-0.2cm}
-\small \key{Goal:} Sum $N$ 64-bit integers \hfill \key{C pattern:} \code{sum += *ptr++} with \code{uint64\_t *ptr}
+\small \key{Goal:} Sum $N$ 64-bit integers \hfill \key{C pattern:} \code{while (n--) sum += *ptr++;}
 \vspace{-0.1cm}
 
 \begin{block}{AArch64 Implementation (Using Post-Indexed Addressing)}
