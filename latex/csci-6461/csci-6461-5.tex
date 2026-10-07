@@ -742,7 +742,7 @@ Post-indexing combines the load and pointer advance in one instruction.
 \small \key{Goal:} Check Element at Index $i$ in Array \hfill \key{C pattern:} \code{arr[i]}
 
 \vspace{0.1cm}
-\begin{block}{AArch64 Implementation (Using Scaled Register Offset)}
+\begin{block}{AArch64 Implementation (Using a Shifted Register Offset)}
 \small
 \begin{tabular}{lll}
 \multicolumn{3}{l}{\textit{// x0 = array pointer, x1 = index i, x2 = target value}} \\
@@ -756,7 +756,7 @@ Post-indexing combines the load and pointer advance in one instruction.
 
 \vspace{0.25cm}
 \normalsize
-Combines index scaling and load into a single instruction without modifying the base pointer \bits{x0}.
+Uses a shifted register offset to form the address of \code{arr[i]} and load it in one instruction, without modifying the base pointer \bits{x0}.
 \end{frame}
 
 % ============================================================
