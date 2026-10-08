@@ -190,9 +190,8 @@ Explain how AArch64 transfers values between registers and memory and how an ins
 \item \key{Section 1}: Memory addresses and load/store semantics
 \item \key{Section 2}: Transfer width and extension
 \item \key{Section 3}: AArch64 addressing modes
-\item \key{Section 4}: Arrays, pointers, and byte data
-\item \key{Section 5}: Memory alignment and pair transfers
-\item \key{Section 6}: Summary and self-test
+\item \key{Section 4}: Alignment and pair transfers
+\item \key{Section 5}: Summary and self-test
 \end{itemize}
 \end{frame}
 
@@ -241,35 +240,28 @@ Arithmetic and logical instructions operate on register values. Dedicated load a
 % ============================================================
 
 \begin{frame}{Memory Is Byte Addressed}
-\begin{columns}[T,onlytextwidth]
-\column{0.56\textwidth}
 \begin{itemize}
 \item Each memory address identifies one byte.
 \item Multi-byte values occupy consecutive addresses.
 \item The instruction determines how many bytes are transferred.
-\item The base address for a load/store is held in a 64-bit base register or in \code{sp}.
 \end{itemize}
-\vspace{0.15cm}
-\begin{block}{Example}
-A 64-bit value beginning at \hex{1000} occupies byte addresses \hex{1000} through \hex{1007}.
-\end{block}
-\column{0.40\textwidth}
+\vspace{0.2cm}
 \begin{center}
-\small
-\renewcommand{\arraystretch}{1.12}
-\begin{tabular}{c c}
-\toprule
-\textbf{Address} & \textbf{Byte} \\
-\midrule
-\hex{1000} & byte 0 \\
-\hex{1001} & byte 1 \\
-\hex{1002} & byte 2 \\
-\multicolumn{2}{c}{$\vdots$} \\
-\hex{1007} & byte 7 \\
-\bottomrule
-\end{tabular}
+\begin{tikzpicture}[x=1.4cm,y=1cm]
+\node[anchor=west,font=\small\bfseries,text=navy] at (-0.5,1.35) {Byte offset (hex)};
+\foreach \offset/\position in {07/0,06/1,05/2,04/3,03/4,02/5,01/6,00/7} {
+  \node[font=\small\ttfamily,text=navy] at (\position,0.95) {\offset};
+  \draw[draw=deepblue,fill=softgray,line width=0.8pt] (\position-0.5,0) rectangle (\position+0.5,0.65);
+  \node[font=\small] at (\position,0.325) {1 byte};
+}
+\draw[->,thick,deepblue] (7.4,-0.4) -- (-0.4,-0.4)
+  node[midway,below,font=\small] {Increasing byte addresses};
+\end{tikzpicture}
 \end{center}
-\end{columns}
+\vspace{0.1cm}
+\begin{block}{Example: One 64-Bit Value}
+Starting address: \code{1000} (hexadecimal). The rightmost byte is at \code{1000}; the next byte to its left is at \code{1001}; the leftmost byte is at \code{1007}. Together, the eight bytes occupy 64 bits.
+\end{block}
 \end{frame}
 
 % ============================================================
@@ -472,36 +464,22 @@ If memory contains the byte \hex{ff}, \code{ldrb} interprets the transferred bit
 % ============================================================
 
 \begin{frame}{Load Width and Extension Example}
-Assume memory at \hex{2000} contains the byte \hex{80}.
-\vspace{0.25cm}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Unsigned Byte Load}
-\large
-\hspace{1.1cm}\code{ldrb w0, [x1]}
-\normalsize
-\vspace{0.12cm}
-\code{w0 = 0x00000080}
-\vspace{0.08cm}
+Assume \code{x1 = 0x2000} and memory at that address contains the byte \hex{80}.
+\vspace{0.2cm}
 \begin{itemize}
-\item Decimal value: 128
-\item Upper bits filled with zeros
+\item \textbf{Unsigned byte load:} \code{ldrb w0, [x1]}
+  \begin{itemize}
+  \item Reads one byte and fills the remaining bits with zeros.
+  \item Result: \code{w0 = 0x00000080}, decimal value 128.
+  \item Writing \code{w0} also clears the upper 32 bits of \code{x0}.
+  \end{itemize}
+\vspace{0.15cm}
+\item \textbf{Signed byte load:} \code{ldrsb x0, [x1]}
+  \begin{itemize}
+  \item Reads one byte and copies its sign bit into all higher bits.
+  \item Result: \code{x0 = 0xffffffffffffff80}, decimal value $-128$.
+  \end{itemize}
 \end{itemize}
-\end{block}
-\column{0.48\textwidth}
-\begin{block}{Signed Byte Load}
-\large
-\hspace{1.0cm}\code{ldrsb x0, [x1]}
-\normalsize
-\vspace{0.12cm}
-\code{x0 = 0xffffffffffffff80}
-\vspace{0.08cm}
-\begin{itemize}
-\item Decimal value: $-128$
-\item Sign bit replicated upward
-\end{itemize}
-\end{block}
-\end{columns}
 \end{frame}
 
 % ============================================================
@@ -509,6 +487,30 @@ Assume memory at \hex{2000} contains the byte \hex{80}.
 % Slide Header: AArch64 Addressing Modes
 % ============================================================
 \sectiondivider{Section 3}{AArch64 Addressing Modes}
+
+\begin{frame}{Three Addressing Types}
+A \textbf{pointer} holds a memory address. In these examples, the \textbf{base register} holds that pointer: C pointer \code{p} corresponds to register \code{x1}.
+\vspace{0.1cm}
+\begin{enumerate}
+\item \textbf{Offset:} access an address relative to the base; leave the base unchanged.
+  \begin{itemize}
+  \item \code{ldr x0, [x1, \#8]} \quad C: \code{value = p[1];}
+  \end{itemize}
+\item \textbf{Pre-index:} adjust the pointer, then access that address.
+  \begin{itemize}
+  \item \code{ldr x0, [x1, \#8]!} \quad C: \code{p++; value = *p;}
+  \end{itemize}
+\item \textbf{Post-index:} access the current address, then adjust the pointer.
+  \begin{itemize}
+  \item \code{ldr x0, [x1], \#8} \quad C: \code{value = *p; p++;}
+  \end{itemize}
+\end{enumerate}
+\vspace{0.15cm}
+\begin{block}{C Conventions Used in This Section}
+\code{uint64\_t *p} corresponds to \code{x1}; \code{uint64\_t value} corresponds to \code{x0}. Each element occupies 8 bytes, so \code{p++} advances by 8 bytes. Examples assume valid array accesses.
+\end{block}
+\end{frame}
+
 
 % ============================================================
 % Slide 14
@@ -526,7 +528,7 @@ The effective address is the memory address computed for a particular load or st
 \end{block}
 \vspace{0.25cm}
 \begin{itemize}
-\item A base register supplies the starting address.
+\item A base register holds the pointer that supplies the starting address.
 \item An optional immediate or register offset can modify that address.
 \item Some addressing forms also write an updated address back to the base register.
 \end{itemize}
@@ -546,7 +548,7 @@ AArch64 memory operands normally use a 64-bit general-purpose register or \code{
 % Slide 12
 % ============================================================
 
-\begin{frame}{Base Register Addressing}
+\begin{frame}{1. Offset: Base Register Only}
 \begin{block}{Syntax}
 \large
 \hspace{4.0cm}\code{ldr x0, [x1]}
@@ -560,7 +562,7 @@ AArch64 memory operands normally use a 64-bit general-purpose register or \code{
 \end{itemize}
 \vspace{0.2cm}
 \begin{block}{C Analogy}
-If \code{x1} represents pointer \code{p}, then the memory operand \code{[x1]} corresponds conceptually to \code{*p}.
+\code{value = *p;}\par This is offset addressing with a zero offset: read the current element and leave \code{p} unchanged.
 \end{block}
 \end{frame}
 
@@ -574,7 +576,7 @@ If \code{x1} represents pointer \code{p}, then the memory operand \code{[x1]} co
 % Slide 13
 % ============================================================
 
-\begin{frame}{Immediate Offset Addressing}
+\begin{frame}{1. Offset: Immediate Offset}
 \begin{block}{Example}
 \large
 \hspace{3.6cm}\code{ldr x0, [x1, \#16]}
@@ -587,6 +589,9 @@ If \code{x1} represents pointer \code{p}, then the memory operand \code{[x1]} co
 \item Useful for structure fields and fixed-position array elements.
 \end{itemize}
 \vspace{0.15cm}
+\begin{block}{Equivalent C}
+\code{value = p[2];}\par Read the element 16 bytes beyond \code{p}; \code{p} is unchanged.
+\end{block}
 \begin{block}{Encoding Detail}
 A64 has more than one load/store immediate encoding. Common unsigned offsets are scaled by transfer size; unscaled forms use a smaller signed byte offset.
 \end{block}
@@ -602,55 +607,23 @@ A64 has more than one load/store immediate encoding. Common unsigned offsets are
 % Slide 14
 % ============================================================
 
-\begin{frame}{Register Offset Addressing}
-\begin{block}{Unscaled Register Offset}
-\large
-\hspace{3.6cm}\code{ldr x0, [x1, x2]}
-\normalsize
-\vspace{0.05cm}
-Effective address $= \code{x1} + \code{x2}$.
+\begin{frame}{1. Offset: Register Offset}
+\begin{block}{Pointer Access: \code{x2} Holds a Byte Displacement}
+\code{ldr x0, [x1, x2]}\par
+\code{value = *(ptr + offset);}\par
+Here \code{ptr} is a pointer to 64-bit elements. C counts \code{offset} in elements; \code{x1} holds \code{ptr} and \code{x2} holds \code{offset * 8} bytes.
 \end{block}
 \vspace{0.15cm}
-\begin{block}{Scaled Index for 64-Bit Elements}
-\large
-\hspace{3.0cm}\code{ldr x0, [x1, x2, lsl \#3]}
-\normalsize
-\vspace{0.05cm}
-Effective address $= \code{x1} + (\code{x2} \times 8)$.
+\begin{block}{Array Index: \code{x2} Holds Element Index \code{i}}
+\code{ldr x0, [x1, x2, lsl \#3]}\par
+\code{value = p[i];}\par
+Multiply \code{i} by 8 to obtain the byte displacement for 64-bit elements.
 \end{block}
 \vspace{0.15cm}
-Register-offset forms are well suited to array indexing because the index can be scaled to the element size.
+Both forms leave \code{x1} (the pointer \code{p}) unchanged.
 \end{frame}
 
-% ============================================================
-% Slide 18
-% Slide Header: 32-Bit Index with Extension
-% ============================================================
 
-
-% ============================================================
-% Slide 15
-% ============================================================
-
-\begin{frame}{Using a 32-Bit Index Register}
-AArch64 register-offset addressing can extend a 32-bit index while forming a 64-bit address.
-\vspace{0.25cm}
-\begin{block}{Unsigned 32-Bit Index}
-\large
-\hspace{2.8cm}\code{ldr x0, [x1, w2, uxtw \#3]}
-\normalsize
-\end{block}
-\vspace{0.15cm}
-\begin{itemize}
-\item \code{w2} is zero-extended to address width.
-\item \code{lsl \#3} scales the index by 8 bytes.
-\item This is useful when the source-language array index is a 32-bit unsigned value.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Signed Index}
-\code{sxtw} can be used instead when the 32-bit index must be sign-extended before address formation.
-\end{block}
-\end{frame}
 
 % ============================================================
 % Slide 19
@@ -662,22 +635,20 @@ AArch64 register-offset addressing can extend a 32-bit index while forming a 64-
 % Slide 16
 % ============================================================
 
-\begin{frame}{Pre-Indexed Addressing}
-\begin{block}{Example}
-\large
-\hspace{3.5cm}\code{ldr x0, [x1, \#8]!}
-\normalsize
+\begin{frame}{2. Pre-Indexed Addressing}
+\begin{block}{Assembly}
+\code{ldr x0, [x1, \#8]!}
 \end{block}
-\vspace{0.25cm}
-\begin{enumerate}
-\item Compute \code{x1 + 8}.
-\item Use the updated address for the memory access.
-\item Write the updated address back into \code{x1}.
-\end{enumerate}
-\vspace{0.15cm}
-\begin{block}{Syntax Marker}
-The exclamation mark indicates writeback. In A64, pre-indexed writeback uses an immediate offset, not a general-purpose register offset.
+\begin{block}{Equivalent C: Advance, Then Read}
+\code{p++;}\par
+\code{value = *p;}\par
+Or, in one expression: \code{value = *++p;}
 \end{block}
+\begin{itemize}
+\item Access address: original \code{x1 + 8} (the next element).
+\item Base after the instruction: original \code{x1 + 8}.
+\item The exclamation mark indicates writeback; A64 pre-index uses an immediate offset.
+\end{itemize}
 \end{frame}
 
 % ============================================================
@@ -690,22 +661,20 @@ The exclamation mark indicates writeback. In A64, pre-indexed writeback uses an 
 % Slide 17
 % ============================================================
 
-\begin{frame}{Post-Indexed Addressing}
-\begin{block}{Example}
-\large
-\hspace{3.5cm}\code{ldr x0, [x1], \#8}
-\normalsize
+\begin{frame}{3. Post-Indexed Addressing}
+\begin{block}{Assembly}
+\code{ldr x0, [x1], \#8}
 \end{block}
-\vspace{0.25cm}
-\begin{enumerate}
-\item Access memory using the original value of \code{x1}.
-\item After the access, compute \code{x1 + 8}.
-\item Write the updated address back into \code{x1}.
-\end{enumerate}
-\vspace{0.15cm}
-\begin{block}{Common Use}
-Post-indexing is useful when processing the current element and then advancing a pointer to the next element.
+\begin{block}{Equivalent C: Read, Then Advance}
+\code{value = *p;}\par
+\code{p++;}\par
+Or, in one expression: \code{value = *p++;}
 \end{block}
+\begin{itemize}
+\item Access address: original \code{x1} (the current element).
+\item Base after the instruction: original \code{x1 + 8}.
+\item The immediate outside the brackets specifies the pointer update.
+\end{itemize}
 \end{frame}
 
 % ============================================================
@@ -729,7 +698,7 @@ Post-indexing is useful when processing the current element and then advancing a
 {\color{white}\bfseries Access Address} &
 {\color{white}\bfseries Base After} \\
 \rowcolor{softgray}
-Base &
+Offset (zero) &
 \code{ldr x0, [x1]} &
 \code{x1} &
 unchanged \\
@@ -762,72 +731,6 @@ Offset addressing computes an access address without changing the base register;
 \end{frame}
 
 % ============================================================
-% Slide 22
-% Slide Header: Arrays, Pointers, and Byte Data
-% ============================================================
-\sectiondivider{Section 4}{Arrays, Pointers, and Byte Data}
-
-% ============================================================
-% Slide 23
-% Slide Header: Array Address Calculation
-% ============================================================
-
-
-% ============================================================
-% Slide 19
-% ============================================================
-
-\begin{frame}{Array Address Calculation}
-For an array with element size $S$, element \code{A[i]} begins at:
-\[
-\text{address}(A[i]) = \text{base}(A) + i \times S
-\]
-\vspace{0.1cm}
-\begin{block}{Example: 64-Bit Array}
-If \code{x1} contains the array base and \code{x2} contains index \code{i}:
-\par
-\vspace{0.08cm}
-\large
-\hspace{3.0cm}\mbox{\code{ldr x0, [x1, x2, lsl \#3]}}
-\normalsize
-\end{block}
-\vspace{0.15cm}
-\begin{itemize}
-\item \code{lsl \#3} multiplies the index by $2^3 = 8$.
-\item The computed byte offset selects the requested 64-bit element.
-\end{itemize}
-\end{frame}
-
-% ============================================================
-% Slide 24
-% Slide Header: Traversing an Array with a Pointer
-% ============================================================
-
-
-% ============================================================
-% Slide 20
-% ============================================================
-
-\begin{frame}{Traversing an Array with a Pointer}
-Assume \code{x0} points to the current 64-bit array element.
-\vspace{0.25cm}
-\large
-\hspace{3.4cm}\mbox{\code{ldr x1, [x0], \#8}}
-\normalsize
-\vspace{0.3cm}
-\begin{itemize}
-\item The load copies the current 64-bit element into \code{x1}.
-\item The memory access uses the original address in \code{x0}.
-\item After the load, post-index writeback advances \code{x0} by 8 bytes.
-\item \code{x0} therefore points to the next array element.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Pointer Traversal}
-Post-index addressing combines the current access with advancement to the next element. Topic 7 will place this operation inside a loop.
-\end{block}
-\end{frame}
-
-% ============================================================
 % Slide 25
 % Slide Header: Byte Arrays and Pointer Advancement
 % ============================================================
@@ -837,30 +740,26 @@ Post-index addressing combines the current access with advancement to the next e
 % Slide 21
 % ============================================================
 
-\begin{frame}{Byte Arrays and Pointer Advancement}
-A C-style string is a byte array, so one character occupies one byte.
-\vspace{0.25cm}
-\large
-\hspace{3.3cm}\code{ldrb w1, [x0], \#1}
-\normalsize
-\vspace{0.25cm}
-\begin{itemize}
-\item \code{ldrb} reads the current byte and zero-extends it into \code{w1}.
-\item The access uses the original address in \code{x0}.
-\item Post-index writeback advances \code{x0} by one byte.
-\item Testing for the null terminator and repeating the access are Topic 7 control-flow operations.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Scope Boundary}
-This instruction demonstrates byte access and pointer movement only; the complete string-traversal loop belongs in the next topic.
+\begin{frame}{Byte Access: Advance by One Byte}
+\begin{block}{C: Read One Byte, Then Advance}
+\code{uint8\_t *ptr;}\par
+\code{value = *ptr++;}
 \end{block}
+\begin{block}{AArch64: \code{x0} Holds \code{ptr}}
+\code{ldrb w1, [x0], \#1}
+\end{block}
+\begin{itemize}
+\item Read one byte and zero-extend it into \code{w1}.
+\item Advance by 1 byte for a byte array, compared with 8 bytes for a 64-bit array.
+\item Match both the load width and pointer increment to the element size.
+\end{itemize}
 \end{frame}
 
 % ============================================================
 % Slide 26
 % Slide Header: Alignment and Pair Transfers
 % ============================================================
-\sectiondivider{Section 5}{Alignment and Pair Transfers}
+\sectiondivider{Section 4}{Alignment and Pair Transfers}
 
 % ============================================================
 % Slide 27
@@ -931,7 +830,7 @@ A pair transfer is one architectural instruction, but it is not guaranteed to be
 % Slide 29
 % Slide Header: Summary and Self-Test
 % ============================================================
-\sectiondivider{Section 6}{Summary and Self-Test}
+\sectiondivider{Section 5}{Summary and Self-Test}
 
 % ============================================================
 % Slide 30
@@ -947,7 +846,7 @@ A pair transfer is one architectural instruction, but it is not guaranteed to be
 \begin{itemize}
 \item AArch64 uses explicit load/store instructions to move values between registers and memory.
 \item The instruction determines transfer width and whether a narrow loaded value is zero-extended or sign-extended.
-\item Effective addresses can use a base register, immediate offset, register offset, or pre/post-indexed immediate writeback.
+\item The base register holds a pointer. Offset addressing leaves it unchanged; pre-index and post-index addressing update it before or after the access, respectively.
 \item Scaled register offsets map naturally to array indexing; post-indexing maps naturally to pointer traversal.
 \item Natural alignment is preferred, although many ordinary unaligned accesses to normal memory are permitted.
 \item \code{ldp} and \code{stp} transfer adjacent register pairs without implying atomicity or a particular physical bus transaction.
@@ -966,11 +865,11 @@ A pair transfer is one architectural instruction, but it is not guaranteed to be
 
 \begin{frame}{Self-Test 1/2}
 \begin{enumerate}
-\item What does the bracket notation in \code{ldr x0, [x1]} mean?
+\item If C pointer \code{ptr} is held in base register \code{x1}, what C statement corresponds to \code{ldr x0, [x1]}? What do the brackets mean?
 \item How many bytes are read by \code{ldrb}, \code{ldrh}, \code{ldr w0, [...]}, and \code{ldr x0, [...]}?
-\item What is the difference between \code{ldrb w0, [x1]} and \code{ldrsb x0, [x1]}?
-\item For \code{ldr x0, [x1, \#16]}, what is the effective address and what happens to \code{x1}?
-\item Why is \code{ldr x0, [x1, x2, lsl \#3]} suitable for a 64-bit array?
+\item Memory contains byte \hex{80}. What decimal values result from \code{ldrb w0, [x1]} and \code{ldrsb x0, [x1]}? Explain the extension used.
+\item Name the three addressing types. Which leave the base pointer unchanged, and which update it?
+\item For \code{ldr x0, [x1, \#16]}, give the effective address and equivalent C statement, assuming \code{ptr} points to 64-bit elements.
 \end{enumerate}
 \end{frame}
 
@@ -987,11 +886,11 @@ A pair transfer is one architectural instruction, but it is not guaranteed to be
 \begin{frame}{Self-Test 2/2}
 \begin{enumerate}
 \setcounter{enumi}{5}
-\item What changes in \code{x1} after \code{ldr x0, [x1, \#8]!}?
-\item What changes in \code{x1} after \code{ldr x0, [x1], \#8}?
-\item Why is \code{ldr x0, [x1, x2]!} not a valid example of A64 pre-indexed register addressing?
-\item What does natural alignment mean for an 8-byte object?
-\item Why does \code{ldrb w1, [x0], \#1} advance a byte-array pointer by one rather than by eight?
+\item Translate \code{value = ptr[i];} into a load using \code{x1} for \code{ptr} and \code{x2} for \code{i}. Assume 64-bit elements. Why is a shift of 3 needed?
+\item Compare \code{ldr x0, [x1, \#8]!} and \code{ldr x0, [x1], \#8}. Give the access address, final base value, and equivalent C statements for each.
+\item For a byte pointer, translate \code{value = *ptr++;} using \code{x0} for \code{ptr}. Why is the increment 1 rather than 8?
+\item What does natural alignment mean for an 8-byte object? Must every ordinary AArch64 load use a naturally aligned address?
+\item What do \code{ldp} and \code{stp} transfer? Do they guarantee an atomic transfer?
 \end{enumerate}
 \end{frame}
 
