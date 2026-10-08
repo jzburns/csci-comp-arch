@@ -489,25 +489,25 @@ Assume \code{x1 = 0x2000} and memory at that address contains the byte \hex{80}.
 \sectiondivider{Section 3}{AArch64 Addressing Modes}
 
 \begin{frame}{Three Addressing Types}
-A \textbf{pointer} holds a memory address. In these examples, the \textbf{base register} holds that pointer: C pointer \code{p} corresponds to register \code{x1}.
+A \textbf{pointer} holds a memory address. In these examples, the \textbf{base register} holds that pointer: C pointer \code{ptr} corresponds to register \code{x1}.
 \vspace{0.1cm}
 \begin{enumerate}
 \item \textbf{Offset:} access an address relative to the base; leave the base unchanged.
   \begin{itemize}
-  \item \code{ldr x0, [x1, \#8]} \quad C: \code{value = p[1];}
+  \item \code{ldr x0, [x1, \#8]} \quad C: \code{value = ptr[1];}
   \end{itemize}
 \item \textbf{Pre-index:} adjust the pointer, then access that address.
   \begin{itemize}
-  \item \code{ldr x0, [x1, \#8]!} \quad C: \code{p++; value = *p;}
+  \item \code{ldr x0, [x1, \#8]!} \quad C: \code{ptr++; value = *ptr;}
   \end{itemize}
 \item \textbf{Post-index:} access the current address, then adjust the pointer.
   \begin{itemize}
-  \item \code{ldr x0, [x1], \#8} \quad C: \code{value = *p; p++;}
+  \item \code{ldr x0, [x1], \#8} \quad C: \code{value = *ptr; ptr++;}
   \end{itemize}
 \end{enumerate}
 \vspace{0.15cm}
 \begin{block}{C Conventions Used in This Section}
-\code{uint64\_t *p} corresponds to \code{x1}; \code{uint64\_t value} corresponds to \code{x0}. Each element occupies 8 bytes, so \code{p++} advances by 8 bytes. Examples assume valid array accesses.
+\code{uint64\_t *ptr} corresponds to \code{x1}; \code{uint64\_t value} corresponds to \code{x0}. Each element occupies 8 bytes, so \code{ptr++} advances by 8 bytes. Examples assume valid array accesses.
 \end{block}
 \end{frame}
 
@@ -562,7 +562,7 @@ AArch64 memory operands normally use a 64-bit general-purpose register or \code{
 \end{itemize}
 \vspace{0.2cm}
 \begin{block}{C Analogy}
-\code{value = *p;}\par This is offset addressing with a zero offset: read the current element and leave \code{p} unchanged.
+\code{value = *ptr;}\par This is offset addressing with a zero offset: read the current element and leave \code{ptr} unchanged.
 \end{block}
 \end{frame}
 
@@ -590,7 +590,7 @@ AArch64 memory operands normally use a 64-bit general-purpose register or \code{
 \end{itemize}
 \vspace{0.15cm}
 \begin{block}{Equivalent C}
-\code{value = p[2];}\par Read the element 16 bytes beyond \code{p}; \code{p} is unchanged.
+\code{value = ptr[2];}\par Read the element 16 bytes beyond \code{ptr}; \code{ptr} is unchanged.
 \end{block}
 \begin{block}{Encoding Detail}
 A64 has more than one load/store immediate encoding. Common unsigned offsets are scaled by transfer size; unscaled forms use a smaller signed byte offset.
@@ -616,11 +616,11 @@ Here \code{ptr} is a pointer to 64-bit elements. C counts \code{offset} in eleme
 \vspace{0.15cm}
 \begin{block}{Array Index: \code{x2} Holds Element Index \code{i}}
 \code{ldr x0, [x1, x2, lsl \#3]}\par
-\code{value = p[i];}\par
+\code{value = ptr[i];}\par
 Multiply \code{i} by 8 to obtain the byte displacement for 64-bit elements.
 \end{block}
 \vspace{0.15cm}
-Both forms leave \code{x1} (the pointer \code{p}) unchanged.
+Both forms leave \code{x1} (the pointer \code{ptr}) unchanged.
 \end{frame}
 
 
@@ -640,9 +640,9 @@ Both forms leave \code{x1} (the pointer \code{p}) unchanged.
 \code{ldr x0, [x1, \#8]!}
 \end{block}
 \begin{block}{Equivalent C: Advance, Then Read}
-\code{p++;}\par
-\code{value = *p;}\par
-Or, in one expression: \code{value = *++p;}
+\code{ptr++;}\par
+\code{value = *ptr;}\par
+Or, in one expression: \code{value = *++ptr;}
 \end{block}
 \begin{itemize}
 \item Access address: original \code{x1 + 8} (the next element).
@@ -666,9 +666,9 @@ Or, in one expression: \code{value = *++p;}
 \code{ldr x0, [x1], \#8}
 \end{block}
 \begin{block}{Equivalent C: Read, Then Advance}
-\code{value = *p;}\par
-\code{p++;}\par
-Or, in one expression: \code{value = *p++;}
+\code{value = *ptr;}\par
+\code{ptr++;}\par
+Or, in one expression: \code{value = *ptr++;}
 \end{block}
 \begin{itemize}
 \item Access address: original \code{x1} (the current element).
@@ -786,6 +786,40 @@ An $n$-byte object is naturally aligned when its starting address is a multiple 
 Many ordinary AArch64 loads and stores to normal memory permit unaligned addresses, but natural alignment is preferred. Misaligned accesses may be slower or cross memory-system boundaries, and some access classes have stricter requirements.
 \end{block}
 \end{frame}
+
+\begin{frame}{Natural Alignment Boundaries}
+\begin{center}
+\begin{tikzpicture}[x=1.1cm,y=0.85cm]
+\definecolor{alignbyte}{RGB}{232,236,240}
+\definecolor{alignhalf}{RGB}{220,233,225}
+\definecolor{alignword}{RGB}{222,230,241}
+\definecolor{aligndouble}{RGB}{235,227,217}
+\node[anchor=east,font=\small\bfseries] at (-0.7,0.95) {Byte offset (hex)};
+\foreach \offset/\position in {07/0,06/1,05/2,04/3,03/4,02/5,01/6,00/7} {
+  \node[font=\small\ttfamily] at (\position,0.95) {\offset};
+  \draw[draw=darkgray!65,fill=alignbyte] (\position-0.5,0) rectangle (\position+0.5,0.6);
+}
+\node[anchor=east,font=\small] at (-0.7,0.3) {8-bit (1 byte)};
+\node[anchor=east,font=\small] at (-0.7,-0.6) {16-bit (2 bytes)};
+\foreach \start in {0,2,4,6} {
+  \draw[draw=darkgray!65,fill=alignhalf] (\start-0.5,-0.9) rectangle (\start+1.5,-0.3);
+  \node[font=\small] at (\start+0.5,-0.6) {2 bytes};
+}
+\node[anchor=east,font=\small] at (-0.7,-1.5) {32-bit (4 bytes)};
+\foreach \start in {0,4} {
+  \draw[draw=darkgray!65,fill=alignword] (\start-0.5,-1.8) rectangle (\start+3.5,-1.2);
+  \node[font=\small] at (\start+1.5,-1.5) {4 bytes};
+}
+\node[anchor=east,font=\small] at (-0.7,-2.4) {64-bit (8 bytes)};
+\draw[draw=darkgray!65,fill=aligndouble] (-0.5,-2.7) rectangle (7.5,-2.1);
+\node[font=\small] at (3.5,-2.4) {8 bytes};
+\end{tikzpicture}
+\end{center}
+\begin{block}{Aligned Starting Addresses}
+Assume offset \code{00} begins at address \code{1000} (hex). Read each group from its right edge: bytes can start anywhere; 16-bit objects at offsets \code{00, 02, 04, 06}; 32-bit objects at \code{00, 04}; and a 64-bit object at \code{00}. The pattern repeats every 8 bytes.
+\end{block}
+\end{frame}
+
 
 % ============================================================
 % Slide 28
