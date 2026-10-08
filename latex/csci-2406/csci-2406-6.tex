@@ -41,11 +41,7 @@
 % ============================================================
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\IfFileExists{sourcecodepro.sty}{%
-  \usepackage[scale=0.92]{sourcecodepro}%
-}{%
-  \usepackage{courier}%
-}
+\usepackage[scale=0.92]{sourcecodepro}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -183,14 +179,14 @@ Explain how AArch64 transfers values between registers and memory and how an ins
 \end{block}
 \vspace{0.25cm}
 \begin{itemize}
-\item \key{Section 1}: AArch64 addressing modes
-\item \key{Section 2}: Alignment and pair transfers
-\item \key{Section 3}: Transfer width and extension
+\item \key{Section 1}: Alignment and transfer widths
+\item \key{Section 2}: AArch64 addressing modes
+\item \key{Section 3}: Pair transfers
 \item \key{Section 4}: Summary and self-test
 \end{itemize}
 \end{frame}
 
-\sectiondivider{Section 1}{AArch64 Addressing Modes}
+\sectiondivider{Section 1}{Alignment and Transfer Widths}
 
 \begin{frame}{Memory Is Byte Addressed}
 \begin{itemize}
@@ -216,6 +212,176 @@ Explain how AArch64 transfers values between registers and memory and how an ins
 Starting address: \code{1000} (hexadecimal). The rightmost byte is at \code{1000}; the next byte to its left is at \code{1001}; the leftmost byte is at \code{1007}. Together, the eight bytes occupy 64 bits.
 \end{block}
 \end{frame}
+
+\begin{frame}{Natural Alignment}
+\begin{block}{Natural Alignment Rule}
+An $n$-byte object is naturally aligned when its starting address is a multiple of $n$.
+\end{block}
+\vspace{0.2cm}
+\begin{itemize}
+\item 2-byte halfword: address divisible by 2.
+\item 4-byte word: address divisible by 4.
+\item 8-byte doubleword: address divisible by 8.
+\end{itemize}
+\vspace{0.15cm}
+\begin{block}{AArch64 Qualification}
+Many ordinary AArch64 loads and stores to normal memory permit unaligned addresses, but natural alignment is preferred. Misaligned accesses may be slower or cross memory-system boundaries, and some access classes have stricter requirements.
+\end{block}
+\end{frame}
+
+\begin{frame}{Natural Alignment Boundaries}
+\begin{center}
+\begin{tikzpicture}[x=1.1cm,y=0.72cm]
+\definecolor{alignbyte}{RGB}{232,236,240}
+\definecolor{alignhalf}{RGB}{220,233,225}
+\definecolor{alignword}{RGB}{222,230,241}
+\definecolor{aligndouble}{RGB}{235,227,217}
+\node[anchor=east,font=\small\bfseries] at (-0.7,0.95) {Byte offset (hex)};
+\foreach \offset/\position in {07/0,06/1,05/2,04/3,03/4,02/5,01/6,00/7} {
+  \node[font=\small\ttfamily] at (\position,0.95) {\offset};
+  \draw[draw=darkgray!65,fill=alignbyte] (\position-0.5,0) rectangle (\position+0.5,0.6);
+}
+\node[anchor=east,font=\small] at (-0.7,0.3) {8-bit (1 byte)};
+\node[anchor=east,font=\small] at (-0.7,-0.6) {16-bit (2 bytes)};
+\foreach \start in {0,2,4,6} {
+  \draw[draw=darkgray!65,fill=alignhalf] (\start-0.5,-0.9) rectangle (\start+1.5,-0.3);
+  \node[font=\small] at (\start+0.5,-0.6) {2 bytes};
+}
+\node[anchor=east,font=\small] at (-0.7,-1.5) {32-bit (4 bytes)};
+\foreach \start in {0,4} {
+  \draw[draw=darkgray!65,fill=alignword] (\start-0.5,-1.8) rectangle (\start+3.5,-1.2);
+  \node[font=\small] at (\start+1.5,-1.5) {4 bytes};
+}
+\node[anchor=east,font=\small] at (-0.7,-2.4) {64-bit (8 bytes)};
+\draw[draw=darkgray!65,fill=aligndouble] (-0.5,-2.7) rectangle (7.5,-2.1);
+\node[font=\small] at (3.5,-2.4) {8 bytes};
+\end{tikzpicture}
+\end{center}
+\begin{block}{Natural Alignment for Loads and Stores}
+\small
+Let $A$ be the effective byte address. For an $n$-byte transfer, natural alignment means $A \bmod n = 0$.
+\par\smallskip
+\begin{tabular}{@{}ll@{\qquad}ll@{}}
+\code{ldrb/strb}: & $A \bmod 1 = 0$ & \code{ldrh/strh}: & $A \bmod 2 = 0$ \\
+\code{ldr/str} (32-bit): & $A \bmod 4 = 0$ & \code{ldr/str} (64-bit): & $A \bmod 8 = 0$
+\end{tabular}
+\par\smallskip
+\small Offset \code{00} starts at \code{1000} (hex); each group begins at its right edge. These are natural alignment conditions; ordinary loads/stores to normal memory may permit unaligned addresses.
+\end{block}
+\end{frame}
+
+\begin{frame}{Consequences of Unaligned Access}
+\begin{block}{Example}
+An 8-byte access at address \code{1003} (hex) is not naturally aligned: $A \bmod 8 \ne 0$.
+\end{block}
+\begin{itemize}
+\item \textbf{Correct access may still be possible:} ordinary AArch64 loads/stores to normal memory often support unaligned addresses.
+\item \textbf{Lower performance:} crossing a cache-line boundary may require extra work.
+\item \textbf{Possible fault:} alignment checking, certain instructions, or device memory can prohibit unaligned access.
+\item \textbf{Atomicity may not be guaranteed:} an unaligned access may lack the guarantees of a naturally aligned access.
+\end{itemize}
+\begin{block}{Why Prefer Natural Alignment?}
+An unaligned access does not automatically produce the wrong value. Natural alignment avoids these complications.
+\end{block}
+\end{frame}
+
+
+\begin{frame}{Load/Store Transfer Widths}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{>{\raggedright\arraybackslash}m{2.7cm} >{\raggedright\arraybackslash}m{2.7cm} >{\raggedright\arraybackslash}m{1.5cm} >{\raggedright\arraybackslash}m{4.6cm}}
+\rowcolor{navy}
+{\color{white}\bfseries Load} & {\color{white}\bfseries Store} & {\color{white}\bfseries Width} & {\color{white}\bfseries Load Result} \\
+\rowcolor{softgray}
+\code{ldrb} & \code{strb} & 1 byte & Zero-extended to 32 bits \\
+\rowcolor{white}
+\code{ldrh} & \code{strh} & 2 bytes & Zero-extended to 32 bits \\
+\rowcolor{softgray}
+\code{ldr} (32-bit) & \code{str} (32-bit) & 4 bytes & 32-bit value; upper 32 bits cleared \\
+\rowcolor{white}
+\code{ldr} (64-bit) & \code{str} (64-bit) & 8 bytes & Full 64-bit value \\
+\end{tabular}
+\end{center}
+\begin{itemize}
+\item A load into a 32-bit register clears the upper half of its 64-bit register.
+\item Stores write the specified number of bytes from the low end of the source register.
+\item The instruction determines transfer width; the memory address carries no type.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide Header: Signed Loads Preserve Negative Values
+% ============================================================
+
+
+% ============================================================
+% ============================================================
+
+\begin{frame}{Signed Loads Preserve Negative Values}
+\begin{block}{Sign Extension}
+A signed load copies the sign bit of the narrow source into the new upper bits so the two's-complement value is preserved.
+\end{block}
+\vspace{0.15cm}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{>{\raggedright\arraybackslash}m{3.2cm} >{\raggedright\arraybackslash}m{2.4cm} >{\raggedright\arraybackslash}m{5.4cm}}
+\rowcolor{navy}
+{\color{white}\bfseries Instruction} &
+{\color{white}\bfseries Source Width} &
+{\color{white}\bfseries Result} \\
+\rowcolor{softgray}
+\code{ldrsb x1, [x0]} &
+8 bits &
+Sign-extended to 64 bits \\
+\rowcolor{white}
+\code{ldrsh x1, [x0]} &
+16 bits &
+Sign-extended to 64 bits \\
+\rowcolor{softgray}
+\code{ldrsw x1, [x0]} &
+32 bits &
+Sign-extended to 64 bits \\
+\end{tabular}
+\end{center}
+\vspace{0.2cm}
+\begin{block}{Example}
+If memory contains the byte \hex{ff}, \code{ldrb} interprets the transferred bits as 255 after zero extension, while \code{ldrsb x1, [x0]} produces the 64-bit representation of $-1$.
+\end{block}
+\end{frame}
+
+% ============================================================
+% Slide Header: Load Width and Extension Example
+% ============================================================
+
+
+% ============================================================
+% ============================================================
+
+\begin{frame}{Load Width and Extension Example}
+Assume \code{x0 = 0x2000} and memory at that address contains the byte \hex{80}.
+\vspace{0.2cm}
+\begin{itemize}
+\item \textbf{Unsigned byte load:} \code{ldrb w1, [x0]}
+  \begin{itemize}
+  \item Reads one byte and fills the remaining bits with zeros.
+  \item Result: \code{w1 = 0x00000080}, decimal value 128.
+  \item Writing \code{w1} also clears the upper 32 bits of \code{x1}.
+  \end{itemize}
+\vspace{0.15cm}
+\item \textbf{Signed byte load:} \code{ldrsb x1, [x0]}
+  \begin{itemize}
+  \item Reads one byte and copies its sign bit into all higher bits.
+  \item Result: \code{x1 = 0xffffffffffffff80}, decimal value $-128$.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% Slide Header: AArch64 Addressing Modes
+% ============================================================
+\sectiondivider{Section 2}{AArch64 Addressing Modes}
 
 \begin{frame}{Three Addressing Types}
 \begin{block}{Pointer and Base Register}
@@ -295,7 +461,7 @@ AArch64 memory operands normally use a 64-bit general-purpose register or \code{
 \hspace{3.6cm}\code{ldr x1, [x0, \#16]}
 \normalsize
 \end{block}
-\vspace{0.25cm}
+\vspace{0.15cm}
 \begin{itemize}
 \item Effective address $= \code{x0} + 16$.
 \item The base register \code{x0} is unchanged.
@@ -303,11 +469,9 @@ AArch64 memory operands normally use a 64-bit general-purpose register or \code{
 \end{itemize}
 \vspace{0.15cm}
 \begin{block}{Equivalent C}
-\code{value = ptr[2];}\par Read the element 16 bytes beyond \code{ptr}; \code{ptr} is unchanged.
+\code{value = *(ptr + 2);}\par Read the element 16 bytes beyond \code{ptr}; \code{ptr} is unchanged.
 \end{block}
-\begin{block}{Encoding Detail}
-A64 has more than one load/store immediate encoding. Common unsigned offsets are scaled by transfer size; unscaled forms use a smaller signed byte offset.
-\end{block}
+
 \end{frame}
 
 % ============================================================
@@ -319,19 +483,22 @@ A64 has more than one load/store immediate encoding. Common unsigned offsets are
 % ============================================================
 
 \begin{frame}{1. Offset: Register Offset}
-\begin{block}{Pointer Access: \code{x2} Holds a Byte Displacement}
-\code{ldr x1, [x0, x2]}\par
-\code{value = *(ptr + offset);}\par
-Here \code{ptr} is a pointer to 64-bit elements. C counts \code{offset} in elements; \code{x0} holds \code{ptr} and \code{x2} holds \code{offset * 8} bytes.
+\begin{block}{1. Register Holds the Byte Offset}
+\textbf{AArch64:} \code{ldr x1, [x0, x2]}\par
+\textbf{C:} \code{value = *(ptr + offset);}\par
+C counts \code{offset} in elements. \code{x2} holds \code{offset * 8}, the corresponding byte offset.
 \end{block}
-\vspace{0.15cm}
-\begin{block}{Array Index: \code{x2} Holds Element Index \code{i}}
-\code{ldr x1, [x0, x2, lsl \#3]}\par
-\code{value = ptr[i];}\par
-Multiply \code{i} by 8 to obtain the byte displacement for 64-bit elements.
+\vspace{0.1cm}
+\begin{block}{2. Element Index Converted to a Byte Displacement}
+\textbf{AArch64:} \code{ldr x1, [x0, x2, lsl \#3]}\par
+\textbf{C:} \code{value = *(ptr + i);}\par
+\code{x2} holds index \code{i}; \code{lsl \#3} multiplies it by 8.
 \end{block}
-\vspace{0.15cm}
-Both forms leave \code{x0} (the pointer \code{ptr}) unchanged.
+\vspace{0.1cm}
+\begin{itemize}
+\item In both examples, \code{x0} holds \code{ptr}, pointing to 64-bit elements.
+\item The loaded value goes into \code{x1}; \code{x0} is unchanged.
+\end{itemize}
 \end{frame}
 
 
@@ -461,73 +628,7 @@ Offset addressing computes an access address without changing the base register;
 % ============================================================
 % Slide Header: Alignment and Pair Transfers
 % ============================================================
-\sectiondivider{Section 2}{Alignment and Pair Transfers}
-
-% ============================================================
-% Slide Header: Natural Alignment
-% ============================================================
-
-
-% ============================================================
-% ============================================================
-
-\begin{frame}{Natural Alignment}
-\begin{block}{Natural Alignment Rule}
-An $n$-byte object is naturally aligned when its starting address is a multiple of $n$.
-\end{block}
-\vspace{0.2cm}
-\begin{itemize}
-\item 2-byte halfword: address divisible by 2.
-\item 4-byte word: address divisible by 4.
-\item 8-byte doubleword: address divisible by 8.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{AArch64 Qualification}
-Many ordinary AArch64 loads and stores to normal memory permit unaligned addresses, but natural alignment is preferred. Misaligned accesses may be slower or cross memory-system boundaries, and some access classes have stricter requirements.
-\end{block}
-\end{frame}
-
-\begin{frame}{Natural Alignment Boundaries}
-\begin{center}
-\begin{tikzpicture}[x=1.1cm,y=0.85cm]
-\definecolor{alignbyte}{RGB}{232,236,240}
-\definecolor{alignhalf}{RGB}{220,233,225}
-\definecolor{alignword}{RGB}{222,230,241}
-\definecolor{aligndouble}{RGB}{235,227,217}
-\node[anchor=east,font=\small\bfseries] at (-0.7,0.95) {Byte offset (hex)};
-\foreach \offset/\position in {07/0,06/1,05/2,04/3,03/4,02/5,01/6,00/7} {
-  \node[font=\small\ttfamily] at (\position,0.95) {\offset};
-  \draw[draw=darkgray!65,fill=alignbyte] (\position-0.5,0) rectangle (\position+0.5,0.6);
-}
-\node[anchor=east,font=\small] at (-0.7,0.3) {8-bit (1 byte)};
-\node[anchor=east,font=\small] at (-0.7,-0.6) {16-bit (2 bytes)};
-\foreach \start in {0,2,4,6} {
-  \draw[draw=darkgray!65,fill=alignhalf] (\start-0.5,-0.9) rectangle (\start+1.5,-0.3);
-  \node[font=\small] at (\start+0.5,-0.6) {2 bytes};
-}
-\node[anchor=east,font=\small] at (-0.7,-1.5) {32-bit (4 bytes)};
-\foreach \start in {0,4} {
-  \draw[draw=darkgray!65,fill=alignword] (\start-0.5,-1.8) rectangle (\start+3.5,-1.2);
-  \node[font=\small] at (\start+1.5,-1.5) {4 bytes};
-}
-\node[anchor=east,font=\small] at (-0.7,-2.4) {64-bit (8 bytes)};
-\draw[draw=darkgray!65,fill=aligndouble] (-0.5,-2.7) rectangle (7.5,-2.1);
-\node[font=\small] at (3.5,-2.4) {8 bytes};
-\end{tikzpicture}
-\end{center}
-\begin{block}{Aligned Starting Addresses}
-Assume offset \code{00} begins at address \code{1000} (hex). Read each group from its right edge: bytes can start anywhere; 16-bit objects at offsets \code{00, 02, 04, 06}; 32-bit objects at \code{00, 04}; and a 64-bit object at \code{00}. The pattern repeats every 8 bytes.
-\end{block}
-\end{frame}
-
-
-% ============================================================
-% Slide Header: Load and Store Pair
-% ============================================================
-
-
-% ============================================================
-% ============================================================
+\sectiondivider{Section 3}{Pair Transfers}
 
 \begin{frame}{Load and Store Pair: \code{ldp} and \code{stp}}
 \begin{columns}[T,onlytextwidth]
@@ -558,123 +659,42 @@ A pair transfer is one architectural instruction, but it is not guaranteed to be
 \end{block}
 \end{frame}
 
-% ============================================================
-% Slide Header: Summary and Self-Test
-% ============================================================
-\sectiondivider{Section 3}{Transfer Width and Extension}
-
-% ============================================================
-% Slide Header: Load Width Determines Bytes Read
-% ============================================================
-
-
-% ============================================================
-% ============================================================
-
-\begin{frame}{Load Width Determines Bytes Read}
+\begin{frame}{Pair Transfers: Order in Memory}
+\begin{columns}[T,onlytextwidth]
+\column{0.46\textwidth}
 \begin{center}
-\small
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{>{\raggedright\arraybackslash}m{3.0cm} >{\raggedright\arraybackslash}m{2.5cm} >{\raggedright\arraybackslash}m{5.6cm}}
-\rowcolor{navy}
-{\color{white}\bfseries Instruction} &
-{\color{white}\bfseries Bytes Read} &
-{\color{white}\bfseries Destination Result} \\
-\rowcolor{softgray}
-\code{ldrb w1, [x0]} &
-1 byte &
-Zero-extended to 32 bits in \code{w1} \\
-\rowcolor{white}
-\code{ldrh w1, [x0]} &
-2 bytes &
-Zero-extended to 32 bits in \code{w1} \\
-\rowcolor{softgray}
-\code{ldr w1, [x0]} &
-4 bytes &
-Written to \code{w1}; upper half of \code{x1} becomes zero \\
-\rowcolor{white}
-\code{ldr x1, [x0]} &
-8 bytes &
-Full 64-bit value written to \code{x1} \\
-\end{tabular}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\draw[draw=deepblue,fill=deepblue!12] (0,1.3) rectangle (3.6,2.6);
+\draw[draw=deepblue,fill=gold!15] (0,0) rectangle (3.6,1.3);
+\node[font=\normalsize\bfseries] at (1.8,1.95) {\code{x30} (LR)};
+\node[font=\normalsize\bfseries] at (1.8,0.65) {\code{x29} (FP)};
+\node[anchor=west,font=\small] at (3.75,1.3) {\code{sp + 8}};
+\node[anchor=west,font=\small] at (3.75,0) {\code{sp}};
+\node[font=\small,text=darkgray] at (1.8,2.9) {After reserving 16 bytes};
+\draw[->,thick,deepblue] (-0.4,2.6) -- (-0.4,0)
+ node[midway,left,rotate=90,anchor=south,font=\small] {Decreasing addresses};
+\end{tikzpicture}
 \end{center}
-\vspace{0.25cm}
-\begin{block}{Width Comes from the Instruction}
-A memory address does not carry a type. The load/store instruction determines the number of bytes transferred.
+\column{0.50\textwidth}
+\begin{block}{Reserve Space, Then Store}
+\code{sub sp, sp, \#16}\par
+\code{stp x29, x30, [sp]}\par
+Store FP, then LR in the adjacent slot.
 \end{block}
-\end{frame}
-
-% ============================================================
-% Slide Header: Signed Loads Preserve Negative Values
-% ============================================================
-
-
-% ============================================================
-% ============================================================
-
-\begin{frame}{Signed Loads Preserve Negative Values}
-\begin{block}{Sign Extension}
-A signed load copies the sign bit of the narrow source into the new upper bits so the two's-complement value is preserved.
+\begin{block}{Load, Then Release Space}
+\code{ldp x29, x30, [sp]}\par
+\code{add sp, sp, \#16}\par
+Restore the pair, then restore the original \code{sp}.
 \end{block}
-\vspace{0.15cm}
-\begin{center}
+\end{columns}
+\vspace{0cm}
+\begin{block}{Pointer Adjustment and Stack Uses}
 \small
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{>{\raggedright\arraybackslash}m{3.2cm} >{\raggedright\arraybackslash}m{2.4cm} >{\raggedright\arraybackslash}m{5.4cm}}
-\rowcolor{navy}
-{\color{white}\bfseries Instruction} &
-{\color{white}\bfseries Source Width} &
-{\color{white}\bfseries Result} \\
-\rowcolor{softgray}
-\code{ldrsb x1, [x0]} &
-8 bits &
-Sign-extended to 64 bits \\
-\rowcolor{white}
-\code{ldrsh x1, [x0]} &
-16 bits &
-Sign-extended to 64 bits \\
-\rowcolor{softgray}
-\code{ldrsw x1, [x0]} &
-32 bits &
-Sign-extended to 64 bits \\
-\end{tabular}
-\end{center}
-\vspace{0.2cm}
-\begin{block}{Example}
-If memory contains the byte \hex{ff}, \code{ldrb} interprets the transferred bits as 255 after zero extension, while \code{ldrsb x1, [x0]} produces the 64-bit representation of $-1$.
+\textbf{FP}: frame pointer (\code{x29}); \textbf{LR}: link register (\code{x30}), holding the return address. Only \code{sub/add} change \code{sp} here. Stack frames and saving these registers will be developed in the stack lecture.
 \end{block}
 \end{frame}
 
-% ============================================================
-% Slide Header: Load Width and Extension Example
-% ============================================================
 
-
-% ============================================================
-% ============================================================
-
-\begin{frame}{Load Width and Extension Example}
-Assume \code{x0 = 0x2000} and memory at that address contains the byte \hex{80}.
-\vspace{0.2cm}
-\begin{itemize}
-\item \textbf{Unsigned byte load:} \code{ldrb w1, [x0]}
-  \begin{itemize}
-  \item Reads one byte and fills the remaining bits with zeros.
-  \item Result: \code{w1 = 0x00000080}, decimal value 128.
-  \item Writing \code{w1} also clears the upper 32 bits of \code{x1}.
-  \end{itemize}
-\vspace{0.15cm}
-\item \textbf{Signed byte load:} \code{ldrsb x1, [x0]}
-  \begin{itemize}
-  \item Reads one byte and copies its sign bit into all higher bits.
-  \item Result: \code{x1 = 0xffffffffffffff80}, decimal value $-128$.
-  \end{itemize}
-\end{itemize}
-\end{frame}
-
-% ============================================================
-% Slide Header: AArch64 Addressing Modes
-% ============================================================
 \sectiondivider{Section 4}{Summary and Self-Test}
 
 % ============================================================
@@ -725,7 +745,7 @@ Assume \code{x0 = 0x2000} and memory at that address contains the byte \hex{80}.
 \begin{frame}{Self-Test 2/2}
 \begin{enumerate}
 \setcounter{enumi}{5}
-\item Translate \code{value = ptr[i];} into a load using \code{x0} for \code{ptr} and \code{x2} for \code{i}. Assume 64-bit elements. Why is a shift of 3 needed?
+\item Translate \code{value = *(ptr + i);} into a load using \code{x0} for \code{ptr} and \code{x2} for \code{i}. Assume 64-bit elements. Why is a shift of 3 needed?
 \item Compare \code{ldr x1, [x0, \#8]!} and \code{ldr x1, [x0], \#8}. Give the access address, final base value, and equivalent C statements for each.
 \item For a byte pointer, translate \code{value = *ptr++;} using \code{x0} for \code{ptr}. Why is the increment 1 rather than 8?
 \item What does natural alignment mean for an 8-byte object? Must every ordinary AArch64 load use a naturally aligned address?
