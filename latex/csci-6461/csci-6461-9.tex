@@ -103,17 +103,17 @@
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
-\end{tikzpicture}
-\vspace*{\fill}
-\begin{minipage}{0.94\textwidth}
+% Explicit page coordinates keep the divider independent of top-aligned frames.
+\node[anchor=west,inner sep=0pt,text width=.93\paperwidth] at
+  ([xshift=.55cm,yshift=.12\paperheight]current page.west) {%
 \raggedright
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 {\color{gold}\large\bfseries #1\par}
 \vspace{0.3cm}
 {\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
-\end{minipage}
-\vspace*{\fill}
+};
+\end{tikzpicture}
 \end{frame}
 }
 
@@ -321,23 +321,46 @@
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
-\end{tikzpicture}
-\vspace*{\fill}
-\begin{minipage}{0.94\textwidth}
+% Cover text and author use fixed page positions, matching the template layout.
+\node[anchor=north west,inner sep=0pt,text width=.94\textwidth] at
+  ([xshift=.65cm,yshift=-.10\paperheight]current page.north west) {%
+\raggedright
 {\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 9\par}
 \vspace{0.3cm}
 {\color{white}\fontsize{24}{28}\selectfont\bfseries Pipelining Fundamentals\\[0.12cm]\& the 5-Stage RISC Pipeline\par}
 \vspace{0.35cm}
 {\color{white!80}\large AArch64 instruction flow, pipeline state,\\hazards, and performance\par}
-\end{minipage}
-\vfill
-{\color{white!70}\small Dr. J. Burns\par}
-\vspace*{\fill}
+};
+\node[anchor=north west,inner sep=0pt,text=white!70,font=\small] at
+  ([xshift=.65cm,yshift=-.72\paperheight]current page.north west) {Dr. J. Burns};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Topic 9 Outline}
+\setbeamertemplate{enumerate item}{\arabic{enumi}.}
+\begin{enumerate}\setlength{\itemsep}{8pt}
+  \item \key{Pipelining Principles and Timing}
+  \begin{itemize}
+    \item Instruction overlap, pipeline timing diagrams, latency, and throughput.
+  \end{itemize}
+  \item \key{The Five Stages and Pipeline State}
+  \begin{itemize}
+    \item IF, ID, EX, MEM, and WB; pipeline registers and AArch64 instruction paths.
+  \end{itemize}
+  \item \key{Hazards, Forwarding, and Stalls}
+  \begin{itemize}
+    \item Structural and data hazards, forwarding paths, and load-use stalls.
+  \end{itemize}
+  \item \key{Control Flow and Pipeline Performance}
+  \begin{itemize}
+    \item AArch64 branches, flushing, CPI, and execution time; summary and self-tests.
+  \end{itemize}
+\end{enumerate}
 \end{frame}
 
 \sectiondivider{PART 1}{Pipelining Principles and Timing}
 
-\begin{frame}{The AArch64 Teaching Model}
+\begin{frame}{Pipeline Assumptions}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item \key{ISA behavior:} execute real A64 instructions while preserving their register, memory, and control-flow effects.
@@ -348,7 +371,7 @@
 \end{itemize}
 \vspace{0.05cm}
 \begin{block}{ISA and Microarchitecture}
-The AArch64 ISA does not prescribe five stages. The diagrams describe the teaching implementation used in this lecture.
+The AArch64 ISA does not prescribe five stages. The five stages shown here are a processor design choice.
 \end{block}
 
 \end{frame}
