@@ -319,7 +319,7 @@
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item The \key{ISA} defines the instructions visible to software.
   \item The \key{microarchitecture} is the hardware organization that executes those instructions.
-  \item A single-cycle datapath is one microarchitectural implementation of the AArch64 ISA.
+  \item This single-cycle datapath implements a small subset of AArch64 instructions.
   \item The datapath moves values through memories, registers, ALUs, and multiplexers.
   \item The control unit interprets the instruction and selects the datapath actions.
   \item Later implementations can use pipelining while preserving the same ISA behavior.
@@ -372,13 +372,13 @@
 \end{center}
 \end{frame}
 
-\begin{frame}{AArch64 State Used Here}
+\begin{frame}{AArch64 Architectural State}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item \key{PC}: address of the current instruction.
   \item \key{Register fields}: 5-bit fields encode register numbers 0--31. Ordinary integer registers are \code{x0}--\code{x30}.
-  \item \key{NZCV}: condition flags used by conditional branches.
+  \item \key{NZCV}: condition flags used by conditional branches. Flag storage and condition-check logic are not shown in the diagrams.
 \end{itemize}
 \column{0.48\textwidth}
 \begin{itemize}\setlength{\itemsep}{6pt}
@@ -395,12 +395,13 @@ The AArch64 PC is separate from its general-purpose register file.
 \normalsize
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item \key{Memory}: \code{ldr xT, [xN, \#imm]} and \code{str xT, [xN, \#imm]} using unsigned scaled offsets.
-  \item \key{Data processing}: register forms of \code{add}, \code{sub}, \code{and}, and \code{orr}, plus unshifted immediate \code{add}/\code{sub}.
-  \item \key{Control flow}: \code{b label} and simple conditional branches such as \code{b.eq label}.
+  \item \key{Data processing}: unshifted register forms of \code{add}, \code{sub}, \code{and}, and \code{orr}, plus unshifted immediate \code{add}/\code{sub}.
+  \item \key{Control flow}: unconditional \code{b label}.
   \item The load instruction is traced first because it exercises fetch, register read, immediate generation, ALU address calculation, data memory, and writeback.
 \end{itemize}
 \vspace{0.15cm}
-The diagrams implement this instruction subset. Additional AArch64 instruction forms require additional decoding and datapath support.
+\small
+Examples use \code{x0}--\code{x30}. Handling \code{sp}/\code{xzr} requires register-31 logic; conditional branches require flag storage and condition-check logic. These additions are not shown.
 \end{frame}
 
 \sectiondivider{PART 2}{State Elements and Core Datapath Blocks}
@@ -415,7 +416,7 @@ The diagrams implement this instruction subset. Additional AArch64 instruction f
   \node[state,right=of dp,minimum width=2.8cm] (new) {updated\\state};
   \draw[bus] (state)--(dp); \draw[bus] (dp)--(new);
   \draw[ctrl] (ctrl)--node[right,font=\scriptsize]{control signals}(dp);
-  \draw[ctrl] (dp.north west)--node[left,font=\scriptsize]{instruction fields}(ctrl.south west);
+  \draw[bus] (dp.north west)--node[left,font=\scriptsize]{instruction fields}(ctrl.south west);
 \end{tikzpicture}
 \end{center}
 \vspace{0.1cm}
@@ -494,10 +495,10 @@ Example: \code{ldr x7, [x5, \#8]}.
   \coordinate (instrbus) at (5.55,.44);
   \draw[bus] (pc.east)--(imem-A);
   \draw[bus] (imem-RD)--(instrbus);
-  \draw[navy,line width=1.4pt] (5.55,-1.8)--(5.55,2);
+  \draw[navy,line width=1.4pt] (5.55,-1.75)--(5.55,2);
   \node[logic,text width=2.05cm,minimum width=2.19cm,inner sep=2pt,font=\scriptsize] (decode) at (6.85,2)
     {Decode\\opcode/form\\\code{Instr[31:22]}};
-  \draw[ctrl] (5.55,2)--(decode.west);
+  \draw[bus] (5.55,2)--(decode.west);
   \fill[navy] (5.55,2) circle (1.5pt);
   \draw[bus] (5.55,.8)--node[above,font=\ttfamily\scriptsize]{Rn = 5} (rf-A1);
   \fill[navy] (5.55,.8) circle (1.5pt);
@@ -572,12 +573,12 @@ The ALU is combinational. Its operation does not itself update a register.
 \code{ldr/str xT, [xN, \#imm]} & \code{imm12} & zero-extended and scaled by access size \\
 \code{add/sub xD, xN, \#imm} & \code{imm12} & zero-extended immediate \\
 \code{b label} & \code{imm26} & sign-extended, shifted left by 2 \\
-\code{b.cond label} & \code{imm19} & sign-extended, shifted left by 2 \\
 \bottomrule
 \end{tabular}
 \end{center}
 \vspace{0.15cm}
-The control unit selects the immediate mode using an \code{ImmSrc} signal.
+\code{ImmSrc} selects the field, extension, and scaling.
+The \code{add}/\code{sub} row uses unshifted immediates.
 \end{frame}
 
 \begin{frame}{Data Memory}
@@ -696,7 +697,7 @@ The PC supplies the instruction address. Instruction memory returns the 32-bit A
 \begin{frame}{Step 2: Decode Register Fields}
 \begin{center}
 \begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{10}{opcode}{gold!22}
+  \bfld{0}{0}{10}{opcode/form}{gold!22}
   \bfld{10}{0}{12}{imm12 = 1}{lightblue}
   \bfld{22}{0}{5}{Rn = 5}{blue!8}
   \bfld{27}{0}{5}{Rt = 7}{lightblue}
@@ -750,10 +751,10 @@ AArch64 unsigned load/store offsets are scaled by the access size.
 \begin{frame}{Step 5: Compute the Effective Address}
 \begin{center}
 \begin{tikzpicture}[font=\small]
-  \node[logic,minimum width=3cm] (base) at (0,.8) {RD1\\base = \code{x5}};
-  \node[logic,minimum width=3cm] (imm) at (0,-.8) {ExtImm = 8};
+  \node[logic,minimum width=3cm] (base) at (0,.8) {\code{RD1}\\base value from \code{x5}};
+  \node[logic,minimum width=3cm] (imm) at (0,-.8) {\code{ExtImm = 8}};
   \node[logic,minimum width=2cm,minimum height=1.6cm] (alu) at (4.4,0) {ALU\\add};
-  \node[logic,minimum width=3.1cm] (addr) at (8.6,0) {ALUResult\\effective address};
+  \node[logic,minimum width=3.1cm] (addr) at (8.6,0) {\code{ALUResult}\\effective address};
   \draw[bus] (base.east) -- ++(.65,0) |- ([yshift=.4cm]alu.west);
   \draw[bus] (imm.east) -- ++(.65,0) |- ([yshift=-.4cm]alu.west);
   \draw[bus] (alu.east) -- (addr.west);
@@ -780,7 +781,7 @@ The memory read value becomes the candidate writeback value for \code{x7}.
 \begin{frame}{Step 7: Write Back and Update PC}
 \begin{center}
 \begin{tikzpicture}[font=\small]
-  \node[logic,minimum width=2.8cm] (data) at (0,1) {ReadData};
+  \node[logic,minimum width=2.8cm] (data) at (0,1) {\code{ReadData}};
   \node[state,minimum width=4cm,minimum height=1.5cm] (rf) at (6,1) {Register write\\\code{A3 = 7}\\\code{WE3 = 1}};
   \draw[bus] (data.east) -- node[above]{\code{WD3}} (rf.west);
   \node[logic,minimum width=2cm] (next) at (0,-1) {PC + 4};
@@ -832,7 +833,7 @@ At the clock edge, \code{x7} receives the loaded value and the PC receives \(PC+
   \draw[bus] (3.8,-.4)--node[above,font=\ttfamily\tiny]{Rt=7} (rf-A3);
   \draw[bus] (3.8,2)--node[above,font=\ttfamily\tiny]{imm12=1} (imm.west);
   \draw[bus] (3.8,3)--(10.8,3)--(decode.north);
-  \node[font=\scriptsize,above] at (7.4,3) {opcode/form};
+  \node[font=\ttfamily\scriptsize,above] at (7.4,3) {opcode/form};
   \foreach \yy in {-.4,0,.45,2,3} {\fill[navy] (3.8,\yy) circle (1.3pt);}
 
   % Register operand and extended offset reach distinct ALU inputs.
@@ -974,7 +975,7 @@ The assembler calculates the displacement from the label. Each A64 instruction o
     {Signed byte offset\\\code{SignExtend(imm26 : 00)}};
   \node[logic,minimum width=2.4cm] (add) at (4.1,-1.15) {Target adder};
   \node[logic,minimum width=2.4cm] (seq) at (4.1,2.1) {PC + 4};
-  \pic (pcmux) at (7.1,.5) {muxright={PC\\src}};
+  \pic (pcmux) at (7.1,.5) {muxright={PC\\Src}};
   \draw[bus] (pc.south) |- (add.west);
   \draw[bus] (pc.north) |- (seq.west);
   \draw[bus] (imm.east) -| (add.south);
@@ -1005,7 +1006,7 @@ For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At th
   \node[state,minimum width=1cm,minimum height=1cm,font=\small] (pc) at (0,0) {PC};
   \node[state,minimum width=1.65cm,minimum height=1.2cm,font=\scriptsize] (imem) at (1.8,0) {Instruction\\memory};
   \node[state,minimum width=1.5cm,minimum height=1.75cm,font=\scriptsize] (rf) at (5.3,0) {Register\\file};
-  \pic (srcmux) at (6.65,-.5) {muxright={ALU\\src}};
+  \pic (srcmux) at (6.65,-.5) {muxright={ALU\\Src}};
   \node[logic,minimum width=1.3cm,minimum height=1.3cm,font=\small] (alu) at (8.85,0) {ALU};
   \node[state,minimum width=1.8cm,minimum height=1.3cm,font=\scriptsize] (dmem) at (10.95,0) {Data\\memory};
   \pic (wbmux) at (12.4,0) {muxwriteback};
@@ -1016,7 +1017,7 @@ For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At th
   \node[logic,fill=softpurple,minimum width=2.6cm,minimum height=.9cm,font=\scriptsize] (decode) at (10.95,-2.3) {Control decode};
   \node[logic,minimum width=1.6cm,minimum height=.8cm,font=\small] (add4) at (2,2.55) {+4};
   \node[logic,minimum width=1.7cm,minimum height=.85cm,font=\scriptsize] (target) at (9.5,1.85) {Target\\adder};
-  \pic (pcmux) at (12.4,2.2) {muxright={PC\\src}};
+  \pic (pcmux) at (12.4,2.2) {muxright={PC\\Src}};
 
   \coordinate (rf-A1) at ([yshift=.62cm]rf.west);
   \coordinate (rf-A3) at ([yshift=-.68cm]rf.west);
@@ -1048,11 +1049,12 @@ For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At th
   \draw[bus] (srcmux-out)--(alu-B);
   \draw[bus] (6.2,-.35)--(6.2,-1.45)--(10.65,-1.45)--(mem-WD);
   \fill[navy] (6.2,-.35) circle (1.2pt);
-  \node[font=\ttfamily\tiny,above] at (9,-1.45) {RD2: store data};
+  \node[font=\ttfamily\tiny,above] at (8.8,-1.45) {RD2 to WD};
 
   % Writeback mux: 0 selects ALUResult; 1 selects memory ReadData.
   \draw[bus] (alu.east)--(dmem.west);
-  \draw[bus] (9.75,0)--(9.75,-1.8)--(12.05,-1.8)--(12.05,-.35)--(wbmux-lower);
+  \draw[bus,crossing] (9.75,0)--(9.75,-1.8)--(12.05,-1.8)--(12.05,-.35)--(wbmux-lower);
+  \node[font=\ttfamily\tiny,above,inner sep=.5pt] at (10.4,-1.8) {ALUResult};
   \fill[navy] (9.75,0) circle (1.2pt);
   \draw[bus] (dmem.east)--(12.05,0)--(12.05,.35)--(wbmux-upper);
   \draw[bus] (wbmux-out)--(14.1,0)--(14.1,-3.55)--(5.75,-3.55)--(rf-WD3);
@@ -1062,13 +1064,13 @@ For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At th
   \draw[bus,crossing] (3.1,-1.35)--(5.95,-1.35)--(5.95,-2.3)--(imm.west);
   \node[font=\ttfamily\tiny,above,inner sep=.5pt] at (4.65,-1.35) {imm bits};
   \draw[bus,crossing] (imm.north)--(7.6,-1.35)--(6.45,-1.35)--(6.45,-.85)--(srcmux-lower);
-  \fill[navy] (7.6,-1.35) circle (1.2pt);
 
   % Sequential PC and branch target enter the base of PCSrc.
   \draw[bus] (pc.north)--(0,2.55)--(add4.west);
   \draw[bus,crossing] (0,1.5)--(7.65,1.5)--(7.65,2.05)--(target-PC);
   \fill[navy] (0,1.5) circle (1.2pt);
   \draw[bus,crossing] (7.6,-1.35)--(7.85,-1.35)--(7.85,1.65)--(target-imm);
+  \fill[navy] (7.6,-1.35) circle (1.2pt);
   \node[font=\ttfamily\tiny,above] at (8.23,1.65) {ExtImm};
   \draw[bus,crossing] (add4.east)--(pcmux-upper);
   \node[font=\ttfamily\tiny,above] at (5,2.55) {PC + 4};
@@ -1104,7 +1106,7 @@ For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At th
 \end{tikzpicture}
 \end{center}
 \scriptsize
-Triangles are multiplexers; dashed lines carry controls. The same hardware supports \code{add} and \code{str}; see Self-Test 2.
+Triangles: multiplexers; dashed bus: separate controls. The same hardware supports \code{add} and \code{str}; see Self-Test 2.
 \end{frame}
 
 \sectiondivider{PART 5}{Control Signals and Timing}
@@ -1125,7 +1127,7 @@ Triangles are multiplexers; dashed lines carry controls. The same hardware suppo
 \code{MemToReg} & choose memory data or ALU result for writeback \\
 \code{ALUSrc} & choose register data or immediate as ALU input B \\
 \code{ALUControl} & select add, subtract, and, or other ALU operation \\
-\code{ImmSrc} & select the immediate-extension mode \\
+\code{ImmSrc} & select the immediate field, extension, and scaling \\
 \code{Read2Src} & choose \code{Rm} or \code{Rt} for the second register read \\
 \code{PCSrc} & choose sequential PC or branch target \\
 \bottomrule
@@ -1145,19 +1147,20 @@ Triangles are multiplexers; dashed lines carry controls. The same hardware suppo
 \rowcolor{white}
 \textbf{Instruction} & \textbf{RegW} & \textbf{MemW} & \textbf{MemToReg} & \textbf{ALUSrc} & \textbf{ALU} & \textbf{ImmSrc} & \textbf{Read2Src} & \textbf{PCSrc} \\
 \midrule
-\code{ldr xT, [xN, \#imm]} & 1 & 0 & 1 & 1 & add & load/store & -- & 0 \\
-\code{str xT, [xN, \#imm]} & 0 & 1 & X & 1 & add & load/store & \code{Rt} & 0 \\
-\code{add xD, xN, xM} & 1 & 0 & 0 & 0 & add & -- & \code{Rm} & 0 \\
-\code{sub xD, xN, xM} & 1 & 0 & 0 & 0 & sub & -- & \code{Rm} & 0 \\
-\code{add xD, xN, \#imm} & 1 & 0 & 0 & 1 & add & add/sub imm & -- & 0 \\
-\code{b label} & 0 & 0 & X & X & X & branch & -- & 1 \\
+\code{ldr xT, [xN, \#imm]} & 1 & 0 & 1 & 1 & add & load/store & X & 0 \\
+\code{str xT, [xN, \#imm]} & 0 & 1 & X & 1 & add & load/store & 1 & 0 \\
+\code{add xD, xN, xM} & 1 & 0 & 0 & 0 & add & X & 0 & 0 \\
+\code{sub xD, xN, xM} & 1 & 0 & 0 & 0 & sub & X & 0 & 0 \\
+\code{add xD, xN, \#imm} & 1 & 0 & 0 & 1 & add & add/sub imm & X & 0 \\
+\code{b label} & 0 & 0 & X & X & X & branch & X & 1 \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 \end{center}
 \vspace{0.12cm}
-\normalsize
-The entries marked \code{X} are not used by that instruction.
+\small
+\code{Read2Src}: 0 selects \code{Rm}; 1 selects \code{Rt}.\\[3pt]
+\code{X} means not used: its setting does not affect this instruction.
 \end{frame}
 
 \begin{frame}{Single-Cycle Limitations}
@@ -1187,7 +1190,7 @@ The entries marked \code{X} are not used by that instruction.
 \normalsize
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item A single-cycle datapath computes the next architectural state in one clock period.
-  \item State elements store the PC, registers, memory contents, and flags.
+  \item The state elements shown store the PC, integer register values, and memory contents.
   \item Instruction fields select register ports, immediate-generation modes, and control settings.
   \item The \code{ldr x7, [x5, \#8]} path uses instruction fetch, register read, immediate scaling, ALU address calculation, memory read, and register writeback.
   \item The same datapath is extended with multiplexers and control signals for stores, ALU instructions, and branches.
