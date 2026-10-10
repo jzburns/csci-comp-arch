@@ -121,7 +121,6 @@
   unit/.style={draw=navy,line width=0.8pt,rounded corners=2pt,fill=lightblue,minimum width=2.35cm,minimum height=0.82cm,align=center,font=\small},
   state/.style={unit,fill=gold!24},
   logic/.style={unit,fill=softgreen},
-  mux/.style={trapezium, trapezium left angle=70, trapezium right angle=110, draw=navy, line width=0.8pt, fill=softorange, minimum width=0.62cm, minimum height=0.95cm, font=\scriptsize, align=center},
   arr/.style={-{Stealth[length=2.2mm]},draw=navy,line width=0.8pt},
   bus/.style={-{Stealth[length=2.2mm]},draw=navy,line width=1.0pt},
   ctrl/.style={-{Stealth[length=2.0mm]},draw=deepblue,line width=0.8pt,dashed}
@@ -131,6 +130,41 @@
   regblock/.style={state,minimum width=2.35cm,minimum height=1.45cm}
 }
 
+
+
+% Multiplexers: two data inputs on the base, one output at the tip.
+% The dashed selection control meets a sloping edge.
+\tikzset{
+  pics/muxright/.style args={#1}{code={
+    \draw[draw=navy,line width=.9pt,fill=softorange]
+      (0,.7)--(0,-.7)--(1.05,0)--cycle;
+    \node[font=\ttfamily\scriptsize,align=center,inner sep=0pt] at (.35,0) {#1};
+    \coordinate (-upper) at (0,.35);
+    \coordinate (-lower) at (0,-.35);
+    \coordinate (-out) at (1.05,0);
+    \coordinate (-selN) at (.45,.4);
+    \coordinate (-selS) at (.45,-.4);
+  }},
+  pics/muxwriteback/.style={code={
+    \draw[draw=navy,line width=.9pt,fill=softorange]
+      (0,.8)--(0,-.8)--(1.4,0)--cycle;
+    \node[font=\ttfamily\scriptsize,align=center,inner sep=0pt] at (.36,0) {WB\\mux};
+    \coordinate (-upper) at (0,.35);
+    \coordinate (-lower) at (0,-.35);
+    \coordinate (-out) at (1.4,0);
+    \coordinate (-selN) at (.5,.514286);
+  }},
+  pics/muxread2/.style={code={
+    \draw[draw=navy,line width=.9pt,fill=softorange]
+      (0,.35)--(0,-.35)--(.6,0)--cycle;
+    \coordinate (-upper) at (0,.175);
+    \coordinate (-lower) at (0,-.175);
+    \coordinate (-out) at (.6,0);
+    \coordinate (-selN) at (.26,.198333);
+    \node[font=\ttfamily\tiny,anchor=west,inner sep=0pt] at (.07,.175) {0};
+    \node[font=\ttfamily\tiny,anchor=west,inner sep=0pt] at (.07,-.175) {1};
+  }}
+}
 
 % Detailed component symbols with explicit pin coordinates.
 \tikzset{
@@ -438,32 +472,48 @@ Two read ports and one write port; the read paths are combinational.
 \begin{frame}{Parsing the Instruction Word}
 \small
 Example: \code{ldr x7, [x5, \#8]}.
+\vspace{-.08cm}
+\begin{center}
+\begin{tikzpicture}[x=.32cm,y=.7cm]
+  \bfld{0}{0}{10}{opcode/form}{gold!22}
+  \bfld{10}{0}{12}{imm12 = 1}{lightblue}
+  \bfld{22}{0}{5}{Rn = 5}{blue!8}
+  \bfld{27}{0}{5}{Rt = 7}{lightblue}
+  \foreach \xx/\range/\width in {5/{31:22}/{10 bits},16/{21:10}/{12 bits},24.5/{9:5}/{5 bits},29.5/{4:0}/{5 bits}} {
+    \node[font=\ttfamily\scriptsize,above,inner sep=1pt] at (\xx,.77) {\range};
+    \node[font=\ttfamily\scriptsize,below,inner sep=1pt] at (\xx,-.06) {\width};
+  }
+\end{tikzpicture}
+\end{center}
+\vspace{-.21cm}
 \begin{center}
 \begin{tikzpicture}[font=\small]
   \node[state,minimum width=1.3cm] (pc) at (0,.44) {PC};
   \pic[scale=.88,transform shape] (imem) at (2.1,0) {imem};
-  \pic[scale=.88,transform shape] (rf) at (9.7,0) {regfile};
+  \pic[scale=.8,transform shape] (rf) at (8.05,0) {regfile};
   \coordinate (instrbus) at (5.55,.44);
   \draw[bus] (pc.east)--(imem-A);
   \draw[bus] (imem-RD)--(instrbus);
-  \draw[navy,line width=1.4pt] (5.55,-1.8)--(5.55,1.8);
-  \node[logic,minimum width=2.5cm,font=\scriptsize] (decode) at (7.35,1.8)
-    {Decode opcode/form\\\code{Instr[31:22]}};
-  \draw[ctrl] (5.55,1.8)--(decode.west);
-  \fill[navy] (5.55,1.8) circle (1.5pt);
-  \draw[bus] (5.55,.88)--node[above,font=\ttfamily\scriptsize]{Rn[9:5] = 5} (rf-A1);
-  \fill[navy] (5.55,.88) circle (1.5pt);
-  \draw[bus] (5.55,-.484)--node[above,font=\ttfamily\scriptsize]{Rt[4:0] = 7} (rf-A3);
-  \fill[navy] (5.55,-.484) circle (1.5pt);
-  \node[unit,minimum width=3.25cm,font=\scriptsize] (imm) at (9.45,-1.8)
+  \draw[navy,line width=1.4pt] (5.55,-1.8)--(5.55,2);
+  \node[logic,text width=2.05cm,minimum width=2.19cm,inner sep=2pt,font=\scriptsize] (decode) at (6.85,2)
+    {Decode\\opcode/form\\\code{Instr[31:22]}};
+  \draw[ctrl] (5.55,2)--(decode.west);
+  \fill[navy] (5.55,2) circle (1.5pt);
+  \draw[bus] (5.55,.8)--node[above,font=\ttfamily\scriptsize]{Rn = 5} (rf-A1);
+  \fill[navy] (5.55,.8) circle (1.5pt);
+  \draw[bus] (5.55,-.44)--node[above,font=\ttfamily\scriptsize]{Rt = 7} (rf-A3);
+  \fill[navy] (5.55,-.44) circle (1.5pt);
+  \node[unit,minimum width=3.25cm,minimum height=.7cm,inner sep=2pt,font=\scriptsize] (imm) at (8.7,-1.75)
     {To immediate generator\\\code{imm12[21:10] = 1}};
-  \draw[bus] (5.55,-1.8)--(imm.west);
-  \fill[navy] (5.55,-1.8) circle (1.5pt);
+  \draw[bus] (5.55,-1.75)--(imm.west);
+  \fill[navy] (5.55,-1.75) circle (1.5pt);
   \node[font=\ttfamily\scriptsize,anchor=east] at (5.3,-1.15) {Instr: 32 bits};
 \end{tikzpicture}
 \end{center}
-The vertical bar fans out the instruction bits; it is wiring and stores no state.
-For this load, \code{Rn} drives \code{A1}, \code{Rt} drives \code{A3}, and \code{A2} is unused.
+\vspace{-.15cm}
+\scriptsize
+The bar is wiring, with no stored state. For this load: \code{Rn} $\rightarrow$ \code{A1}, \code{Rt} $\rightarrow$ \code{A3}; \code{A2} is unused.\\[1pt]
+Bits \code{[4:0]} are \code{Rt} for \code{ldr}/\code{str}, and \code{Rd} for arithmetic instructions.
 \end{frame}
 
 \begin{frame}{Immediate Generator}
@@ -920,21 +970,23 @@ The assembler calculates the displacement from the label. Each A64 instruction o
 \begin{center}
 \begin{tikzpicture}[font=\small,scale=.91,transform shape]
   \node[state,minimum width=1.7cm] (pc) at (0,.5) {PC};
-  \node[logic,minimum width=3.8cm,font=\scriptsize] (imm) at (0,-2.5) {Signed byte offset\\\code{SignExtend(imm26 : 00)}};
+  \node[logic,minimum width=3.8cm,font=\scriptsize] (imm) at (0,-2.5)
+    {Signed byte offset\\\code{SignExtend(imm26 : 00)}};
   \node[logic,minimum width=2.4cm] (add) at (4.1,-1.15) {Target adder};
   \node[logic,minimum width=2.4cm] (seq) at (4.1,2.1) {PC + 4};
-  \node[mux,minimum height=1.25cm] (mux) at (7.6,.5) {PC\\src};
+  \pic (pcmux) at (7.1,.5) {muxright={PC\\src}};
   \draw[bus] (pc.south) |- (add.west);
   \draw[bus] (pc.north) |- (seq.west);
   \draw[bus] (imm.east) -| (add.south);
-  \draw[bus] (add.east) -- ++(.6,0) -| node[pos=.2,below,font=\scriptsize]{branch target} (mux.south);
-  \draw[bus] (seq.east) -| (mux.north);
-  \draw[bus] (mux.east)--(9.05,.5)--(9.05,3.15)--(-2.7,3.15)--(-2.7,.5)--(pc.west);
+  \draw[bus] (seq.east)--(6.65,2.1)--(6.65,.85)--(pcmux-upper);
+  \draw[bus] (add.east)--(6.65,-1.15)--(6.65,.15)--(pcmux-lower);
+  \node[font=\ttfamily\tiny,below] at (5.95,-1.15) {PC+offset};
+  \draw[bus] (pcmux-out)--(9.05,.5)--(9.05,3.15)--(-2.7,3.15)--(-2.7,.5)--(pc.west);
   \node[font=\ttfamily\scriptsize,above] at (3.2,3.15) {Next PC};
-  \node[font=\ttfamily\tiny,right] at (7.6,1.4) {0};
-  \node[font=\ttfamily\tiny,right] at (7.6,-.4) {1};
-  \draw[ctrl] (6.3,.5)--(mux.west);
-  \node[font=\ttfamily\scriptsize,above] at (6.4,.5) {PCSrc=1};
+  \draw[ctrl] (7.55,-.8)--(pcmux-selS);
+  \node[font=\ttfamily\scriptsize,right] at (7.55,-.7) {PCSrc=1};
+  \node[font=\ttfamily\tiny,above left,inner sep=1pt] at (pcmux-upper) {0};
+  \node[font=\ttfamily\tiny,above left,inner sep=1pt] at (pcmux-lower) {1};
 \end{tikzpicture}
 \end{center}
 \vspace{.03cm}
@@ -946,123 +998,113 @@ For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At th
 \vspace{-.08cm}
 \begin{center}
 \begin{tikzpicture}[
-  font=\scriptsize,scale=.875,transform shape,
-  selectblock/.style={unit,fill=softorange,minimum width=.75cm,minimum height=1.2cm,font=\scriptsize},
+  font=\scriptsize,scale=.85,transform shape,
   crossing/.style={preaction={draw=white,line width=3.2pt}},
   cbranch/.style={ctrl,crossing,-{Stealth[length=1.6mm]}}
 ]
   \node[state,minimum width=1cm,minimum height=1cm,font=\small] (pc) at (0,0) {PC};
   \node[state,minimum width=1.65cm,minimum height=1.2cm,font=\scriptsize] (imem) at (1.8,0) {Instruction\\memory};
-  \node[state,minimum width=1.8cm,minimum height=1.75cm,font=\scriptsize] (rf) at (5.1,0) {Register\\file};
-  \node[selectblock] (srcmux) at (7.2,-.35) {ALU\\src};
+  \node[state,minimum width=1.5cm,minimum height=1.75cm,font=\scriptsize] (rf) at (5.3,0) {Register\\file};
+  \pic (srcmux) at (6.65,-.5) {muxright={ALU\\src}};
   \node[logic,minimum width=1.3cm,minimum height=1.3cm,font=\small] (alu) at (8.85,0) {ALU};
   \node[state,minimum width=1.8cm,minimum height=1.3cm,font=\scriptsize] (dmem) at (10.95,0) {Data\\memory};
-  \node[selectblock] (wbmux) at (12.9,0) {WB};
-  \node[unit,fill=softorange,minimum width=.85cm,minimum height=.85cm,font=\scriptsize] (readmux) at (4.85,-1.95) {Read2};
-  \node[logic,minimum width=2.4cm,minimum height=1cm,font=\scriptsize] (imm) at (7.6,-2.2) {Immediate\\generator};
-  \node[logic,fill=softpurple,minimum width=2.6cm,minimum height=.9cm,font=\scriptsize] (decode) at (10.95,-2.2) {Control decode};
-  \node[logic,minimum width=1.6cm,minimum height=.8cm,font=\small] (add4) at (2,2.2) {+4};
-  \node[logic,minimum width=1.7cm,minimum height=.85cm,font=\scriptsize] (target) at (9.5,2.2) {Target\\adder};
-  \node[unit,fill=softorange,minimum width=.75cm,minimum height=1.1cm,font=\scriptsize] (pcmux) at (12.9,2.2) {PC\\src};
+  \pic (wbmux) at (12.4,0) {muxwriteback};
+  \node[font=\ttfamily\scriptsize] at (13.1,-1.08) {Writeback};
+  \pic (readmux) at (3.55,-.05) {muxread2};
+  \node[font=\ttfamily\tiny,below,inner sep=.5pt] at (3.84,-.42) {Read2};
+  \node[logic,minimum width=2.4cm,minimum height=1cm,font=\scriptsize] (imm) at (7.6,-2.3) {Immediate\\generator};
+  \node[logic,fill=softpurple,minimum width=2.6cm,minimum height=.9cm,font=\scriptsize] (decode) at (10.95,-2.3) {Control decode};
+  \node[logic,minimum width=1.6cm,minimum height=.8cm,font=\small] (add4) at (2,2.55) {+4};
+  \node[logic,minimum width=1.7cm,minimum height=.85cm,font=\scriptsize] (target) at (9.5,1.85) {Target\\adder};
+  \pic (pcmux) at (12.4,2.2) {muxright={PC\\src}};
 
-  % Explicit signal ports on coloured blocks.
-  \coordinate (rf-A1) at ([yshift=.4cm]rf.west);
-  \coordinate (rf-A3) at ([yshift=-.6cm]rf.west);
-  \coordinate (rf-A2) at ([xshift=-.25cm]rf.south);
+  \coordinate (rf-A1) at ([yshift=.62cm]rf.west);
+  \coordinate (rf-A3) at ([yshift=-.68cm]rf.west);
+  \coordinate (rf-A2) at ([yshift=-.05cm]rf.west);
   \coordinate (rf-WD3) at ([xshift=.45cm]rf.south);
   \coordinate (rf-RD1) at ([yshift=.4cm]rf.east);
   \coordinate (rf-RD2) at ([yshift=-.35cm]rf.east);
   \coordinate (alu-A) at ([yshift=.4cm]alu.west);
-  \coordinate (alu-B) at ([yshift=-.35cm]alu.west);
-  \coordinate (src-0) at ([yshift=.3cm]srcmux.west);
-  \coordinate (src-1) at (srcmux.south);
+  \coordinate (alu-B) at ([yshift=-.5cm]alu.west);
   \coordinate (mem-WD) at ([xshift=-.3cm]dmem.south);
   \coordinate (mem-WE) at ([xshift=.3cm]dmem.south);
-  \coordinate (wb-0) at ([yshift=-.3cm]wbmux.west);
-  \coordinate (wb-1) at ([yshift=.3cm]wbmux.west);
-  \coordinate (read-0) at ([xshift=-.2cm]readmux.south);
-  \coordinate (read-1) at ([xshift=.2cm]readmux.south);
   \coordinate (target-PC) at ([yshift=.2cm]target.west);
   \coordinate (target-imm) at ([yshift=-.2cm]target.west);
 
-  % Fetch and register-number extraction from the same instruction bus.
+  % Instruction bus and the extracted register-number fields.
   \draw[bus] (pc.east)--(imem.west);
-  \draw[bus] (imem.east)--(3.25,0);
-  \draw[navy,line width=1.3pt] (3.25,-3.05)--(3.25,2.65);
-  \draw[bus] (3.25,.4)--node[above,font=\ttfamily\tiny]{Rn} (rf-A1);
-  \draw[bus] (3.25,-.6)--node[above,font=\ttfamily\tiny]{Rd/Rt} (rf-A3);
-  \draw[bus] (3.25,-2.65)--(4.65,-2.65)--(read-0);
-  \draw[bus] (3.25,-3.05)--(5.05,-3.05)--(read-1);
-  \node[font=\ttfamily\tiny,above] at (3.9,-2.65) {Rm};
-  \node[font=\ttfamily\tiny,above] at (4.15,-3.05) {Rt};
-  \draw[bus] (readmux.north)--(rf-A2);
-  \node[font=\ttfamily\tiny,right] at (4.85,-1.04) {A2};
-  \node[font=\ttfamily\tiny,left] at (4.65,-2.5) {0};
-  \node[font=\ttfamily\tiny,right] at (5.05,-2.5) {1};
+  \draw[bus] (imem.east)--(3.1,0);
+  \draw[navy,line width=1.3pt] (3.1,-1.35)--(3.1,2.95);
+  \draw[bus] (3.1,.62)--node[above,font=\ttfamily\tiny]{Rn} (rf-A1);
+  \draw[bus] (3.1,-.68)--node[below,font=\ttfamily\tiny]{Rd/Rt} (rf-A3);
+  \draw[bus] (3.1,.125)--node[above,font=\ttfamily\tiny,inner sep=.5pt]{Rm} (readmux-upper);
+  \draw[bus] (3.1,-.225)--node[above,font=\ttfamily\tiny,inner sep=.5pt]{Rt} (readmux-lower);
+  \draw[bus] (readmux-out)--node[above,font=\ttfamily\tiny,inner sep=.5pt]{A2} (rf-A2);
 
-  % Register operands, immediate operand, and the store-data bypass.
-  \draw[bus] (rf-RD1)--node[above,font=\ttfamily\tiny]{RD1} (alu-A);
-  \draw[bus] (rf-RD2)--(6.2,-.35)--(6.2,-.05)--(src-0);
-  \draw[bus] (srcmux.east)--(alu-B);
-  \draw[bus] (6.2,-.35)--(6.2,-1.15)--(10.65,-1.15)--(mem-WD);
+  % ALUSrc: two data inputs enter its base; one output leaves its tip.
+  \draw[bus] (rf-RD1)--(alu-A);
+  \node[font=\ttfamily\tiny,above] at (6.7,.4) {RD1};
+  \draw[bus] (rf-RD2)--(6.2,-.35)--(6.2,-.15)--(srcmux-upper);
+  \draw[bus] (srcmux-out)--(alu-B);
+  \draw[bus] (6.2,-.35)--(6.2,-1.45)--(10.65,-1.45)--(mem-WD);
   \fill[navy] (6.2,-.35) circle (1.2pt);
-  \node[font=\ttfamily\tiny,above] at (9,-1.15) {RD2: store data};
+  \node[font=\ttfamily\tiny,above] at (9,-1.45) {RD2: store data};
 
-  % ALU result goes both to the memory address and directly to writeback.
+  % Writeback mux: 0 selects ALUResult; 1 selects memory ReadData.
   \draw[bus] (alu.east)--(dmem.west);
-  \draw[bus] (9.75,0)--(9.75,-1.5)--(12,-1.5)--(12,-.3)--(wb-0);
+  \draw[bus] (9.75,0)--(9.75,-1.8)--(12.05,-1.8)--(12.05,-.35)--(wbmux-lower);
   \fill[navy] (9.75,0) circle (1.2pt);
-  \draw[bus] (dmem.east)--(12,0)--(12,.3)--(wb-1);
-  \node[font=\ttfamily\tiny,left] at (wb-0) {0};
-  \node[font=\ttfamily\tiny,left] at (wb-1) {1};
-  \draw[bus] (wbmux.east)--(13.5,0)--(13.5,-3.35)--(5.55,-3.35)--(rf-WD3);
-  \node[font=\ttfamily\tiny,above] at (10.2,-3.35) {Writeback to WD3};
+  \draw[bus] (dmem.east)--(12.05,0)--(12.05,.35)--(wbmux-upper);
+  \draw[bus] (wbmux-out)--(14.1,0)--(14.1,-3.55)--(5.75,-3.55)--(rf-WD3);
+  \node[font=\ttfamily\tiny,above] at (10.2,-3.55) {Writeback to WD3};
 
-  % Immediate bits are extracted by instruction family. White gaps show
-  % crossings over A2 and WD3 without connecting the unrelated signals.
-  \draw[bus,crossing] (3.25,-1.3)--(5.9,-1.3)--(5.9,-2.2)--(imm.west);
-  \node[font=\ttfamily\tiny,above] at (3.85,-1.3) {imm bits};
-  \draw[bus] (imm.north)--(7.6,-1.3)--(7.2,-1.3)--(src-1);
-  \fill[navy] (7.6,-1.3) circle (1.2pt);
+  % Immediate field extraction; crossings do not connect to register ports.
+  \draw[bus,crossing] (3.1,-1.35)--(5.95,-1.35)--(5.95,-2.3)--(imm.west);
+  \node[font=\ttfamily\tiny,above,inner sep=.5pt] at (4.65,-1.35) {imm bits};
+  \draw[bus,crossing] (imm.north)--(7.6,-1.35)--(6.45,-1.35)--(6.45,-.85)--(srcmux-lower);
+  \fill[navy] (7.6,-1.35) circle (1.2pt);
 
-  % Separate PC+4 and PC-relative target paths, selected by PCSrc.
-  \draw[bus] (pc.north)--(0,2.2)--(add4.west);
-  \draw[bus,crossing] (0,1.5)--(8,1.5)--(8,2.4)--(target-PC);
+  % Sequential PC and branch target enter the base of PCSrc.
+  \draw[bus] (pc.north)--(0,2.55)--(add4.west);
+  \draw[bus,crossing] (0,1.5)--(7.65,1.5)--(7.65,2.05)--(target-PC);
   \fill[navy] (0,1.5) circle (1.2pt);
-  \draw[bus,crossing] (7.6,-1.3)--(7.85,-1.3)--(7.85,2)--(target-imm);
-  \node[font=\ttfamily\tiny,above] at (8.32,2) {ExtImm};
-  \draw[bus] (add4.east)--(3,2.2)--(3,3.15)--(12.9,3.15)--(pcmux.north);
-  \node[font=\ttfamily\tiny,above] at (6.5,3.15) {PC + 4};
-  \draw[bus] (target.east)--(10.8,2.2)--(10.8,1.35)--(12.9,1.35)--(pcmux.south);
-  \node[font=\ttfamily\tiny,above] at (11.5,1.35) {PC+offset};
-  \node[font=\ttfamily\tiny,right] at (12.9,2.9) {0};
-  \node[font=\ttfamily\tiny,right] at (12.9,1.55) {1};
-  \draw[bus] (pcmux.east)--(14.15,2.2)--(14.15,3.75)--(-.85,3.75)--(-.85,0)--(pc.west);
+  \draw[bus,crossing] (7.6,-1.35)--(7.85,-1.35)--(7.85,1.65)--(target-imm);
+  \node[font=\ttfamily\tiny,above] at (8.23,1.65) {ExtImm};
+  \draw[bus,crossing] (add4.east)--(pcmux-upper);
+  \node[font=\ttfamily\tiny,above] at (5,2.55) {PC + 4};
+  \draw[bus] (target.east)--(pcmux-lower);
+  \node[font=\ttfamily\tiny,above] at (11.4,1.85) {PC+offset};
+  \draw[bus] (pcmux-out)--(14.3,2.2)--(14.3,3.75)--(-.85,3.75)--(-.85,0)--(pc.west);
   \node[font=\ttfamily\tiny,above] at (6.5,3.75) {Next PC};
 
-  % Opcode/form reaches the control decoder on its own instruction tap.
-  \draw[bus,crossing] (3.25,2.65)--(6.3,2.65)--(6.3,-2.8)--(10.95,-2.8)--(decode.south);
-  \node[font=\ttfamily\tiny,below] at (7.2,-2.8) {opcode/form};
-  \foreach \yy in {-3.05,-2.65,-1.3,-.6,0,.4,2.65} {\fill[navy] (3.25,\yy) circle (1.1pt);}
+  % Instruction opcode/form travels to the control decoder separately.
+  \draw[bus,crossing] (3.1,2.95)--(6.3,2.95)--(6.3,-2.95)--(10.95,-2.95)--(decode.south);
+  \node[font=\ttfamily\tiny,below] at (7.2,-2.95) {opcode/form};
+  \foreach \yy in {-1.35,-.68,-.225,0,.125,.62,2.95} {\fill[navy] (3.1,\yy) circle (1.1pt);}
 
-  % Control bundle with separate arrows to every selector and write enable.
-  \draw[draw=deepblue,dashed,line width=.8pt,crossing] (decode.east)--(13.8,-2.2)--(13.8,1.15)--(2.9,1.15);
-  \draw[cbranch] (2.9,1.15)--(2.9,-1.95)--(readmux.west);
-  \draw[cbranch] (5.3,1.15)--([xshift=.2cm]rf.north);
-  \draw[cbranch] (6.6,1.15)--([xshift=-1cm]imm.north);
-  \draw[cbranch] (7.2,1.15)--(srcmux.north);
+  % Dashed controls terminate at dedicated selection ports on sloping edges.
+  \draw[draw=deepblue,dashed,line width=.8pt,crossing] (decode.east)--(14.5,-2.3)--(14.5,1.15)--(2.9,1.15);
+  \draw[cbranch] (2.9,1.15)--(2.9,.4)--(3.81,.4)--(readmux-selN);
+  \draw[cbranch] (5.5,1.15)--([xshift=.2cm]rf.north);
+  \draw[cbranch] (decode.west)--node[above,font=\ttfamily\tiny]{ImmSrc} (imm.east);
+  \draw[cbranch] (7.1,1.15)--(srcmux-selN);
   \draw[cbranch] (8.85,1.15)--(alu.north);
-  \draw[cbranch] (12.9,1.15)--(wbmux.north);
-  \draw[cbranch] (12.2,1.15)--(12.2,2.2)--(pcmux.west);
+  \draw[cbranch] (12.9,1.15)--(wbmux-selN);
+  \draw[cbranch] (12.85,1.15)--(pcmux-selS);
   \draw[cbranch] ([xshift=.3cm]decode.north)--(mem-WE);
-  \foreach \xx in {2.9,5.3,6.6,7.2,8.85,12.2,12.9} {\fill[deepblue] (\xx,1.15) circle (1.0pt);}
-  % Selector input indices are placed after the crossing wires.
-  \node[font=\ttfamily\tiny,above,fill=white,inner sep=.6pt] at (6.82,-.05) {0};
-  \node[font=\ttfamily\tiny,left,fill=white,inner sep=.6pt] at (7.2,-1.03) {1};
+  \foreach \xx in {2.9,5.5,7.1,8.85,12.85,12.9} {\fill[deepblue] (\xx,1.15) circle (1.0pt);}
+
+  % Data-input indices, kept clear of crossings and arrowheads.
+  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (srcmux-upper) {0};
+  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (srcmux-lower) {1};
+  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (wbmux-upper) {1};
+  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (wbmux-lower) {0};
+  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (pcmux-upper) {0};
+  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (pcmux-lower) {1};
 \end{tikzpicture}
 \end{center}
 \scriptsize
-The same hardware supports \code{add} and \code{str}; verify both paths in Self-Test 2. Dashed lines carry controls.
+Triangles are multiplexers; dashed lines carry controls. The same hardware supports \code{add} and \code{str}; see Self-Test 2.
 \end{frame}
 
 \sectiondivider{PART 5}{Control Signals and Timing}
@@ -1167,7 +1209,7 @@ The entries marked \code{X} are not used by that instruction.
 \begin{frame}{Self-Test 2: Control and Timing}
 \small
 \begin{enumerate}\setlength{\itemsep}{6pt}
-  \item Identify the four selectors in the complete extended datapath. What does each selector choose?
+  \item Identify the four triangular multiplexers in the complete extended datapath. What two data inputs and one output does each have? Which signal controls the writeback multiplexer?
   \item Why does \code{str} assert \code{MemWrite} but not \code{RegWrite}?
   \item Trace \code{add x1, x2, x3} and \code{str x7, [x5, \#8]} through the complete diagram. For each, identify the register fields, ALU inputs, selector settings, memory action, register write (if any), and next PC.
   \item Why does a single-cycle implementation have a long clock period?
