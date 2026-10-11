@@ -1,6 +1,9 @@
 /*
- * program global variables
+ * 07-sum-1-to-10.s
+ * sum the numbers from 1 to 10
  */
+
+// program global variables
 .data
   msg: .asciz "Position %d \n"
 
@@ -11,8 +14,8 @@ main:
     // Prologue: save lr and fp
     stp x29, x30, [sp, #-16]!
 
-    mov w3, #1
-    mov w4, #0
+    mov w3, #0
+    mov w4, #1
 
 loop:
     add w3, w3, w4
@@ -29,8 +32,8 @@ loop:
     // now restore w3/w4
     ldp w3, w4, [sp], #16
 
-    // if w4 < 40, repeat
-    cmp w4, #40
+    // if w4 <= 10, repeat
+    cmp w4, #11
     b.lt loop
 
     // Epilogue: restore lr and fp
