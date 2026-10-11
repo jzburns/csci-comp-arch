@@ -18,7 +18,7 @@ loop:
     add w3, w3, w4
     add w4, w4, #1
 
-    // caller preserved
+    // x0-x17 are caller preserved
     // if we forget this, the callees
     // will probably trash them
     // so save w3/w4
@@ -29,6 +29,7 @@ loop:
     // now restore w3/w4
     ldp w3, w4, [sp], #16
 
+    // if w4 < 40, repeat
     cmp w4, #40
     b.lt loop
 
