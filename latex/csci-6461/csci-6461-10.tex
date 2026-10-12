@@ -338,15 +338,15 @@
 \begin{center}
 \begin{tikzpicture}[font=\small]
   \node[cachebox,fill=softgreen,minimum width=3cm,minimum height=2cm] (r) at (0,1.7) {AArch64 core\\registers and\\execution units};
-  \node[cachebox,fill=lightblue] (i) at (4.1,2.35) {L1 instruction cache\\instruction fetches};
-  \node[cachebox,fill=softpurple] (d) at (4.1,1.05) {L1 data cache\\loads and stores};
-  \node[cachebox,fill=gold!24] (l2) at (8.2,1.7) {Unified L2\\instructions\\and data};
-  \node[cachebox,fill=softorange,minimum width=3cm] (ll) at (8.2,-.15) {Optional further cache\\e.g. shared L3};
-  \node[cachebox,fill=softgray,minimum width=3cm] (ram) at (3.7,-.15) {Main memory\\DRAM};
-  \draw[twoway] ([yshift=.65cm]r.east)--(i.west);
-  \draw[twoway] ([yshift=-.65cm]r.east)--(d.west);
-  \draw[twoway] (i.east)--(6.3,2.35)--(6.3,1.95)--([yshift=.25cm]l2.west);
-  \draw[twoway] (d.east)--(6.65,1.05)--(6.65,1.45)--([yshift=-.25cm]l2.west);
+  \node[cachebox,fill=lightblue,minimum width=3.6cm] (i) at (4.1,2.35) {L1 instruction cache\\instruction fetches};
+  \node[cachebox,fill=softpurple,minimum width=3.6cm] (d) at (4.1,1.05) {L1 data cache\\loads and stores};
+  \node[cachebox,fill=gold!24,minimum width=3cm,minimum height=2cm] (l2) at (8.2,1.7) {Unified L2\\instructions\\and data};
+  \node[cachebox,fill=softorange,minimum width=3cm] (ll) at (8.2,-.5) {Optional further cache\\e.g. shared L3};
+  \node[cachebox,fill=softgray,minimum width=3cm] (ram) at (4.1,-.5) {Main memory\\DRAM};
+  \draw[twoway] (r.east|-i.west)--(i.west);
+  \draw[twoway] (r.east|-d.west)--(d.west);
+  \draw[twoway] (i.east)--(i.east-|l2.west);
+  \draw[twoway] (d.east)--(d.east-|l2.west);
   \draw[twoway] (l2.south)--(ll.north);
   \draw[twoway] (ll.west)--(ram.east);
 \end{tikzpicture}
