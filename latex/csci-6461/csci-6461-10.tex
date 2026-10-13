@@ -358,35 +358,10 @@
 \end{itemize}
 \end{frame}
 
-% CONTENT 03
-\begin{frame}{AArch64 Addresses Bytes; Instructions Choose the Width}
-\small
-\renewcommand{\arraystretch}{1.35}
-\begin{tabular}{R{4.4cm}R{2.5cm}R{6.4cm}}
-\toprule
-\textbf{Instruction} & \textbf{Bytes accessed} & \textbf{Architectural result}\\
-\midrule
-\code{ldrb w2, [x0]} & 1 & zero-extend an 8-bit value into \code{w2}\\
-\code{ldrh w2, [x0]} & 2 & zero-extend a 16-bit value into \code{w2}\\
-\code{ldr w2, [x0]} & 4 & load a 32-bit value into \code{w2}\\
-\code{ldr x2, [x0]} & 8 & load a 64-bit value into \code{x2}\\
-\code{str x2, [x0]} & 8 & store the 64 bits of \code{x2}\\
-\bottomrule
-\end{tabular}\par
-\vspace{.22cm}
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item A write to a W register also clears the upper 32 bits of its X view.
-  \item \code{ldr x2, [x0, \#8]} uses address \code{x0+8}: the assembly displacement is in bytes.
-  \item The instruction's access width is separate from the cache's line size. An 8-byte load can cause a 64-byte line fill in our examples.
-\end{itemize}
-\SourceNote{Assume valid, naturally aligned accesses to cacheable Normal memory; each illustrated access lies within one line.}
-\note{Arm A64 LDR, LDRB, LDRH and STR immediate instruction specifications. Unsigned offsets are encoded with access-size scaling; the displayed assembly offset is a byte displacement.}
-\end{frame}
-
 % CONTENT 04
 \begin{frame}{A Cache Line Contains Neighbouring Bytes}
 \small
-\Model{64-byte lines; \code{x0=0x1000}; the requested line is initially absent.}
+\Model{64-byte lines; cacheable Normal memory; valid aligned load; \code{x0=0x1000}; line initially absent.}
 \code{ldr x2, [x0, \#16]} requests bytes \hex{1010}--\hex{1017}.
 \begin{center}
 \begin{tikzpicture}
@@ -394,12 +369,14 @@
   \node[memcell,fill=gold!32] at (2.52,0) {16-23};
   \node[font=\ttfamily\scriptsize,above] at (0,.5) {0x1000};
   \node[font=\ttfamily\scriptsize,above] at (8.82,.5) {0x103F};
-  \draw[decorate,decoration={brace,amplitude=5pt},draw=navy] (-.61,-.48)--(9.43,-.48)
-    node[midway,below=7pt,font=\small] {one aligned 64-byte line; cell labels are byte offsets};
+  \draw[draw=navy,line width=.8pt]
+    (-.61,-.48)--(-.61,-.72)--(9.43,-.72)--(9.43,-.48);
+  \node[font=\small,anchor=north] at (4.41,-.88)
+    {one aligned 64-byte line; cell labels are byte offsets};
 \end{tikzpicture}
 \end{center}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item The cache obtains the line beginning at \hex{1000}, not only the eight requested bytes.
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item \key{Access width: 8 bytes. Line-fill size: 64 bytes.} The cache fetches the line at \hex{1000}.
   \item A 64-byte line holds eight 64-bit values, sixteen 32-bit values, or sixteen 4-byte A64 instructions.
   \item Neighbouring accesses can reuse the fetched line while it remains resident.
   \item Line base \(=\lfloor\text{address}/64\rfloor\times64\). A line boundary is independent of source-level object boundaries.
@@ -410,11 +387,11 @@
 \begin{frame}{Temporal and Spatial Locality}
 \begin{columns}[T,onlytextwidth]
 \column{.48\textwidth}
-\begin{block}{Temporal: revisit the same location}
-\Asm{ldr x2, [x0]\\...\\ldr x3, [x0]}
+\begin{block}{Temporal: reuse loop instructions}
+\Asm{mov  x1, \#8\\.Lloop:\\subs x1, x1, \#1\\b.ne .Lloop}
 \end{block}
 \small
-The later load can hit the line brought in by the earlier load, provided that line is still resident.
+Each iteration reuses the same \code{subs} and \code{b.ne} instructions: temporal locality in instruction fetch.
 \column{.48\textwidth}
 \begin{block}{Spatial: access nearby locations}
 \Asm{ldr x2, [x0]\\ldr x3, [x0, \#8]}
@@ -425,7 +402,7 @@ With \code{x0} aligned to a 64-byte line, both loads use the same line. The firs
 \vspace{.25cm}
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item Caching recently used lines exploits temporal locality; fetching neighbouring bytes exploits spatial locality.
-  \item Loop instructions often have temporal locality because the same code is fetched repeatedly.
+  \item Repeated accesses to the same memory variable can also have temporal locality.
   \item Reusing a value already held in an X register creates no new data-cache access.
 \end{itemize}
 \end{frame}
@@ -650,6 +627,7 @@ Fully associative & 1 & 4 & any of the four lines\\
 \begin{frame}{Replacement: Choose an Invalid Way, Then a Victim}
 \small
 \Model{256-byte cache; two sets; two ways; 64-byte lines; LRU replacement; initially empty.}
+\key{Victim}: a resident cache line selected for eviction.\par
 \key{LRU}: least recently used. A hit makes its line most recently used.
 \vspace{.17cm}
 \renewcommand{\arraystretch}{1.15}
@@ -703,8 +681,10 @@ Conflict & Reuse fails here, but would hit in that fully associative LRU cache. 
   \foreach \x/\addr in {0/1000,2.55/3000,5.1/5000,7.65/7000,10.2/9000} {
     \node[memcell,fill=lightblue,minimum width=2.2cm] at (\x,0) {0x\addr};
   }
-  \draw[decorate,decoration={brace,amplitude=5pt},draw=navy] (-1.1,-.5)--(11.3,-.5)
-    node[midway,below=7pt,font=\small] {all five line addresses map to set 64};
+  \draw[draw=navy,line width=.8pt]
+    (-1.1,-.48)--(-1.1,-.72)--(11.3,-.72)--(11.3,-.48);
+  \node[font=\small,anchor=north] at (5.1,-.88)
+    {all five line addresses map to set 64};
 \end{tikzpicture}
 \end{center}
 \begin{itemize}\setlength{\itemsep}{6pt}
@@ -736,7 +716,7 @@ Conflict & Reuse fails here, but would hit in that fully associative LRU cache. 
 \end{center}
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item The next level can be L2, another cache, or DRAM; an L1 miss need not reach DRAM.
-  \item Preserve a dirty victim by writeback; invalid or clean victims need no data writeback.
+  \item Before evicting a line with pending writes (a \key{dirty victim}), write it back. Clean or invalid lines need no data writeback.
   \item Return bytes \hex{1238}--\hex{123F} from the fetched line at \hex{1200}.
   \item A cache miss changes timing; it does not itself imply a page fault.
 \end{itemize}
@@ -763,7 +743,7 @@ Write-back & Update the cached bytes and set a dirty bit. & The newest bytes may
 \bottomrule
 \end{tabular}\par
 \vspace{.18cm}
-\small A \key{dirty} line differs from the next level's copy. Eviction requires writeback; maintenance or coherence may also cause writeback in real systems.
+\small A \key{dirty} line may differ from the next level's copy. Eviction requires writeback; maintenance or coherence may also cause writeback in real systems.
 \end{frame}
 
 % CONTENT 19
@@ -947,9 +927,9 @@ Same timings; miss rate reduced to 1\% & \(1+0.01\times60=1.6\) ns\\
   \item \code{PLDL1KEEP}: prefetch for a future load, targeting L1 with a temporal retention hint.
   \item \code{prfm} has an implementation-defined effect. It neither loads \code{x2} nor guarantees residency; the \code{ldr} is still required.
   \item Memory attributes make Normal memory cacheable or non-cacheable. Device memory is non-cacheable.
-  \item Sizes, ways, line sizes, and policies vary with the processor and configuration; 64-byte lines are an example.
+  \item Write policies depend on memory attributes and the processor implementation; \code{ldr}/\code{str} do not select them.
 \end{itemize}
-\SourceNote{Worked traces model cacheable Normal memory on one core; translation, coherence, and device ordering are outside their scope.}
+\SourceNote{Cache sizes and line lengths vary by implementation; 64-byte lines are examples. Our single-core traces omit translation, coherence, and device ordering.}
 \note{Arm PRFM immediate instruction reference: PLD, L1 and KEEP; implementation-defined effect; displayed byte displacement 64 encodes imm12=8. Arm Learn the architecture, Armv8-A memory systems, sections 3 and 4: Normal and Device memory attributes.}
 \end{frame}
 
