@@ -385,26 +385,25 @@
 
 % CONTENT 05
 \begin{frame}{Temporal and Spatial Locality}
+\small
+\Model{\code{x0=0x1000}; \code{x1=8}; 64-byte data-cache lines; valid aligned loads from cacheable Normal memory.}
 \begin{columns}[T,onlytextwidth]
-\column{.48\textwidth}
-\begin{block}{Temporal: reuse loop instructions}
-\Asm{mov  x1, \#8\\.Lloop:\\subs x1, x1, \#1\\b.ne .Lloop}
+\column{.42\textwidth}
+\begin{block}{One AArch64 loop}
+\Asm{.Lscan:\\ldr  x2, [x0], \#8\\subs x1, x1, \#1\\b.ne .Lscan}
 \end{block}
-\small
-Each iteration reuses the same \code{subs} and \code{b.ne} instructions: temporal locality in instruction fetch.
-\column{.48\textwidth}
-\begin{block}{Spatial: access nearby locations}
-\Asm{ldr x2, [x0]\\ldr x3, [x0, \#8]}
+Each \code{ldr} reads eight bytes, then advances the data pointer \code{x0} by eight bytes.
+\column{.54\textwidth}
+\begin{block}{Instruction temporal locality}
+Each iteration reuses the same \code{ldr}, \code{subs}, and \code{b.ne} instructions. Their \key{instruction addresses repeat}.
 \end{block}
-\small
-With \code{x0} aligned to a 64-byte line, both loads use the same line. The first fill supplies the second value too.
+\begin{block}{Data spatial locality}
+The loads access \hex{1000}, \hex{1008}, \ldots, \hex{1038}. These \key{data addresses advance} through eight adjacent values in one 64-byte line.
+\end{block}
 \end{columns}
-\vspace{.25cm}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Caching recently used lines exploits temporal locality; fetching neighbouring bytes exploits spatial locality.
-  \item Repeated accesses to the same memory variable can also have temporal locality.
-  \item Reusing a value already held in an X register creates no new data-cache access.
-\end{itemize}
+\vspace{.2cm}
+\key{Two reference streams from one program:} instruction fetches demonstrate reuse over time; data loads demonstrate access to neighbouring locations.
+\SourceNote{Either form of locality can occur in instruction or data accesses; this example explicitly identifies one of each.}
 \end{frame}
 
 % CONTENT 06
@@ -437,22 +436,71 @@ Eight data loads: \key{one miss, seven hits}. Miss rate \(=1/8=12.5\%\).
 % CONTENT 07
 \begin{frame}{Stride Determines How Much of Each Line Is Used}
 \small
-\Model{Eight 8-byte loads; cold cache; base \hex{1000}; 64-byte lines; enough capacity; no prefetching.}
-\renewcommand{\arraystretch}{1.4}
+\key{Stride} is the difference, in bytes, between successive memory-access addresses.
+\par\vspace{.12cm}
+\Model{Each row is a separate eight-iteration loop; 8-byte loads; 64-byte cache lines; cold cache; base \hex{1000}; no prefetching.}
+\renewcommand{\arraystretch}{1.25}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{R{2.9cm}R{4.4cm}R{2.3cm}R{2.9cm}}
 \toprule
-\textbf{Address stride} & \textbf{Load addresses} & \textbf{Lines fetched} & \textbf{Useful bytes / fetched bytes}\\
+\textbf{Address stride} & \textbf{Load repeated eight times} & \textbf{Lines fetched} & \textbf{Useful bytes / fetched bytes}\\
 \midrule
-8 bytes & \hex{1000}, \hex{1008}, \ldots, \hex{1038} & 1 & \(64/64=100\%\)\\
-64 bytes & \hex{1000}, \hex{1040}, \ldots, \hex{11C0} & 8 & \(64/512=12.5\%\)\\
+8 bytes & \code{ldr x2, [x0], \#8} & 1 & \(64/64=100\%\)\\
+64 bytes & \code{ldr x2, [x0], \#64} & 8 & \(64/512=12.5\%\)\\
 \bottomrule
 \end{tabular}\par
-\vspace{.23cm}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Both sequences request 64 useful bytes. The second transfers eight times as many line-fill bytes.
+\vspace{.18cm}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item In each loop, the shown instruction executes \key{eight times}, reading \key{8 bytes per iteration}. Its post-index immediate advances \code{x0} by 8 or 64 bytes after each load.
+  \item \key{Impact here:} stride 8 uses all eight values in one fetched line. Stride 64 uses one value per line: eight times the fill traffic for the same 64 useful bytes.
   \item The \key{working set} is the collection of lines needed over a period of execution.
-  \item Reuse depends on whether that working set remains resident: total capacity, set placement, and replacement all matter.
+\end{itemize}
+\end{frame}
+
+% CONTENT 07A
+\begin{frame}{Visualizing Stride: Line Use and Performance}
+\small
+\Model{Same two loops; cold cache; no prefetching. Each 64-byte line has eight 8-byte cells.}
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize]
+  \node[anchor=east,font=\scriptsize] at (-.3,2.15) {Line base:};
+  \foreach \i/\addr in {0/1000,1/1040,2/1080,3/10C0,4/1100,5/1140,6/1180,7/11C0} {
+    \node[font=\ttfamily\scriptsize] at ({1.36*\i+.6},2.15) {0x\addr};
+    \foreach \w in {0,...,7} {
+      \ifnum\i=0
+        \fill[gold!35] ({1.36*\i+.15*\w},1.4) rectangle ++(.15,.45);
+      \else
+        \fill[black!12] ({1.36*\i+.15*\w},1.4) rectangle ++(.15,.45);
+      \fi
+      \draw[navy!45,line width=.35pt] ({1.36*\i+.15*\w},1.4) rectangle ++(.15,.45);
+      \ifnum\w=0
+        \fill[gold!35] ({1.36*\i+.15*\w},.35) rectangle ++(.15,.45);
+      \else
+        \fill[lightblue] ({1.36*\i+.15*\w},.35) rectangle ++(.15,.45);
+      \fi
+      \draw[navy!45,line width=.35pt] ({1.36*\i+.15*\w},.35) rectangle ++(.15,.45);
+    }
+    \ifnum\i=0
+      \draw[navy,line width=.7pt] ({1.36*\i},1.4) rectangle ++(1.2,.45);
+    \else
+      \draw[navy!50,dashed,line width=.7pt] ({1.36*\i},1.4) rectangle ++(1.2,.45);
+    \fi
+    \draw[navy,line width=.7pt] ({1.36*\i},.35) rectangle ++(1.2,.45);
+  }
+  \node[anchor=east,align=right,font=\small] at (-.3,1.63)
+    {\textbf{8-byte stride}\\{\scriptsize 1 miss, 7 hits}};
+  \node[anchor=east,align=right,font=\small] at (-.3,.58)
+    {\textbf{64-byte stride}\\{\scriptsize 8 misses}};
+  \foreach \x/\col/\legendtext in {0/gold!35/bytes read,3.7/lightblue/fetched but unused,7.9/black!12/line not fetched} {
+    \draw[navy,fill=\col,line width=.5pt] (\x,-.16) rectangle ++(.25,.25);
+    \node[anchor=west,font=\scriptsize] at ({\x+.35},-.035) {\legendtext};
+  }
+\end{tikzpicture}
+\end{center}
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item \key{Performance:} more misses can expose memory latency; more line-fill bytes consume bandwidth. Eight times the traffic does not imply eight times the execution time.
+  \item \key{Cache pressure:} stride 64 needs eight lines for 64 useful bytes; stride 8 needs one. On repeated scans, limited capacity can evict lines before reuse.
+  \item \key{Thrashing}: repeatedly evicting and refetching needed lines. The eight first-pass misses above do not by themselves demonstrate thrashing.
 \end{itemize}
 \end{frame}
 
