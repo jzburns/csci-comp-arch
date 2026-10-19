@@ -1,3 +1,6 @@
+\PassOptionsToPackage{table}{xcolor}
+% Compile with pdfLaTeX, XeLaTeX, or LuaLaTeX.
+% pdfLaTeX requires the sourcecodepro package; Xe/LuaLaTeX require the Source Code Pro font.
 \documentclass[aspectratio=169,11pt,t]{beamer}
 
 % ============================================================
@@ -41,9 +44,13 @@
 % ============================================================
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\IfFileExists{sourcecodepro.sty}
-  {\usepackage[scale=0.92]{sourcecodepro}}
-  {\usepackage{courier}}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[scale=0.92]{sourcecodepro}
+\else
+  \usepackage{fontspec}
+  \setmonofont[Scale=0.92]{Source Code Pro}
+\fi
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -123,6 +130,17 @@
 \author{Computer Organization \& Architecture}
 \date{Topic 8}
 
+
+\definecolor{lightblue}{RGB}{235,242,250}
+\definecolor{tablealt}{RGB}{246,248,251}
+\setbeamertemplate{itemize item}{\tikz[baseline=-0.6ex]\fill[navy] (0,0) circle (2.2pt);}
+\setbeamertemplate{itemize subitem}{\tikz[baseline=-0.6ex]\fill[navy] (0,0) circle (1.7pt);}
+\setbeamertemplate{itemize subsubitem}{\tikz[baseline=-0.6ex]\fill[navy] (0,0) circle (1.4pt);}
+\setbeamertemplate{enumerate item}{\bfseries\insertenumlabel.}
+\setbeamertemplate{enumerate subitem}{\bfseries\insertsubenumlabel.}
+\setbeamercolor{enumerate item}{fg=navy}
+\setbeamercolor{enumerate subitem}{fg=navy}
+
 \begin{document}
 
 % ============================================================
@@ -170,141 +188,87 @@ Dr. J. Burns
 \vspace*{\fill}
 \end{frame}
 
-% ============================================================
-% Slide 2
-% Slide Header: Topic 8 Outline
-% ============================================================
+\begin{frame}{Topic Outline}
 
+\setbeamertemplate{enumerate item}{\arabic{enumi}.}
 
-% ============================================================
-% Slide 2
-% ============================================================
+\begin{enumerate}\setlength{\itemsep}{8pt}
+  \item \key{Function Calls and Returns}
+  \begin{itemize}
+    \item Branch-with-link, the link register, returns, leaf functions, and non-leaf functions.
+  \end{itemize}
 
-\begin{frame}{Topic 8 Outline}
-\begin{block}{Topic Objective}
-Explain how AArch64 implements function calls using branch-with-link,
-return addresses, stack discipline, and register-preservation rules.
-\end{block}
-\vspace{0.25cm}
-\begin{itemize}
-\item \key{Section 1}: Procedure calls and returns
-\item \key{Section 2}: Argument passing and return values
-\item \key{Section 3}: Caller-saved and callee-saved registers
-\item \key{Section 4}: Stack frames, prologues, and epilogues
-\item \key{Section 5}: Leaf functions, non-leaf functions, and recursion
-\item \key{Section 6}: Summary and self-test
-\end{itemize}
+  \item \key{AAPCS64 Register Rules}
+  \begin{itemize}
+    \item Argument registers, return registers, caller-saved registers, and callee-saved registers.
+  \end{itemize}
+
+  \item \key{Stack Frames}
+  \begin{itemize}
+    \item Stack purpose and lifetime, local-variable storage, allocation, frames, alignment, and entry/exit sequences.
+  \end{itemize}
+
+  \item \key{Worked Function Examples}
+  \begin{itemize}
+    \item Nested calls, recursion, and common linkage mistakes.
+  \end{itemize}
+\end{enumerate}
+
 \end{frame}
 
-% ============================================================
-% Slide 3
-% Slide Header: Procedure Calls and Returns
-% ============================================================
-\sectiondivider{Section 1}{Procedure Calls and Returns}
 
-% ============================================================
-% Slide 4
-% Slide Header: Why Procedures Need a Convention
-% ============================================================
+\sectiondivider{PART 1}{Subroutine Linkage \& Control Flow}
 
 
-% ============================================================
-% Slide 3
-% ============================================================
+\begin{frame}{The Link Register (\texttt{x30}) and Branch-with-Link (\texttt{bl})}
 
-\begin{frame}{Why Procedures Need a Convention}
-\begin{block}{Problem}
-A function call temporarily transfers control to another code region,
-but the caller must later continue as if the call produced one
-well-defined result.
-\end{block}
-\vspace{0.25cm}
-\begin{itemize}
-\item The caller and callee need an agreed way to pass arguments.
-\item The return address must be saved somewhere.
-\item Both sides must know which registers may be overwritten.
-\item The stack must remain correctly aligned and balanced.
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item The \key{caller} invokes another function, the \key{callee}, and must be able to resume after it returns.
+  \item \key{Branch with Link (\code{bl label}):} Atomically performs two operations:
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item Saves return address ($\text{PC} + 4$) into the \key{Link Register (\bits{x30} / \bits{lr})}.
+    \item Branches to target function: $\text{PC} \leftarrow \text{label}$.
+  \end{enumerate}
 \end{itemize}
+
 \vspace{0.2cm}
-\begin{block}{Calling Convention}
-The A64 ISA supplies instructions such as \code{bl}, \code{blr}, and
-\code{ret}. AAPCS64 is the software contract that assigns argument
-registers, preserved registers, return values, and stack rules.
+\centering
+\begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
+  \node[draw=navy, fill=lightblue, rounded corners=2pt, minimum width=3.8cm, minimum height=0.6cm, font=\small\bfseries] (save) {1. $x_{30} \leftarrow \text{PC} + 4$};
+  \node[draw=gold!80!black, fill=gold!20, line width=1pt, rounded corners=2pt, right=1.2cm of save, minimum width=3.2cm, minimum height=0.6cm, font=\small\bfseries] (jump) {2. $\text{PC} \leftarrow \text{Target Address}$};
+  \draw[-{Latex}, thick, navy] (save) -- (jump);
+\end{tikzpicture}
+
+\vspace{0.3cm}
+\begin{block}{Direct and Indirect Calls}
+\code{bl label} calls a PC-relative target. For a function address held in a register, \code{blr x2} calls through \bits{x2}; it also writes the return address to \bits{x30}.
 \end{block}
 \end{frame}
 
-% ============================================================
-% Slide 5
-% Slide Header: Branch with Link
-% ============================================================
 
-
-% ============================================================
-% Slide 4
-% ============================================================
-
-\begin{frame}{Branch with Link}
-\begin{block}{Function Call Instruction}
+\begin{frame}{Subroutine Return Mechanics (\texttt{ret})}
 \large
-\hspace{4.1cm}\code{bl function}
-\normalsize
-\end{block}
-\vspace{0.25cm}
-\begin{itemize}
-\item \code{bl} branches to the target label.
-\item The address of the next instruction is written to \code{x30}.
-\item Register \code{x30} is also called the link register, \code{lr}.
-\item The callee uses that saved address to return to the caller.
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \key{Return from Subroutine (\code{ret}):} Branches to the address held in a register. With no explicit operand, \code{ret} uses the link register: $\text{PC} \leftarrow x_{30}$.
+  \item A normal \code{bl} / \code{ret} pair therefore resumes at the instruction following the original call.
 \end{itemize}
-\vspace{0.15cm}
-\begin{block}{Architectural Effect}
-\code{bl} changes control flow and records the return address. It does
-not automatically save general-purpose registers or allocate a stack
-frame.
+
+\vspace{-0.05cm}
+\begin{block}{Example: Minimal Leaf Return Sequence}
+\small
+\begin{tabular}{ll}
+\code{caller\_func:} & \\
+\quad \code{bl  helper\_func}  & \text{\scriptsize // x30 = return address; branch to helper} \\
+\quad \code{mov x1, x0}        & \text{\scriptsize // resumes here after ret} \\
+\code{helper\_func:} & \\
+\quad \code{add x0, x0, \#1}  & \text{\scriptsize // compute result} \\
+\quad \code{ret}               & \text{\scriptsize // default target register is x30} \\
+\end{tabular}
 \end{block}
 \end{frame}
 
-% ============================================================
-% Slide 6
-% Slide Header: Return from a Procedure
-% ============================================================
 
-
-% ============================================================
-% Slide 5
-% ============================================================
-
-\begin{frame}{Return from a Procedure}
-\begin{block}{Return Instruction}
-\large
-\hspace{4.8cm}\code{ret}
-\normalsize
-\end{block}
-\vspace{0.25cm}
-\begin{itemize}
-\item By default, \code{ret} branches to the address held in \code{x30}.
-\item It completes the control-flow path started by \code{bl}.
-\item The return value, if any, is usually already placed in \code{x0}.
-\item The stack pointer must be restored before returning.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Common Form}
-Most simple returns use \code{ret}. The explicit form \code{ret x30}
-means return to the address in \code{x30}.
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 7
-% Slide Header: Call and Return Control Flow
-% ============================================================
-
-
-% ============================================================
-% Slide 6
-% ============================================================
-
-\begin{frame}{Call and Return Control Flow}
+\begin{frame}{Subroutine Call Execution Trace}
 \begin{center}
 \begin{tikzpicture}[
   scale=.88,
@@ -323,7 +287,7 @@ means return to the address in \code{x30}.
 ]
 \node[inst] (c1) {mov x0, \#5};
 \node[inst,below=of c1] (c2) {bl square};
-\node[inst,below=of c2] (c3) {str x0, [x1]};
+\node[inst,below=of c2] (c3) {str x0, [x20]};
 \node[inst,right=2.3cm of c2,fill=gold!25]
   (f1) {square: mul x0, x0, x0};
 \node[inst,below=of f1] (f2) {ret};
@@ -336,1074 +300,529 @@ means return to the address in \code{x30}.
   (f2.west) -- node[above,note]{return} (c3.east);
 \end{tikzpicture}
 \end{center}
-\vspace{0cm}
-\begin{block}{Control-Flow Rule}
-The call target runs temporarily, then \code{ret} resumes execution
-after the original \code{bl} instruction.
+\begin{block}{Control Flow}
+\code{bl square} writes the address of the next instruction into \bits{x30} and branches to \code{square}. The callee computes the result in \bits{x0}; \code{ret} resumes at the instruction after \code{bl}.
 \end{block}
 \end{frame}
 
-% ============================================================
-% Slide 8
-% Slide Header: Link Register Hazard
-% ============================================================
-
-
-% ============================================================
-% Slide 7
-% ============================================================
-
-\begin{frame}{The Link Register Hazard}
-\begin{block}{Why Non-Leaf Functions Need Care}
-A function that calls another function will execute its own \code{bl}.
-That new \code{bl} overwrites \code{x30}.
-\end{block}
-\vspace{0cm}
+\begin{frame}{Leaf vs.\ Non-Leaf Functions}
 \begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Leaf Function}
-\begin{itemize}
-\item Calls no other function.
-\item May return using the original \code{x30}.
-\item May not need a stack frame.
+\begin{column}{0.48\textwidth}
+\begin{block}{Leaf Functions}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item Call \key{no other functions}.
+  \item \bits{x30} is not overwritten by a nested \code{bl}.
+  \item May still use stack space for local data, but need not save \bits{x30} solely for linkage.
 \end{itemize}
 \end{block}
-\column{0.48\textwidth}
-\begin{block}{Non-Leaf Function}
-\begin{itemize}
-\item Calls at least one function.
-\item Must preserve its return address if needed later.
-\item Commonly saves \code{x30} on the stack.
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{Non-Leaf Functions}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item Call one or more \key{nested subroutines}.
+  \item A nested \code{bl} overwrites \bits{x30} with the nested return address.
+  \item Preserve the incoming return address before that happens if it will be needed later.
 \end{itemize}
 \end{block}
+\end{column}
 \end{columns}
-\vspace{0.05cm}
-\begin{block}{Practical Rule}
-If a function uses \code{bl} and still needs its caller's return
-address, it must save \code{x30} before the nested call.
+\vspace{0.2cm}
+\begin{block}{The Non-Leaf Rule}
+If a function makes another call and must later return to its own caller, its incoming return address must be preserved before \bits{x30} is overwritten.
 \end{block}
 \end{frame}
 
-% ============================================================
-% Slide 9
-% Slide Header: Arguments and Return Values
-% ============================================================
-\sectiondivider{Section 2}{Arguments and Return Values}
 
-% ============================================================
-% Slide 10
-% Slide Header: Integer Argument Registers
-% ============================================================
+\sectiondivider{PART 2}{Procedure Call Standard \& Register Roles}
 
 
-% ============================================================
-% Slide 8
-% ============================================================
-
-\begin{frame}{Integer Argument Registers}
-\begin{block}{First Eight Integer or Pointer Arguments}
-Under AAPCS64, the first eight ordinary integer or pointer arguments are passed in \code{x0}--\code{x7}. Smaller integer values use the corresponding \code{w} registers.
+\begin{frame}{Why a Calling Convention Is Needed}
+\small
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\begin{block}{Separately Compiled Code Must Agree}
+A program may combine separately compiled C, assembly, and libraries. These components need shared rules: \code{bl} transfers control and records a return address, but does not define argument locations or register preservation.
 \end{block}
+\begin{itemize}\setlength{\itemsep}{6pt}
+\item \key{ABI --- Application Binary Interface:} rules that let compiled components work together, including data layout, procedure calls, and object-file conventions.
+\item \key{AAPCS64 --- Procedure Call Standard for the Arm 64-bit Architecture:} the calling convention within the Arm ABI: where arguments/results go, which registers survive calls, and how the stack is aligned.
+\item \key{Example:} for a function adding two 64-bit integers, both sides agree that \bits{x0}/\bits{x1} carry the arguments and \bits{x0} returns the result. Disagreement can corrupt data or execution.
+\end{itemize}
+\vspace{0.15cm}
+\small
+\key{ISA vs.\ ABI:} A64 defines instruction behavior; the ABI defines how compiled components cooperate.
+\end{frame}
+
+
+\begin{frame}{Integer Arguments and Return Values}
+\begin{itemize}\setlength{\itemsep}{8pt}
+\item \key{Arguments:} ordinary 64-bit scalar integer and pointer arguments use \bits{x0}--\bits{x7}, subject to AAPCS64 classification rules. Ordinary 32-bit integers use the corresponding \bits{w} registers.
+\item \key{Return value:} a 64-bit integer or pointer result normally uses \bits{x0}; a 32-bit integer result uses \bits{w0}.
+\item \key{Beyond the registers:} additional arguments assigned to memory use a stack argument area prepared by the caller. The stack is defined in the next section.
+\end{itemize}
 \vspace{0.18cm}
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.12}
-\begin{tabular}{
-  >{\raggedright\arraybackslash}m{2.8cm}
-  >{\raggedright\arraybackslash}m{7.7cm}
-}
-\rowcolor{navy}
-{\color{white}\bfseries Register(s)} &
-{\color{white}\bfseries Role at a call boundary} \\
-\rowcolor{softgray}
-\code{x0}--\code{x7} & First eight 64-bit integer or pointer arguments. \\
-\rowcolor{white}
-\code{w0}--\code{w7} & First eight 32-bit integer arguments. \\
-\rowcolor{softgray}
-\code{x0}/\code{w0} & Common location for an integer or pointer return value. \\
-\end{tabular}
-\end{center}
-\vspace{0.2cm}
-\begin{block}{Scope}
-This slide is only about argument and return-value placement. Caller-saved and callee-saved responsibilities are introduced separately.
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 11
-% Slide Header: Arguments Beyond the Register Limit
-% ============================================================
-
-
-% ============================================================
-% Slide 9
-% ============================================================
-
-\begin{frame}{Arguments Beyond the Register Limit}
-\begin{columns}[T,onlytextwidth]
-\column{0.53\textwidth}
-\begin{block}{More Than Eight Arguments}
-After \code{x0}--\code{x7} are assigned, additional integer or pointer
-arguments are passed in memory through the stack.
-\end{block}
-\vspace{0.15cm}
-\begin{itemize}
-\item The caller creates the required argument area.
-\item The first stacked argument begins at the incoming \code{sp}.
-\item Later stacked arguments follow at ABI-defined aligned offsets.
-\item The caller removes its outgoing argument area after the call.
-\end{itemize}
-\column{0.43\textwidth}
-\begin{block}{Nine-Argument Shape}
-\small
-\code{// a1--a8 use x0--x7}\\[0.10cm]
-\code{sub sp, sp, \#16}\\[0.10cm]
-\code{str x9, [sp]}\\[0.10cm]
-\code{bl combine9}\\[0.10cm]
-\code{add sp, sp, \#16}
-\end{block}
-\vspace{0.12cm}
-\small
-Here \code{x9} temporarily holds the ninth argument before the caller
-stores it at the incoming stack location for \code{combine9}.
-\end{columns}
-\end{frame}
-
-% ============================================================
-% Slide 12
-% Slide Header: Return Values
-% ============================================================
-
-
-% ============================================================
-% Slide 10
-% ============================================================
-
-\begin{frame}{Return Values}
-\begin{block}{Common Integer Return}
-\large
-\hspace{3.7cm}\code{x0 = return value}
-\normalsize
-\end{block}
-\vspace{0.2cm}
-\begin{itemize}
-\item A simple integer or pointer return value is placed in \code{x0}.
-\item Some larger or multi-register return values may use additional
-ABI rules.
-\item The caller reads the return value after the callee executes
-\code{ret}.
-\item If the caller needs an argument value after the call, it must
-preserve it if the register is caller-saved.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Example}
-\large
-\hspace{3.2cm}\code{bl abs\_value}\\[0.10cm]
-\hspace{3.2cm}\code{str x0, [x20]}
-\normalsize
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 13
-% Slide Header: Example Function Call
-% ============================================================
-
-
-% ============================================================
-% Slide 11
-% ============================================================
-
-\begin{frame}{Example Function Call}
-\begin{columns}[T,onlytextwidth]
-\column{0.43\textwidth}
-\begin{block}{C}
-\large
-\hspace{0.8cm}\code{z = add2(a, b);}
-\normalsize
-\end{block}
-\vspace{0.15cm}
-\begin{itemize}
-\item First argument: \code{a}
-\item Second argument: \code{b}
-\item Return value assigned to \code{z}
-\end{itemize}
-\column{0.53\textwidth}
-\begin{block}{AArch64 Shape}
-\large
-\hspace{0.8cm}\code{mov x0, x19}\\[0.10cm]
-\hspace{0.8cm}\code{mov x1, x20}\\[0.10cm]
-\hspace{0.8cm}\code{bl add2}\\[0.10cm]
-\hspace{0.8cm}\code{mov x21, x0}
-\normalsize
-\end{block}
-\vspace{0.15cm}
-\small
-The example assumes \code{a}, \code{b}, and \code{z} are being kept
-in \code{x19}, \code{x20}, and \code{x21}.
-\end{columns}
-\end{frame}
-
-% ============================================================
-% Slide 14
-% Slide Header: Simple Leaf Function
-% ============================================================
-
-
-% ============================================================
-% Slide 12
-% ============================================================
-
-\begin{frame}{Simple Leaf Function}
-\begin{block}{C Function}
-\large
-\hspace{3.7cm}\code{long add2(long a, long b)}\\[0.10cm]
-\hspace{3.7cm}\code{return a + b;}
-\normalsize
-\end{block}
-\vspace{0.2cm}
-\begin{block}{AArch64 Function Body}
-\large
-\hspace{3.7cm}\code{add2:}\\[0.10cm]
-\hspace{3.7cm}\code{add x0, x0, x1}\\[0.10cm]
-\hspace{3.7cm}\code{ret}
-\normalsize
-\end{block}
-\vspace{0.15cm}
-\begin{itemize}
-\item \code{x0} and \code{x1} arrive holding the two arguments.
-\item The sum is written to \code{x0}, the return-value register.
-\item No stack frame is required for this simple leaf function.
-\end{itemize}
-\end{frame}
-
-% ============================================================
-% Slide 15
-% Slide Header: Register Preservation
-% ============================================================
-\sectiondivider{Section 3}{Register Preservation Rules}
-
-% ============================================================
-% Slide 16.a
-% Slide Header: AAPCS64 Is the Procedure-Call Blueprint
-% ============================================================
-
-
-% ============================================================
-% Slide 13
-% ============================================================
-
-\begin{frame}{AAPCS64 Is the Procedure-Call Blueprint}
-\begin{block}{Arm Procedure Call Standard for AArch64}
-AAPCS64 is the engineering blueprint that lets assembly routines,
-compilers, libraries, linkers, and debuggers cooperate correctly.
-\end{block}
-\vspace{0cm}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{The Blueprint Defines}
-\begin{itemize}
-\item where arguments and results are placed
-\item which registers may change or must be preserved
-\item how \code{sp} and stack data are aligned
-\end{itemize}
-\end{block}
-\column{0.48\textwidth}
-\begin{block}{Why the Rules Matter}
-\begin{itemize}
-\item independently produced code can interoperate
-\item callers and callees know their responsibilities
-\item violations can corrupt data or return control
-\end{itemize}
-\end{block}
-\end{columns}
-\vspace{0cm}
-\key{Two layers:} The A64 ISA defines what instructions can do;
-AAPCS64 defines how software must use those capabilities at
-procedure boundaries.
-\end{frame}
-
-% ============================================================
-% Slide 16.b
-% Slide Header: Caller-Saved and Callee-Saved Registers
-% ============================================================
-
-
-% ============================================================
-% Slide 14
-% ============================================================
-
-\begin{frame}{Caller-Saved and Callee-Saved Registers}
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.05}
-\begin{tabular}{
-  >{\raggedright\arraybackslash}m{2.4cm}
-  >{\raggedright\arraybackslash}m{2.7cm}
-  >{\raggedright\arraybackslash}m{5.8cm}
-}
-\rowcolor{navy}
-{\color{white}\bfseries Category} &
-{\color{white}\bfseries Registers} &
-{\color{white}\bfseries Meaning} \\
-\rowcolor{softgray}
-Caller-saved &
-\code{x0}--\code{x17} &
-A call may overwrite them; the caller saves live values it still needs. \\
-\rowcolor{white}
-Callee-saved &
-\code{x19}--\code{x28} &
-The callee must restore these before returning if it changes them. \\
-\rowcolor{softgray}
-Platform register &
-\code{x18} &
-Its use is platform-specific; portable code should avoid it. \\
-\rowcolor{white}
-Frame pointer &
-\code{x29} &
-Preserved when used as the current frame pointer. \\
-\rowcolor{softgray}
-Link register &
-\code{x30} &
-Holds the return address after \code{bl}; non-leaf functions commonly
-save it. \\
-\end{tabular}
-\end{center}
-\vspace{0.1cm}
-\begin{block}{Core Distinction}
-Caller-saved values may be destroyed by a call; callee-saved values
-must be restored by the function that changes them.
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 17.a
-% Slide Header: A libc Call Uses the Same AAPCS64 Contract
-% ============================================================
-
-
-% ============================================================
-% Slide 15
-% ============================================================
-
-% ============================================================
-% Slide 17.b
-% Slide Header: Caller-Saved Example
-% ============================================================
-
-
-% ============================================================
-% Slide 16
-% ============================================================
-
-\begin{frame}{Caller-Saved Example}
-\begin{block}{Situation}
-The caller has a live value in \code{x0}, but also needs to call
-another function. Since \code{x0} is caller-saved, the caller must
-protect it if the value is still needed.
-\end{block}
-\vspace{0.2cm}
-\large
-\hspace{3.1cm}\code{str x0, [sp, \#-16]!}\\[0.10cm]
-\hspace{3.1cm}\code{bl helper}\\[0.10cm]
-\hspace{3.1cm}\code{ldr x1, [sp], \#16}
-\normalsize
-\vspace{0.2cm}
-\begin{itemize}
-\item This example reserves 16 bytes to preserve stack alignment.
-\item The result from \code{helper} remains in \code{x0}; the saved
-value is restored into \code{x1}.
-\item The principle is that the caller saves caller-saved values it
-still needs.
-\end{itemize}
-\end{frame}
-
-% ============================================================
-% Slide 18
-% Slide Header: Callee-Saved Example
-% ============================================================
-
-
-% ============================================================
-% Slide 17
-% ============================================================
-
-\begin{frame}{Callee-Saved Example}
-\begin{block}{Situation}
-A function wants to use \code{x19}. Because \code{x19} is
-callee-saved, the function must restore the caller's original
-\code{x19} before returning.
-\end{block}
-\vspace{0.15cm}
-\large
-\hspace{3.2cm}\code{str x19, [sp, \#-16]!}\\[0.10cm]
-\hspace{3.2cm}\code{// use x19 inside function}\\[0.10cm]
-\hspace{3.2cm}\code{ldr x19, [sp], \#16}\\[0.10cm]
-\hspace{3.2cm}\code{ret}
-\normalsize
-\vspace{0.15cm}
-\begin{block}{Preservation Rule}
-The caller should see the same \code{x19} value after the function
-returns as before the call began.
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 19
-% Slide Header: Common Register Roles
-% ============================================================
-
-
-% ============================================================
-% Slide 18
-% ============================================================
-
-% ============================================================
-% Slide 20
-% Slide Header: Stack Frames
-% ============================================================
-\sectiondivider{Section 4}{Stack Frames}
-
-% ============================================================
-% Slide 21
-% Slide Header: The Stack Grows Down
-% ============================================================
-
-
-% ============================================================
-% Slide 19
-% ============================================================
-
-\begin{frame}{The Stack Grows Down}
-\begin{columns}[T,onlytextwidth]
-\column{0.52\textwidth}
-\begin{itemize}
-\item The stack is a memory region used for call-related temporary
-storage.
-\item Under AAPCS64, \code{sp} is 16-byte aligned at public interfaces
-and whenever memory is accessed through \code{sp}.
-\item Pushing data usually subtracts from \code{sp}.
-\item Popping data usually adds back to \code{sp}.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Direction}
-The stack grows toward lower addresses, so allocating stack space
-means decreasing \code{sp}.
-\end{block}
-\column{0.42\textwidth}
-\begin{center}
-\begin{tikzpicture}[
-  scale=.87,
-  transform shape,
-  region/.style={
-    draw=navy,
-    minimum width=3.55cm,
-    align=center,
-    font=\small
-  },
-  used/.style={region,fill=softgray},
-  cur/.style={region,fill=gold!30},
-  addr/.style={
-    font=\scriptsize\ttfamily,
-    anchor=east,
-    text=darkgray
-  }
-]
-\node[font=\scriptsize] (hi) {higher addresses};
-
-\node[used,minimum height=.46cm,below=.06cm of hi]
-  (old1) {older frame};
-\node[used,minimum height=.74cm,below=0pt of old1]
-  (old2) {older frame};
-\node[cur,minimum height=.60cm,below=0pt of old2]
-  (curf) {current frame};
-\node[used,minimum height=.52cm,below=0pt of curf]
-  (free) {unused stack space};
-\node[font=\scriptsize,below=.06cm of free]
-  (lo) {lower addresses};
-
-\node[addr,left=.18cm of old1.north west] {0x7ffffff0};
-\node[addr,left=.18cm of old1.south west] {0x7fffffe0};
-\node[addr,left=.18cm of old2.south west] {0x7fffffc8};
-\node[addr,left=.18cm of curf.south west] {0x7fffffb8};
-\node[addr,left=.18cm of free.south west] {0x7fffffa8};
-
-\draw[-{Latex[length=2.5mm]},thick,navy]
-  ([xshift=.62cm,yshift=.02cm]old1.east)
-  --
-  ([xshift=.62cm,yshift=-.02cm]free.east);
-
-\node[
-  font=\scriptsize,
-  text=darkgray,
-  align=center,
-  below=.20cm of lo
-] {illustrative only --- frame sizes vary by function};
-\end{tikzpicture}
-\end{center}
-\end{columns}
-\end{frame}
-
-% ============================================================
-% Slide 22
-% Slide Header: Stack Frame Contents
-% ============================================================
-
-
-% ============================================================
-% Slide 20
-% ============================================================
-
-\begin{frame}{Stack Frame Contents}
-\begin{columns}[T,onlytextwidth]
-\column{0.50\textwidth}
-\begin{itemize}
-\item Saved return address when \code{x30} must be preserved.
-\item Saved frame pointer when \code{x29} is used.
-\item Saved callee-saved registers used by the function.
-\item Local variables or spill slots that do not fit in registers.
-\item Outgoing stack arguments when register arguments are insufficient.
-\end{itemize}
-\column{0.46\textwidth}
-\begin{center}
-\begin{tikzpicture}[
-  row/.style={
-    draw=navy,
-    text width=4.6cm,
-    minimum height=.55cm,
-    align=center,
-    font=\small
-  },
-  saved/.style={row,fill=gold!25},
-  local/.style={row,fill=softgray}
-]
-\node[row,fill=white] (top) {higher addresses};
-\node[saved,below=0pt of top]
-  (lr) {saved \code{x29}, saved \code{x30}};
-\node[saved,below=0pt of lr]
-  (regs) {saved \code{x19}--\code{x28} as needed};
-\node[local,below=0pt of regs]
-  (loc) {local variables and spill slots};
-\node[row,fill=white,below=0pt of loc]
-  (bot) {lower addresses};
-\node[font=\scriptsize,below=.05cm of bot]
-  {\code{sp} after allocation};
-\end{tikzpicture}
-\end{center}
-\end{columns}
-\end{frame}
-
-% ============================================================
-% Slide 23
-% Slide Header: Function Prologue
-% ============================================================
-
-
-% ============================================================
-% Slide 21
-% ============================================================
-
-\begin{frame}{Function Prologue}
-\begin{block}{Purpose}
-A prologue prepares the callee's execution environment before the
-function body runs.
-\end{block}
-\vspace{0.2cm}
-\large
-\hspace{3.0cm}\code{stp x29, x30, [sp, \#-16]!}\\[0.10cm]
-\hspace{3.0cm}\code{mov x29, sp}
-\normalsize
-\vspace{0.2cm}
-\begin{itemize}
-\item The first instruction allocates 16 bytes and stores old
-\code{x29} and \code{x30}.
-\item \code{mov x29, sp} establishes a frame pointer for this frame.
-\item Additional stack allocation may follow if locals or spills are
-needed.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Compiler Variation}
-Depending on the platform ABI profile and optimization choices, code
-may omit \code{x29} as a frame pointer or use a different frame layout
-while preserving its obligations.
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 24
-% Slide Header: Function Epilogue
-% ============================================================
-
-
-% ============================================================
-% Slide 22
-% ============================================================
-
-\begin{frame}{Function Epilogue}
-\begin{block}{Purpose}
-An epilogue restores the caller's environment before returning.
-\end{block}
-\vspace{0.2cm}
-\large
-\hspace{3.0cm}\code{ldp x29, x30, [sp], \#16}\\[0.10cm]
-\hspace{3.0cm}\code{ret}
-\normalsize
-\vspace{0.2cm}
-\begin{itemize}
-\item The load pair restores the previous frame pointer and return
-address.
-\item Post-indexing adds 16 to \code{sp}, releasing the stack space.
-\item \code{ret} branches to the restored return address in \code{x30}.
-\end{itemize}
-\vspace{0.15cm}
-\begin{block}{Stack Balance}
-A function that subtracts from \code{sp} must add the same amount back
-before returning.
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 25
-% Slide Header: Prologue and Epilogue Diagram
-% ============================================================
-
-
-% ============================================================
-% Slide 23
-% ============================================================
-
-\begin{frame}{Prologue and Epilogue Diagram}
-\begin{center}
-\begin{tikzpicture}[
-  scale=.90,
-  transform shape,
-  inst/.style={
-    draw=navy,
-    fill=softgray,
-    rounded corners=2pt,
-    minimum width=4.8cm,
-    minimum height=.52cm,
-    align=center,
-    font=\small\ttfamily
-  },
-  note/.style={font=\small,align=center}
-]
-\node[inst] (a) {stp x29, x30, [sp, \#-16]!};
-\node[inst,below=.30cm of a] (b) {mov x29, sp};
-\node[inst,below=.55cm of b,fill=gold!25]
-  (c) {function body};
-\node[inst,below=.55cm of c]
-  (d) {ldp x29, x30, [sp], \#16};
-\node[inst,below=.30cm of d] (e) {ret};
-
-\draw[-{Latex},thick,deepblue] (a.south) -- (b.north);
-\draw[-{Latex},thick,deepblue]
-  (b.south) -- node[right,note]{execute body} (c.north);
-\draw[-{Latex},thick,deepblue] (c.south) -- (d.north);
-\draw[-{Latex},thick,deepblue] (d.south) -- (e.north);
-
-\draw[
-  decorate,
-  decoration={brace,amplitude=4pt},
-  thick,
-  navy
-]
-  ([xshift=-.25cm]a.west)
-  --
-  ([xshift=-.25cm]b.west)
-  node[midway,left=.12cm,font=\small]{prologue};
-
-\draw[
-  decorate,
-  decoration={brace,amplitude=4pt},
-  thick,
-  navy
-]
-  ([xshift=-.25cm]d.west)
-  --
-  ([xshift=-.25cm]e.west)
-  node[midway,left=.12cm,font=\small]{epilogue};
-\end{tikzpicture}
-\end{center}
-\vspace{-0.05cm}
-\begin{block}{Function Entry and Exit}
-The prologue establishes the function's stack-frame state before the
-body executes. The epilogue reverses those changes, restores the saved
-return state, and then \code{ret} transfers control back to the caller.
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 26
-% Slide Header: Local Stack Storage
-% ============================================================
-
-
-% ============================================================
-% Slide 24
-% ============================================================
-
-\begin{frame}{Local Stack Storage}
-\begin{block}{When Registers Are Not Enough}
-A function may allocate additional stack space for local arrays,
-temporary spill slots, or values whose address must be taken.
-\end{block}
-\vspace{0.15cm}
-\large
-\hspace{2.8cm}\code{sub sp, sp, \#32}\\[0.10cm]
-\hspace{2.8cm}\code{str x0, [sp, \#16]}\\[0.10cm]
-\hspace{2.8cm}\code{ldr x1, [sp, \#16]}\\[0.10cm]
-\hspace{2.8cm}\code{add sp, sp, \#32}
-\normalsize
-\vspace{0.15cm}
-\begin{itemize}
-\item Stack space is usually allocated in multiples that preserve
-alignment.
-\item Positive offsets from \code{sp} or \code{x29} can address slots
-in the frame.
-\item The frame layout is a compiler convention, not an A64
-instruction requirement.
-\end{itemize}
-\end{frame}
-
-% ============================================================
-% Slide 27
-% Slide Header: Leaf and Non-Leaf Functions
-% ============================================================
-\sectiondivider{Section 5}{Function Calls and Recursion}
-
-% ============================================================
-% Slide 28
-% Slide Header: Leaf Function without a Stack Frame
-% ============================================================
-
-
-% ============================================================
-% Slide 25
-% ============================================================
-
-\begin{frame}{Leaf Function without a Stack Frame}
-\begin{block}{Leaf Function}
-A leaf function calls no other function. If it only uses caller-saved
-registers and needs no local stack storage, it may avoid stack use
-entirely.
-\end{block}
-\vspace{0.2cm}
-\large
-\hspace{3.6cm}\code{double\_it:}\\[0.10cm]
-\hspace{3.6cm}\code{add x0, x0, x0}\\[0.10cm]
-\hspace{3.6cm}\code{ret}
-\normalsize
-\vspace{0.2cm}
-\begin{itemize}
-\item Argument arrives in \code{x0}.
-\item Return value is written back into \code{x0}.
-\item \code{x30} is not overwritten because this function makes no
-nested calls.
-\end{itemize}
-\end{frame}
-
-% ============================================================
-% Slide 29
-% Slide Header: Non-Leaf Function Saves the Link Register
-% ============================================================
-
-
-% ============================================================
-% Slide 26
-% ============================================================
-
-\begin{frame}{Non-Leaf Function Saves the Link Register}
-\begin{block}{Nested Call}
-A non-leaf function must preserve its own return address before
-executing another \code{bl} if it needs to return to its caller
-afterward.
-\end{block}
-\vspace{0.15cm}
-\small
-\hspace{3.0cm}\code{outer:}\\[0.08cm]
-\hspace{3.0cm}\code{stp x29, x30, [sp, \#-16]!}\\[0.08cm]
-\hspace{3.0cm}\code{mov x29, sp}\\[0.08cm]
-\hspace{3.0cm}\code{bl inner}\\[0.08cm]
-\hspace{3.0cm}\code{add x0, x0, \#1}\\[0.08cm]
-\hspace{3.0cm}\code{ldp x29, x30, [sp], \#16}\\[0.08cm]
-\hspace{3.0cm}\code{ret}
-\normalsize
-\vspace{0.15cm}
-\begin{block}{Reason}
-The \code{bl inner} instruction overwrites \code{x30}; therefore
-\code{outer} saves its original \code{x30} first.
-\end{block}
-\end{frame}
-
-% ============================================================
-% Slide 30
-% Slide Header: Recursion Requires Separate Frames
-% ============================================================
-
-
-% ============================================================
-% Slide 27
-% ============================================================
-
-\begin{frame}{Recursion Requires Separate Frames}
-\begin{block}{Recursive Calls}
-Each recursive call needs its own preserved state: return address,
-saved registers, and local values that must survive the nested call.
-\end{block}
-\vspace{0.2cm}
-\begin{columns}[T,onlytextwidth]
-\column{0.50\textwidth}
-\begin{itemize}
-\item One invocation cannot reuse another invocation's saved return
-address.
-\item Local variables from different recursion depths must remain
-distinct.
-\item Stack frames naturally provide separate storage per invocation.
-\end{itemize}
-\column{0.46\textwidth}
-\begin{center}
-\begin{tikzpicture}[
-  framebox/.style={
-    draw=navy,
-    minimum width=4.8cm,
-    minimum height=.58cm,
-    align=center,
-    font=\small,
-    fill=softgray
-  }
-]
-\node[framebox] (f3) {call depth 3 frame};
-\node[framebox,below=0pt of f3] (f2) {call depth 2 frame};
-\node[framebox,below=0pt of f2] (f1) {call depth 1 frame};
-\node[font=\scriptsize,above=.05cm of f3]
-  {lower current \code{sp}};
-\node[font=\scriptsize,below=.05cm of f1]
-  {older frames};
-\end{tikzpicture}
-\end{center}
-\end{columns}
-\end{frame}
-
-% ============================================================
-% Slide 31
-% Slide Header: Recursive Factorial Uses One Frame per Call
-% ============================================================
-
-
-% ============================================================
-% Slide 28
-% ============================================================
-
-\begin{frame}{Recursive Factorial Uses One Frame per Call}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{block}{Entry and Base Case}
-\small
-\code{fact:}\\[0.08cm]
-\code{stp x29, x30, [sp, \#-32]!}\\[0.08cm]
-\code{mov x29, sp}\\[0.08cm]
-\code{str x0, [sp, \#16]}\\[0.08cm]
-\code{cmp x0, \#1}\\[0.08cm]
-\code{b.gt recurse}\\[0.08cm]
-\code{mov x0, \#1}\\[0.08cm]
-\code{b done}
-\end{block}
-\column{0.48\textwidth}
-\begin{block}{Recursive Case and Return}
-\small
-\code{recurse:}\\[0.08cm]
-\code{sub x0, x0, \#1}\\[0.08cm]
-\code{bl fact}\\[0.08cm]
-\code{ldr x1, [sp, \#16]}\\[0.08cm]
-\code{mul x0, x1, x0}\\[0.08cm]
-\code{done:}\\[0.08cm]
-\code{ldp x29, x30, [sp], \#32}\\[0.08cm]
+\begin{block}{Example: Two Arguments, One Result}
+\code{add x0, x0, x1}\\[0.10cm]
 \code{ret}
 \end{block}
+\small
+The incoming values in \bits{x0} and \bits{x1} are added; the result returns in \bits{x0}. Floating-point and aggregate classification are outside this example.
+\end{frame}
+
+
+\begin{frame}{Caller-Saved and Callee-Saved Registers}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\begin{block}{Caller-Saved: \bits{x0}--\bits{x17}}
+\begin{itemize}\setlength{\itemsep}{6pt}
+\item A call may overwrite these registers.
+\item The caller must preserve values it still needs after the call.
+\item \bits{x0}--\bits{x7}: arguments/results; \bits{x8}: indirect result address when required; \bits{x9}--\bits{x17}: temporary uses, including IP0/IP1 in \bits{x16}/\bits{x17}.
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{Callee-Saved: \bits{x19}--\bits{x29}}
+\begin{itemize}\setlength{\itemsep}{6pt}
+\item A function that modifies one of these registers must restore its incoming value before returning.
+\item Values kept in them survive ordinary calls.
+\item \bits{x29} has the additional conventional role of frame pointer (\bits{fp}).
+\end{itemize}
+\end{block}
+\end{column}
 \end{columns}
-\vspace{0.10cm}
+\vspace{0.18cm}
+\key{Example:} a loop counter needed after a call can use \bits{x19}, provided the function preserves its caller's original \bits{x19}.
+\end{frame}
+
+
+\begin{frame}{Special-Purpose ABI Registers}
+
+\begin{itemize}\setlength{\itemsep}{7pt}
+  \item \bits{x29} / \bits{fp}: frame pointer: a stable reference for accessing saved state and local storage on the stack.
+  \item \bits{x30} / \bits{lr}: link register; \code{bl} and \code{blr} write the return address here.
+  \item \bits{sp}: stack pointer; marks the active stack boundary and must stay properly aligned.
+  \item \bits{x18}: platform register; do not use it in hand-written examples unless the target platform says it is available.
+\end{itemize}
+
+
+\end{frame}
+
+
+\sectiondivider{PART 3}{The Runtime Stack \& Stack Frames}
+
+
+\begin{frame}{The Runtime Stack}
 \small
-Each invocation preserves its return address and original \code{n};
-the recursive result returns in \code{x0}.
+\begin{block}{Definition}
+The runtime stack is a \key{per-thread data structure in memory} for temporary function-call state. The OS and runtime establish its memory region. Each thread has its own stack pointer (\bits{sp}).
+\end{block}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.57\textwidth}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item Saved return address (\bits{lr}/\bits{x30}) and caller's frame pointer (\bits{fp}/\bits{x29}), when needed.
+  \item Other saved register values.
+  \item Stack arguments, e.g., integer arguments beyond the first eight register arguments.
+  \item Short-lived local variables, arrays, and temporary values that need memory.
+\end{itemize}
+\end{column}
+\begin{column}{0.39\textwidth}
+\centering
+\begin{tikzpicture}[
+  every node/.style={font=\scriptsize\ttfamily,inner sep=4pt},
+  stackrow/.style={draw=navy,minimum width=3.65cm,minimum height=0.65cm,align=center}
+]
+\node at (1.825,0.35) {Higher addresses};
+\node[stackrow,fill=lightblue] at (1.825,-0.325) {Earlier call data};
+\node[stackrow,fill=gold!20] at (1.825,-0.975) {Current call data};
+\node[stackrow,draw=navy,dashed,fill=softgray] at (1.825,-1.625) {Available stack space};
+\draw[-{Latex},thick,navy] (4.0,-0.1) -- (4.0,-1.85);
+\node at (1.825,-2.3) {Lower addresses};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\vspace{0.15cm}
+\small
+\key{Direction:} AAPCS64 uses a descending stack: growth is from high to low addresses. This is a convention, not a property of every stack data structure.
 \end{frame}
 
-% ============================================================
-% Slide 32
-% Slide Header: Common Procedure Bugs
-% ============================================================
-
-
-% ============================================================
-% Slide 29
-% ============================================================
-
-\begin{frame}{Common Procedure Bugs}
-\begin{itemize}
-\item Forgetting that \code{bl} overwrites \code{x30}.
-\item Changing \code{x19}--\code{x28} without restoring them before
-returning.
-\item Returning with \code{sp} different from its value at function
-entry.
-\item Assuming caller-saved registers survive a call.
-\item Using \code{w} registers for pointer values that require 64-bit
-addresses.
-\item Adjusting \code{sp} by only 8 bytes and then accessing memory
-through the misaligned stack pointer.
+\begin{frame}{Where Does the Compiler Store Local Variables?}
+\small
+\begin{block}{Compiler Rule}
+The compiler chooses storage while preserving observable behavior. A local declaration does not require a stack slot.
+\end{block}
+\begin{itemize}\setlength{\itemsep}{7pt}
+\item \key{Register:} keep a value in an available register when no memory address is needed.
+\item \key{Stack storage:} typically holds addressable locals, arrays that need memory, and values displaced from registers (\key{spills}).
+\item \key{No storage:} eliminate unused variables, substitute constants, or recompute values.
 \end{itemize}
 \vspace{0.15cm}
-\begin{block}{Debugging Order}
-Check the return address, then stack balance, then
-register-preservation rules.
-\end{block}
+\small
+\key{Taking an address:} a local whose address is passed to a function that accesses it needs memory, usually a stack slot, unless optimization removes that need.
+\vspace{0.12cm}
+
+\key{Build settings:} unoptimized builds commonly use more stack slots; optimization can reduce them.
 \end{frame}
 
-% ============================================================
-% Slide 33
-% Slide Header: Summary and Self-Test
-% ============================================================
-\sectiondivider{Section 6}{Summary and Self-Test}
-
-% ============================================================
-% Slide 34
-% Slide Header: Topic 8 Summary
-% ============================================================
-
-
-% ============================================================
-% Slide 30
-% ============================================================
-
-\begin{frame}{Topic 8 Summary}
-\begin{itemize}
-\item \code{bl} calls a function and writes the return address into
-\code{x30}.
-\item \code{ret} returns to the address held in \code{x30} by default.
-\item \code{x0}--\code{x7} pass the first eight integer/pointer
-arguments; 32-bit values use \code{w0}--\code{w7}.
-\item Additional arguments use the stack, and \code{x0} holds a common
-integer/pointer return value.
-\item Caller-saved registers may be overwritten by a call; callee-saved
-registers must be restored if changed.
-\item Stack frames preserve return addresses, saved registers, and
-local storage.
-\item Leaf functions may avoid stack frames; non-leaf and recursive
-functions often need them.
+\begin{frame}{Stack Lifetime, Balance, and Limits}
+\begin{itemize}\setlength{\itemsep}{7pt}
+\item \key{Short-lived storage:} call-related data remains live while needed by the function. Nested callees can allocate more space while the caller's data remains allocated.
+\item \key{Balance before return:} release all space allocated by the function and restore required saved registers. \bits{sp} must equal its entry value; several allocations can be released together.
+\item \key{Stack leak:} unreleased allocations that accumulate consume capacity. An incorrect \bits{sp} at return can also corrupt execution.
+\item \key{Finite capacity:} each thread's stack limit depends on the OS, executable, and runtime configuration. Deep recursion or large locals can cause stack overflow.
+\item \key{After release:} the space can be reused, so pointers to former locals must not be used. Releasing space does not erase its bytes.
 \end{itemize}
 \end{frame}
 
-% ============================================================
-% Slide 35
-% Slide Header: Self-Test 1/2
-% ============================================================
 
 
-% ============================================================
-% Slide 31
-% ============================================================
 
-\begin{frame}{Self-Test 1/2}
-\begin{enumerate}
-\item What does \code{bl function} write into \code{x30}?
-\item Why can a non-leaf function not blindly trust \code{x30} after
-it calls another function?
-\item Which registers carry the first eight integer or pointer
-arguments, and where is a ninth argument passed?
-\item Where is a simple integer return value normally placed?
-\item What is the difference between caller-saved and callee-saved
-registers?
-\end{enumerate}
-\end{frame}
+\begin{frame}{Allocating and Releasing Stack Space}
+\large
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Stack storage is reserved and released by changing the stack pointer (\bits{sp}).
+  \item \key{Stack behavior:}
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item Grows \textbf{downward} from high memory addresses toward low memory addresses.
+    \item Stack Pointer (\bits{sp}) points to the current \key{lowest active address} (top of stack).
+    \item Follows \key{Last-In, First-Out (LIFO)} order: the most recently allocated storage is released first.
+  \end{itemize}
+\end{itemize}
 
-% ============================================================
-% Slide 36
-% Slide Header: Self-Test 2/2
-% ============================================================
-
-
-% ============================================================
-% Slide 32
-% ============================================================
-
-\begin{frame}{Self-Test 2/2}
-\begin{enumerate}
-\setcounter{enumi}{5}
-\item Why does \code{stp x29, x30, [sp, \#-16]!} both allocate stack
-space and save registers?
-\item What does \code{ldp x29, x30, [sp], \#16} do before the final
-\code{ret}?
-\item Why must \code{sp} be restored before returning to the caller?
-\item Why can a small leaf function sometimes avoid a stack frame?
-\item Why does recursion require a separate stack frame for each
-active call?
-\end{enumerate}
-\end{frame}
-
-% ============================================================
-% Slide 37
-% Slide Header: Register Preservation Exercise
-% ============================================================
-
-
-% ============================================================
-% Slide 33
-% ============================================================
-
-\begin{frame}{Register Preservation Exercise}
-\begin{block}{Classify Each Register}
-For each register, state whether it is mainly used for argument/return,
-caller-saved temporary use, callee-saved preservation, frame pointer,
-link register, or stack pointer.
+\vspace{0.22cm}
+\begin{block}{Allocation vs.\ Deallocation}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item \key{Allocate:} subtract from \bits{sp}, e.g., \code{sub sp, sp, \#32}.
+  \item Here \code{\#32} means \key{32 bytes}: room for four 64-bit \bits{x} register slots.
+  \item \key{Release:} add the same amount back, e.g., \code{add sp, sp, \#32}.
+\end{itemize}
 \end{block}
-\vspace{0.15cm}
+\end{frame}
+
+
+\begin{frame}{What Is a Stack Frame?}
+
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Each function call may reserve a region of the runtime stack called a \key{stack frame}.
+  \item A stack frame can hold:
+  \begin{itemize}\setlength{\itemsep}{3pt}
+    \item an optional \key{frame record}: the 16-byte pair holding saved old \bits{x29} and saved \bits{x30},
+    \item other saved callee-saved registers and space for outgoing stack arguments,
+    \item local variables, temporary storage, and alignment padding.
+  \end{itemize}
+  \item The stack pointer (\bits{sp}) identifies the current stack boundary and changes as stack storage is allocated or released.
+\end{itemize}
+
+\vfill
+
+\begin{block}{Frame Pointer (fp)}
+\bits{x29} (fp) provides a \key{stable reference within the frame}, not necessarily its beginning. When a frame record is maintained, fp points to that record. Its address remains fixed while \bits{sp} tracks allocations and releases.
+\end{block}
+
+\end{frame}
+
+
+\begin{frame}{Frame Pointer (\texttt{x29}) and Frame Records}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item The \key{stack frame} is the whole allocation; the \key{frame record} is a 16-byte part of it.
+  \item The record has two 64-bit fields:
+  \begin{itemize}\setlength{\itemsep}{2pt}
+    \item \code{[x29]}: saved previous \bits{x29}
+    \item \code{[x29, \#8]}: saved \bits{x30}
+  \end{itemize}
+  \item fp points to the saved old \bits{x29} slot. Its stored value points to the caller's frame record, forming a chain.
+\end{itemize}
+\end{column}
+\begin{column}{0.4\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.78, every node/.style={transform shape}]
+  \node[font=\scriptsize\bfseries, anchor=west] at (0,3.7) {higher addresses};
+  \draw[fill=lightblue, draw=navy] (0,2.8) rectangle (4.2,3.5) node[midway, font=\small\bfseries] {saved \bits{x30 (lr)}};
+  \draw[fill=lightblue, draw=navy] (0,2.1) rectangle (4.2,2.8) node[midway, font=\small\bfseries] {saved old \bits{x29 (fp)}};
+  \draw[fill=softgray, draw=navy, dashed] (0,1.0) rectangle (4.2,2.1) node[midway, font=\small] {rest of stack frame};
+  \node[font=\scriptsize\bfseries, anchor=west] at (0,0.6) {lower addresses};
+  \draw[-{Latex}, thick, navy] (4.55,3.35) -- (4.55,1.15);
+  \draw[-{Latex}, thick, gold!80!black] (-0.7,2.45) -- (0,2.45);
+  \node[anchor=east, font=\scriptsize\bfseries] at (-0.75,2.45) {\bits{x29 (fp)}};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+
+
+\end{frame}
+
+\begin{frame}{Example Stack Frame Structure}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item A \key{stack frame} stores the stack-resident state associated with one function invocation.
+  \item In the layout used here:
+  \begin{enumerate}\setlength{\itemsep}{2pt}
+    \item saved link register (\bits{x30}) and frame pointer (\bits{x29}),
+    \item saved callee-saved registers, such as \bits{x19} in the diagram, come below it,
+    \item local variables and buffers extend farther downward.
+  \end{enumerate}
+  \item Arrows identify slots; pointers hold their lowest byte addresses.
+\end{itemize}
+\end{column}
+\begin{column}{0.44\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.75, every node/.style={transform shape}]
+  \draw[fill=lightblue, draw=navy] (0,3.6) rectangle (4.5,4.4) node[midway, font=\small\bfseries] {saved \bits{x30 (lr)}};
+  \draw[fill=lightblue, draw=navy] (0,2.8) rectangle (4.5,3.6) node[midway, font=\small\bfseries] {saved \bits{x29 (fp)}};
+  \draw[fill=softgray, draw=navy] (0,2.0) rectangle (4.5,2.8) node[midway, font=\small\bfseries] {saved \bits{x19}};
+  \draw[fill=softgray, draw=navy, dashed] (0,1.2) rectangle (4.5,2.0) node[midway, font=\small] {Local Variables / Padding};
+  \node[anchor=west, font=\scriptsize\bfseries] at (0,4.7) {Higher addresses};
+  \draw[-{Latex}, thick, gold!80!black] (-0.55,1.6) -- (0,1.6);
+  \node[anchor=east, font=\scriptsize\bfseries] at (-0.6,1.6) {\bits{sp}};
+  \draw[-{Latex}, thick, gold!80!black] (-0.55,3.2) -- (0,3.2);
+  \node[anchor=east, font=\scriptsize\bfseries] at (-0.6,3.2) {\bits{x29 (fp)}};
+  \node[anchor=west, font=\scriptsize\bfseries] at (0,0.9) {Lower addresses};
+  \draw[-{Latex}, thick, navy] (4.85,4.25) -- (4.85,1.35);
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\vspace{0.18cm}
+\footnotesize
+\key{AAPCS64 reminder:} a callee that modifies any of \bits{x19}--\bits{x29} must preserve its incoming value and restore it before returning. Reading a register alone does not require saving it.
+\end{frame}
+
+
+\begin{frame}{Stack Alignment and Padding Rules}
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item AAPCS64 requires \bits{sp} to satisfy 16-byte alignment at public interfaces and when used for stack memory accesses.
+  \item Stack-frame allocation therefore rounds the required stack space up to a multiple of 16 bytes.
+\end{itemize}
+\vspace{0.1cm}
+\small
+\key{Padding} is unused space added for alignment. Round the total required bytes up to a multiple of 16: 36 bytes becomes 48 bytes.
+
+\vspace{0.1cm}
 \begin{center}
-\small
-\renewcommand{\arraystretch}{1.16}
-\begin{tabular}{
-  >{\raggedright\arraybackslash}m{4.0cm}
-  >{\raggedright\arraybackslash}m{6.4cm}
-}
-\rowcolor{navy}
-{\color{white}\bfseries Register} &
-{\color{white}\bfseries Classification} \\
-\rowcolor{softgray}
-\code{x0} & \\
-\rowcolor{white}
-\code{x9} & \\
-\rowcolor{softgray}
-\code{x19} & \\
-\rowcolor{white}
-\code{x29} & \\
-\rowcolor{softgray}
-\code{x30} & \\
-\rowcolor{white}
-\code{sp} & \\
+\footnotesize
+\renewcommand{\arraystretch}{1.12}
+\rowcolors{2}{white}{tablealt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.31\textwidth} >{\raggedright\arraybackslash}p{0.22\textwidth} >{\raggedright\arraybackslash}p{0.34\textwidth}}
+\toprule
+\rowcolor{lightblue}
+\textbf{Required Space} & \textbf{Stack Frame Size} & \textbf{Example Allocation} \\
+\midrule
+16B saved fp/LR & 16 bytes & \code{stp x29, x30, [sp, \#-16]!} \\
+16B saved fp/LR + 20B locals & 48 bytes & allocate a 48-byte stack frame and place saved state/locals within it \\
+16B saved fp/LR + 32B locals & 48 bytes & allocate a 48-byte stack frame \\
+\bottomrule
 \end{tabular}
+\rowcolors{2}{}{}
 \end{center}
 \end{frame}
 
-% ============================================================
-% Slide 38
-% Slide Header: Next Topic
-% ============================================================
+\begin{frame}[fragile]{Function Prologue Mechanics}
+\begin{itemize}\setlength{\itemsep}{3pt}
+  \item A \key{prologue} allocates stack storage and saves required state on function entry.
+  \item Here the \bits{x29}/\bits{x30} frame record stays at the high-address end of this function's stack frame.
+  \item Saving one 8-byte \bits{x} register still reserves 16 bytes so \bits{sp} remains aligned.
+\end{itemize}
 
+\vspace{0.05cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\begin{block}{Prologue Template}
+\footnotesize
+\begin{verbatim}
+my_func:
+    // save old fp and LR as frame record
+    stp    x29, x30, [sp, #-16]!
 
-% ============================================================
-% Slide 34
-% ============================================================
+    // fp = address of saved old x29
+    mov    x29, sp
 
-\begin{frame}{Next Topic}
-\begin{block}{Machine Instruction Encoding}
-Topic 9 moves from assembly-level procedure structure to the binary
-encoding of selected A64 instructions.
+    // save x19 below the frame record
+    str    x19, [sp, #-16]!
+\end{verbatim}
 \end{block}
-\vspace{0.25cm}
-\begin{itemize}
-\item AArch64 instruction formats and machine-code fields
-\item Data-processing instruction encoding
-\item Memory instruction encoding and PC-relative addressing
-\item Branch instruction encoding and machine-code decoding
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{block}{Stack Layout}
+\centering
+\begin{tikzpicture}[scale=0.74, every node/.style={transform shape}]
+  \node[font=\scriptsize\bfseries, anchor=west] at (0,4.6) {higher addresses};
+  \draw[fill=tablealt, draw=navy] (0,3.8) rectangle (4.4,4.45) node[midway, font=\scriptsize] {caller's stack frame};
+  \draw[fill=lightblue, draw=navy] (0,3.15) rectangle (4.4,3.8) node[midway, font=\scriptsize\bfseries] {saved \bits{x30 (lr)}};
+  \draw[fill=lightblue, draw=navy] (0,2.5) rectangle (4.4,3.15) node[midway, font=\scriptsize\bfseries] {saved old \bits{x29 (fp)}};
+  \draw[fill=tablealt, draw=navy] (0,1.85) rectangle (4.4,2.5) node[midway, font=\scriptsize] {alignment / available};
+  \draw[fill=tablealt, draw=navy] (0,1.2) rectangle (4.4,1.85) node[midway, font=\scriptsize\bfseries] {saved x19};
+  \draw[-{Latex}, thick, gold!80!black] (-0.5,2.82) -- (0,2.82);
+  \node[anchor=east, font=\scriptsize\bfseries] at (-0.55,2.82) {\bits{x29 (fp)}};
+  \draw[-{Latex}, thick, gold!80!black] (-0.5,1.52) -- (0,1.52);
+  \node[anchor=east, font=\scriptsize\bfseries] at (-0.55,1.52) {sp};
+  \node[font=\scriptsize\bfseries, anchor=west] at (0,0.8) {lower addresses};
+  \draw[-{Latex}, thick, gold!80!black] (5.0,4.1) -- (5.0,1.25) node[midway, right, font=\tiny\bfseries, rotate=-90, anchor=south] {stack grows};
+\end{tikzpicture}
+\end{block}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Function Epilogue Mechanics}
+
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item An \key{epilogue} restores saved state and releases stack storage before return.
+  \item Restore any saved callee registers before restoring the frame record and returning.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{block}{Epilogue Template}
+\small
+\begin{verbatim}
+    // 1. Restore saved callee register; release its slot
+    ldr    x19, [sp], #16
+
+    // 2. Restore original fp and LR; release frame record
+    ldp    x29, x30, [sp], #16
+
+    // 3. Return to caller
+    ret
+\end{verbatim}
+\end{block}
+
+\small
+\code{ldp} restores both the caller\textquotesingle s fp and the saved LR; \code{ret} then branches to LR (\bits{x30}). Post-indexing releases each allocation after loading it.
+\end{frame}
+
+
+\sectiondivider{PART 4}{Worked Assembly Examples \& Patterns}
+
+
+\begin{frame}[fragile]{Worked Example 1: Non-Leaf Nested Function}
+\begin{block}{C Code: \texttt{int64\_t compute(int64\_t x)}}
+\small
+\code{return add\_three(x, 10, 20);}
+\end{block}
+\vspace{0.05cm}
+\begin{block}{AArch64 Assembly Implementation}
+\footnotesize
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\textit{// Input: x0 = x}} \\
+\code{compute:} & & \\
+ & \code{stp x29, x30, [sp, \#-16]!} & \text{\scriptsize // save fp and LR} \\
+ & \code{mov x29, sp}                  & \text{\scriptsize // establish frame record} \\
+ & \code{mov x1, \#10}                 & \text{\scriptsize // 2nd argument} \\
+ & \code{mov x2, \#20}                 & \text{\scriptsize // 3rd argument} \\
+ & \code{bl  add\_three}               & \text{\scriptsize // nested call overwrites x30} \\
+ & \code{ldp x29, x30, [sp], \#16}     & \text{\scriptsize // restore fp/LR} \\
+ & \code{ret}                           & \text{\scriptsize // return to caller} \\
+\end{tabular}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]{Worked Example 2: Recursive Factorial}
+\vspace{-0.2cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.4\textwidth}
+\begin{block}{C Logic}
+\footnotesize
+\begin{verbatim}
+uint64_t factorial(uint64_t n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
+\end{verbatim}
+\end{block}
+\vspace{0.07cm}
+\footnotesize
+Each invocation preserves its own return address and the current value of \code{n} across the recursive call.
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{block}{AArch64 Assembly}
+\scriptsize
+\begin{verbatim}
+factorial:
+    cmp  x0, #1
+    b.ls .Lbase
+
+    stp  x29, x30, [sp, #-32]!
+    mov  x29, sp
+    str  x19, [sp, #16]
+    mov  x19, x0
+    sub  x0, x0, #1
+    bl   factorial
+    mul  x0, x0, x19
+    ldr  x19, [sp, #16]
+    ldp  x29, x30, [sp], #32
+    ret
+
+.Lbase:
+    mov  x0, #1
+    ret
+\end{verbatim}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Common Function Linkage Bugs in Assembly}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item \key{1. Overwriting the Return Address:} A nested \code{bl} overwrites \bits{x30}; failing to preserve the incoming return address can return control to the wrong location.
+  \item \key{2. Corrupting Callee-Saved Registers:} Modifying \bits{x19}--\bits{x28} without restoring them violates the calling convention.
+  \item \key{3. Stack Misalignment:} Violating AAPCS64 stack-alignment rules breaks ABI assumptions and can fault where SP-alignment checking is enabled.
+  \item \key{4. Unbalanced Stack Pointer:} Failing to restore \bits{sp} correctly can corrupt stack-resident state and later restores.
 \end{itemize}
 \end{frame}
+
+
+\sectiondivider{SUMMARY \& ASSESSMENT}{Review and Self-Test Questions}
+
+
+\begin{frame}{Summary}
+\begin{itemize}\setlength{\itemsep}{5pt}
+  \item \key{Linkage Primitives:} \code{bl}/\code{blr} write the return address to \bits{x30}; \code{ret} normally returns through \bits{x30}.
+  \item \key{AAPCS64 Register Contract:}
+  \begin{itemize}\setlength{\itemsep}{1.5pt}
+    \item Scalar arguments commonly begin in \bits{x0}--\bits{x7}; most scalar results return in \bits{x0}.
+    \item \bits{x0}--\bits{x17} are caller-saved; \bits{x19}--\bits{x28} are callee-saved.
+  \end{itemize}
+  \item \key{Stack Frames:} A stack frame holds saved linkage state, preserved registers, and local storage while maintaining required alignment.
+  \item \key{Prologue/Epilogue:} Paired \code{stp}/\code{ldp} instructions commonly save and restore \bits{x29}/\bits{x30} while updating \bits{sp}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Self-Test Questions: Linkage \& AAPCS64}
+
+\begin{enumerate}\setlength{\itemsep}{6pt}
+  \item \key{Leaf vs.\ Non-Leaf Function Linkage:} How do leaf and non-leaf functions differ regarding link-register management and return-address preservation?
+
+  \item \key{Register Preservation Contracts:} Suppose function \code{foo()} calls \code{bar()}. If \code{foo()} needs to maintain a loop counter value across the call, should it store that counter in \bits{x9} or \bits{x19}? Why?
+
+  \item \key{Parameter Passing Limits:} How are integer parameters handled when calling a C function declared with 10 scalar arguments: \code{void test(int a1, ..., int a10)}?
+\end{enumerate}
+
+\end{frame}
+
+
+\begin{frame}{Self-Test Questions: Stack Frame Management}
+
+\begin{enumerate}\setlength{\itemsep}{6pt}
+  \item \key{Stack Allocation Alignment:} A non-leaf function saves \bits{x29}/\bits{x30} (16 bytes) and needs 20 bytes of local buffer space. What is the minimum stack-frame size it must allocate to maintain AAPCS64 compliance?
+
+  \item \key{Prologue/Epilogue Verification:} Identify the bug in the following epilogue:
+  \small
+  \begin{tabular}{l}
+  \code{ldp x29, x30, [sp], \#16} \\
+  \code{ldr x19, [sp, \#16]} \\
+  \code{ret} \\
+  \end{tabular}
+
+  \item \key{Frame Pointer Chains:} Why need fp not point to the beginning of the whole frame? What do \code{[x29]} and \code{[x29, \#8]} contain, and how can a debugger follow the chain?
+\end{enumerate}
+
+\end{frame}
+
 
 \end{document}

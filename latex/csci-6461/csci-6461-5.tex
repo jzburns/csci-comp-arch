@@ -530,103 +530,6 @@ For \code{int32\_t *p}, reads the 32-bit value starting 16 bytes from \code{x0}:
 \end{frame}
 
 % ============================================================
-% Scaled Immediate Offsets -- Concept
-% ============================================================
-
-\begin{frame}{Scaled Immediate Offsets: What Does ``Scaled'' Mean?}
-
-\begin{block}{The Key Idea}
-The offset written in the instruction is a \key{byte offset}.  
-The transfer size determines how that byte offset relates to the data being accessed.
-\end{block}
-
-\vspace{0.2cm}
-
-\small
-Assume the same byte offset, \code{\#8}, in each instruction:
-
-\vspace{0.15cm}
-
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.18}
-\setlength{\tabcolsep}{5pt}
-
-\begin{tabular}{
-  >{\raggedright\arraybackslash}p{4.4cm}
-  >{\raggedright\arraybackslash}p{5.2cm}
-}
-\toprule
-\textbf{Instruction} &
-\textbf{Meaning of the 8-byte offset} \\
-\midrule
-
-\code{ldrb w3, [x0, \#8]} &
-8 byte-sized elements from \code{x0} \\
-
-\code{ldrh w3, [x0, \#8]} &
-4 halfword-sized elements from \code{x0} \\
-
-\code{ldr w3, [x0, \#8]} &
-2 word-sized elements from \code{x0} \\
-
-\code{ldr x3, [x0, \#8]} &
-1 doubleword-sized element from \code{x0} \\
-
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.25cm}
-
-\centering
-\textbf{All four instructions access memory starting at \code{x0 + 8}.}
-
-\end{frame}
-
-% ============================================================
-% Scaled Immediate Offsets -- Transfer Size
-% ============================================================
-
-\begin{frame}{Transfer Size Determines the Scale}
-
-\small
-
-The transfer size comes from the \key{instruction form}, not simply from the register name.
-
-\vspace{0.2cm}
-
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.15}
-\setlength{\tabcolsep}{9pt}
-
-\begin{tabular*}{0.96\textwidth}{@{\extracolsep{\fill}}llll@{}}
-\toprule
-\textbf{Load} &
-\textbf{Store} &
-\textbf{Transfer Size} &
-\textbf{Scale} \\
-\midrule
-\code{ldrb w3, [...]} & \code{strb w3, [...]} & 1 byte  & $\times 1$ \\
-\code{ldrh w3, [...]} & \code{strh w3, [...]} & 2 bytes & $\times 2$ \\
-\code{ldr w3, [...]}  & \code{str w3, [...]}  & 4 bytes & $\times 4$ \\
-\code{ldr x3, [...]}  & \code{str x3, [...]}  & 8 bytes & $\times 8$ \\
-\bottomrule
-\end{tabular*}
-\end{center}
-
-\vspace{0.3cm}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \code{ldrb w3} and \code{ldrh w3} both use \code{w3}, but transfer different amounts of memory.
-  \item \code{ldr w3} / \code{str w3} transfer 4 bytes.
-  \item \code{ldr x3} / \code{str x3} transfer 8 bytes.
-  \item The same scaling rule applies to both \key{loads and stores}.
-\end{itemize}
-
-\end{frame}
-% ============================================================
 % Slide 15
 % ============================================================
 
@@ -718,35 +621,48 @@ The transfer size comes from the \key{instruction form}, not simply from the reg
 % Slide 18
 % ============================================================
 
-\begin{frame}{Mode 4: Register Offset with Scaling}
+
+
+\begin{frame}{Mode 4: Register Offset with a Scaled Index}
+
+\vspace{-0.3cm}
+
+\small
+\begin{block}{Purpose}
+Use a base address plus an index register to access \code{arr[i]}; the index is explicitly scaled by the element size.
+\end{block}
+
+\begin{center}
 \large
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Uses an index register ($x_m$) multiplied by element size to access array items:
-  $$\code{ldr xt, [xn, xm, lsl \#shift]}$$
-  \item This directly corresponds to the C pattern \code{arr[i]}.
+\code{ldr x0, [x1, x2, lsl \#3]}
+\end{center}
+
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item \code{x1}: base address; \code{x2}: element index.
+  \item \code{lsl \#3}: multiply the index by 8 for 64-bit elements.
+  \item Effective address: $x_1 + (x_2 \times 8)$.
 \end{itemize}
 
-\vspace{0.2cm}
 \begin{center}
-\small
-\setlength{\tabcolsep}{8pt}
+\scriptsize
+\renewcommand{\arraystretch}{1.08}
+\setlength{\tabcolsep}{4pt}
 \rowcolors{2}{softgray}{white}
 \begin{tabular}{llll}
 \toprule
 \rowcolor{white}
-\textbf{Element Type} & \textbf{C Pattern} & \textbf{Assembly Instruction} & \textbf{Effective Address} \\
+\textbf{Element Type} & \textbf{Element Size} & \textbf{Index Scale} & \textbf{Example Load} \\
 \midrule
-Byte      & \code{arr[i]} & \code{ldrb w0, [x1, x2]}          & $x_1 + x_2$ \\
-Halfword  & \code{arr[i]} & \code{ldrh w0, [x1, x2, lsl \#1]} & $x_1 + (x_2 \times 2)$ \\
-Word      & \code{arr[i]} & \code{ldr  w0, [x1, x2, lsl \#2]} & $x_1 + (x_2 \times 4)$ \\
-Doubleword& \code{arr[i]} & \code{ldr  x0, [x1, x2, lsl \#3]} & $x_1 + (x_2 \times 8)$ \\
+Byte       & 1 byte  & none          & \code{ldrb w0, [x1, x2]} \\
+Halfword   & 2 bytes & \code{lsl \#1} & \code{ldrh w0, [x1, x2, lsl \#1]} \\
+Word       & 4 bytes & \code{lsl \#2} & \code{ldr w0, [x1, x2, lsl \#2]} \\
+Doubleword & 8 bytes & \code{lsl \#3} & \code{ldr x0, [x1, x2, lsl \#3]} \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\vspace{0.2cm}
-\normalsize
-Directly implements high-level array access: \code{val = arr[i];}.
+\footnotesize
+Here, scaling is programmer-visible: scale the index by the element size, then add it to the base address.
 \end{frame}
 
 % ============================================================
@@ -792,8 +708,9 @@ Paired transfers reduce instruction count when the program naturally works with 
 
 \begin{frame}[fragile]{Worked Pattern 1: Stepping Through an Array}
 \vspace{-0.2cm}
-\small \key{Goal:} Sum $N$ 64-bit integers \hfill \key{C pattern:} \code{sum += *ptr++} with \code{uint64\_t *ptr}
-\vspace{-0.1cm}
+\small \key{Goal:} Sum $n$ 64-bit integers, with \code{uint64\_t *ptr}\\[0.1cm]
+\key{C pattern:} \code{while (n\char45{}\char45{}) sum += *ptr++;}
+\vspace{-0.3cm}
 
 \begin{block}{AArch64 Implementation (Using Post-Indexed Addressing)}
 \small
@@ -826,7 +743,7 @@ Post-indexing combines the load and pointer advance in one instruction.
 \small \key{Goal:} Check Element at Index $i$ in Array \hfill \key{C pattern:} \code{arr[i]}
 
 \vspace{0.1cm}
-\begin{block}{AArch64 Implementation (Using Scaled Register Offset)}
+\begin{block}{AArch64 Implementation (Using a Shifted Register Offset)}
 \small
 \begin{tabular}{lll}
 \multicolumn{3}{l}{\textit{// x0 = array pointer, x1 = index i, x2 = target value}} \\
@@ -840,7 +757,7 @@ Post-indexing combines the load and pointer advance in one instruction.
 
 \vspace{0.25cm}
 \normalsize
-Combines index scaling and load into a single instruction without modifying the base pointer \bits{x0}.
+Uses a shifted register offset to form the address of \code{arr[i]} and load it in one instruction, without modifying the base pointer \bits{x0}.
 \end{frame}
 
 % ============================================================
@@ -898,17 +815,19 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
 
 \begin{frame}{Topic 5 Summary}
 
-\begin{itemize}\setlength{\itemsep}{5pt}
+\begin{itemize}\setlength{\itemsep}{4pt}
   \item \key{Load/Store Discipline:} ALU instructions operate on registers; load/store-family instructions move data between registers and memory.
-  \item \key{Data Widths \& Extensions:} The instruction width controls how many bytes are transferred; signed sub-word data needs sign-extension.
+  \item \key{Data Widths \& Extensions:} The access width determines the bytes transferred. Loads use zero-extension or sign-extension to fill upper bits.
+  \item \key{Store Width:} Byte and halfword stores write the lowest 8 or 16 register bits.
+  \item \key{Paired Transfers:} \code{ldp}/\code{stp} load/store two values at consecutive addresses.
   \item \key{Core Addressing Modes:}
   \begin{itemize}\setlength{\itemsep}{1.5pt}
     \item Standard offset (\code{[xn, \#imm]}): byte offset, base unchanged.
-    \item Pre-indexed (\code{[xn, \#imm]!}): byte offset applied before access.
-    \item Post-indexed (\code{[xn], \#imm}): byte offset applied after access.
-    \item Scaled register offset (\code{[xn, xm, lsl \#3]}): base plus scaled index for arrays.
+    \item Pre-indexed (\code{[xn, \#imm]!}): update base, then access memory.
+    \item Post-indexed (\code{[xn], \#imm}): access memory, then update base.
+    \item Shifted register offset (\code{[xn, xm, lsl \#3]}): shift index to form a byte offset, then add to base. Base unchanged.
   \end{itemize}
-  \item \key{C vs.\ Assembly:} C pointer arithmetic is element-scaled; AArch64 immediate offsets are byte displacements.
+  \item \key{C vs.\ Assembly:} C pointer steps count elements. Immediate offsets count bytes.
 \end{itemize}
 
 \end{frame}
@@ -917,23 +836,17 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
 % Slide 34
 % ============================================================
 
-\begin{frame}{Self-Test Questions: Sizing \& Addressing Modes}
+\begin{frame}{Self-Test Questions: Data Transfers \& Sizing}
 
 \begin{enumerate}\setlength{\itemsep}{7pt}
-  \item \key{Sign Extension vs.\ Zero Extension:} Memory byte at address \hex{2000} holds value \hex{fe} ($-2$ in signed 8-bit). What value resides in register \bits{x0} after:
-  \begin{itemize}\setlength{\itemsep}{2pt}
-    \item \code{ldrb  w0, [x1]} \quad (where $x_1 = \hex{2000}$)
-    \item \code{ldrsb x0, [x1]} \quad (where $x_1 = \hex{2000}$)
-  \end{itemize}
+  \item \key{Load/Store Discipline:} A 64-bit value is stored at the address in \bits{x1}. Write a load, an add, and a store to increase it by 1, using \bits{x0} as a temporary register.
 
-  \item \key{Addressing Mode Mechanics:} If register \bits{x1} holds address \hex{3000}, what address is read and what is the final value in \bits{x1} for:
-  \begin{itemize}\setlength{\itemsep}{2pt}
-    \item \code{ldr x0, [x1, \#8]}
-    \item \code{ldr x0, [x1, \#8]!}
-    \item \code{ldr x0, [x1], \#8}
-  \end{itemize}
+  \item \key{Zero-Extension vs.\ Sign-Extension:} The byte at \bits{x1} is \hex{fe}. For each load below, give the full 64-bit pattern in \bits{x0} and its decimal value. Which load preserves the signed 8-bit value $-2$?\\[0.08cm]
+  \code{ldrb w0, [x1]} \qquad \code{ldrsb x0, [x1]}
 
-  \item \key{Array Element Indexing:} Given base array pointer in \bits{x0} and index $i$ in \bits{x1}, write a single instruction to load a 32-bit integer \code{arr[i]} into \bits{w2}.
+  \item \key{Store Width:} If \bits{w0} contains \hex{12345678}, which bits does \code{strb w0, [x1]} store, how many bytes does it write, and does it change neighboring bytes?
+
+  \item \key{Paired Transfers:} If \bits{x2} = \hex{4000}, which addresses supply the two 64-bit values loaded by \code{ldp x0, x1, [x2]}? How many bytes are read, and does \bits{x2} change?
 \end{enumerate}
 
 \end{frame}
@@ -942,14 +855,18 @@ Moving two adjacent values & \code{ptr[0], ptr[1]} & Paired transfer & \code{ldp
 % Slide 35
 % ============================================================
 
-\begin{frame}{Self-Test Questions: Applied Addressing Patterns}
+\begin{frame}{Self-Test Questions: Addressing \& Array Traversal}
 
 \begin{enumerate}\setlength{\itemsep}{7pt}
-  \item \key{Sequential Traversal:} Register \bits{x0} points to the current element of a 64-bit array. Write one load instruction that reads the current element into \bits{x2} and then advances \bits{x0} to the next element.
+  \item \key{Offset Modes:} Treat each instruction independently, starting with \bits{x1} = \hex{3000}. Give the address read and the final value of \bits{x1} for each:\\[0.08cm]
+  \code{ldr x0, [x1, \#8]} \quad \code{ldr x0, [x1, \#8]!}\\
+  \code{ldr x0, [x1], \#8}
 
-  \item \key{Scaled Indexing:} Register \bits{x0} holds the base address of a 32-bit integer array and \bits{x1} holds index \(i\). Write one instruction that loads \code{arr[i]} into \bits{w2}.
+  \item \key{Shifted Register Offset:} A \code{uint32\_t} array starts at \bits{x0}, with index $i$ in \bits{x1}. Write one instruction to load \code{arr[i]} into \bits{w2}. Explain the shift and whether either address register changes.
 
-  \item \key{Mode Selection:} Which addressing form best matches each case: a fixed struct field, sequential traversal, and \code{arr[i]} access?
+  \item \key{Summation Loop:} In Worked Pattern 1, which instruction implements \code{*ptr++}? Why does \bits{x0} advance by 8 while \bits{x1} decreases by 1? What does the initial \code{cbz} do when $n = 0$?
+
+  \item \key{Backward Traversal:} For \code{uint64\_t *ptr} in \bits{x1}, write one instruction to load \code{*\char45{}\char45{}ptr} into \bits{x0}. Which addressing mode does it use, and when does the pointer change?
 \end{enumerate}
 
 \end{frame}
