@@ -250,8 +250,8 @@ A label is a symbolic name for an instruction address. The assembler and linker 
 \begin{block}{Assembly Pattern}
 \large
 \codeline{loop:}\\[0.10cm]
-\codeline{subs x0, x0, \#1}\\[0.10cm]
-\codeline{b.ne loop}
+\hspace{1.2cm}\code{subs x0, x0, \#1}\\[0.10cm]
+\hspace{1.2cm}\code{b.ne loop}
 \normalsize
 \end{block}
 \column{0.46\textwidth}
@@ -499,8 +499,8 @@ Do not use signed and unsigned branch mnemonics interchangeably. They inspect di
 \end{block}
 \vspace{0.25cm}
 \large
-\hspace{4.0cm}\code{b done}\\[0.15cm]
-\hspace{4.0cm}\code{add x0, x0, \#1}\\[0.15cm]
+\hspace{4.5cm}\code{b done}\\[0.15cm]
+\hspace{4.5cm}\code{add x0, x0, \#1}\\[0.15cm]
 \hspace{4.0cm}\code{done:}
 \normalsize
 \vspace{0.25cm}
@@ -758,9 +758,9 @@ Use \code{b.cond} when NZCV already contains the needed comparison. Use a direct
 \column{0.53\textwidth}
 \begin{block}{AArch64}
 \large
-\hspace{0.7cm}\code{cmp x0, x1}\\[0.10cm]
-\hspace{0.7cm}\code{b.ne endif}\\[0.10cm]
-\hspace{0.7cm}\code{add x2, x0, x1}\\[0.10cm]
+\hspace{1.2cm}\code{cmp x0, x1}\\[0.10cm]
+\hspace{1.2cm}\code{b.ne endif}\\[0.10cm]
+\hspace{1.2cm}\code{add x2, x0, x1}\\[0.10cm]
 \hspace{0.7cm}\code{endif:}
 \normalsize
 \end{block}
@@ -795,12 +795,12 @@ The branch often tests the opposite of the high-level condition so execution can
 \column{0.53\textwidth}
 \begin{block}{AArch64}
 \small
-\hspace{0.7cm}\code{cmp x0, x1}\\[0.08cm]
-\hspace{0.7cm}\code{b.ne else\_case}\\[0.08cm]
-\hspace{0.7cm}\code{add x2, x0, x1}\\[0.08cm]
-\hspace{0.7cm}\code{b end\_if}\\[0.08cm]
+\hspace{1.2cm}\code{cmp x0, x1}\\[0.08cm]
+\hspace{1.2cm}\code{b.ne else\_case}\\[0.08cm]
+\hspace{1.2cm}\code{add x2, x0, x1}\\[0.08cm]
+\hspace{1.2cm}\code{b end\_if}\\[0.08cm]
 \hspace{0.7cm}\code{else\_case:}\\[0.08cm]
-\hspace{0.7cm}\code{sub x2, x0, x1}\\[0.08cm]
+\hspace{1.2cm}\code{sub x2, x0, x1}\\[0.08cm]
 \hspace{0.7cm}\code{end\_if:}
 \end{block}
 \end{columns}
@@ -840,11 +840,11 @@ The unconditional branch after the true block prevents fall-through into the fal
 \begin{block}{AArch64 Skeleton}
 \small
 \hspace{0.5cm}\code{loop\_test:}\\[0.08cm]
-\hspace{0.5cm}\code{cmp x1, x2}\\[0.08cm]
-\hspace{0.5cm}\code{b.ge loop\_done}\\[0.08cm]
-\hspace{0.5cm}\code{// loop body}\\[0.08cm]
-\hspace{0.5cm}\code{add x1, x1, \#1}\\[0.08cm]
-\hspace{0.5cm}\code{b loop\_test}\\[0.08cm]
+\hspace{1.0cm}\code{cmp x1, x2}\\[0.08cm]
+\hspace{1.0cm}\code{b.ge loop\_done}\\[0.08cm]
+\hspace{1.0cm}\code{// loop body}\\[0.08cm]
+\hspace{1.0cm}\code{add x1, x1, \#1}\\[0.08cm]
+\hspace{1.0cm}\code{b loop\_test}\\[0.08cm]
 \hspace{0.5cm}\code{loop\_done:}
 \end{block}
 \end{columns}
@@ -877,9 +877,9 @@ A \code{while} loop checks its condition before executing the body, so the body 
 \begin{block}{AArch64}
 \small
 \hspace{0.5cm}\code{loop\_body:}\\[0.08cm]
-\hspace{0.5cm}\code{add x0, x0, x1}\\[0.08cm]
-\hspace{0.5cm}\code{cmp x0, x2}\\[0.08cm]
-\hspace{0.5cm}\code{b.lt loop\_body}
+\hspace{1.0cm}\code{add x0, x0, x1}\\[0.08cm]
+\hspace{1.0cm}\code{cmp x0, x2}\\[0.08cm]
+\hspace{1.0cm}\code{b.lt loop\_body}
 \end{block}
 \end{columns}
 \vspace{0.15cm}
@@ -905,9 +905,9 @@ A decrementing loop can combine counter update and flag update using \code{subs}
 \vspace{0.25cm}
 \large
 \hspace{3.6cm}\code{loop:}\\[0.12cm]
-\hspace{3.6cm}\code{// loop body}\\[0.12cm]
-\hspace{3.6cm}\code{subs x0, x0, \#1}\\[0.12cm]
-\hspace{3.6cm}\code{b.ne loop}
+\hspace{4.1cm}\code{// loop body}\\[0.12cm]
+\hspace{4.1cm}\code{subs x0, x0, \#1}\\[0.12cm]
+\hspace{4.1cm}\code{b.ne loop}
 \normalsize
 \vspace{0.25cm}
 \begin{itemize}
@@ -933,13 +933,13 @@ Sum \code{n} 64-bit integers. Let \code{x0} hold the base pointer, \code{x1} hol
 \end{block}
 \vspace{0.05cm}
 \small
-\hspace{2.8cm}\code{mov x2, xzr}\\[0.05cm]
+\hspace{3.3cm}\code{mov x2, xzr}\\[0.05cm]
 \hspace{2.8cm}\code{loop:}\\[0.05cm]
-\hspace{2.8cm}\code{cbz x1, done}\\[0.05cm]
-\hspace{2.8cm}\code{ldr x3, [x0], \#8}\\[0.05cm]
-\hspace{2.8cm}\code{add x2, x2, x3}\\[0.05cm]
-\hspace{2.8cm}\code{sub x1, x1, \#1}\\[0.05cm]
-\hspace{2.8cm}\code{b loop}\\[0.05cm]
+\hspace{3.3cm}\code{cbz x1, done}\\[0.05cm]
+\hspace{3.3cm}\code{ldr x3, [x0], \#8}\\[0.05cm]
+\hspace{3.3cm}\code{add x2, x2, x3}\\[0.05cm]
+\hspace{3.3cm}\code{sub x1, x1, \#1}\\[0.05cm]
+\hspace{3.3cm}\code{b loop}\\[0.05cm]
 \hspace{2.8cm}\code{done:}
 \vspace{0.05cm}
 \begin{block}{Pointer Update}
@@ -964,10 +964,10 @@ A C string ends with a zero byte. Byte loads are used so the loop tests one char
 \vspace{0.15cm}
 \small
 \hspace{3.0cm}\code{loop:}\\[0.08cm]
-\hspace{3.0cm}\code{ldrb w1, [x0], \#1}\\[0.08cm]
-\hspace{3.0cm}\code{cbz w1, done}\\[0.08cm]
-\hspace{3.0cm}\code{// process character in w1}\\[0.08cm]
-\hspace{3.0cm}\code{b loop}\\[0.08cm]
+\hspace{3.5cm}\code{ldrb w1, [x0], \#1}\\[0.08cm]
+\hspace{3.5cm}\code{cbz w1, done}\\[0.08cm]
+\hspace{3.5cm}\code{// process character in w1}\\[0.08cm]
+\hspace{3.5cm}\code{b loop}\\[0.08cm]
 \hspace{3.0cm}\code{done:}
 \vspace{0.15cm}
 \begin{itemize}
