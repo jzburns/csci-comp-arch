@@ -44,7 +44,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\IfFileExists{sourcecodepro.sty}{\usepackage[scale=0.92]{sourcecodepro}}{\usepackage{courier}}
+\usepackage[scale=0.92]{sourcecodepro}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
@@ -143,7 +143,7 @@
 % Metadata
 % ============================================================
 
-\title[Topic 7]{
+\title[Topic 9]{
   Machine Code \& AArch64 Instruction Encoding
 }
 
@@ -170,17 +170,14 @@
 % ============================================================
 
 \begin{frame}[plain]
-
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west)
-  rectangle ([yshift=.15cm]current page.south east);
+\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
 
 \vspace*{\fill}
 
 \begin{minipage}{0.88\textwidth}
-
 {\color{gold}\normalsize\bfseries
 CSCI 6461 \;|\; Computer Systems Architecture \;|\; TOPIC 7
 \par}
@@ -196,7 +193,6 @@ Machine Code \& AArch64\\[0.08cm]Instruction Encoding
 {\color{white!80}\large
 Instruction words, encoding fields, immediates, memory operations,\\and branch targets in AArch64
 \par}
-
 \end{minipage}
 
 \vfill
@@ -206,43 +202,38 @@ Dr. J. Burns
 \par}
 
 \vspace*{\fill}
-
 \end{frame}
 
 % ============================================================
 % Slide 2
 % ============================================================
 
-\begin{frame}{Topic 7 Outline}
-
-\setbeamertemplate{enumerate item}{\arabic{enumi}.}
-
+\begin{frame}{Topic 9 Outline}
 \begin{enumerate}\setlength{\itemsep}{8pt}
-  \item \key{Machine Code and 32-bit Instruction Words}
-  \begin{itemize}
-    \item Assembly text, instruction words, bit fields, and byte order.
-  \end{itemize}
-  \item \key{AArch64 Encoding Families}
-  \begin{itemize}
-    \item How high-order bits select data-processing, load/store, and branch formats.
-  \end{itemize}
-  \item \key{Data-Processing Encodings}
-  \begin{itemize}
-    \item Register operands, immediate operands, and worked examples.
-  \end{itemize}
-  \item \key{Memory and Branch Encodings}
-  \begin{itemize}
-    \item Load/store offsets, PC-relative addressing, unconditional branches, and conditional branches.
-  \end{itemize}
+\item \key{Machine Code and 32-bit Instruction Words}
+\begin{itemize}
+\item Assembly text, instruction words, bit fields, and byte order.
+\end{itemize}
+\item \key{AArch64 Encoding Families}
+\begin{itemize}
+\item How high-order bits select data-processing, load/store, and branch formats.
+\end{itemize}
+\item \key{Data-Processing Encodings}
+\begin{itemize}
+\item Register and immediate fields, worked encodings, and decoding an instruction word.
+\end{itemize}
+\item \key{Memory and Branch Encodings}
+\begin{itemize}
+\item Scaled load/store offsets, PC-relative addresses, and immediate branch fields and targets.
+\end{itemize}
 \end{enumerate}
-
 \end{frame}
 
 % ============================================================
 % Slide 3
 % ============================================================
 
-\sectiondivider{Topic 7}{Machine Code and 32-bit Instruction Words}
+\sectiondivider{Section 1}{Machine Code and 32-bit Instruction Words}
 
 % ============================================================
 % Slide 4
@@ -284,7 +275,7 @@ Dr. J. Burns
 
 \node[procbox] (asm) {\textbf{assembly}\\\code{add x0, x1, x2}};
 \node[procbox, right=of asm] (assembler) {\textbf{assembler}\\encodes fields};
-\node[wordboxstyle, right=of assembler] (wordbox) {\textbf{machine code}\\\bits{100010\ldots00010}};
+\node[wordboxstyle, right=of assembler] (wordbox) {\textbf{machine code}\\\hex{8B020020}};
 
 \draw[arr] (asm) -- (assembler);
 \draw[arr] (assembler) -- (wordbox);
@@ -292,42 +283,22 @@ Dr. J. Burns
 \end{tikzpicture}
 \end{center}
 
+
+\small In memory, \hex{8B020020} is stored as bytes \code{20 00 02 8B} in increasing address order (A64 instruction byte order).
 \end{frame}
 
 % ============================================================
 % Slide 5
 % ============================================================
 
-\begin{frame}{AArch64 vs. AArch32 Encoding}
-
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\begin{block}{Shared 32-bit Structure}
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item Instructions are encoded as fields inside a 32-bit word.
-  \item Different instruction classes use different field layouts.
-  \item A small number of high-level formats helps the decoder.
+\begin{frame}{AArch64 Encoding Essentials}
+\begin{itemize}\setlength{\itemsep}{7pt}
+\item Every A64 instruction is a 32-bit word containing operation and operand fields.
+\item Different instruction families use different field layouts.
+\item Register fields are normally 5 bits, encoding register numbers 0--31.
+\item There are 31 general-purpose registers. Register number 31 denotes the zero register or stack pointer, depending on the instruction and operand.
+\item Identify the instruction form before interpreting its fields.
 \end{itemize}
-\end{block}
-
-\column{0.48\textwidth}
-\begin{block}{AArch64 Encoding}
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item There is no 4-bit condition field in every instruction.
-  \item Register fields are usually 5 bits because there are 32 integer registers.
-  \item The high-order bits identify a broader encoding family.
-\end{itemize}
-\end{block}
-
-\end{columns}
-
-\vspace{0.25cm}
-
-\vspace{0.1cm}
-
-Machine code is a structured 32-bit word whose fields the processor decodes.
-
 \end{frame}
 
 % ============================================================
@@ -339,9 +310,9 @@ Machine code is a structured 32-bit word whose fields the processor decodes.
 \vspace{-0.15cm}
 
 Each AArch64 instruction is 32 bits, or 4 bytes. Four consecutive
-instructions therefore occupy two 64-bit memory rows.
+instructions occupy 16 bytes, shown here as two 8-byte rows.
 
-\vspace{0.2cm}
+\vspace{0.12cm}
 
 \begin{center}
 \begin{tikzpicture}[x=0.18cm,y=0.95cm]
@@ -390,7 +361,7 @@ instructions therefore occupy two 64-bit memory rows.
 
 \begin{block}{Instruction Boundaries}
 Each instruction starts 4 bytes after the previous one. A 64-bit memory row
-holds two AArch64 instructions.
+holds two AArch64 instructions in this diagram; it is not a required hardware fetch width.
 \end{block}
 
 \end{frame}
@@ -398,6 +369,8 @@ holds two AArch64 instructions.
 % ============================================================
 % Slide 7
 % ============================================================
+
+\sectiondivider{Section 2}{AArch64 Encoding Families}
 
 \begin{frame}{How the Decoder Starts}
 
@@ -426,194 +399,71 @@ that family.
 
 \end{frame}
 
+\begin{frame}{From Instruction Word to Operand Fields}
+\begin{center}
+\begin{tikzpicture}[
+  font=\small,
+  stage/.style={draw=navy,line width=0.8pt,rounded corners=2pt,align=center},
+  family/.style={stage,text width=3.65cm,minimum height=1.7cm,inner sep=5pt},
+  flow/.style={-{Stealth[length=2mm]},draw=deepblue,line width=0.9pt}
+]
+\node[stage,fill=softgray,minimum width=8.7cm,minimum height=0.65cm] (word) at (0,0)
+  {\textbf{32-bit instruction word} \quad bits 31\ldots0};
+\node[stage,fill=gold!18,text width=7.8cm,minimum height=0.85cm] (decode) at (0,-1.15)
+  {\textbf{Match fixed encoding bits}\\Identify the family, then the specific instruction form};
+\draw[flow] (word) -- (decode);
+\node[family,fill=lightblue] (data) at (-4.3,-3.05)
+  {\textbf{Data processing}\\\code{Rd, Rn, Rm}\\or \code{Rd, Rn, imm12}};
+\node[family,fill=green!8] (mem) at (0,-3.05)
+  {\textbf{Load/store}\\Unsigned-offset form:\\ \code{Rt, Rn, imm12}};
+\node[family,fill=gold!12] (branch) at (4.3,-3.05)
+  {\textbf{Immediate branch}\\\code{b/bl}: \code{imm26}\\\code{b.cond}: \code{imm19, cond}};
+\draw[flow] (decode.south) -- ++(0,-0.35) -| (data.north);
+\draw[flow] (decode.south) -- (mem.north);
+\draw[flow] (decode.south) -- ++(0,-0.35) -| (branch.north);
+\end{tikzpicture}
+\end{center}
+\begin{block}{The Form Determines the Meaning of the Fields}
+There is no universal opcode layout. The selected form determines how to interpret register numbers, immediates, shifts and offsets. The following slides expand these examples.
+\end{block}
+\end{frame}
+
+
 % ============================================================
 % Slide 8
 % ============================================================
 
-\sectiondivider{Topic 7}{Common Encoding Fields and Conditional Patterns}
+
 
 % ============================================================
 % Slide 9
 % ============================================================
 
-\begin{frame}{Common AArch64 Encoding Prefixes}
 
-\small
-AArch64 has no single universal opcode field. Fixed high-order bits identify
-the instruction form, and the remaining bits encode operands.
-
-\vspace{0.1cm}
-
-\begin{center}
-\scriptsize
-\rowcolors{2}{lightblue!70}{white}
-\begin{tabular}{@{}lll@{}}
-\toprule
-Instruction form & Fixed high-order bits & Remaining fields \\
-\midrule
-\code{add x, x, x}     & \bits{10001011000} & \code{Rm}, shift, \code{Rn}, \code{Rd} \\
-\code{sub x, x, x}     & \bits{11001011000} & \code{Rm}, shift, \code{Rn}, \code{Rd} \\
-\code{add x, x, \#imm} & \bits{10010001}    & shift, \code{imm12}, \code{Rn}, \code{Rd} \\
-\code{sub x, x, \#imm} & \bits{11010001}    & shift, \code{imm12}, \code{Rn}, \code{Rd} \\
-\code{ldr x, [x, \#imm]} & \bits{1111100101} & \code{imm12}, \code{Rn}, \code{Rt} \\
-\code{str x, [x, \#imm]} & \bits{1111100100} & \code{imm12}, \code{Rn}, \code{Rt} \\
-\code{b label}         & \bits{000101}       & \code{imm26} \\
-\code{bl label}        & \bits{100101}       & \code{imm26} \\
-\code{b.cond label}    & \bits{01010100}     & \code{imm19}, \code{cond} \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.08cm}
-
-\textbf{Reading the table:} these prefixes identify the form; they are not complete instructions. Operand fields fill the remaining bits.
-
-\end{frame}
 
 % ============================================================
 % Slide 10
 % ============================================================
 
-\begin{frame}{Conditional Execution in AArch64}
 
-\small
-\begin{itemize}\setlength{\itemsep}{4pt}
-  \item AArch32 allowed a condition code on most instructions; AArch64 does not.
-  \item AArch64 uses conditional branches and selected conditional operations instead.
-  \item Conditions are evaluated from the NZCV flags set by earlier arithmetic or compare instructions.
-\end{itemize}
-
-\vspace{0.12cm}
-
-\begin{block}{Example}
-\centering
-\code{cmp x0, x1}
-\quad$\longrightarrow$\quad
-\code{b.lt less}
-\quad\text{or}\quad
-\code{csel x2, x3, x4, eq}
-\end{block}
-
-\vspace{0.1cm}
-
-\begin{center}
-\scriptsize
-\rowcolors{2}{blue!6}{white}
-\begin{tabular}{@{}ll@{\hspace{0.75cm}}ll@{}}
-\toprule
-Condition & Meaning & Condition & Meaning \\
-\midrule
-\code{eq} / \code{ne} & equal / not equal
-  & \code{ge} / \code{lt} & signed $\ge$ / $<$ \\
-\code{hs} / \code{lo} & unsigned $\ge$ / $<$
-  & \code{gt} / \code{le} & signed $>$ / $\le$ \\
-\code{hi} / \code{ls} & unsigned $>$ / $\le$
-  & \code{mi} / \code{pl} & negative / non-negative \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.12cm}
-
-Conditional behavior remains, but the 4-bit condition field is no longer attached to most instructions.
-
-\end{frame}
 
 % ============================================================
 % Slide 11
 % ============================================================
 
-\begin{frame}{From AArch32 Predication to AArch64 Conditions}
 
-\small
-
-AArch32 ARM instructions usually reserved bits 31:28 for a condition field.
-That made most instructions conditionally executable.
-
-\vspace{0.2cm}
-
-\begin{center}
-\begin{tikzpicture}[x=0.285cm,y=1cm]
-
-  % AArch32 layout
-  \bfld{0}{0.95}{4}{\footnotesize cond}{gold!25}
-  \bfld{4}{0.95}{28}{\footnotesize operation and operands}{lightblue}
-
-  \node[font=\footnotesize, anchor=south] at (2,1.6) {31:28};
-
-  % AArch64 layout
-  \bfld{0}{-0.25}{11}{\footnotesize opcode / form}{gold!25}
-  \bfld{11}{-0.25}{5}{\footnotesize Rm}{lightblue}
-  \bfld{16}{-0.25}{6}{\footnotesize shift}{blue!8}
-  \bfld{22}{-0.25}{5}{\footnotesize Rn}{lightblue}
-  \bfld{27}{-0.25}{5}{\footnotesize Rd}{lightblue}
-
-  \node[font=\scriptsize, align=center] at (16,-0.95)
-    {AArch64 uses the 32-bit word for larger register fields\\and more specialized instruction formats};
-
-\end{tikzpicture}
-\end{center}
-
-\vspace{0.12cm}
-
-AArch64 no longer attaches a 4-bit condition field to most instructions.
-Conditional behavior is handled with conditional branches and selected
-conditional operations.
-
-\end{frame}
 
 % ============================================================
 % Slide 12
 % ============================================================
 
-\begin{frame}{Conditional Examples in AArch64}
 
-\small
-
-AArch64 does not have a general \code{add.lt} form.
-
-\vspace{0.18cm}
-
-\noindent
-\begin{minipage}[t]{0.48\textwidth}
-\vspace{0pt}
-\begin{block}{Move if less than}
-\code{cmp x0, x1}\\[2pt]
-\code{csel x2, x3, x2, lt}
-
-\vspace{0.1cm}
-
-If \code{x0 < x1}, then \code{x2} gets \code{x3}; otherwise \code{x2}
-keeps its old value.
-\end{block}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.48\textwidth}
-\vspace{0pt}
-\begin{block}{Add if less than}
-\code{cmp x0, x1}\\[2pt]
-\code{b.ge skip}\\[2pt]
-\code{add x2, x2, \#1}\\[2pt]
-\code{skip:}
-
-\vspace{0.1cm}
-
-The \code{add} executes only when \code{x0 < x1}.
-\end{block}
-\end{minipage}
-
-\vspace{0.12cm}
-
-Use conditional selection when choosing between values; use a branch when the
-arithmetic instruction itself should be conditional.
-
-\end{frame}
 
 % ============================================================
 % Slide 13
 % ============================================================
 
-\sectiondivider{Topic 7}{Data-Processing Instruction Encodings}
+\sectiondivider{Section 3}{Data-Processing Encodings}
 
 % ============================================================
 % Slide 14
@@ -631,12 +481,16 @@ arithmetic instruction itself should be conditional.
 
 \begin{center}
 \begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{11}{opcode}{gold!22}
+  \bfld{0}{0}{8}{opcode}{gold!22}
+  \bfld{8}{0}{2}{\tiny shift}{blue!8}
+  \bfld{10}{0}{1}{0}{gold!22}
   \bfld{11}{0}{5}{Rm}{lightblue}
-  \bfld{16}{0}{6}{shift/amount}{blue!8}
+  \bfld{16}{0}{6}{imm6}{blue!8}
   \bfld{22}{0}{5}{Rn}{lightblue}
   \bfld{27}{0}{5}{Rd}{lightblue}
-  \bitnote{5.5}{0.95}{31:21}
+  \bitnote{4}{0.95}{31:24}
+  \bitnote{9}{0.95}{23:22}
+  \bitnote{10.5}{0.95}{21}
   \bitnote{13.5}{0.95}{20:16}
   \bitnote{19}{0.95}{15:10}
   \bitnote{24.5}{0.95}{9:5}
@@ -650,7 +504,7 @@ arithmetic instruction itself should be conditional.
   \item \code{Rd} is the destination register.
   \item \code{Rn} is the first source register.
   \item \code{Rm} is the second source register.
-  \item Shift fields are available because this form supports shifted register operands.
+  \item Bits 23:22 select the shift type; \code{imm6} (15:10) gives the shift amount. Bit 21 is fixed at 0.
 \end{itemize}
 
 \end{frame}
@@ -726,13 +580,13 @@ The complete encoding is
 
 \begin{center}
 \begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{8}{opcode}{gold!22}
-  \bfld{8}{0}{2}{shift}{blue!8}
+  \bfld{0}{0}{9}{opcode / fixed}{gold!22}
+  \bfld{9}{0}{1}{\tiny sh}{blue!8}
   \bfld{10}{0}{12}{imm12}{lightblue}
   \bfld{22}{0}{5}{Rn}{lightblue}
   \bfld{27}{0}{5}{Rd}{lightblue}
-  \bitnote{4}{0.95}{31:24}
-  \bitnote{9}{0.95}{23:22}
+  \bitnote{4.5}{0.95}{31:23}
+  \bitnote{9.5}{0.95}{22}
   \bitnote{16}{0.95}{21:10}
   \bitnote{24.5}{0.95}{9:5}
   \bitnote{29.5}{0.95}{4:0}
@@ -743,7 +597,7 @@ The complete encoding is
 
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item The immediate field is 12 bits wide.
-  \item The shift field can optionally shift the immediate by 12 bits.
+  \item The one-bit \code{sh} field (bit 22) selects a shift of 0 or 12 bits; bit 23 is fixed at 0.
   \item This format is common for address arithmetic and small integer constants.
 \end{itemize}
 
@@ -780,8 +634,8 @@ The immediate value is part of the instruction word.
 
 \begin{center}
 \begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{8}{10010001}{gold!22}
-  \bfld{8}{0}{2}{00}{blue!8}
+  \bfld{0}{0}{9}{100100010}{gold!22}
+  \bfld{9}{0}{1}{0}{blue!8}
   \bfld{10}{0}{12}{000000011000}{lightblue}
   \bfld{22}{0}{5}{00110}{lightblue}
   \bfld{27}{0}{5}{00101}{lightblue}
@@ -802,7 +656,6 @@ The immediate value is part of the instruction word.
 \begin{frame}{AArch64 Immediate Encodings Are Specialized}
 
 \begin{itemize}\setlength{\itemsep}{7pt}
-  \item AArch64 does not use the AArch32 rotated-\code{imm8} data-processing scheme.
   \item Different instruction families have different immediate encodings.
   \item Some constants fit directly in an \code{add} or \code{sub} immediate.
   \item Other constants require move-wide instructions such as \code{movz}, \code{movn}, or \code{movk}.
@@ -822,7 +675,64 @@ in the specific immediate field of the instruction being used.
 % Slide 19
 % ============================================================
 
-\sectiondivider{Topic 7}{Memory and PC-Relative Encodings}
+\begin{frame}{Decoding Checklist}
+
+\begin{enumerate}\setlength{\itemsep}{8pt}
+  \item Convert the hexadecimal word to 32 binary bits.
+  \item Identify the broad encoding family from the opcode bits.
+  \item Split the word into the fields for that family.
+  \item Translate register fields into \code{x} or \code{w} register names.
+  \item Interpret immediates carefully: sign extension, scaling, and shifts matter.
+  \item Reconstruct the assembly instruction.
+\end{enumerate}
+
+\vspace{0.2cm}
+
+\begin{block}{Important}
+The same bit positions can mean different things in different instruction families.
+Always identify the family before naming the fields.
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Reverse Engineering Example}
+
+\begin{block}{Given Machine Code}
+\[
+\hex{8B0700C5}
+\]
+\end{block}
+
+\vspace{0.1cm}
+
+\begin{center}
+\begin{tikzpicture}[x=0.285cm,y=1cm]
+  \bfld{0}{0}{11}{10001011000}{gold!22}
+  \bfld{11}{0}{5}{00111}{lightblue}
+  \bfld{16}{0}{6}{000000}{blue!8}
+  \bfld{22}{0}{5}{00110}{lightblue}
+  \bfld{27}{0}{5}{00101}{lightblue}
+  \bitnote{5.5}{-0.28}{add x-register}
+  \bitnote{13.5}{-0.28}{Rm = x7}
+  \bitnote{19}{-0.28}{no shift}
+  \bitnote{24.5}{-0.28}{Rn = x6}
+  \bitnote{29.5}{-0.28}{Rd = x5}
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.35cm}
+
+\begin{block}{Decoded Instruction}
+\[
+\hex{8B0700C5}
+\quad\longrightarrow\quad
+\code{add x5, x6, x7}
+\]
+\end{block}
+
+\end{frame}
+
+\sectiondivider{Section 4}{Memory and Branch Encodings}
 
 % ============================================================
 % Slide 20
@@ -959,9 +869,9 @@ The instruction stores the scaled value, not the byte offset directly.
 Instruction kind & Access size & Encoded immediate meaning \\
 \midrule
 \code{ldrb}/\code{strb} & 1 byte & byte offset \\
-\code{ldrh}/\code{strh} & 2 bytes & halfword offset divided by 2 \\
-\code{ldr w}/\code{str w} & 4 bytes & word offset divided by 4 \\
-\code{ldr x}/\code{str x} & 8 bytes & doubleword offset divided by 8 \\
+\code{ldrh}/\code{strh} & 2 bytes & byte offset divided by 2 \\
+\code{ldr w}/\code{str w} & 4 bytes & byte offset divided by 4 \\
+\code{ldr x}/\code{str x} & 8 bytes & byte offset divided by 8 \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -981,9 +891,9 @@ Scaling lets a 12-bit field cover a larger byte range for naturally aligned acce
 \begin{frame}{PC-Relative Addresses in AArch64}
 
 \begin{itemize}\setlength{\itemsep}{6pt}
-  \item PC-relative instructions encode an offset from the current instruction address.
+  \item PC-relative instructions use the current instruction address as their reference; \code{adrp} uses its 4 KiB page base.
   \item This supports position-independent code and nearby constants or labels.
-  \item AArch64 does not use the AArch32 ``PC + 8'' rule for these examples.
+  \item For \code{adr}, literal loads and immediate branches, PC is the address of the current instruction.
 \end{itemize}
 
 \vspace{0.2cm}
@@ -1027,7 +937,7 @@ A literal load reads a constant stored near the instruction stream using a PC-re
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item The instruction encodes where to find the constant relative to the PC.
   \item The loaded value is data, even though it may be placed near the code.
-  \item Assemblers may create literal pools automatically when a constant does not fit a simple immediate form.
+  \item The pseudo-instruction \code{ldr x0, =constant} may use a literal pool; \code{ldr x0, literal} explicitly loads from a label.
 \end{itemize}
 
 \end{frame}
@@ -1036,7 +946,7 @@ A literal load reads a constant stored near the instruction stream using a PC-re
 % Slide 26
 % ============================================================
 
-\sectiondivider{Topic 7}{Branch Encodings}
+
 
 % ============================================================
 % Slide 27
@@ -1154,7 +1064,7 @@ The branch is taken when the Z flag is set.
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item \code{b} and \code{bl} use a signed 26-bit immediate field.
   \item The offset is measured in 4-byte instructions, not raw bytes.
-  \item \code{bl} also writes the return address into \code{x30}.
+  \item \code{bl} also writes the return address (PC + 4) into \code{x30}.
 \end{itemize}
 
 \vspace{0.1cm}
@@ -1218,72 +1128,19 @@ The branch is taken when the Z flag is set.
 % Slide 31
 % ============================================================
 
-\sectiondivider{Topic 7}{Decoding and Reverse Engineering Machine Code}
+
 
 % ============================================================
 % Slide 32
 % ============================================================
 
-\begin{frame}{Decoding Checklist}
 
-\begin{enumerate}\setlength{\itemsep}{8pt}
-  \item Convert the hexadecimal word to 32 binary bits.
-  \item Identify the broad encoding family from the opcode bits.
-  \item Split the word into the fields for that family.
-  \item Translate register fields into \code{x} or \code{w} register names.
-  \item Interpret immediates carefully: sign extension, scaling, and shifts matter.
-  \item Reconstruct the assembly instruction.
-\end{enumerate}
-
-\vspace{0.2cm}
-
-\begin{block}{Important}
-The same bit positions can mean different things in different instruction families.
-Always identify the family before naming the fields.
-\end{block}
-
-\end{frame}
 
 % ============================================================
 % Slide 33
 % ============================================================
 
-\begin{frame}{Reverse Engineering Example}
 
-\begin{block}{Given Machine Code}
-\[
-\hex{8B0700C5}
-\]
-\end{block}
-
-\vspace{0.1cm}
-
-\begin{center}
-\begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{11}{10001011000}{gold!22}
-  \bfld{11}{0}{5}{00111}{lightblue}
-  \bfld{16}{0}{6}{000000}{blue!8}
-  \bfld{22}{0}{5}{00110}{lightblue}
-  \bfld{27}{0}{5}{00101}{lightblue}
-  \bitnote{5.5}{-0.28}{add x-register}
-  \bitnote{13.5}{-0.28}{Rm = x7}
-  \bitnote{19}{-0.28}{no shift}
-  \bitnote{24.5}{-0.28}{Rn = x6}
-  \bitnote{29.5}{-0.28}{Rd = x5}
-\end{tikzpicture}
-\end{center}
-
-\vspace{0.35cm}
-
-\begin{block}{Decoded Instruction}
-\[
-\hex{8B0700C5}
-\quad\longrightarrow\quad
-\code{add x5, x6, x7}
-\]
-\end{block}
-
-\end{frame}
 
 % ============================================================
 % Slide 34
@@ -1295,7 +1152,7 @@ Always identify the family before naming the fields.
   \item Treating a register number as decimal text instead of a binary field.
   \item Forgetting that AArch64 register fields are usually 5 bits.
   \item Encoding a byte offset directly when the immediate field is scaled.
-  \item Applying the AArch32 \code{PC + 8} rule to AArch64 branch examples.
+  \item Adding a pipeline offset to PC instead of using the branch instruction address.
   \item Reading little-endian memory bytes as if they were the printed instruction word.
 \end{itemize}
 
@@ -1311,7 +1168,7 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 % Slide 35
 % ============================================================
 
-\begin{frame}{Topic 7: Summary}
+\begin{frame}{Topic 9: Summary}
 
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item AArch64 instructions are fixed-width 32-bit words.
@@ -1319,8 +1176,8 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
   \item Data-processing register instructions encode register operands and optional shift information.
   \item Data-processing immediate instructions use a different field layout.
   \item Load/store instructions commonly encode a base register, target/source register, and scaled offset.
-  \item Branch instructions encode PC-relative offsets scaled by 4 bytes.
-  \item AArch64 uses conditional branches and conditional operations rather than general per-instruction predication.
+  \item Direct immediate branches encode PC-relative offsets scaled by 4 bytes; register-indirect branches use a register target.
+  \item In \code{b.cond}, bits 3:0 encode the condition and \code{imm19} encodes the signed instruction displacement.
 \end{itemize}
 
 \end{frame}
@@ -1330,15 +1187,14 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Instruction Words}
-
-\begin{enumerate}\setlength{\itemsep}{7pt}
-  \item Why does AArch64 use 5-bit register fields?
-  \item What is the difference between the printed hexadecimal instruction word and the byte order in memory?
-  \item Why must the instruction family be identified before interpreting the fields?
-  \item What fields are needed to encode \code{add x5, x6, x7}?
-  \item Why does \code{add x5, x6, \#24} use a different format from \code{add x5, x6, x7}?
+\begin{enumerate}\setlength{\itemsep}{6pt}
+\item How many bytes does an A64 instruction occupy? How far apart are consecutive instruction addresses?
+\item If the instruction word is \hex{8B020020}, what are its four bytes in increasing memory-address order?
+\item Why must the instruction family be identified before interpreting operand fields?
+\item What do \code{Rd}, \code{Rn}, and \code{Rm} represent in \code{add x5, x6, x7}? Give their 5-bit register numbers.
+\item How do the fields change for \code{add x5, x6, \#24}? What does its \code{sh} bit control?
+\item Decode \hex{8B0700C5} into an assembly instruction using the register-form layout.
 \end{enumerate}
-
 \end{frame}
 
 % ============================================================
@@ -1346,16 +1202,14 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Memory and Branches}
-
-\begin{enumerate}\setlength{\itemsep}{7pt}
-  \item In \code{ldr x5, [x6, \#16]}, why is the encoded immediate 2 rather than 16?
-  \item What is the role of \code{Rt} in a load? What is its role in a store?
-  \item How is the target of an unconditional AArch64 branch computed?
-  \item How does AArch64 conditional execution differ from AArch32 predication?
-  \item Where is the condition code stored in a conditional branch instruction?
-  \item Decode \hex{8B0700C5} back into the corresponding AArch64 assembly instruction.
+\begin{enumerate}\setlength{\itemsep}{6pt}
+\item In \code{ldr x5, [x6, \#16]}, why is \code{imm12} equal to 2? Which field identifies the base register?
+\item How does the role of \code{Rt} differ between \code{ldr} and \code{str}?
+\item For a 32-bit unsigned-offset load with \code{imm12 = 3}, what is the byte offset?
+\item What address is the reference for a literal load, and what page is the reference for \code{adrp}?
+\item A branch at \hex{100} targets \hex{110}. What is its encoded immediate? Is the reference PC or PC + 4?
+\item Compare \code{b} and \code{b.eq}: give the immediate-field width, offset scaling, and location of the condition field where applicable.
 \end{enumerate}
-
 \end{frame}
 
 % ============================================================
