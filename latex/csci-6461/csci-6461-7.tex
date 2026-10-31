@@ -104,10 +104,10 @@
   \pgfmathsetmacro{\cx}{#1 + #3/2}%
   \fill[#5] (#1,#2) rectangle ++(#3,0.72);%
   \draw[navy,line width=0.7pt] (#1,#2) rectangle ++(#3,0.72);%
-  \node[font=\scriptsize\ttfamily,align=center,text=darkgray] at (\cx,#2+0.36) {#4};%
+  \node[font=\scriptsize\ttfamily,text height=1.5ex,text depth=0.35ex,align=center,text=darkgray] at (\cx,#2+0.36) {#4};%
 }
 \newcommand{\bitnote}[3]{%
-  \node[font=\tiny,align=center,text=darkgray] at (#1,#2) {#3};%
+  \node[font=\tiny,text height=1.5ex,text depth=0.35ex,align=center,text=darkgray] at (#1,#2) {#3};%
 }
 \newcommand{\codeblock}[1]{%
   \begingroup\small\ttfamily\setlength{\fboxsep}{5pt}\colorbox{softgray}{\begin{minipage}{0.92\linewidth}#1\end{minipage}}\endgroup%
@@ -172,7 +172,6 @@
 \begin{document}
 
 % ============================================================
-% Slide 1
 % ============================================================
 
 \begin{frame}[plain]
@@ -211,10 +210,19 @@ Dr. J. Burns
 \end{frame}
 
 % ============================================================
-% Slide 2
 % ============================================================
 
 \begin{frame}{Topic 7 Outline}
+\setbeamertemplate{enumerate item}{%
+\begin{tikzpicture}[baseline=-0.65ex]
+\fill[black!20] (0.035,-0.035) circle (0.145);
+\fill[blue!35!black] (0,0) circle (0.145);
+\fill[blue!55!black] (-0.012,0.012) circle (0.123);
+\fill[blue!65!white] (-0.027,0.035) circle (0.096);
+\fill[blue!45!black] (0.008,-0.018) circle (0.102);
+\node[text=white,font=\scriptsize\sffamily,inner sep=0pt] at (0,0) {\insertenumlabel};
+\end{tikzpicture}}
+\setbeamercolor{item projected}{fg=white,bg=blue!50!black}
 \begin{enumerate}\setlength{\itemsep}{13pt}
 \item \key{Machine Code and 32-bit Instruction Words}
 \item \key{AArch64 Encoding Families}
@@ -225,13 +233,11 @@ Dr. J. Burns
 \end{frame}
 
 % ============================================================
-% Slide 3
 % ============================================================
 
 \sectiondivider{Section 1}{Machine Code and 32-bit Instruction Words}
 
 % ============================================================
-% Slide 4
 % ============================================================
 
 \begin{frame}{From Assembly to Machine Code}
@@ -283,12 +289,11 @@ Dr. J. Burns
 \end{frame}
 
 % ============================================================
-% Slide 5
 % ============================================================
 
 \begin{frame}{AArch64 Encoding Essentials}
 \begin{itemize}\setlength{\itemsep}{7pt}
-\item Every A64 instruction is a 32-bit word containing operation and operand fields.
+\item Every A64 instruction occupies 32 bits (4 bytes), with operation and operand fields. Consecutive instruction addresses differ by 4 bytes.
 \item Different instruction families use different field layouts.
 \item Register fields are normally 5 bits, encoding register numbers 0--31.
 \item There are 31 general-purpose registers. Register number 31 denotes the zero register or stack pointer, depending on the instruction and operand.
@@ -297,90 +302,29 @@ Dr. J. Burns
 \end{frame}
 
 % ============================================================
-% Slide 6
 % ============================================================
 
-\begin{frame}{AArch64 Instruction Word Basics}
 
-\vspace{-0.15cm}
-
-Each AArch64 instruction is 32 bits, or 4 bytes. Four consecutive
-instructions occupy 16 bytes, shown here as two 8-byte rows.
-
-\vspace{0.12cm}
-
-\begin{center}
-\begin{tikzpicture}[x=0.18cm,y=0.95cm]
-
-  % top row
-  \fill[blue!10] (0,1.05) rectangle (32,1.95);
-  \fill[gold!25] (32,1.05) rectangle (64,1.95);
-  \draw[navy, line width=0.9pt] (0,1.05) rectangle (64,1.95);
-  \draw[navy, dashed, line width=0.8pt] (32,1.05) -- (32,1.95);
-
-  % bottom row
-  \fill[blue!10] (0,0) rectangle (32,0.9);
-  \fill[gold!25] (32,0) rectangle (64,0.9);
-  \draw[navy, line width=0.9pt] (0,0) rectangle (64,0.9);
-  \draw[navy, dashed, line width=0.8pt] (32,0) -- (32,0.9);
-
-  \node[align=center, font=\small] at (48,1.50)
-    {instruction $n$\\32 bits / 4 bytes};
-  \node[align=center, font=\small] at (16,1.50)
-    {instruction $n\!+\!1$\\32 bits / 4 bytes};
-  \node[align=center, font=\small] at (48,0.45)
-    {instruction $n\!+\!2$\\32 bits / 4 bytes};
-  \node[align=center, font=\small] at (16,0.45)
-    {instruction $n\!+\!3$\\32 bits / 4 bytes};
-
-  % addresses, shown with low-order bits/lowest byte address on the right
-  \node[font=\scriptsize] at (64,2.23) {byte address $A$};
-  \node[font=\scriptsize] at (32,2.23) {$A+4$};
-  \node[font=\scriptsize] at (0,2.23) {$A+8$};
-  \node[font=\scriptsize] at (64,-0.28) {$A+8$};
-  \node[font=\scriptsize] at (32,-0.28) {$A+12$};
-  \node[font=\scriptsize] at (0,-0.28) {$A+16$};
-
-  % width labels
-  \draw[navy, <->, line width=0.7pt] (0,-0.72) -- (32,-0.72);
-  \node[font=\scriptsize] at (16,-0.95) {32 bits};
-  \draw[navy, <->, line width=0.7pt] (32,-0.72) -- (64,-0.72);
-  \node[font=\scriptsize] at (48,-0.95) {32 bits};
-  \draw[navy, <->, line width=0.7pt] (0,-1.32) -- (64,-1.32);
-  \node[font=\scriptsize] at (32,-1.56) {64-bit row};
-
-\end{tikzpicture}
-\end{center}
-
-\vspace{-0.15cm}
-
-\begin{block}{Instruction Boundaries}
-Each instruction starts 4 bytes after the previous one. A 64-bit memory row
-holds two AArch64 instructions in this diagram; it is not a required hardware fetch width.
-\end{block}
-
-\end{frame}
 
 % ============================================================
-% Slide 7
 % ============================================================
 
 \sectiondivider{Section 2}{AArch64 Encoding Families}
 
 \begin{frame}{Where Do Opcode Patterns Come From?}
 \begin{itemize}\setlength{\itemsep}{8pt}
-\item \key{Arm assigns the encoding templates.} Look up the fixed family/form bits in the ISA; they cannot be calculated from the mnemonic.
-\item \key{Select the form first:} \code{add x5, x6, x7} uses a shifted-register form; \code{add x5, x6, \#24} uses an immediate form with a different template.
+\item \key{Look up the instruction format in Arm's ISA reference.} It specifies the fixed bits and field positions for that instruction form.
+\item \key{Select the form first, for example:} \code{add x5, x6, x7} uses a shifted-register form; \code{add x5, x6, \#24} uses an immediate form with a different field layout.
 \item \key{Fill the selectors:} width, operation, flag update, shift type, access size, or addressing mode choose among related encodings.
 \item \key{Insert the operands:} register numbers, immediates, and offsets occupy the remaining fields.
+\item \key{A prefix is not necessarily one opcode field:} leading bits may combine fixed family bits with selectors. Each table states the form and bit positions to which its patterns apply.
 \end{itemize}
-\vspace{0.15cm}
-\begin{block}{A Prefix Is Not Necessarily One Opcode Field}
-Leading bits may combine fixed family bits with selectors. Each table states the form and bit positions to which its patterns apply.
-\end{block}
 \end{frame}
 
 \begin{frame}{From Instruction Word to Operand Fields}
+\small
+\code{Rd}: destination; \code{Rn}/\code{Rm}: source registers (\code{Rn} is the memory base).\\
+\code{Rt}: transferred register; \code{immN}: an N-bit immediate; \code{cond}: condition selector.
 \begin{center}
 \begin{tikzpicture}[
   font=\small,
@@ -404,57 +348,50 @@ Leading bits may combine fixed family bits with selectors. Each table states the
 \draw[flow] (decode.south) -- ++(0,-0.35) -| (branch.north);
 \end{tikzpicture}
 \end{center}
-\begin{block}{The Form Determines the Meaning of the Fields}
-There is no universal opcode layout. The selected form determines how to interpret register numbers, immediates, shifts and offsets. The following slides expand these examples.
-\end{block}
+The selected form determines each field\textquotesingle s meaning. The following slides define the layouts and values.
 \end{frame}
 
 
 % ============================================================
-% Slide 8
 % ============================================================
 
 
 
 % ============================================================
-% Slide 9
 % ============================================================
 
 
 
 % ============================================================
-% Slide 10
 % ============================================================
 
 
 
 % ============================================================
-% Slide 11
 % ============================================================
 
 
 
 % ============================================================
-% Slide 12
 % ============================================================
 
 
 
 % ============================================================
-% Slide 13
 % ============================================================
 
 \sectiondivider{Section 3}{Data-Processing Encodings}
 
 % ============================================================
-% Slide 14
 % ============================================================
 
-\begin{frame}{ADD/SUB: Shifted-Register Form}
+\begin{frame}{add/sub: Shifted-Register Form}
+\small
+Here we compare two versions of \code{add}: one uses the second source register directly; the other shifts its value left before adding.
 
-\begin{block}{Example Instruction}
-\centering\code{add x5, x6, x7}
-\end{block}
+\begin{center}
+\small Sample instructions: \code{add x5, x6, x7}\qquad\code{add x5, x6, x7, lsl \#3}
+\end{center}
 
 \vspace{0.1cm}
 
@@ -481,21 +418,20 @@ There is no universal opcode layout. The selected form determines how to interpr
 
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item \code{sf/op/S/fixed} will be defined on the next slide.
-  \item \code{Rd} is the destination register.
-  \item \code{Rn} is the first source register.
-  \item \code{Rm} is the second source register.
-  \item Bits 23:22 select the shift type; \code{imm6} (15:10) gives the shift amount. Bit 21 is fixed at 0.
+  \item \code{Rd}: destination; \code{Rn}: first source; \code{Rm}: second source.
+  \item Both examples use \code{shift=00} (lsl). The first implies \code{lsl \#0}.
+  \item \code{imm6} changes from \code{000000} to \code{000011} for \code{lsl \#3}: the second example computes \code{x5 = x6 + (x7 << 3)}.
+  \item Bit 21 is fixed at \code{0} in this arithmetic form.
 \end{itemize}
 
 \end{frame}
 
 % ============================================================
-% Slide 15
 % ============================================================
 
 \begin{frame}{Deriving the Prefix: \texttt{add x5, x6, x7}}
 \small
-Select \key{ADD/SUB (shifted register)}. Bits 31:21 have this structure:
+Select \key{add/sub (shifted register)}. Bits 31:21 have this structure:
 \begin{center}
 \begin{tikzpicture}[x=0.8cm,y=1cm]
 \bfld{0}{0}{1}{1}{lightblue}
@@ -521,8 +457,8 @@ Select \key{ADD/SUB (shifted register)}. Bits 31:21 have this structure:
 \code{sf} & \code{1} & 64-bit \code{x} operands; \code{0} selects 32-bit \code{w} operands \\
 \code{op} & \code{0} & Add; \code{1} selects subtract \\
 \code{S} & \code{0} & Preserve NZCV flags; \code{1} updates them \\
-Fixed bits & \code{01011} and \code{0} & Assigned by Arm for this encoding class \\
-\code{shift} & \code{00} & LSL; the absent shift defaults to LSL \code{\#0} \\
+Fixed bits & \code{01011} and \code{0} & Fixed bits for this encoding class \\
+\code{shift} & \code{00} & lsl; the absent shift defaults to lsl \code{\#0} \\
 \bottomrule
 \end{tabular}\par}\vspace{3pt}
 \vspace{0.18cm}
@@ -531,48 +467,31 @@ Fixed bits & \code{01011} and \code{0} & Assigned by Arm for this encoding class
 The separate \code{imm6} field is \code{000000} for shift amount zero.
 \end{frame}
 
-\begin{frame}{Common Data-Processing Register Patterns}
+
+\begin{frame}{Common Arithmetic Register Patterns}
 \small
-All rows: \key{64-bit shifted-register forms}, \code{sf=1}, \code{shift=00} (LSL). Shift amount: \code{imm6}.
-\vspace{0.15cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.49\textwidth}
-\textbf{Arithmetic: fixed bits 28:24 = \code{01011}}
-\par\vspace{6pt}{\centering
+All rows use 64-bit shifted-register forms: \code{sf=1}, \code{shift=00} (lsl), and bit 21 fixed at 0.
+
+\par\vspace{8pt}{\centering
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{@{}lll@{}}
 \toprule
 \textbf{Instruction} & \textbf{op / S} & \textbf{Prefix 31:21} \\
 \midrule
-\code{add} & \code{0 / 0} & \code{10001011000} \\
-\code{adds} & \code{0 / 1} & \code{10101011000} \\
-\code{sub} & \code{1 / 0} & \code{11001011000} \\
-\code{subs} & \code{1 / 1} & \code{11101011000} \\
+\code{add} & \code{0 / 0} & \code{1|0|0|01011|00|0} \\
+\code{adds} & \code{0 / 1} & \code{1|0|1|01011|00|0} \\
+\code{sub} & \code{1 / 0} & \code{1|1|0|01011|00|0} \\
+\code{subs} & \code{1 / 1} & \code{1|1|1|01011|00|0} \\
 \bottomrule
-\end{tabular}\par}
-\end{column}
-\begin{column}{0.49\textwidth}
-\textbf{Logical: fixed bits 28:24 = \code{01010}}
-\par\vspace{6pt}{\centering
-\renewcommand{\arraystretch}{1.25}
-\begin{tabular}{@{}lll@{}}
-\toprule
-\textbf{Instruction} & \textbf{opc} & \textbf{Prefix 31:21} \\
-\midrule
-\code{and} & \code{00} & \code{10001010000} \\
-\code{orr} & \code{01} & \code{10101010000} \\
-\code{eor} & \code{10} & \code{11001010000} \\
-\code{ands} & \code{11} & \code{11101010000} \\
-\bottomrule
-\end{tabular}\par}
-\end{column}
-\end{columns}
+\end{tabular}
+\par}
 \vspace{0.2cm}
-\key{Arithmetic prefix:} \code{sf | op | S | 01011 | shift | 0}.\\[0.08cm]
-\key{Logical prefix:} \code{sf | opc | 01010 | shift | N}, with \code{N=0} here.
-\vspace{0.12cm}
-
-For logical forms, \code{opc} is bits 30:29; \code{N} is bit 21. Setting \code{N=1} inverts the shifted second operand. For 32-bit versions, set \code{sf=0}; shifts must be 0--31.
+\setbeamertemplate{itemize item}{\color{navy}\raisebox{0.15ex}{\rule{0.65ex}{0.65ex}}}
+\begin{itemize}\setlength{\itemsep}{5pt}
+\item Prefix field order: \code{sf | op | S | 01011 | shift | 0}.
+\item \code{op} selects addition (0) or subtraction (1); \code{S=1} updates NZCV.
+\item \code{imm6} selects the shift amount. For 32-bit forms, set \code{sf=0}; shift amounts are 0--31.
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Encoding Example: \texttt{add x5, x6, x7}}
@@ -627,16 +546,14 @@ The prefix comes from \code{sf/op/S/fixed/shift}; now insert the operands:
 \end{frame}
 
 % ============================================================
-% Slide 16
 % ============================================================
 
-\begin{frame}{ADD/SUB: Immediate Form}
+\begin{frame}{add/sub: Immediate Form}
+Now we move on to the immediate form, where the second operand is a constant encoded in the instruction.
 
-\begin{block}{Example Instruction}
-\[
-\code{add x5, x6, \#24}
-\]
-\end{block}
+\begin{center}
+Sample instruction: \code{add x5, x6, \#24}
+\end{center}
 
 \vspace{0.1cm}
 
@@ -659,19 +576,18 @@ The prefix comes from \code{sf/op/S/fixed/shift}; now insert the operands:
 
 \begin{itemize}\setlength{\itemsep}{5pt}
   \item The immediate field is 12 bits wide.
-  \item The one-bit \code{sh} field (bit 22) selects a shift of 0 or 12 bits; bit 23 is fixed at 0.
+  \item Bit 22, \code{sh}: 0 means no shift; 1 means shift the immediate left by 12 bits. Bit 23 is fixed at 0.
   \item This format is common for address arithmetic and small integer constants.
 \end{itemize}
 
 \end{frame}
 
 % ============================================================
-% Slide 17
 % ============================================================
 
 \begin{frame}{Common Arithmetic Immediate Patterns}
 \small
-ADD/SUB (immediate) uses \code{sf | op | S | 100010 | sh | imm12 | Rn | Rd}.
+add/sub (immediate) uses \code{sf | op | S | 100010 | sh | imm12 | Rn | Rd}.
 The six fixed bits \code{100010} occupy bits 28:23; \code{sh} is bit 22.
 \vspace{0.16cm}
 \par\renewcommand{\arraystretch}{1.25}
@@ -680,14 +596,14 @@ The six fixed bits \code{100010} occupy bits 28:23; \code{sh} is bit 22.
 \toprule
 \textbf{64-bit form} & \textbf{op} & \textbf{S} & \textbf{Prefix 31:23} \\
 \midrule
-\code{add Xd, Xn, \#imm}  & \code{0} & \code{0} & \code{100100010} \\
-\code{adds Xd, Xn, \#imm} & \code{0} & \code{1} & \code{101100010} \\
-\code{sub Xd, Xn, \#imm}  & \code{1} & \code{0} & \code{110100010} \\
-\code{subs Xd, Xn, \#imm} & \code{1} & \code{1} & \code{111100010} \\
+\code{add Xd, Xn, \#imm}  & \code{0} & \code{0} & \code{1|0|0|100010} \\
+\code{adds Xd, Xn, \#imm} & \code{0} & \code{1} & \code{1|0|1|100010} \\
+\code{sub Xd, Xn, \#imm}  & \code{1} & \code{0} & \code{1|1|0|100010} \\
+\code{subs Xd, Xn, \#imm} & \code{1} & \code{1} & \code{1|1|1|100010} \\
 \bottomrule
 \end{tabular}\par}\vspace{3pt}
 \vspace{0.2cm}
-\begin{block}{Derive the ADD Immediate Prefix}
+\begin{block}{Derive the add Immediate Prefix}
 \code{sf=1, op=0, S=0}: \code{1 | 0 | 0 | 100010 = 100100010}.\\
 For \code{\#24}, choose \code{sh=0} and encode 24 directly in \code{imm12}. With \code{sh=1}, the immediate is shifted left by 12 bits.
 \end{block}
@@ -733,105 +649,98 @@ The immediate value is part of the instruction word.
 
 \centering
 \code{add x5, x6, \#24} is encoded as \hex{910060C5}.
+\par\vspace{0.12cm}\small\raggedright
+Immediate rules depend on the instruction form. Constants outside this form may require another instruction form or a sequence of instructions.
 
 \end{frame}
 
 % ============================================================
-% Slide 18
 % ============================================================
 
-\begin{frame}{AArch64 Immediate Encodings Are Specialized}
 
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Different instruction families have different immediate encodings.
-  \item Some constants fit directly in an \code{add} or \code{sub} immediate.
-  \item Other constants require move-wide instructions such as \code{movz}, \code{movn}, or \code{movk}.
-  \item Logical instructions use their own bitmask-immediate encoding.
-\end{itemize}
-
-\vspace{0.2cm}
-
-\begin{block}{Immediate Fields}
-Do not ask whether a constant fits ``in AArch64'' in general. Ask whether it fits
-in the specific immediate field of the instruction being used.
-\end{block}
-
-\end{frame}
 
 % ============================================================
-% Slide 19
 % ============================================================
 
-\begin{frame}{Decoding Checklist}
 
-\begin{enumerate}\setlength{\itemsep}{8pt}
-  \item Convert the hexadecimal word to 32 binary bits.
-  \item Identify the broad encoding family from the opcode bits.
-  \item Split the word into the fields for that family.
-  \item Translate register fields into \code{x} or \code{w} register names.
-  \item Interpret immediates carefully: sign extension, scaling, and shifts matter.
-  \item Reconstruct the assembly instruction.
-\end{enumerate}
 
-\vspace{0.2cm}
-
-\begin{block}{Important}
-The same bit positions can mean different things in different instruction families.
-Always identify the family before naming the fields.
-\end{block}
-
-\end{frame}
-
-\begin{frame}{Reverse Engineering Example}
-
-\begin{block}{Given Machine Code}
-\[
-\hex{8B0700C5}
-\]
-\end{block}
-
-\vspace{0.1cm}
-
+\begin{frame}{Decoding an Instruction Word}
+\small
+\key{Given:} \hex{8B020020}. Use the reference patterns, then interpret the fields for that form.
 \begin{center}
-\begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{11}{10001011000}{gold!22}
-  \bfld{11}{0}{5}{00111}{lightblue}
-  \bfld{16}{0}{6}{000000}{blue!8}
-  \bfld{22}{0}{5}{00110}{lightblue}
-  \bfld{27}{0}{5}{00101}{lightblue}
-  \bitnote{5.5}{-0.28}{add x-register}
-  \bitnote{13.5}{-0.28}{Rm = x7}
-  \bitnote{19}{-0.28}{no shift}
-  \bitnote{24.5}{-0.28}{Rn = x6}
-  \bitnote{29.5}{-0.28}{Rd = x5}
+\begin{tikzpicture}[x=0.43cm,y=1cm]
+\bfld{0}{0}{11}{10001011000}{gold!22}
+\bfld{11}{0}{5}{00010}{lightblue}
+\bfld{16}{0}{6}{000000}{blue!8}
+\bfld{22}{0}{5}{00001}{lightblue}
+\bfld{27}{0}{5}{00000}{lightblue}
+\bitnote{5.5}{0.95}{31:21: prefix}
+\bitnote{13.5}{0.95}{20:16: Rm}
+\bitnote{19}{0.95}{15:10: imm6}
+\bitnote{24.5}{0.95}{9:5: Rn}
+\bitnote{29.5}{0.95}{4:0: Rd}
 \end{tikzpicture}
 \end{center}
-
-\vspace{0.35cm}
-
-\begin{block}{Decoded Instruction}
-\[
-\hex{8B0700C5}
-\quad\longrightarrow\quad
-\code{add x5, x6, x7}
-\]
+\begin{enumerate}\setlength{\itemsep}{8pt}
+\item \key{Identify the form:} \code{1|0|0|01011|00|0} selects 64-bit \code{add}, without flag updates, using lsl.
+\item \key{Read the operands:} \code{Rm=2}, \code{Rn=1}, \code{Rd=0}; \code{imm6=0} means no shift.
+\item \key{Reconstruct:} \code{add x0, x1, x2}.
+\end{enumerate}
+\vspace{0.18cm}
+\begin{block}{Decoding Rule}
+Identify the form before interpreting the fields. The same bit positions can have different meanings in another form.
 \end{block}
-
 \end{frame}
 
 \sectiondivider{Section 4}{Memory Instruction Encodings}
 
 % ============================================================
-% Slide 20
 % ============================================================
+
+\begin{frame}{Scaled Offsets Depend on Access Size}
+
+\small
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
+In unsigned-offset loads/stores, the 12-bit \code{imm12} field stores the \key{byte offset divided by the access size}. The processor multiplies it back:
+\[
+\text{address} = \text{base} + \text{imm12} \times \text{access size}
+\]
+
+\vspace{0.05cm}
+
+\begin{center}
+\small
+\par\vspace{3pt}{\centering
+\begin{tabular}{lll}
+\toprule
+Instruction kind & Access size & Encoded immediate meaning \\
+\midrule
+\code{ldrb}/\code{strb} & 1 byte & byte offset \\
+\code{ldrh}/\code{strh} & 2 bytes & byte offset divided by 2 \\
+\code{ldr w}/\code{str w} & 4 bytes & byte offset divided by 4 \\
+\code{ldr x}/\code{str x} & 8 bytes & byte offset divided by 8 \\
+\bottomrule
+\end{tabular}\par}\vspace{3pt}
+\end{center}
+
+\vspace{0.05cm}
+
+\key{For 8-byte accesses:}
+\begin{itemize}\setlength{\itemsep}{3pt}
+\item \key{Unsigned, scaled \code{imm12}:} 0 to +32,760 bytes, in steps of 8 --- greater forward reach.
+\item \key{Signed, unscaled \code{imm9}:} $-256$ to $+255$ bytes, in steps of 1 --- short reach in both directions.
+\end{itemize}
+\vspace{0.05cm}
+Scaling trades finer offset steps for greater reach; signed offsets allow access below the base address.
+
+\end{frame}
 
 \begin{frame}{Load/Store Instruction Encoding}
 
-\begin{block}{Example Instruction}
-\[
-\code{ldr x5, [x6, \#16]}
-\]
-\end{block}
+\begin{center}
+Sample instruction: \code{ldr x5, [x6, \#16]}
+\end{center}
 
 \vspace{0.1cm}
 
@@ -853,47 +762,39 @@ Always identify the family before naming the fields.
 \begin{itemize}\setlength{\itemsep}{4pt}
   \item \code{Rt} is the register loaded or stored.
   \item \code{Rn} is the base address register.
-  \item \code{imm12} is a scaled unsigned offset for this common form.
+  \item \code{imm12} stores byte offset / access size in this unsigned-offset form.
   \item For a 64-bit \code{ldr}: \(\text{address} = \code{x6} + 8 \times \text{imm12}\).
 \end{itemize}
 
 \end{frame}
 
 % ============================================================
-% Slide 21
 % ============================================================
 
-\begin{frame}{Deriving Load/Store Unsigned-Offset Prefixes}
+\begin{frame}{Memory Prefix: Width, Addressing Form and Operation}
 \small
-For integer \key{unsigned-offset} transfers, bits 31:22 are:
-\begin{center}
-\begin{tikzpicture}[x=0.85cm,y=1cm]
-\bfld{0}{0}{2}{11}{lightblue}
-\bfld{2}{0}{3}{111}{gold!22}
-\bfld{5}{0}{1}{0}{lightblue}
-\bfld{6}{0}{2}{01}{gold!22}
-\bfld{8}{0}{2}{01}{lightblue}
-\bitnote{1}{0.95}{31:30: size}
-\bitnote{3.5}{0.95}{29:27: fixed}
-\bitnote{5.5}{0.95}{26: VR}
-\bitnote{7}{0.95}{25:24: fixed}
-\bitnote{9}{0.95}{23:22: opc}
-\end{tikzpicture}
-\end{center}
-\begin{itemize}\setlength{\itemsep}{6pt}
-\item \code{size}: \code{00}/\code{01}/\code{10}/\code{11} select 1/2/4/8-byte accesses for the transfers in the next table.
-\item \code{VR=0}: use general-purpose integer registers, rather than SIMD/FP registers.
-\item \code{opc=00}: store; \code{opc=01}: load without sign extension. Sign-extending loads use other \code{opc} values.
-\item \code{111} and \code{01} are ISA-assigned fixed bits for this form.
-\end{itemize}
-\vspace{0.14cm}
-\key{64-bit load:} \code{11 | 111 | 0 | 01 | 01 = 1111100101}.\\
-\key{64-bit store:} change \code{opc} to \code{00}, giving \code{1111100100}.
+Bits 31:22 combine five fields. \code{opc} means operation code; \code{VR} selects the register class (0: general-purpose; 1: SIMD/floating-point).
+\par\vspace{7pt}{\centering
+\renewcommand{\arraystretch}{1.22}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Bits} & \textbf{Field} & \textbf{Choice for \code{ldr x5}} & \textbf{Meaning} \\
+\midrule
+31:30 & \code{size} & \code{11} & 8-byte access; \code{10} selects 4 bytes \\
+29:27 & Fixed & \code{111} & Fixed bits for these load/store forms \\
+26 & \code{VR} & \code{0} & General-purpose integer registers \\
+25:24 & Form & \code{01} & Unsigned scaled offset, no writeback \\
+23:22 & \code{opc} & \code{01} & Load; \code{00} selects store \\
+\bottomrule
+\end{tabular}\par}\vspace{8pt}
+\vspace{0.12cm}
+\key{64-bit \code{ldr}:} \code{11 | 111 | 0 | 01 | 01}.\\[0.1cm]
+For \code{str}, keep width and addressing form; change \code{opc} from \code{01} to \code{00}.
 \end{frame}
 
 \begin{frame}{Common Memory Instruction Patterns}
 \small
-All rows use \key{integer unsigned-offset addressing}, \code{[Xn|SP, \#offset]}, with \code{VR=0} and no base-register writeback.
+Use the field order \code{size | fixed | VR | form | opc}. All rows use unsigned-offset addressing \code{[Xn|SP, \#offset]}, with no base update.
 \vspace{0.12cm}
 \par\renewcommand{\arraystretch}{1.16}
 \par\vspace{3pt}{\centering
@@ -901,10 +802,10 @@ All rows use \key{integer unsigned-offset addressing}, \code{[Xn|SP, \#offset]},
 \toprule
 \textbf{Transfer} & \textbf{Bytes} & \textbf{size} & \textbf{opc} & \textbf{Prefix 31:22} \\
 \midrule
-\code{str Wt}  & 4 & \code{10} & \code{00} & \code{1011100100} \\
-\code{ldr Wt}  & 4 & \code{10} & \code{01} & \code{1011100101} \\
-\code{str Xt}  & 8 & \code{11} & \code{00} & \code{1111100100} \\
-\code{ldr Xt}  & 8 & \code{11} & \code{01} & \code{1111100101} \\
+\code{str Wt}  & 4 & \code{10} & \code{00} & \code{10|111|0|01|00} \\
+\code{ldr Wt}  & 4 & \code{10} & \code{01} & \code{10|111|0|01|01} \\
+\code{str Xt}  & 8 & \code{11} & \code{00} & \code{11|111|0|01|00} \\
+\code{ldr Xt}  & 8 & \code{11} & \code{01} & \code{11|111|0|01|01} \\
 \bottomrule
 \end{tabular}\par}\vspace{3pt}
 \vspace{0.15cm}
@@ -950,230 +851,129 @@ The instruction stores the scaled value, not the byte offset directly.
 
 \centering
 \code{ldr x5, [x6, \#16]} is encoded as \hex{F94008C5}.
+\par\vspace{0.1cm}\small\raggedright
+For \code{str x5, [x6, \#16]}, keep the address fields and change \code{opc} from \code{01} to \code{00}: \hex{F90008C5}. Now \code{Rt} is the source.
 
 \end{frame}
 
 % ============================================================
-% Slide 22
 % ============================================================
 
-\begin{frame}{Store Uses the Same Address Fields}
 
+
+% ============================================================
+% ============================================================
+
+\begin{frame}{Offset, Pre-Index and Post-Index: What Changes?}
 \small
-
-\code{str x5, [x6, \#16]} is encoded as \hex{F90008C5}.
-
-\vspace{0.2cm}
-
-\begin{center}
-\begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{10}{1111100100}{gold!22}
-  \bfld{10}{0}{12}{000000000010}{lightblue}
-  \bfld{22}{0}{5}{00110}{blue!8}
-  \bfld{27}{0}{5}{00101}{lightblue}
-\end{tikzpicture}
-\end{center}
-
-\vspace{0.15cm}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item The base register and scaled offset fields match the load example.
-  \item \code{opc} (23:22) changes from \code{01} (load) to \code{00} (store); \code{size=11} remains unchanged.
-  \item \code{Rt} is now the source register whose value is written to memory.
-\end{itemize}
-
-\end{frame}
-
-% ============================================================
-% Slide 23
-% ============================================================
-
-\begin{frame}{Addressing Mode Also Selects the Encoding}
-\small
-The mnemonic \code{ldr} alone does not determine the fixed bits. Compare these \key{64-bit integer load} forms:
-\vspace{0.12cm}
-\par\renewcommand{\arraystretch}{1.25}
-\par\vspace{3pt}{\centering
-\begin{tabular}{@{}lll@{}}
+Each example starts separately with \code{x6 = 0x1000}. All three load 8 bytes into \code{x5}. \key{Writeback} means updating the base register, \code{x6}.
+\par\vspace{4pt}{\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}llll@{}}
 \toprule
-\textbf{Assembly form} & \textbf{Fixed leading bits} & \textbf{Offset / mode fields} \\
+\textbf{Instruction} & \textbf{Address read} & \textbf{Final \code{x6}} & \textbf{Offset field} \\
 \midrule
-\code{ldr Xt, [Xn, \#off]} & \code{1111100101} (31:22) & \code{imm12}, scaled by 8 \\
-\code{ldr Xt, [Xn, \#off]!} & \code{11111000010} (31:21) & signed \code{imm9}; 11:10 = \code{11} \\
-\code{ldr Xt, [Xn], \#off} & \code{11111000010} (31:21) & signed \code{imm9}; 11:10 = \code{01} \\
+\code{ldr x5, [x6, \#16]}  & \code{0x1010} & \code{0x1000} & \code{imm12 = 2} \\
+\code{ldr x5, [x6, \#16]!} & \code{0x1010} & \code{0x1010} & \code{imm9 = 16} \\
+\code{ldr x5, [x6], \#16}  & \code{0x1000} & \code{0x1010} & \code{imm9 = 16} \\
 \bottomrule
-\end{tabular}\par}\vspace{3pt}
-\vspace{0.06cm}
-\begin{itemize}\setlength{\itemsep}{3pt}
-\item Unsigned offset: no writeback. Pre-index \code{!}: update the base before access. Post-index: update it after access.
-\item In the two writeback forms, \code{imm9} (20:12) is a signed \key{byte} offset, $-256$ to $255$. \code{Rn}/\code{Rt} remain in bits 9:5 / 4:0.
-\item For unsigned-offset \code{ldr}, bits 11:10 belong to \code{imm12}; they are not separate mode selectors.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Scaled Offsets Depend on Access Size}
-
-\begin{block}{Unsigned Offset Form}
-\[
-\text{address} = \text{base} + \text{imm12} \times \text{access size}
-\]
-\end{block}
-
-\vspace{0.15cm}
-
-\begin{center}
-\small
-\par\vspace{3pt}{\centering
-\begin{tabular}{lll}
-\toprule
-Instruction kind & Access size & Encoded immediate meaning \\
-\midrule
-\code{ldrb}/\code{strb} & 1 byte & byte offset \\
-\code{ldrh}/\code{strh} & 2 bytes & byte offset divided by 2 \\
-\code{ldr w}/\code{str w} & 4 bytes & byte offset divided by 4 \\
-\code{ldr x}/\code{str x} & 8 bytes & byte offset divided by 8 \\
-\bottomrule
-\end{tabular}\par}\vspace{3pt}
-\end{center}
-
-\vspace{0.15cm}
-
-\begin{block}{Scaled Offset Range}
-Scaling lets a 12-bit field cover a larger byte range for naturally aligned accesses.
-\end{block}
-
-\end{frame}
-
-% ============================================================
-% Slide 24
-% ============================================================
-
-\begin{frame}{PC-Relative Addresses for Memory Access}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item PC-relative instructions use the current instruction address as their reference; \code{adrp} uses its 4 KiB page base.
-  \item This supports position-independent code and nearby constants or labels.
-  \item For \code{adr} and literal loads, PC is the address of the current instruction.
-\end{itemize}
-
-\vspace{0.2cm}
-
-\begin{block}{Common PC-Relative Forms}
+\end{tabular}\par}\vspace{4pt}
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item \code{adr}: forms an address near the current PC.
-  \item \code{adrp}: forms a page address relative to the current PC page.
-  \item \code{ldr literal}: loads data from a nearby PC-relative literal location.
+\item \key{Offset:} add the offset for the access; leave the base unchanged. The unsigned \code{imm12} is scaled: $16/8=2$.
+\item \key{Pre-index:} update the base, then access the updated address.
+\item \key{Post-index:} access the old base address, then update the base.
 \end{itemize}
-\end{block}
-
+\vspace{0.1cm}
+Pre/post forms encode a signed \key{byte offset} in \code{imm9}: no division by access size. Their range is $-256$ to $255$ bytes.
 \end{frame}
 
-% ============================================================
-% Slide 25
-% ============================================================
-
-\begin{frame}{Literal Loads in AArch64}
-
-\begin{block}{Concept}
-A literal load reads a constant stored near the instruction stream using a PC-relative offset.
-\end{block}
-
-\vspace{0.1cm}
-
+\begin{frame}{Addressing Modes: Encoding Reference}
+\small
+Reference layout: focus on offset scaling and base updates; exact mode-bit positions need not be memorised.
 \begin{center}
-\begin{tikzpicture}[
-  font=\scriptsize,
-  box/.style={draw=navy, line width=0.8pt, minimum height=0.75cm, align=center}
-]
-\node[box, fill=gold!18, minimum width=3.1cm] (insn) {\code{ldr x0, literal}};
-\node[box, fill=lightblue, minimum width=2.6cm, right=2.4cm of insn] (lit) {constant\\in code area};
-\draw[-{Latex[length=3mm]}, navy, line width=1pt] (insn.east) -- node[above,font=\scriptsize]{PC-relative offset} (lit.west);
+\begin{tikzpicture}[x=0.43cm,y=1cm]
+\node[anchor=west,font=\small\bfseries] at (0,2.85) {Unsigned offset: no base update};
+\bfld{0}{1.9}{2}{size}{lightblue}
+\bfld{2}{1.9}{3}{111}{softgray}
+\bfld{5}{1.9}{1}{\tiny VR}{softgray}
+\bfld{6}{1.9}{2}{01}{gold!25}
+\bfld{8}{1.9}{2}{opc}{lightblue}
+\bfld{10}{1.9}{12}{imm12: offset / access size}{gold!15}
+\bfld{22}{1.9}{5}{Rn}{lightblue}
+\bfld{27}{1.9}{5}{Rt}{lightblue}
+\node[anchor=west,font=\small\bfseries] at (0,1.4) {Pre/post index: base update};
+\bfld{0}{0.45}{2}{size}{lightblue}
+\bfld{2}{0.45}{3}{111}{softgray}
+\bfld{5}{0.45}{1}{\tiny VR}{softgray}
+\bfld{6}{0.45}{2}{00}{gold!25}
+\bfld{8}{0.45}{2}{opc}{lightblue}
+\bfld{10}{0.45}{1}{0}{softgray}
+\bfld{11}{0.45}{9}{imm9: byte offset}{gold!15}
+\bfld{20}{0.45}{2}{mode}{gold!25}
+\bfld{22}{0.45}{5}{Rn}{lightblue}
+\bfld{27}{0.45}{5}{Rt}{lightblue}
+\bitnote{7}{0.12}{25:24}
+\bitnote{10.5}{0.12}{21}
+\bitnote{15.5}{0.12}{20:12}
+\bitnote{21}{0.12}{11:10}
+\bitnote{24.5}{0.12}{9:5}
+\bitnote{29.5}{0.12}{4:0}
 \end{tikzpicture}
 \end{center}
-
-\vspace{0.2cm}
-
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item The instruction encodes where to find the constant relative to the PC.
-  \item The loaded value is data, even though it may be placed near the code.
-  \item The pseudo-instruction \code{ldr x0, =constant} may use a literal pool; \code{ldr x0, literal} explicitly loads from a label.
+\item \key{Form bits 25:24:} \code{01} for unsigned offset; \code{00} for the pre/post forms shown. Their bit 21 is also fixed at \code{0}.
+\item \key{Mode bits 11:10:} \code{11} selects pre-index; \code{01} selects post-index.
+\item In unsigned-offset form, bits 11:10 are part of \code{imm12}; there is no separate mode field there.
 \end{itemize}
-
 \end{frame}
 
+
+
 % ============================================================
-% Slide 26
 % ============================================================
 
 
 
 % ============================================================
-% Slide 27
+% ============================================================
+
+
+% ============================================================
+% ============================================================
+
+
+
+% ============================================================
 % ============================================================
 
 \sectiondivider{Section 5}{Branch Instruction Encodings}
 
 \begin{frame}{Common Immediate Branch Patterns}
 \small
-B/BL use a 6-bit prefix; conditional branches use 8 fixed high bits and a condition field.
+The signed displacement counts 4-byte instruction steps: target = branch PC + displacement $\times 4$. PC is the address of the branch itself.
+\par\vspace{4pt}
+\code{b}/\code{bl} use \code{op | 00101}: \code{op=0} branches; \code{op=1} also saves a return address. Conditional branches use the fixed prefix \code{01010100}, then a displacement and condition field.
 \par\vspace{3pt}{\centering
-\renewcommand{\arraystretch}{1.2}
+\renewcommand{\arraystretch}{1.1}
 \begin{tabular}{@{}llll@{}}
 \toprule
 \textbf{Instruction} & \textbf{Fixed leading bits} & \textbf{Displacement field} & \textbf{cond (3:0)} \\
 \midrule
-\code{b label} & \code{000101} (31:26) & \code{imm26} (25:0) & --- \\
-\code{bl function} & \code{100101} (31:26) & \code{imm26} (25:0) & --- \\
+\code{b label} & \code{0|00101} (31:26) & \code{imm26} (25:0) & --- \\
+\code{bl function} & \code{1|00101} (31:26) & \code{imm26} (25:0) & --- \\
 \code{b.eq label} & \code{01010100} (31:24) & \code{imm19} (23:5) & \code{0000} \\
 \code{b.ne label} & \code{01010100} (31:24) & \code{imm19} (23:5) & \code{0001} \\
 \code{b.lt label} & \code{01010100} (31:24) & \code{imm19} (23:5) & \code{1011} \\
 \bottomrule
 \end{tabular}\par}\vspace{3pt}
 \begin{itemize}\setlength{\itemsep}{4pt}
-\item \key{B versus BL:} bit 31 selects branch (\code{0}) or branch-with-link (\code{1}); bits 30:26 stay \code{00101}.
+
 \item \key{Conditional branches:} bit 4 is fixed at \code{0}; \code{cond} selects EQ (Z=1), NE (Z=0), or signed LT (N differs from V).
-\item \key{All five rows:} target = current instruction address + sign-extended displacement $\times 4$. \code{bl} also writes PC + 4 to \code{x30}.
+\item \code{bl} writes the return address, PC + 4, to \code{x30}.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Unconditional Branch Encoding}
 
-\begin{block}{Instruction Forms}
-\[
-\code{b label}
-\qquad\qquad
-\code{bl function}
-\]
-\end{block}
-
-\vspace{0.1cm}
-
-\begin{center}
-\begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{6}{opcode}{gold!22}
-  \bfld{6}{0}{26}{imm26}{lightblue}
-  \bitnote{3}{0.95}{31:26}
-  \bitnote{19}{0.95}{25:0}
-\end{tikzpicture}
-\end{center}
-
-\vspace{0.15cm}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \code{b} and \code{bl} use a signed 26-bit immediate field.
-  \item The offset is measured in 4-byte instructions, not raw bytes.
-  \item \code{bl} also writes the return address (PC + 4) into \code{x30}.
-\end{itemize}
-
-\vspace{0.1cm}
-
-\begin{block}{Target Calculation}
-\[
-\text{target address} = \text{PC} + \operatorname{signextend}(\text{imm26}) \times 4
-\]
-\end{block}
-
-\end{frame}
 
 \begin{frame}{Branch Example: Forward Target}
 \small
@@ -1189,8 +989,8 @@ B/BL use a 6-bit prefix; conditional branches use 8 fixed high bits and a condit
 \code{0x100:} & \code{b target} \\
 \code{0x104:} & \code{add x0, x0, \#1} \\
 \code{0x108:} & \code{sub x1, x1, \#1} \\
-\code{0x10c:} & \code{nop} \\
-\code{0x110:} & \code{target: nop}
+\code{0x10c:} & \code{add x2, x2, \#1} \\
+\code{0x110:} & \code{target: sub x3, x3, \#1}
 \end{tabular}\par}\vspace{3pt}
 \end{block}
 
@@ -1212,6 +1012,8 @@ B/BL use a 6-bit prefix; conditional branches use 8 fixed high bits and a condit
 \begin{tikzpicture}[x=0.285cm,y=1cm]
   \bfld{0}{0}{6}{000101}{gold!22}
   \bfld{6}{0}{26}{00000000000000000000000100}{lightblue}
+  \bitnote{3}{0.95}{31:26: b prefix}
+  \bitnote{19}{0.95}{25:0: signed imm26}
 \end{tikzpicture}
 \end{center}
 
@@ -1222,49 +1024,16 @@ B/BL use a 6-bit prefix; conditional branches use 8 fixed high bits and a condit
 
 \end{frame}
 
-\begin{frame}{Conditional Branch Encoding}
 
-\begin{block}{Example Forms}
-\[
-\code{b.eq label}
-\qquad
-\code{b.lt label}
-\qquad
-\code{b.ne label}
-\]
-\end{block}
-
-\vspace{0.1cm}
-
-\begin{center}
-\begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{8}{01010100}{gold!22}
-  \bfld{8}{0}{19}{imm19}{lightblue}
-  \bfld{27}{0}{1}{0}{blue!8}
-  \bfld{28}{0}{4}{cond}{gold!15}
-  \bitnote{4}{0.95}{31:24}
-  \bitnote{17.5}{0.95}{23:5}
-  \bitnote{27.5}{0.95}{4}
-  \bitnote{30}{0.95}{3:0}
-\end{tikzpicture}
-\end{center}
-
-\vspace{0.15cm}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item The condition code is encoded in the low 4 bits.
-  \item The signed immediate is 19 bits, scaled by 4 bytes.
-  \item Conditional branches test the flags set by earlier compare or arithmetic instructions.
-\end{itemize}
-
-\end{frame}
 
 % ============================================================
-% Slide 28
 % ============================================================
 
 \begin{frame}{Conditional Branch Example: \texttt{b.eq}}
 
+\small
+\code{b.cond} tests NZCV flags: signed \code{imm19} is scaled by 4; bits 3:0 select the condition, and bit 4 is fixed at 0.
+\vspace{0.12cm}
 \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
 \begin{block}{Target Offset}
@@ -1294,6 +1063,10 @@ The branch is taken when the Z flag is set.
   \bfld{8}{0}{19}{0000000000000000100}{lightblue}
   \bfld{27}{0}{1}{0}{blue!8}
   \bfld{28}{0}{4}{0000}{gold!15}
+  \bitnote{4}{0.95}{31:24: fixed}
+  \bitnote{17.5}{0.95}{23:5: signed imm19}
+  \bitnote{27.5}{0.95}{4}
+  \bitnote{30}{0.95}{3:0: cond}
 \end{tikzpicture}
 \end{center}
 
@@ -1305,37 +1078,31 @@ The branch is taken when the Z flag is set.
 \end{frame}
 
 % ============================================================
-% Slide 29
 % ============================================================
 
 
 
 % ============================================================
-% Slide 30
 % ============================================================
 
 
 
 % ============================================================
-% Slide 31
 % ============================================================
 
 
 
 % ============================================================
-% Slide 32
 % ============================================================
 
 
 
 % ============================================================
-% Slide 33
 % ============================================================
 
 
 
 % ============================================================
-% Slide 34
 % ============================================================
 
 \begin{frame}{Branch Example: Backward Loop}
@@ -1365,7 +1132,7 @@ Assume \code{x0=0} and \code{x1} is a positive iteration count. The branch retur
 \end{column}
 \end{columns}
 \vspace{0.12cm}
-The 19-bit two's-complement representation of $-2$ is \code{1111111111111111110} (\hex{7FFFE}). With \code{cond=0001} (NE):
+For $-2$: write $+2$ in 19 bits (17 zeros followed by \code{10}), invert all bits, then add 1. This gives \code{1111111111111111110} (\hex{7FFFE}); \code{cond=0001} selects NE.
 \begin{center}
 \begin{tikzpicture}[x=0.4cm,y=1cm]
 \bfld{0}{0}{8}{01010100}{gold!22}
@@ -1396,76 +1163,57 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 \end{frame}
 
 % ============================================================
-% Slide 35
 % ============================================================
 
 \begin{frame}{Topic 7: Summary}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item AArch64 instructions are fixed-width 32-bit words.
-  \item The meaning of each bit field depends on the instruction family.
-  \item Fixed family patterns are looked up in the ISA; selector fields explain the related instruction variants.
-  \item Data-processing immediate instructions use a different field layout.
-  \item Load/store instructions commonly encode a base register, target/source register, and scaled offset.
-  \item Direct immediate branches encode PC-relative offsets scaled by 4 bytes; register-indirect branches use a register target.
-  \item In \code{b.cond}, bits 3:0 encode the condition and \code{imm19} encodes the signed instruction displacement.
+\small
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\begin{itemize}\setlength{\itemsep}{9pt}
+\item \key{Instruction words and forms:} A64 instructions occupy 32 bits (4 bytes), stored little-endian. Select the form, look up its fixed pattern, then interpret its fields.
+\item \key{Data processing:} \code{op} selects add/subtract and \code{S} controls NZCV updates. Register shifts use \code{shift}/\code{imm6}; arithmetic immediates use \code{imm12}/\code{sh}.
+\item \key{Memory:} unsigned offsets are scaled by access size. Pre/post-index forms use signed byte offsets and update the base; the mode determines which address is accessed.
+\item \key{PC-relative branches:} target = branch PC + signed immediate $\times 4$. \code{b}/\code{bl} use \code{imm26}; \code{b.cond} uses \code{imm19} and a 4-bit condition. \code{bl} saves PC + 4 in \code{x30}.
 \end{itemize}
-
 \end{frame}
 
 % ============================================================
-% Slide 36
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Instruction Words}
-\begin{enumerate}\setlength{\itemsep}{6pt}
-\item How many bytes does an A64 instruction occupy? How far apart are consecutive instruction addresses?
-\item If the instruction word is \hex{8B020020}, what are its four bytes in increasing memory-address order?
-\item Why must the instruction family be identified before interpreting operand fields?
-\item What do \code{Rd}, \code{Rn}, and \code{Rm} represent in \code{add x5, x6, x7}? Give their 5-bit register numbers.
-\item How do the fields change for \code{add x5, x6, \#24}? What does its \code{sh} bit control?
-\item Split \code{10001011000} into its selector and fixed fields. How does the prefix change for \code{subs x5, x6, x7}?
+\small
+Use the reference tables; fixed binary patterns need not be memorised. Show how you choose the variable fields.
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\begin{enumerate}\setlength{\itemsep}{8pt}
+\item How many bytes does an A64 instruction occupy? For \hex{8B020020}, list the four bytes in increasing memory-address order.
+\item In the add/sub shifted-register form, what do \code{sf}, \code{op}, and \code{S} select? Which values encode a 64-bit subtraction that updates NZCV?
+\item For \code{add x5, x6, x7}, give \code{Rd}, \code{Rn}, and \code{Rm} as 5-bit values. What happens to \code{shift} and \code{imm6} when \code{lsl \#3} is added?
+\item For \code{add x5, x6, \#24}, give \code{imm12} and \code{sh}. What would setting \code{sh=1} do to the immediate value?
+\item Split \code{10001011000} into its fixed and selector fields. Which selector bits change for \code{subs x5, x6, x7}?
 \end{enumerate}
 \end{frame}
 
 % ============================================================
-% Slide 37
 % ============================================================
 
 \begin{frame}{Self-Test Questions: Memory and Branches}
-\begin{enumerate}\setlength{\itemsep}{6pt}
-\item In \code{ldr x5, [x6, \#16]}, why is \code{imm12} equal to 2? Which field identifies the base register?
-\item Derive \code{1111100101} from \code{size}, fixed bits, \code{VR}, and \code{opc}. What changes for \code{str x5, [x6, \#16]}?
-\item For a 32-bit unsigned-offset load with \code{imm12 = 3}, what is the byte offset?
-\item What address is the reference for a literal load, and what page is the reference for \code{adrp}?
-\item Compute the signed immediates for a branch at \hex{100} to \hex{110}, and a branch at \hex{208} to \hex{200}. Which PC is the reference?
-\item Compare \code{b} and \code{b.eq}: give the immediate-field width, offset scaling, and location of the condition field where applicable.
+\small
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\begin{enumerate}\setlength{\itemsep}{8pt}
+\item In \code{ldr x5, [x6, \#16]}, why is \code{imm12=2}? Which field identifies the base register?
+\item For an 8-byte access, compare the offset range and step size of unsigned scaled \code{imm12} and signed unscaled \code{imm9}. Which can address below the base?
+\item Each time starting with \code{x6=0x1000}, compare the address read and final \code{x6} for offset, pre-index and post-index \code{ldr} with \code{\#16}. Explain when the base register changes.
+\item Compare \code{ldr x5, [x6, \#16]} with \code{str x5, [x6, \#16]}. What is the role of \code{x5} in each, and does either update \code{x6}?
+\item A \code{b} at \hex{100} targets \hex{110}; a \code{b.ne} at \hex{208} targets \hex{200}. Calculate each signed immediate and give its field width. Which PC is the reference, and where is NE encoded?
 \end{enumerate}
 \end{frame}
 
 % ============================================================
-% Slide 38
 % ============================================================
 
-\begin{frame}{Looking Ahead}
 
-\begin{block}{Next Topic}
-Building a simple single-cycle RISC datapath.
-\end{block}
 
-\vspace{0.25cm}
-
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Instruction fields become inputs to the datapath and control logic.
-  \item Register fields select operands in the register file.
-  \item Immediate fields must be extracted, extended, and routed.
-  \item Branch offsets feed the next-PC calculation.
-\end{itemize}
-
-\end{frame}
-
-% Encoding references: Arm A64 ISA instruction descriptions, ADD (shifted register),
-% ADD (immediate), AND/ORR/EOR/ANDS (shifted register), LDR/STR/LDRB/STRB/LDRH/STRH
+% Encoding references: Arm A64 ISA instruction descriptions, add (shifted register),
+% add (immediate), ldr/str/ldrb/strb/ldrh/strh
 % (immediate). Official collection:
 % https://documentation-service.arm.com/static/67e40f3398aa3c3b6eea6a85
 % Arm instruction descriptions, HTML presentation:
