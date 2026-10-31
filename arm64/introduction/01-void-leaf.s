@@ -17,7 +17,6 @@
 
 .text
 .global main
-.type main, %function
 main:
     // Allocate 32 bytes: frame record (16), local int and padding (16).
     stp x29, x30, [sp, #-32]!
@@ -29,14 +28,10 @@ main:
     mov w0, #0                  // main returns 0.
     ldp x29, x30, [sp], #32      // Restore fp/lr and deallocate the frame.
     ret
-.size main, .-main
 
-.type set_value, %function
 set_value:
     // A leaf calls no other functions, so this leaf need not save x30.
     mov w1, #42
     str w1, [x0]                // Store a 32-bit int through ptr.
     ret                         // A void function supplies no return value.
-.size set_value, .-set_value
 
-.section .note.GNU-stack,"",%progbits

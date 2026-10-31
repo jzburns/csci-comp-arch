@@ -15,7 +15,7 @@
 
 .text
 .global main
-.type main, %function
+
 main:
     // main calls another function, so preserve its own return address.
     stp x29, x30, [sp, #-16]!
@@ -26,13 +26,8 @@ main:
 
     ldp x29, x30, [sp], #16      // Leave w0 unchanged for main's return.
     ret
-.size main, .-main
 
-.type square, %function
 square:
     // No calls, local storage or callee-saved registers are needed.
     mul w0, w0, w0              // w0 = value * value.
     ret                         // Return using the address in x30.
-.size square, .-square
-
-.section .note.GNU-stack,"",%progbits
