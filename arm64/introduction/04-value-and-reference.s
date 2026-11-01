@@ -24,7 +24,6 @@ main:
     mov w0, #6
     str w0, [sp, #16]
 
-    ldr w0, [sp, #16]
     bl change_value
     ldr w0, [sp, #16]
     str w0, [sp, #20]
