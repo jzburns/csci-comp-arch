@@ -311,20 +311,22 @@ Dr. J. Burns
 
 \sectiondivider{Section 2}{AArch64 Encoding Families}
 
-\begin{frame}{Where Do Opcode Patterns Come From?}
-\begin{itemize}\setlength{\itemsep}{8pt}
-\item \key{Look up the instruction format in Arm's ISA reference.} It specifies the fixed bits and field positions for that instruction form.
-\item \key{Select the form first, for example:} \code{add x5, x6, x7} uses a shifted-register form; \code{add x5, x6, \#24} uses an immediate form with a different field layout.
-\item \key{Fill the selectors:} width, operation, flag update, shift type, access size, or addressing mode choose among related encodings.
-\item \key{Insert the operands:} register numbers, immediates, and offsets occupy the remaining fields.
-\item \key{A prefix is not necessarily one opcode field:} leading bits may combine fixed family bits with selectors. Each table states the form and bit positions to which its patterns apply.
+\begin{frame}{How Instructions Are Encoded}
+An instruction's 32-bit word encodes the operation and its operands using a defined field layout.
+\vspace{0.2cm}
+\begin{itemize}\setlength{\itemsep}{10pt}
+\item \key{Operation:} what to do, such as \code{add} or \code{ldr}. The bits identifying the operation are called the \key{opcode} (operation code).
+\item \key{Operands:} which registers or constant values to use.
+\item \key{Instruction format:} where the fields appear within the 32-bit instruction word. In AArch64, operation-identifying bits can span several fields.
 \end{itemize}
+\vspace{0.2cm}
+Arm's ISA reference specifies each format's fixed bits: required patterns that help the decoder identify the format. The assembler fills the other fields from the chosen instruction and operands.
 \end{frame}
 
-\begin{frame}{From Instruction Word to Operand Fields}
+\begin{frame}{Instruction Decoding}
 \small
 \code{Rd}: destination; \code{Rn}/\code{Rm}: source registers (\code{Rn} is the memory base).\\
-\code{Rt}: transferred register; \code{immN}: an N-bit immediate; \code{cond}: condition selector.
+\code{Rt}: transferred register; \code{immN}: an N-bit constant (immediate); \code{cond}: selects a branch condition.
 \begin{center}
 \begin{tikzpicture}[
   font=\small,
@@ -417,11 +419,10 @@ Here we compare two versions of \code{add}: one uses the second source register 
 \vspace{0.15cm}
 
 \begin{itemize}\setlength{\itemsep}{4pt}
-  \item \code{sf/op/S/fixed} will be defined on the next slide.
+  \item \code{sf}: operand width; \code{op}: add/subtract; \code{S}: flag update. Fixed bits identify the format; the next slide gives their values.
   \item \code{Rd}: destination; \code{Rn}: first source; \code{Rm}: second source.
   \item Both examples use \code{shift=00} (lsl). The first implies \code{lsl \#0}.
   \item \code{imm6} changes from \code{000000} to \code{000011} for \code{lsl \#3}: the second example computes \code{x5 = x6 + (x7 << 3)}.
-  \item Bit 21 is fixed at \code{0} in this arithmetic form.
 \end{itemize}
 
 \end{frame}
@@ -431,7 +432,7 @@ Here we compare two versions of \code{add}: one uses the second source register 
 
 \begin{frame}{Deriving the Prefix: \texttt{add x5, x6, x7}}
 \small
-Select \key{add/sub (shifted register)}. Bits 31:21 have this structure:
+A \key{prefix} is a group of leading bits. Here, bits 31:21 combine fixed format bits with operation selectors:
 \begin{center}
 \begin{tikzpicture}[x=0.8cm,y=1cm]
 \bfld{0}{0}{1}{1}{lightblue}
@@ -456,8 +457,8 @@ Select \key{add/sub (shifted register)}. Bits 31:21 have this structure:
 \midrule
 \code{sf} & \code{1} & 64-bit \code{x} operands; \code{0} selects 32-bit \code{w} operands \\
 \code{op} & \code{0} & Add; \code{1} selects subtract \\
-\code{S} & \code{0} & Preserve NZCV flags; \code{1} updates them \\
-Fixed bits & \code{01011} and \code{0} & Fixed bits for this encoding class \\
+\code{S} & \code{0} & Preserve flags; \code{1} updates them \\
+Fixed bits & \code{01011} and \code{0} & \shortstack[l]{Required bit pattern that identifies this\\instruction format to the decoder} \\
 \code{shift} & \code{00} & lsl; the absent shift defaults to lsl \code{\#0} \\
 \bottomrule
 \end{tabular}\par}\vspace{3pt}
@@ -489,7 +490,7 @@ All rows use 64-bit shifted-register forms: \code{sf=1}, \code{shift=00} (lsl), 
 \setbeamertemplate{itemize item}{\color{navy}\raisebox{0.15ex}{\rule{0.65ex}{0.65ex}}}
 \begin{itemize}\setlength{\itemsep}{5pt}
 \item Prefix field order: \code{sf | op | S | 01011 | shift | 0}.
-\item \code{op} selects addition (0) or subtraction (1); \code{S=1} updates NZCV.
+\item \code{op} selects addition (0) or subtraction (1); \code{S=1} updates NZCV (negative, zero, carry, overflow flags).
 \item \code{imm6} selects the shift amount. For 32-bit forms, set \code{sf=0}; shift amounts are 0--31.
 \end{itemize}
 \end{frame}
@@ -588,7 +589,7 @@ Sample instruction: \code{add x5, x6, \#24}
 \begin{frame}{Common Arithmetic Immediate Patterns}
 \small
 add/sub (immediate) uses \code{sf | op | S | 100010 | sh | imm12 | Rn | Rd}.
-The six fixed bits \code{100010} occupy bits 28:23; \code{sh} is bit 22.
+The required pattern \code{100010} at bits 28:23 identifies this format to the decoder; \code{sh} is bit 22.
 \vspace{0.16cm}
 \par\renewcommand{\arraystretch}{1.25}
 \par\vspace{3pt}{\centering
@@ -781,9 +782,9 @@ Bits 31:22 combine five fields. \code{opc} means operation code; \code{VR} selec
 \textbf{Bits} & \textbf{Field} & \textbf{Choice for \code{ldr x5}} & \textbf{Meaning} \\
 \midrule
 31:30 & \code{size} & \code{11} & 8-byte access; \code{10} selects 4 bytes \\
-29:27 & Fixed & \code{111} & Fixed bits for these load/store forms \\
+29:27 & Fixed & \code{111} & Identifies the load/store format family \\
 26 & \code{VR} & \code{0} & General-purpose integer registers \\
-25:24 & Form & \code{01} & Unsigned scaled offset, no writeback \\
+25:24 & Form & \code{01} & Scaled offset; base unchanged \\
 23:22 & \code{opc} & \code{01} & Load; \code{00} selects store \\
 \bottomrule
 \end{tabular}\par}\vspace{8pt}
@@ -921,7 +922,7 @@ Reference layout: focus on offset scaling and base updates; exact mode-bit posit
 \end{tikzpicture}
 \end{center}
 \begin{itemize}\setlength{\itemsep}{5pt}
-\item \key{Form bits 25:24:} \code{01} for unsigned offset; \code{00} for the pre/post forms shown. Their bit 21 is also fixed at \code{0}.
+\item \key{Format-identifying bits 25:24:} \code{01} for unsigned offset; \code{00} for the pre/post forms shown. Their bit 21 is also fixed at \code{0}.
 \item \key{Mode bits 11:10:} \code{11} selects pre-index; \code{01} selects post-index.
 \item In unsigned-offset form, bits 11:10 are part of \code{imm12}; there is no separate mode field there.
 \end{itemize}
@@ -950,9 +951,9 @@ Reference layout: focus on offset scaling and base updates; exact mode-bit posit
 
 \begin{frame}{Common Immediate Branch Patterns}
 \small
-The signed displacement counts 4-byte instruction steps: target = branch PC + displacement $\times 4$. PC is the address of the branch itself.
+PC is the branch instruction address. The signed displacement is an offset in 4-byte steps: target = PC + displacement $\times 4$.
 \par\vspace{4pt}
-\code{b}/\code{bl} use \code{op | 00101}: \code{op=0} branches; \code{op=1} also saves a return address. Conditional branches use the fixed prefix \code{01010100}, then a displacement and condition field.
+\code{b}/\code{bl} use \code{op | 00101}: \code{op=0} branches; \code{op=1} also saves a return address. Required patterns \code{00101} and \code{01010100} identify the respective branch formats to the decoder.
 \par\vspace{3pt}{\centering
 \renewcommand{\arraystretch}{1.1}
 \begin{tabular}{@{}llll@{}}
@@ -968,7 +969,7 @@ The signed displacement counts 4-byte instruction steps: target = branch PC + di
 \end{tabular}\par}\vspace{3pt}
 \begin{itemize}\setlength{\itemsep}{4pt}
 
-\item \key{Conditional branches:} bit 4 is fixed at \code{0}; \code{cond} selects EQ (Z=1), NE (Z=0), or signed LT (N differs from V).
+\item \key{Conditional branches:} required bit 4 = \code{0} also helps identify this form; \code{cond} selects EQ (Z=1), NE (Z=0), or signed LT (N differs from V).
 \item \code{bl} writes the return address, PC + 4, to \code{x30}.
 \end{itemize}
 \end{frame}
