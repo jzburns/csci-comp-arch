@@ -223,12 +223,13 @@ Dr. J. Burns
 \node[text=white,font=\scriptsize\sffamily,inner sep=0pt] at (0,0) {\insertenumlabel};
 \end{tikzpicture}}
 \setbeamercolor{item projected}{fg=white,bg=blue!50!black}
-\begin{enumerate}\setlength{\itemsep}{13pt}
+\begin{enumerate}\setlength{\itemsep}{10pt}
 \item \key{Machine Code and 32-bit Instruction Words}
 \item \key{AArch64 Encoding Families}
 \item \key{Data-Processing Encodings}
 \item \key{Memory Instruction Encodings}
 \item \key{Branch Instruction Encodings}
+\item \key{Instruction Decoding Logic}
 \end{enumerate}
 \end{frame}
 
@@ -337,7 +338,7 @@ Arm's ISA reference specifies each format's fixed bits: required patterns that h
 \node[stage,fill=softgray,minimum width=8.7cm,minimum height=0.65cm] (word) at (0,0)
   {\textbf{32-bit instruction word} \quad bits 31\ldots0};
 \node[stage,fill=gold!18,text width=7.8cm,minimum height=0.85cm] (decode) at (0,-1.15)
-  {\textbf{Match fixed encoding bits}\\Identify the family, then the specific instruction form};
+  {\textbf{Extract and test fixed encoding bits}\\Use the matching pattern to identify the family and form};
 \draw[flow] (word) -- (decode);
 \node[family,fill=lightblue] (data) at (-4.3,-3.05)
   {\textbf{Data processing}\\\code{Rd, Rn, Rm}\\or \code{Rd, Rn, imm12}};
@@ -1165,6 +1166,82 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 
 % ============================================================
 % ============================================================
+
+\sectiondivider{Section 6}{Instruction Decoding Logic}
+
+\begin{frame}{Instruction Decoding: A Decision Tree}
+\par
+{\centering
+\scalebox{0.90}{\begin{tikzpicture}[
+font=\scriptsize,
+box/.style={draw=navy,text=black,rounded corners=2pt,align=center,inner sep=4pt},
+lane/.style={box,text width=4.22cm},
+flow/.style={-{Stealth[length=1.8mm]},draw=deepblue}
+]
+\node[box,fill=softgray] (start) at (0,0) {32-bit instruction word};
+\node[box,fill=gold!18] (root) at (0,-0.7)
+  {Read bits [28:25] to select the instruction group};
+\draw[flow] (start)--(root);
+\node[lane,fill=lightblue] (dp) at (-4.85,-1.9)
+  {\code{100x} or \code{x101} $\to$ Data processing};
+\node[lane,fill=green!8] (ls) at (0,-1.9)
+  {\code{x1x0} $\to$ Load/store};
+\node[lane,fill=gold!12] (br) at (4.85,-1.9)
+  {\code{101x} $\to$ Branch/system};
+\draw[flow] (root.south)--++(0,-0.26)-|(dp.north);
+\draw[flow] (root.south)--(ls.north);
+\draw[flow] (root.south)--++(0,-0.26)-|(br.north);
+\node[lane,fill=lightblue,anchor=north] (dptest) at (-4.85,-2.45)
+ {\textbf{Match an arithmetic form}\\
+ \strut [28:23] = \code{100010} $\to$ immediate\\
+ \strut [28:24] = \code{01011}, [21] = 0\\
+ $\to$ shifted register};
+\node[lane,fill=green!8,anchor=north] (lstest) at (0,-2.45)
+ {\textbf{Match the integer transfer}\\
+ Require [29:26] = \code{1110}, [23] = 0\\
+ \strut [31:30]: \code{10} = 4 B; \code{11} = 8 B};
+\node[lane,fill=gold!12,anchor=north] (brtest) at (4.85,-2.45)
+ {\textbf{Match a branch form}\\
+ \strut [30:26] = \code{00101} $\to$ \code{b}/\code{bl}\\
+ \strut [31:24] = \code{01010100}, [4] = 0\\
+ $\to$ \code{b.cond}};
+\draw[flow] (dp)--(dptest);
+\draw[flow] (ls)--(lstest);
+\draw[flow] (br)--(brtest);
+\node[lane,fill=lightblue,anchor=north] (dpout) at (-4.85,-4.25)
+ {\textbf{Select the operation}\\
+ Bit 30: 0 $\to$ \code{add}, 1 $\to$ \code{sub}\\
+ Bit 29: 1 selects \code{adds}/\code{subs}};
+\node[lane,fill=green!8,anchor=north] (lsout) at (0,-4.25)
+ {\textbf{Select operation and mode}\\
+ Bit 22: 0 $\to$ \code{str}, 1 $\to$ \code{ldr}\\
+ \strut [25:24] = \code{01}: unsigned offset\\
+ \strut [25:24] = \code{00}, [21] = 0: test [11:10]\\
+ \code{11} pre-index; \code{01} post-index};
+\node[lane,fill=gold!12,anchor=north] (brout) at (4.85,-4.25)
+ {\textbf{Select link or condition}\\
+ Bit 31: 0 $\to$ \code{b}, 1 $\to$ \code{bl}\\
+ For \code{b.cond}, read [3:0]};
+\draw[flow] (dptest)--(dpout);
+\draw[flow] (lstest)--(lsout);
+\draw[flow] (brtest)--(brout);
+\end{tikzpicture}}
+\par}
+\vspace{3pt}
+\scriptsize \code{x} means either bit value. Unmatched patterns go to other decode rules. Only forms taught here are shown.
+\end{frame}
+
+\begin{frame}{Decoding Steps: A Worked Example}
+\small
+Start with the raw word \hex{F90008C5}. Each result determines which bits to inspect next.
+\begin{itemize}\setlength{\itemsep}{8pt}
+\item \key{Route to a group.} Bits [28:25] are \code{1100}, which match \code{x1x0}: use the load/store path.
+\item \key{Match the transfer and address form.} Bits [29:26] are \code{1110} and bit 23 is 0. Bits [25:24] are \code{01}, so use the unsigned-offset layout.
+\item \key{Resolve the operation and width.} Bit 22 is 0 (\code{str}); bits [31:30] are \code{11} (8 bytes).
+\item \key{Interpret the operands.} Bits [9:5] give base \code{x6}; bits [4:0] give source \code{x5}. Bits [21:10] give \code{imm12=2}, so the byte offset is $2\times8=16$.
+\end{itemize}
+\key{Decoded instruction:} \code{str x5, [x6, \#16]}.
+\end{frame}
 
 \begin{frame}{Topic 9: Summary}
 \small
