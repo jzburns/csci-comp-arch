@@ -1167,6 +1167,32 @@ Read \code{x2} and \code{x3}; select the register operand and ALU addition; writ
 \end{frame}
 
 
+
+\begin{frame}{Instruction Decoding and Control Signals}
+\small
+For \code{ldr x7, [x5, \#8]}, the instruction word is \hex{F94004A7}.
+The decoder recognizes the supported instruction form and generates its control settings.
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize]
+\node[unit,text width=3.25cm,minimum height=1.3cm] (bits) at (0,0)
+ {\key{Instruction bits}\\\code{Instr[31:22]}\\\code{1111100101}};
+\node[controlunit,text width=3.3cm,minimum height=1.3cm] (decode) at (4.5,0)
+ {\key{Control decoder}\\matches the 64-bit \code{ldr}\\unsigned-offset form};
+\node[unit,text width=3.65cm,minimum height=1.3cm] (settings) at (9.3,0)
+ {\code{RegWrite=1}, \code{MemWrite=0}\\
+ \code{ALUSrc=1}, \code{MemToReg=1}\\
+ \code{PCSrc=0}};
+\draw[bus] (bits)--(decode);
+\draw[ctrl] (decode)--(settings);
+\end{tikzpicture}
+\end{center}
+\begin{itemize}\setlength{\itemsep}{6pt}
+\item These ten bits identify the access size, instruction form, and load operation; they are not a single indivisible opcode field.
+\item The decoder also selects \code{ALUControl=add} and the load/store immediate mode: zero-extend \code{imm12} and multiply by 8.
+\item Register fields select \code{x5} and \code{x7}; \code{imm12=1} produces byte offset 8. These operand fields change the selected registers and offset, while the instruction form determines the control settings.
+\end{itemize}
+\end{frame}
+
 \begin{frame}{Control Examples: Load, Store, and Branch}
 \small
 \begin{itemize}\setlength{\itemsep}{10pt}
@@ -1333,37 +1359,27 @@ These are controls for this datapath, not ISA-defined control-signal encodings.
 \end{frame}
 
 
-\begin{frame}{Timing: The Load Determines the Clock Period}
-\small
-The clock must allow the longest state-to-state path to settle before the next edge. For this datapath, a load is the usual limiting instruction.
-\begin{center}
-\begin{tikzpicture}[font=\scriptsize,node distance=.25cm]
-\node[state,minimum width=.8cm] (pc) {PC};
-\node[state,right=of pc,minimum width=2cm] (im) {Instruction\\memory};
-\node[state,right=of im,minimum width=1.8cm] (rf) {Register\\read};
-\node[logic,right=of rf,minimum width=1cm] (alu) {ALU};
-\node[state,right=of alu,minimum width=1.7cm] (dm) {Data\\memory};
-\node[unit,fill=softorange,right=of dm,minimum width=1.4cm] (wb) {WB mux};
-\node[state,right=of wb,minimum width=1.5cm] (reg) {Register\\write};
-\foreach \a/\b in {pc/im,im/rf,rf/alu,alu/dm,dm/wb,wb/reg} {\draw[arr] (\a)--(\b);}
-\end{tikzpicture}
-\end{center}
-\begin{itemize}\setlength{\itemsep}{6pt}
-\item Include PC clock-to-output delay, combinational delays, and destination-register setup time.
-\item Register reads and immediate generation can overlap. ALU-input selection must wait for the required data and control to settle.
-\item The actual limit is the longest data or control path, including multiplexers and the next-PC path.
-\item A shorter \code{add} or \code{b} path still uses the same clock period.
+\begin{frame}{Single-Cycle Clock Period}
+\normalsize
+The clock period must accommodate the longest state-to-state path. In this datapath, a load typically determines that limit.
+\vspace{.18cm}
+\begin{itemize}\setlength{\itemsep}{8pt}
+\item The loaded value must pass through address calculation, data memory, and the writeback multiplexer, reaching the register-file write input before the closing edge.
+\item Allow for source-register clock-to-output delay, combinational propagation delays, and destination-register setup time.
+\item Register reading and immediate generation can overlap. Their delays are not simply added together: the ALU needs both its operands and control settings to settle.
+\item Check every relevant data and control path, including the next-PC path. The longest required path sets the minimum clock period.
+\item Shorter instructions such as \code{add} and \code{b} still use that same period, even when their results are ready earlier.
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Single-Cycle Limitations}
 \normalsize
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item Hardware is easy to reason about, but timing is inefficient.
-  \item Every instruction waits for the worst-case datapath delay.
-  \item Simple instructions cannot finish early.
-  \item Some hardware must be duplicated when two values are needed in the same cycle.
-  \item The next topic reuses the same datapath ideas but overlaps instructions in a pipeline.
+\begin{itemize}\setlength{\itemsep}{8pt}
+\item \key{Fixed clock period:} every instruction occupies the full period required by the longest path, typically a load.
+\item \key{Uneven hardware use:} \code{add} bypasses data memory, while \code{b} uses the target adder. Their shorter paths do not reduce instruction time.
+\item \key{Memory access capacity:} a load needs both instruction fetch and data access within one cycle. A memory permitting only one access per cycle cannot serve both.
+\item \key{Arithmetic resources:} sequential-PC calculation and operand/address calculation need separate resources when required together. This datapath also provides a branch-target adder.
+\item \key{Memory delay:} the model assumes bounded read latency. Cache misses and variable-latency memory require additional mechanisms, such as wait cycles, outside the strict one-instruction-per-cycle model.
 \end{itemize}
 \end{frame}
 
