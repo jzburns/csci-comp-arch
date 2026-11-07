@@ -1,3 +1,6 @@
+% Compile with pdfLaTeX, XeLaTeX, or LuaLaTeX.
+% pdfLaTeX requires sourcecodepro; Xe/LuaLaTeX require Source Code Pro.
+\PassOptionsToPackage{table}{xcolor}
 \documentclass[aspectratio=169,11pt,t]{beamer}
 
 % ============================================================
@@ -44,7 +47,7 @@
   \usepackage[scale=0.92]{sourcecodepro}
 \else
   \usepackage{fontspec}
-  \setmonofont{Source Code Pro}[Scale=0.92]
+  \setmonofont[Scale=0.92]{Source Code Pro}
 \fi
 \usepackage{amsmath}
 \usepackage{booktabs}
@@ -65,6 +68,7 @@
 \definecolor{softgray}{RGB}{245,247,250}
 \definecolor{darkgray}{RGB}{25,28,32}
 \definecolor{gold}{RGB}{200,145,35}
+\definecolor{tablealt}{RGB}{246,248,251}
 \definecolor{softgreen}{RGB}{237,247,240}
 \definecolor{softorange}{RGB}{253,244,231}
 \definecolor{softpurple}{RGB}{245,241,251}
@@ -81,6 +85,19 @@
 \setbeamercolor{block body}{bg=lightblue,fg=darkgray}
 \setbeamercolor{normal text}{fg=darkgray,bg=white}
 
+
+% Solid list markers, independent of symbol fonts.
+\setbeamercolor{itemize item}{fg=navy}
+\setbeamercolor{itemize subitem}{fg=navy}
+\setbeamercolor{itemize subsubitem}{fg=navy}
+\setbeamercolor{enumerate item}{fg=navy}
+\setbeamercolor{enumerate subitem}{fg=navy}
+\setbeamertemplate{itemize item}{\tikz[baseline=-0.6ex]\fill[navy] (0,0) circle (2.2pt);}
+\setbeamertemplate{itemize subitem}{\tikz[baseline=-0.6ex]\fill[navy] (0,0) circle (1.7pt);}
+\setbeamertemplate{itemize subsubitem}{\tikz[baseline=-0.6ex]\fill[navy] (0,0) circle (1.4pt);}
+\setbeamertemplate{enumerate item}{\bfseries\insertenumlabel.}
+\setbeamertemplate{enumerate subitem}{\bfseries\insertsubenumlabel.}
+
 % ============================================================
 % Formatting shortcuts
 % ============================================================
@@ -90,6 +107,12 @@
 \newcommand{\bits}[1]{\texttt{#1}}
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\loadinstruction}{%
+\par\noindent\begingroup\setlength{\fboxsep}{4pt}%
+\colorbox{black!5}{\makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{\small\ttfamily ldr x7, [x5, \#8]}}%
+\endgroup\par\vspace{.08cm}%
+}
+
 
 \newcommand{\bfld}[5]{%
   \pgfmathsetmacro{\cx}{#1 + #3/2}%
@@ -102,18 +125,19 @@
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
-% Explicit page coordinates keep the divider independent of top-aligned frames.
-\node[anchor=west,inner sep=0pt,text width=.93\paperwidth] at
-  ([xshift=.55cm,yshift=.12\paperheight]current page.west) {%
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+\vspace*{\fill}
+\begin{minipage}{0.94\textwidth}
 \raggedright
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 {\color{gold}\large\bfseries #1\par}
 \vspace{0.3cm}
 {\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
-};
-\end{tikzpicture}
+\end{minipage}
+\vspace*{\fill}
 \end{frame}
 }
 
@@ -588,47 +612,75 @@ Bits \code{[4:0]} are \code{Rt} for \code{ldr}/\code{str}, and \code{Rd} for ari
 This is combinational logic: it has no clock input and stores no state.
 \end{frame}
 
-\begin{frame}{Arithmetic Logic Unit (ALU)}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-\begin{itemize}\setlength{\itemsep}{7pt}
-  \item \code{SrcA} and \code{SrcB} supply two 64-bit operands.
-  \item \code{ALUControl} selects add, subtract, or a logical operation.
-  \item \code{Result} is the 64-bit result or effective address.
-  \item The ALU can also produce \code{NZCV}; flag-setting instructions enable a separate flag-register write.
-\end{itemize}
-\column{0.48\textwidth}
-\begin{center}
-\begin{tikzpicture}
-  \pic (alu) {alu};
-\end{tikzpicture}
-\end{center}
-\end{columns}
-\vspace{.2cm}
-The ALU is combinational. Its operation does not itself update a register.
-\end{frame}
 
 \begin{frame}{AArch64 Immediate Modes in This Datapath}
 \small
+\code{ImmSrc} selects the generation rule after the instruction form has been decoded.
 \begin{center}
-\renewcommand{\arraystretch}{1.28}
+\renewcommand{\arraystretch}{1.15}
 \setlength{\tabcolsep}{5pt}
-\rowcolors{2}{softgray}{white}
-\begin{tabular}{lll}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.5cm}>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{6.3cm}}
 \toprule
-\rowcolor{white}
-\textbf{Instruction form} & \textbf{Immediate field} & \textbf{Datapath value} \\
+\textbf{Instruction form and example} & \textbf{Encoded immediate} & \textbf{Generated 64-bit value} \\
 \midrule
-\code{ldr/str xT, [xN, \#imm]} & \code{imm12} & zero-extended and scaled by access size \\
-\code{add/sub xD, xN, \#imm} & \code{imm12} & zero-extended immediate \\
-\code{b label} & \code{imm26} & sign-extended, shifted left by 2 \\
+Unshifted \code{add/sub} immediate\newline
+\code{add x1, x2, \#24}
+& \code{imm12[21:10]}\newline Field value: 24
+& Zero-extend \code{imm12}; no scaling.\newline Result: 24. \\
+\midrule
+Unsigned-offset \code{ldr/str x}\newline
+\code{ldr x7, [x5, \#8]}
+& \code{imm12[21:10]}\newline Field value: 1
+& Zero-extend \code{imm12}, then multiply by 8.\newline Result: 8-byte offset. \\
+\midrule
+Unconditional branch\newline
+\code{b label}\newline Target 8 bytes earlier
+& \code{imm26[25:0]}\newline Signed value: $-2$
+& Append two zero bits, then sign-extend:\newline \code{SignExtend(imm26:00, 64)}.\newline Result: $-8$-byte offset. \\
 \bottomrule
 \end{tabular}
 \end{center}
-\vspace{0.15cm}
-\code{ImmSrc} selects the field, extension, and scaling.
-The \code{add}/\code{sub} row uses unshifted immediates.
+\scriptsize
+Load/store scaling is 8 here because the supported transfers are 64-bit. Branch offsets are added to the address of the branch instruction itself.
 \end{frame}
+
+\begin{frame}{Arithmetic Logic Unit (ALU)}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{.55\textwidth}
+\begin{itemize}\setlength{\itemsep}{5pt}
+\item \code{SrcA} and \code{SrcB}: two 64-bit operands.
+\item \code{ALUControl}: a 2-bit operation selector in this design.
+\item \code{Result}: the 64-bit arithmetic/logical result or effective address.
+\end{itemize}
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{ll}
+\toprule
+\textbf{ALUControl[1:0]} & \textbf{Operation} \\
+\midrule
+\code{00} & Add: \code{SrcA + SrcB} \\
+\code{01} & Subtract: \code{SrcA - SrcB} \\
+\code{10} & Bitwise AND \\
+\code{11} & Bitwise OR \\
+\bottomrule
+\end{tabular}
+\end{center}
+\scriptsize
+These example control codes are chosen for this datapath; they are not AArch64 instruction encodings.
+\column{.43\textwidth}
+\begin{center}
+\begin{tikzpicture}[scale=.88,transform shape]
+\pic (alu) {alu};
+\end{tikzpicture}
+\end{center}
+\vspace{.15cm}
+\scriptsize
+The ALU is combinational. NZCV flags require separate storage and a flag-write enable; these are omitted here.
+\end{columns}
+\end{frame}
+
+
 
 \begin{frame}{Data Memory}
 \small
@@ -710,8 +762,9 @@ opcode/form & \bits{1111100101} & 64-bit load, unsigned immediate \\
 \end{frame}
 
 \begin{frame}{Steps 1--3: Fetch, Decode, and Read the Base Register}
+\loadinstruction
 \small
-\code{ldr x7, [x5, \#8]}\hfill Instruction word: \hex{F94004A7}
+
 \begin{center}
 \begin{tikzpicture}[font=\scriptsize]
 \node[state,minimum width=1.2cm] (pc) at (0,0) {PC};
@@ -726,52 +779,43 @@ opcode/form & \bits{1111100101} & 64-bit load, unsigned immediate \\
 \end{tikzpicture}
 \end{center}
 \begin{enumerate}\setlength{\itemsep}{7pt}
-\item \key{Fetch:} the PC addresses instruction memory, which returns the instruction word.
+\item \key{Fetch:} the PC addresses instruction memory, which returns instruction word \hex{F94004A7}.
 \item \key{Decode:} identify the load and its fields. \code{Rn} selects the base register; \code{Rt} selects the destination.
 \item \key{Read:} the register file supplies the contents of \code{x5}. Immediate generation can proceed alongside this read; address calculation needs both results.
 \end{enumerate}
 \end{frame}
 
-\begin{frame}{Step 4: Generate the Offset}
-\begin{columns}[T,onlytextwidth]
-\column{0.47\textwidth}
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Field value: \code{imm12 = 1}.
-  \item Access size: 8 bytes, because this is \code{ldr x}.
-  \item Byte offset: \(1 \times 8 = 8\).
-\end{itemize}
-\column{0.50\textwidth}
-\begin{center}
-\begin{tikzpicture}[font=\small,scale=.92,transform shape]
-  \node[unit,minimum width=1.8cm] (imm) at (0,0) {\code{imm12}\\\code{= 1}};
-  \node[logic,minimum width=2.65cm,minimum height=1.35cm,font=\scriptsize] (ext) at (2.7,0) {Immediate\\generator\\zero-extend, scale};
-  \node[unit,minimum width=1.65cm] (out) at (5.4,0) {\code{ExtImm}\\\code{= 8}};
-  \draw[arr] (imm.east)--(ext.west);
-  \draw[arr] (ext.east)--(out.west);
-\end{tikzpicture}
-\end{center}
-\end{columns}
-\vspace{.15cm}
-AArch64 unsigned load/store offsets are scaled by the access size.
-\end{frame}
+\begin{frame}{Steps 4--5: Generate the Offset and Compute the Address}
+\loadinstruction
+\small
 
-\begin{frame}{Step 5: Compute the Effective Address}
 \begin{center}
-\begin{tikzpicture}[font=\small]
-  \node[unit,minimum width=3cm] (base) at (0,.8) {\code{RD1}\\base value from \code{x5}};
-  \node[unit,minimum width=3cm] (imm) at (0,-.8) {\code{ExtImm = 8}};
-  \node[logic,minimum width=2cm,minimum height=1.6cm] (alu) at (4.4,0) {ALU\\add};
-  \node[unit,minimum width=3.1cm] (addr) at (8.6,0) {\code{ALUResult}\\effective address};
-  \draw[bus] (base.east) -- ++(.65,0) |- ([yshift=.4cm]alu.west);
-  \draw[bus] (imm.east) -- ++(.65,0) |- ([yshift=-.4cm]alu.west);
-  \draw[bus] (alu.east) -- (addr.west);
+\begin{tikzpicture}[font=\scriptsize,scale=.9,transform shape]
+\node[unit,minimum width=2.5cm,minimum height=.85cm] (base) at (0,1.3)
+ {\code{RD1}\\base value from \code{x5}};
+\node[unit,minimum width=1.8cm,minimum height=.85cm] (imm) at (-1,-.65) {\code{imm12=1}};
+\node[logic,text width=2.8cm,minimum width=2.9cm,minimum height=1.1cm] (gen) at (2.2,-.65)
+ {Immediate generator\\zero-extend, multiply by 8\\\code{ExtImm=8}};
+\node[logic,minimum width=1.8cm,minimum height=1.6cm] (alu) at (6,.35) {ALU\\add};
+\node[unit,minimum width=3.1cm,minimum height=1.1cm] (addr) at (10,.35)
+ {\code{ALUResult}\\effective address};
+\draw[bus] (imm.east)--(gen.west);
+\draw[bus] (base.east)--(4.3,1.3)|-([yshift=.4cm]alu.west);
+\draw[bus] (gen.east)--(4.3,-.65)|-([yshift=-.4cm]alu.west);
+
+\draw[bus] (alu.east)--(addr.west);
 \end{tikzpicture}
 \end{center}
-\vspace{0.2cm}
-For a load or store, the ALU is used as an address adder.
+\begin{enumerate}\setcounter{enumi}{3}\setlength{\itemsep}{9pt}
+\item \key{Generate the byte offset.} This is an 8-byte load, so the encoded \code{imm12=1} becomes \code{ExtImm=8}.
+\item \key{Calculate the effective address.} The ALU adds the base value read from \code{x5} to \code{ExtImm}:\par\vspace{3pt}
+\hspace*{.3cm}\code{Effective address = contents of x5 + 8}.
+\end{enumerate}
+
 \end{frame}
 
 \begin{frame}{Step 6: Read Data Memory}
+\loadinstruction
 \begin{center}
 \begin{tikzpicture}[font=\small]
   \node[unit,minimum width=2.8cm] (addr) at (0,0) {Effective\\address};
@@ -786,6 +830,7 @@ The memory read value becomes the candidate writeback value for \code{x7}.
 \end{frame}
 
 \begin{frame}{Step 7: Write Back and Update PC}
+\loadinstruction
 \begin{center}
 \begin{tikzpicture}[font=\small]
   \node[unit,minimum width=2.8cm] (data) at (0,1) {\code{ReadData}};
@@ -802,10 +847,10 @@ At the clock edge, \code{x7} receives the loaded value and the PC receives \(PC+
 
 
 \begin{frame}{Complete Load Datapath}
+\loadinstruction
 \small
-\code{ldr x7, [x5, \#8]}
 \begin{center}
-\begin{tikzpicture}[font=\scriptsize,scale=.97,transform shape]
+\begin{tikzpicture}[font=\scriptsize,scale=.95,transform shape]
   \node[state,minimum width=1.2cm,minimum height=.9cm,font=\small] (pc) at (0,0) {PC};
   \node[state,minimum width=2cm,minimum height=1.3cm,font=\scriptsize] (imem) at (2.25,0) {Instruction\\memory};
   \node[logic,minimum width=1.8cm,minimum height=.9cm,font=\small] (add4) at (2.25,2) {+4};
@@ -925,7 +970,7 @@ ahead: sub x1,x1,#1  // 0x1008
 \begin{verbatim}
 again: add x0,x0,#1   // 0x2000
        sub x1,x1,#1   // 0x2004
-       b again       // 0x2008
+       b again        // 0x2008
 \end{verbatim}
 \small
 \code{0x2000 - 0x2008 = -8 bytes}
@@ -977,7 +1022,7 @@ The assembler calculates the displacement from the label. Each A64 instruction o
 \begin{frame}{Branch Path: \texttt{b label}}
 \small
 \begin{center}
-\begin{tikzpicture}[font=\small,scale=.91,transform shape]
+\begin{tikzpicture}[font=\small,scale=.88,transform shape]
   \node[state,minimum width=1.7cm] (pc) at (0,.5) {PC};
   \node[unit,minimum width=3.8cm,font=\scriptsize] (imm) at (0,-2.5)
     {Signed byte offset\\\code{SignExtend(imm26 : 00)}};
@@ -998,8 +1043,6 @@ The assembler calculates the displacement from the label. Each A64 instruction o
   \node[font=\ttfamily\tiny,above left,inner sep=1pt] at (pcmux-lower) {1};
 \end{tikzpicture}
 \end{center}
-\vspace{.03cm}
-For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At the clock edge, this target replaces the value in the same PC register.
 \end{frame}
 
 
@@ -1014,7 +1057,7 @@ For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At th
   \node[state,minimum width=1cm,minimum height=1cm,font=\small] (pc) at (0,0) {PC};
   \node[state,minimum width=1.65cm,minimum height=1.2cm,font=\scriptsize] (imem) at (1.8,0) {Instruction\\memory};
   \node[state,minimum width=1.5cm,minimum height=1.75cm,font=\scriptsize] (rf) at (5.3,0) {Register\\file\\\code{RegWrite}};
-  \pic (srcmux) at (6.65,-.5) {muxright={ALU\\Src}};
+  \pic (srcmux) at (6.65,-.5) {muxright={}};
   \node[logic,minimum width=1.3cm,minimum height=1.3cm,font=\small] (alu) at (8.85,0) {ALU};
   \node[state,minimum width=1.8cm,minimum height=1.3cm,font=\scriptsize] (dmem) at (10.95,0) {Data\\memory};
   \pic (wbmux) at (12.4,0) {muxwriteback};
@@ -1025,7 +1068,7 @@ For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At th
   \node[controlunit,minimum width=2.6cm,minimum height=.55cm,inner sep=2pt,font=\scriptsize] (decode) at (5.6,2.95) {Control decode};
   \node[logic,minimum width=1.6cm,minimum height=.8cm,font=\small] (add4) at (2,2.55) {+4};
   \node[logic,minimum width=1.7cm,minimum height=.85cm,font=\scriptsize] (target) at (9.5,1.85) {Target\\adder};
-  \pic (pcmux) at (12.4,2.2) {muxright={PC\\Src}};
+  \pic (pcmux) at (12.4,2.2) {muxright={}};
 
   \coordinate (rf-A1) at ([yshift=.62cm]rf.west);
   \coordinate (rf-A3) at ([yshift=-.68cm]rf.west);
@@ -1102,24 +1145,26 @@ For \code{b}, \code{PCSrc=1} selects \(PC_{\text{branch}}+\text{offset}\). At th
 \fill[deepblue] (2.85,.4) circle (1.0pt);
 \node[font=\ttfamily\tiny,above,inner sep=1pt] at (6.7,-2.95) {ImmSrc};
   \draw[cbranch] (7.1,1.15)--(srcmux-selN);
+  \node[font=\ttfamily\scriptsize,anchor=center,fill=white,inner sep=1.5pt] at (7.1,.94) {ALUSrc};
   \draw[cbranch] (8.85,1.15)--(alu.north);
   \draw[cbranch] (12.9,1.15)--(wbmux-selN);
   \draw[cbranch] (12.85,1.15)--(pcmux-selS);
+  \node[font=\ttfamily\scriptsize,anchor=east,fill=white,inner sep=1pt] at (12.75,1.45) {PCSrc};
   \draw[cbranch] (11.25,1.15)--(mem-WE);
   \foreach \xx in {2.85,5.5,7.1,7.4,8.85,11.25,12.85,12.9} {\fill[deepblue] (\xx,1.15) circle (1.0pt);}
 
 
   \node[font=\ttfamily\tiny,right,inner sep=1pt] at (mem-WE) {MemWrite};
   \node[font=\ttfamily\tiny,above,inner sep=1pt] at (10,0) {A};
-  \node[font=\ttfamily\tiny,above,inner sep=1pt] at (alu-A) {SrcA};
-  \node[font=\ttfamily\tiny,below,inner sep=1pt] at (alu-B) {SrcB};
+  \node[font=\ttfamily\scriptsize,anchor=west,inner sep=1pt] at ([xshift=.07cm]alu-A) {SrcA};
+  \node[font=\ttfamily\scriptsize,anchor=west,inner sep=1pt] at ([xshift=.07cm]alu-B) {SrcB};
   % Data-input indices, kept clear of crossings and arrowheads.
-  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (srcmux-upper) {0};
-  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (srcmux-lower) {1};
+  \node[font=\ttfamily\tiny,anchor=west,inner sep=.5pt] at ([xshift=.06cm]srcmux-upper) {0};
+  \node[font=\ttfamily\tiny,anchor=west,inner sep=.5pt] at ([xshift=.06cm]srcmux-lower) {1};
   \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (wbmux-upper) {1};
   \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (wbmux-lower) {0};
-  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (pcmux-upper) {0};
-  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (pcmux-lower) {1};
+  \node[font=\ttfamily\tiny,anchor=west,inner sep=.5pt] at ([xshift=.06cm]pcmux-upper) {0};
+  \node[font=\ttfamily\tiny,anchor=west,inner sep=.5pt] at ([xshift=.06cm]pcmux-lower) {1};
 \end{tikzpicture}
 \end{center}
 \scriptsize
@@ -1215,7 +1260,7 @@ For the load and store, \code{PCSrc=0} selects \code{PC+4}. All settings settle 
   \node[state,minimum width=1cm,minimum height=1cm,font=\small] (pc) at (0,0) {PC};
   \node[state,minimum width=1.65cm,minimum height=1.2cm,font=\scriptsize] (imem) at (1.8,0) {Instruction\\memory};
   \node[state,minimum width=1.5cm,minimum height=1.75cm,font=\scriptsize] (rf) at (5.3,0) {Register\\file\\\code{RegWrite}};
-  \pic (srcmux) at (6.65,-.5) {muxright={ALU\\Src}};
+  \pic (srcmux) at (6.65,-.5) {muxright={}};
   \node[logic,minimum width=1.3cm,minimum height=1.3cm,font=\small] (alu) at (8.85,0) {ALU};
   \node[state,minimum width=1.8cm,minimum height=1.3cm,font=\scriptsize] (dmem) at (10.95,0) {Data\\memory};
   \pic (wbmux) at (12.4,0) {muxwriteback};
@@ -1226,7 +1271,7 @@ For the load and store, \code{PCSrc=0} selects \code{PC+4}. All settings settle 
   \node[controlunit,minimum width=2.6cm,minimum height=.55cm,inner sep=2pt,font=\scriptsize] (decode) at (5.6,2.95) {Control decode};
   \node[logic,minimum width=1.6cm,minimum height=.8cm,font=\small] (add4) at (2,2.55) {+4};
   \node[logic,minimum width=1.7cm,minimum height=.85cm,font=\scriptsize] (target) at (9.5,1.85) {Target\\adder};
-  \pic (pcmux) at (12.4,2.2) {muxright={PC\\Src}};
+  \pic (pcmux) at (12.4,2.2) {muxright={}};
 
   \coordinate (rf-A1) at ([yshift=.62cm]rf.west);
   \coordinate (rf-A3) at ([yshift=-.68cm]rf.west);
@@ -1303,24 +1348,26 @@ For the load and store, \code{PCSrc=0} selects \code{PC+4}. All settings settle 
 \fill[deepblue] (2.85,.4) circle (1.0pt);
 \node[font=\ttfamily\tiny,above,inner sep=1pt] at (6.7,-2.95) {ImmSrc};
   \draw[cbranch] (7.1,1.15)--(srcmux-selN);
+  \node[font=\ttfamily\scriptsize,anchor=center,fill=white,inner sep=1.5pt] at (7.1,.94) {ALUSrc};
   \draw[cbranch] (8.85,1.15)--(alu.north);
   \draw[cbranch] (12.9,1.15)--(wbmux-selN);
   \draw[cbranch] (12.85,1.15)--(pcmux-selS);
+  \node[font=\ttfamily\scriptsize,anchor=east,fill=white,inner sep=1pt] at (12.75,1.45) {PCSrc};
   \draw[cbranch] (11.25,1.15)--(mem-WE);
   \foreach \xx in {2.85,5.5,7.1,7.4,8.85,11.25,12.85,12.9} {\fill[deepblue] (\xx,1.15) circle (1.0pt);}
 
 
   \node[font=\ttfamily\tiny,right,inner sep=1pt] at (mem-WE) {MemWrite};
   \node[font=\ttfamily\tiny,above,inner sep=1pt] at (10,0) {A};
-  \node[font=\ttfamily\tiny,above,inner sep=1pt] at (alu-A) {SrcA};
-  \node[font=\ttfamily\tiny,below,inner sep=1pt] at (alu-B) {SrcB};
+  \node[font=\ttfamily\scriptsize,anchor=west,inner sep=1pt] at ([xshift=.07cm]alu-A) {SrcA};
+  \node[font=\ttfamily\scriptsize,anchor=west,inner sep=1pt] at ([xshift=.07cm]alu-B) {SrcB};
   % Data-input indices, kept clear of crossings and arrowheads.
-  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (srcmux-upper) {0};
-  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (srcmux-lower) {1};
+  \node[font=\ttfamily\tiny,anchor=west,inner sep=.5pt] at ([xshift=.06cm]srcmux-upper) {0};
+  \node[font=\ttfamily\tiny,anchor=west,inner sep=.5pt] at ([xshift=.06cm]srcmux-lower) {1};
   \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (wbmux-upper) {1};
   \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (wbmux-lower) {0};
-  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (pcmux-upper) {0};
-  \node[font=\ttfamily\tiny,above left,fill=white,inner sep=.6pt] at (pcmux-lower) {1};
+  \node[font=\ttfamily\tiny,anchor=west,inner sep=.5pt] at ([xshift=.06cm]pcmux-upper) {0};
+  \node[font=\ttfamily\tiny,anchor=west,inner sep=.5pt] at ([xshift=.06cm]pcmux-lower) {1};
 \end{tikzpicture}
 \end{center}
 \scriptsize
