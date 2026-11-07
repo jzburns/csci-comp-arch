@@ -1,6 +1,3 @@
-% Compile with pdfLaTeX, XeLaTeX, or LuaLaTeX.
-% pdfLaTeX requires sourcecodepro; Xe/LuaLaTeX require Source Code Pro.
-\PassOptionsToPackage{table}{xcolor}
 \documentclass[aspectratio=169,11pt,t]{beamer}
 
 % ============================================================
@@ -24,15 +21,20 @@
   \end{beamercolorbox}}
 }
 
-\setbeamersize{text margin left=0.65cm,text margin right=0.65cm}
+\setbeamersize{
+  text margin left=0.65cm,
+  text margin right=0.65cm
+}
 
 \setbeamerfont{frametitle}{size=\Large, series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize, series=\bfseries}
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
+% Block vertical padding adjustments
 \addtobeamertemplate{block begin}{\vspace{0.1em}}{\vspace{0.1em}}
 \addtobeamertemplate{block end}{}{\vspace{0.2em}}
 
+% Base list item separation
 \setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{4pt}}
 \setbeamertemplate{itemize/enumerate subbody begin}{\setlength{\itemsep}{2pt}}
 
@@ -54,9 +56,14 @@
 \usepackage{array}
 \usepackage{colortbl}
 \usepackage{tikz}
-\usepackage{adjustbox}
 
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc,decorations.pathreplacing}
+\usetikzlibrary{
+  arrows.meta,
+  positioning,
+  shapes.geometric,
+  calc,
+  decorations.pathreplacing
+}
 
 % ============================================================
 % Colors
@@ -68,10 +75,6 @@
 \definecolor{softgray}{RGB}{245,247,250}
 \definecolor{darkgray}{RGB}{25,28,32}
 \definecolor{gold}{RGB}{200,145,35}
-\definecolor{tablealt}{RGB}{246,248,251}
-\definecolor{softgreen}{RGB}{237,247,240}
-\definecolor{softorange}{RGB}{253,244,231}
-\definecolor{softpurple}{RGB}{245,241,251}
 
 \setbeamercolor{palette primary}{bg=navy,fg=white}
 \setbeamercolor{palette secondary}{bg=deepblue,fg=white}
@@ -85,60 +88,74 @@
 \setbeamercolor{block body}{bg=lightblue,fg=darkgray}
 \setbeamercolor{normal text}{fg=darkgray,bg=white}
 
-
-% Solid list markers, independent of symbol fonts.
-\setbeamercolor{itemize item}{fg=navy}
-\setbeamercolor{itemize subitem}{fg=navy}
-\setbeamercolor{itemize subsubitem}{fg=navy}
-\setbeamercolor{enumerate item}{fg=navy}
-\setbeamercolor{enumerate subitem}{fg=navy}
-\setbeamertemplate{itemize item}{\tikz[baseline=-0.6ex]\fill[navy] (0,0) circle (2.2pt);}
-\setbeamertemplate{itemize subitem}{\tikz[baseline=-0.6ex]\fill[navy] (0,0) circle (1.7pt);}
-\setbeamertemplate{itemize subsubitem}{\tikz[baseline=-0.6ex]\fill[navy] (0,0) circle (1.4pt);}
-\setbeamertemplate{enumerate item}{\bfseries\insertenumlabel.}
-\setbeamertemplate{enumerate subitem}{\bfseries\insertsubenumlabel.}
-
 % ============================================================
 % Formatting shortcuts
 % ============================================================
 
 \setlength{\parskip}{0pt}
+
 \newcommand{\key}[1]{\textbf{#1}}
 \newcommand{\bits}[1]{\texttt{#1}}
 \newcommand{\hex}[1]{\texttt{0x#1}}
 \newcommand{\code}[1]{\texttt{#1}}
-\newcommand{\loadinstruction}{%
-\par\noindent\begingroup\setlength{\fboxsep}{4pt}%
-\colorbox{black!5}{\makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{\small\ttfamily ldr x7, [x5, \#8]}}%
-\endgroup\par\vspace{.08cm}%
-}
-
-
+% Simple fixed-width bit-field box for instruction diagrams.
+% Coordinates use bit positions; set x scale in the tikzpicture.
 \newcommand{\bfld}[5]{%
   \pgfmathsetmacro{\cx}{#1 + #3/2}%
   \fill[#5] (#1,#2) rectangle ++(#3,0.72);%
   \draw[navy,line width=0.7pt] (#1,#2) rectangle ++(#3,0.72);%
-  \node[font=\ttfamily\scriptsize,align=center,text=darkgray] at (\cx,#2+0.36) {#4};%
+  \node[font=\scriptsize\ttfamily,text height=1.5ex,text depth=0.35ex,align=center,text=darkgray] at (\cx,#2+0.36) {#4};%
+}
+\newcommand{\bitnote}[3]{%
+  \node[font=\tiny,text height=1.5ex,text depth=0.35ex,align=center,text=darkgray] at (#1,#2) {#3};%
+}
+\newcommand{\codeblock}[1]{%
+  \begingroup\small\ttfamily\setlength{\fboxsep}{5pt}\colorbox{softgray}{\begin{minipage}{0.92\linewidth}#1\end{minipage}}\endgroup%
 }
 
+
+% Section divider macro
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west)
   rectangle ([yshift=.15cm]current page.south east);
 \end{tikzpicture}
+
 \vspace*{\fill}
+
 \begin{minipage}{0.94\textwidth}
 \raggedright
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
 \end{minipage}
+
 \vspace*{\fill}
+
 \end{frame}
+}
+
+% ============================================================
+
+% Additional packages and component colours used by this lecture.
+\usepackage{adjustbox}
+\definecolor{softgreen}{RGB}{237,247,240}
+\definecolor{softorange}{RGB}{253,244,231}
+\definecolor{softpurple}{RGB}{245,241,251}
+\newcommand{\loadinstruction}{%
+\par\noindent\begingroup\setlength{\fboxsep}{4pt}%
+\colorbox{black!5}{\makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{\small\ttfamily ldr x7, [x5, \#8]}}%
+\endgroup\par\vspace{.08cm}%
 }
 
 \tikzset{
@@ -285,10 +302,7 @@
   }}
 }
 
-% ============================================================
 % Metadata
-% ============================================================
-
 \title[Topic 10]{Single-Cycle Microarchitecture \& Datapath}
 \subtitle{State elements, datapath components, control signals, and AArch64 instruction flow}
 \author{Computer Organization \& Architecture}
@@ -304,23 +318,48 @@
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
-% Cover text and author use fixed page positions, matching the template layout.
-\node[anchor=north west,inner sep=0pt,text width=.94\textwidth] at
-  ([xshift=.65cm,yshift=-.10\paperheight]current page.north west) {%
-\raggedright
-{\color{gold}\small\bfseries CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 10\par}
-\vspace{0.3cm}
-{\color{white}\fontsize{24}{28}\selectfont\bfseries Single-Cycle Microarchitecture\\[0.12cm]\& Datapath\par}
-\vspace{0.35cm}
-{\color{white!80}\large AArch64 datapath components, control signals,\\and a worked \code{ldr} instruction path\par}
-};
-\node[anchor=north west,inner sep=0pt,text=white!70,font=\small] at
-  ([xshift=.65cm,yshift=-.72\paperheight]current page.north west) {Dr. J. Burns};
 \end{tikzpicture}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries
+CSCI 2406 \;|\; Computer Organization \& Architecture \;|\; TOPIC 10
+\par}
+
+\vspace{0.25cm}
+
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+Single-Cycle Microarchitecture\\[0.08cm]\& Datapath
+\par}
+
+\vspace{0.35cm}
+
+{\color{white!80}\large
+AArch64 datapath components, control signals,\\and a worked \code{ldr} instruction path
+\par}
+\end{minipage}
+
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
 \begin{frame}{Topic 10 Outline}
-\setbeamertemplate{enumerate item}{\arabic{enumi}.}
+\setbeamertemplate{enumerate item}{%
+\begin{tikzpicture}[baseline=-0.65ex]
+\fill[black!20] (0.035,-0.035) circle (0.145);
+\fill[blue!35!black] (0,0) circle (0.145);
+\fill[blue!55!black] (-0.012,0.012) circle (0.123);
+\fill[blue!65!white] (-0.027,0.035) circle (0.096);
+\fill[blue!45!black] (0.008,-0.018) circle (0.102);
+\node[text=white,font=\scriptsize\sffamily,inner sep=0pt] at (0,0) {\insertenumlabel};
+\end{tikzpicture}}
+\setbeamercolor{item projected}{fg=white,bg=blue!50!black}
 \begin{enumerate}\setlength{\itemsep}{5pt}
   \item \key{Single-Cycle Microarchitecture}
   \begin{itemize}\item Architectural state and execution within one clock period.\end{itemize}
@@ -337,7 +376,7 @@
 \end{enumerate}
 \end{frame}
 
-\sectiondivider{PART 1}{Single-Cycle Microarchitecture}
+\sectiondivider{Section 1}{Single-Cycle Microarchitecture}
 
 \begin{frame}{Microarchitecture}
 \normalsize
@@ -453,7 +492,7 @@ These are the instructions supported by the single-cycle datapath developed thro
 Examples use \code{x0}--\code{x30}. Handling \code{sp}/\code{xzr} requires register-31 logic; conditional branches require flag storage and condition-check logic. These additions are not shown.
 \end{frame}
 
-\sectiondivider{PART 2}{State Elements and Core Datapath Blocks}
+\sectiondivider{Section 2}{State Elements and Core Datapath Blocks}
 
 \begin{frame}{Datapath and Control}
 \begin{center}
@@ -707,7 +746,7 @@ The data-memory interface accesses the program's data bytes for loads and stores
 
 
 
-\sectiondivider{PART 3}{Worked Load Path}
+\sectiondivider{Section 3}{Worked Load Path}
 
 \begin{frame}{Load Example}
 \normalsize
@@ -941,7 +980,7 @@ Dashed outlines identify control logic; dashed bundles carry separate control si
 These control values select one path through the same hardware.
 \end{frame}
 
-\sectiondivider{PART 4}{Extending the Datapath}
+\sectiondivider{Section 4}{Extending the Datapath}
 
 \begin{frame}[fragile]{Branching in AArch64: Forward and Backward}
 \small
@@ -1171,7 +1210,7 @@ The assembler calculates the displacement from the label. Each A64 instruction o
 Dashed bundles: separate control signals. Triangles: muxes. Trace \code{add} and \code{str} in Self-Test 2.
 \end{frame}
 
-\sectiondivider{PART 5}{Control Signals and Timing}
+\sectiondivider{Section 5}{Control Signals and Timing}
 
 \begin{frame}{How Control Selects an Instruction Path}
 \begin{itemize}\setlength{\itemsep}{7pt}
@@ -1440,7 +1479,7 @@ The clock period must accommodate the longest state-to-state path. In this datap
 \end{itemize}
 \end{frame}
 
-\sectiondivider{PART 6}{Summary and Review}
+\sectiondivider{Section 6}{Summary and Review}
 
 \begin{frame}{Topic 10 Summary}
 \normalsize
