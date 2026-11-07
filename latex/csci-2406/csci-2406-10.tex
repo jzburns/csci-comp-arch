@@ -154,7 +154,7 @@
 \definecolor{softpurple}{RGB}{245,241,251}
 \newcommand{\loadinstruction}{%
 \par\noindent\begingroup\setlength{\fboxsep}{4pt}%
-\colorbox{black!5}{\makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{\small\ttfamily ldr x7, [x5, \#8]}}%
+\colorbox{black!5}{\makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{\small\ttfamily ldr x7, [x5, \#24]}}%
 \endgroup\par\vspace{.08cm}%
 }
 
@@ -366,7 +366,7 @@ Dr. J. Burns
   \item \key{State Elements and Core Datapath Blocks}
   \begin{itemize}\item PC, memories, register file, ALU, and immediate generator.\end{itemize}
   \item \key{Worked Load Path}
-  \begin{itemize}\item The complete path for \code{ldr x7, [x5, \#8]}.\end{itemize}
+  \begin{itemize}\item The complete path for \code{ldr x7, [x5, \#24]}.\end{itemize}
   \item \key{Extending the Datapath}
   \begin{itemize}\item PC-relative branches and the complete extended datapath.\end{itemize}
   \item \key{Control Signals and Timing}
@@ -565,31 +565,33 @@ A single-cycle load needs instruction fetch and data access within the same cycl
 \begin{center}
 \begin{tikzpicture}[font=\small]
   \node[state,minimum width=1.6cm] (pc) at (0,.45) {PC};
-  \pic[scale=.9,transform shape] (imem) at (3,0) {imem};
-  \node[unit,minimum width=3cm] (instr) at (7.8,.45) {32-bit instruction\\\code{Instr}};
-  \node[logic,minimum width=1.6cm] (add4) at (0,-1.65) {+4};
-  \draw[bus] (pc.east)--node[above,font=\scriptsize]{address} (imem-A);
+  \pic[scale=.8,transform shape] (imem) at (2.5,.05) {imem};
+  \node[unit,minimum width=3cm] (instr) at (7.2,.45) {32-bit instruction\\\code{Instr}};
+  \node[unit,minimum width=5.4cm,minimum height=.75cm,font=\scriptsize] (next) at (4.4,-1.4)
+    {Next PC: \code{PC+4} \textbf{OR} branch target address};
+  \draw[bus] (pc.east)--node[above,font=\scriptsize]{address}(imem-A);
   \draw[bus] (imem-RD)--(instr.west);
-  \draw[arr] (pc.south)--(add4.north);
-  \draw[arr] (add4.east)--++(4,0) node[right,font=\scriptsize]{next sequential PC};
+  \draw[arr] (pc.south)--(0,-1.4)--(next.west);
+  \draw[arr] (next.south)--(4.4,-2.25)--(-1.5,-2.25)--(-1.5,.45)--(pc.west);
 \end{tikzpicture}
 \end{center}
-\vspace{.12cm}
+\small
 \begin{itemize}\setlength{\itemsep}{6pt}
   \item The instruction-memory interface fetches instruction bytes from program memory: \code{A} receives the PC; \code{RD} returns the 32-bit word.
   \item Instruction memory is read combinationally in this single-cycle datapath.
-  \item AArch64 instructions are 4 bytes, so the sequential PC value is \(PC+4\).
+  \item Sequential execution uses \code{PC+4}; \code{b} selects a branch target. The PC captures its next value at the clock edge.
 \end{itemize}
+
 \end{frame}
 
 \begin{frame}{Parsing the Instruction Word}
 \small
-Example: \code{ldr x7, [x5, \#8]}.
+Example: \code{ldr x7, [x5, \#24]}.
 \vspace{-.08cm}
 \begin{center}
 \begin{tikzpicture}[x=.32cm,y=.7cm]
   \bfld{0}{0}{10}{opcode/form}{gold!22}
-  \bfld{10}{0}{12}{imm12 = 1}{lightblue}
+  \bfld{10}{0}{12}{imm12 = 3}{lightblue}
   \bfld{22}{0}{5}{Rn = 5}{blue!8}
   \bfld{27}{0}{5}{Rt = 7}{lightblue}
   \foreach \xx/\range/\width in {5/{31:22}/{10 bits},16/{21:10}/{12 bits},24.5/{9:5}/{5 bits},29.5/{4:0}/{5 bits}} {
@@ -608,7 +610,7 @@ Example: \code{ldr x7, [x5, \#8]}.
   \draw[bus] (pc.east)--(imem-A);
   \draw[bus] (imem-RD)--(instrbus);
   \draw[navy,line width=1.4pt] (5.55,-1.75)--(5.55,2);
-  \node[controlunit,text width=2.05cm,minimum width=2.19cm,inner sep=2pt,font=\scriptsize] (decode) at (6.85,2)
+  \node[controlunit,text width=2.05cm,minimum width=2.19cm,inner sep=2pt,font=\scriptsize] (decode) at (7.15,2)
     {Control decode\\opcode/form\\\code{Instr[31:22]}};
   \draw[bus] (5.55,2)--(decode.west);
   \fill[navy] (5.55,2) circle (1.5pt);
@@ -617,7 +619,7 @@ Example: \code{ldr x7, [x5, \#8]}.
   \draw[bus] (5.55,-.44)--node[above,font=\ttfamily\scriptsize]{Rt = 7} (rf-A3);
   \fill[navy] (5.55,-.44) circle (1.5pt);
   \node[unit,minimum width=3.25cm,minimum height=.7cm,inner sep=2pt,font=\scriptsize] (imm) at (8.7,-1.75)
-    {To immediate generator\\\code{imm12[21:10] = 1}};
+    {To immediate generator\\\code{imm12[21:10] = 3}};
   \draw[bus] (5.55,-1.75)--(imm.west);
   \fill[navy] (5.55,-1.75) circle (1.5pt);
   \node[font=\ttfamily\scriptsize,anchor=east] at (5.3,-1.15) {Instr: 32 bits};
@@ -625,7 +627,7 @@ Example: \code{ldr x7, [x5, \#8]}.
 \end{center}
 \vspace{-.15cm}
 \scriptsize
-The bar is wiring, with no stored state. For this load: \code{Rn} $\rightarrow$ \code{A1}, \code{Rt} $\rightarrow$ \code{A3}; \code{A2} is unused.\\[1pt]
+For this load: \code{Rn} $\rightarrow$ \code{A1}, \code{Rt} $\rightarrow$ \code{A3}; \code{A2} is unused.\\[1pt]
 Bits \code{[4:0]} are \code{Rt} for \code{ldr}/\code{str}, and \code{Rd} for arithmetic instructions.
 \end{frame}
 
@@ -668,9 +670,9 @@ Unshifted \code{add/sub} immediate\newline
 & Zero-extend \code{imm12}; no scaling.\newline Result: 24. \\
 \midrule
 Unsigned-offset \code{ldr/str x}\newline
-\code{ldr x7, [x5, \#8]}
-& \code{imm12[21:10]}\newline Field value: 1
-& Zero-extend \code{imm12}, then multiply by 8.\newline Result: 8-byte offset. \\
+\code{ldr x7, [x5, \#24]}
+& \code{imm12[21:10]}\newline Field value: 3
+& Zero-extend \code{imm12}, then multiply by 8.\newline Result: 24-byte offset. \\
 \midrule
 Unconditional branch\newline
 \code{b label}\newline Target 8 bytes earlier
@@ -750,29 +752,32 @@ The data-memory interface accesses the program's data bytes for loads and stores
 
 \begin{frame}{Load Example}
 \normalsize
-\code{ldr x7, [x5, \#8]}
+\code{ldr x7, [x5, \#24]}
 
 \vspace{0.22cm}
 \begin{itemize}\setlength{\itemsep}{7pt}
   \item Read the base address from \code{x5}.
-  \item Add the byte offset \code{8} to form the effective address.
+  \item Add the byte offset \code{24} to form the effective address.
   \item Read 8 bytes from data memory.
   \item Write the loaded 64-bit value into \code{x7}.
   \item Update the PC to the next sequential instruction at the end of the cycle.
 \end{itemize}
 \vspace{0.12cm}
-For a 64-bit AArch64 load with unsigned offset, the encoded \code{imm12} is \(8/8 = 1\).
+For a 64-bit AArch64 load with unsigned offset, the encoded \code{imm12} is \(24/8 = 3\).
 \end{frame}
 
 \begin{frame}{Load Instruction Fields}
 \small
-\code{ldr x7, [x5, \#8]} is encoded as \hex{F94004A7}.
+\code{ldr x7, [x5, \#24]} is encoded as \hex{F9400CA7}.
 
-\vspace{0.18cm}
+\begin{center}
+\code{1111100101 | 000000000011 | 00101 | 00111}
+\end{center}
+\vspace{-.12cm}
 \begin{center}
 \begin{tikzpicture}[x=0.285cm,y=1cm]
   \bfld{0}{0}{10}{1111100101}{gold!22}
-  \bfld{10}{0}{12}{000000000001}{lightblue}
+  \bfld{10}{0}{12}{000000000011}{lightblue}
   \bfld{22}{0}{5}{00101}{blue!8}
   \bfld{27}{0}{5}{00111}{lightblue}
   \node[font=\ttfamily\tiny] at (5,0.95) {31:22};
@@ -792,7 +797,7 @@ For a 64-bit AArch64 load with unsigned offset, the encoded \code{imm12} is \(8/
 \textbf{Field} & \textbf{Value} & \textbf{Meaning} \\
 \midrule
 opcode/form & \bits{1111100101} & 64-bit load, unsigned immediate \\
-\code{imm12} & \bits{000000000001} & scaled offset 1, meaning 8 bytes \\
+\code{imm12} & \bits{000000000011} & scaled offset 3, meaning 24 bytes \\
 \code{Rn} & \bits{00101} & base register \code{x5} \\
 \code{Rt} & \bits{00111} & destination register \code{x7} \\
 \bottomrule
@@ -805,10 +810,14 @@ opcode/form & \bits{1111100101} & 64-bit load, unsigned immediate \\
 \small
 
 \begin{center}
-\begin{tikzpicture}[font=\scriptsize]
+\begin{tikzpicture}[font=\scriptsize,scale=.94,transform shape]
+\foreach \left/\right/\mid/\label in {-.8/4.2/1.7/{1 Fetch},4.2/7.7/5.95/{2 Decode},7.7/11.15/9.425/{3 Register read}} {
+ \draw[draw=navy,fill=lightblue,line width=.6pt] (\left,1.05) rectangle (\right,1.65);
+ \node[font=\scriptsize\bfseries] at (\mid,1.35) {\label};
+}
 \node[state,minimum width=1.2cm] (pc) at (0,0) {PC};
 \node[state,minimum width=2.5cm,minimum height=1.1cm] (im) at (2.55,0) {Instruction\\memory};
-\node[unit,minimum width=2.6cm,minimum height=1.5cm] (fields) at (6,0) {Instruction fields\\\code{Rn=5}, \code{Rt=7}\\\code{imm12=1}};
+\node[unit,minimum width=2.6cm,minimum height=1.5cm] (fields) at (6,0) {Instruction fields\\\code{Rn=5}, \code{Rt=7}\\\code{imm12=3}};
 \node[state,minimum width=2.6cm,minimum height=1.5cm] (rf) at (9.7,0) {Register file\\\code{A1=5}: read \code{x5}\\\code{A3=7}: destination};
 \draw[bus] (pc)--(im);
 \draw[bus] (im)--(fields);
@@ -818,7 +827,7 @@ opcode/form & \bits{1111100101} & 64-bit load, unsigned immediate \\
 \end{tikzpicture}
 \end{center}
 \begin{enumerate}\setlength{\itemsep}{7pt}
-\item \key{Fetch:} the PC addresses instruction memory, which returns instruction word \hex{F94004A7}.
+\item \key{Fetch:} the PC addresses instruction memory, which returns instruction word \hex{F9400CA7}.
 \item \key{Decode:} identify the load and its fields. \code{Rn} selects the base register; \code{Rt} selects the destination.
 \item \key{Read:} the register file supplies the contents of \code{x5}. Immediate generation can proceed alongside this read; address calculation needs both results.
 \end{enumerate}
@@ -832,9 +841,9 @@ opcode/form & \bits{1111100101} & 64-bit load, unsigned immediate \\
 \begin{tikzpicture}[font=\scriptsize,scale=.9,transform shape]
 \node[unit,minimum width=2.5cm,minimum height=.85cm] (base) at (0,1.3)
  {\code{RD1}\\base value from \code{x5}};
-\node[unit,minimum width=1.8cm,minimum height=.85cm] (imm) at (-1,-.65) {\code{imm12=1}};
+\node[unit,minimum width=1.8cm,minimum height=.85cm] (imm) at (-1,-.65) {\code{imm12=3}};
 \node[logic,text width=2.8cm,minimum width=2.9cm,minimum height=1.1cm] (gen) at (2.2,-.65)
- {Immediate generator\\zero-extend, multiply by 8\\\code{ExtImm=8}};
+ {Immediate generator\\zero-extend, multiply by 8\\\code{ExtImm=24}};
 \node[logic,minimum width=1.8cm,minimum height=1.6cm] (alu) at (6,.35) {ALU\\add};
 \node[unit,minimum width=3.1cm,minimum height=1.1cm] (addr) at (10,.35)
  {\code{ALUResult}\\effective address};
@@ -846,9 +855,9 @@ opcode/form & \bits{1111100101} & 64-bit load, unsigned immediate \\
 \end{tikzpicture}
 \end{center}
 \begin{enumerate}\setcounter{enumi}{3}\setlength{\itemsep}{9pt}
-\item \key{Generate the byte offset.} This is an 8-byte load, so the encoded \code{imm12=1} becomes \code{ExtImm=8}.
+\item \key{Generate the byte offset.} This is an 8-byte load, so the encoded \code{imm12=3} becomes \code{ExtImm=24}.
 \item \key{Calculate the effective address.} The ALU adds the base value read from \code{x5} to \code{ExtImm}:\par\vspace{3pt}
-\hspace*{.3cm}\code{Effective address = contents of x5 + 8}.
+\hspace*{.3cm}\code{Effective address = contents of x5 + 24}.
 \end{enumerate}
 
 \end{frame}
@@ -896,7 +905,7 @@ At the clock edge, \code{x7} receives the loaded value and the PC receives \(PC+
   \node[state,minimum width=2.3cm,minimum height=1.85cm,font=\scriptsize] (rf) at (5.7,0)
     {Register file\\read \code{x5}\\write \code{x7}\\\code{RegWrite=1}};
   \node[logic,minimum width=2.6cm,minimum height=1.15cm,font=\scriptsize] (imm) at (6.1,2)
-    {Immediate generator\\load/store mode\\\code{ExtImm=8}};
+    {Immediate generator\\load/store mode\\\code{ExtImm=24}};
   \node[logic,minimum width=1.5cm,minimum height=1.6cm,font=\small] (alu) at (8.3,0) {ALU\\add};
   \node[state,minimum width=2.4cm,minimum height=1.6cm,font=\scriptsize] (dmem) at (10.8,0)
     {Data memory\\64-bit read\\\code{MemWrite=0}};
@@ -922,7 +931,7 @@ At the clock edge, \code{x7} receives the loaded value and the PC receives \(PC+
   \coordinate (alu-Control) at ([xshift=-.4cm]alu.north);
   \draw[bus] (3.8,.45)--node[above,font=\ttfamily\tiny]{Rn=5} (rf-A1);
   \draw[bus] (3.8,-.4)--node[above,font=\ttfamily\tiny]{Rt=7} (rf-A3);
-  \draw[bus] (3.8,2)--node[above,font=\ttfamily\tiny]{imm12=1} (imm.west);
+  \draw[bus] (3.8,2)--node[above,font=\ttfamily\tiny]{imm12=3} (imm.west);
   \draw[bus] (3.8,3)--(decode.west);
   \node[font=\ttfamily\tiny,above,inner sep=1pt] at (4.425,3) {opcode/form};
   \foreach \yy in {-.4,0,.45,2,3} {\fill[navy] (3.8,\yy) circle (1.3pt);}
@@ -964,14 +973,14 @@ Dashed outlines identify control logic; dashed bundles carry separate control si
 \begin{tabular}{lll}
 \toprule
 \rowcolor{white}
-\textbf{Signal} & \textbf{Setting for \code{ldr x7, [x5, \#8]}} & \textbf{Effect} \\
+\textbf{Signal} & \textbf{Setting for \code{ldr x7, [x5, \#24]}} & \textbf{Effect} \\
 \midrule
 \code{RegWrite} & 1 & write loaded value to \code{x7} \\
 \code{MemWrite} & 0 & do not write data memory \\
 \code{MemToReg} & 1 & writeback comes from data memory \\
 \code{ALUSrc} & 1 & ALU second input is the extended offset \\
 \code{ALUControl} & add & compute base + offset \\
-\code{ImmSrc} & load/store scaled & produce byte offset 8 \\
+\code{ImmSrc} & load/store scaled & produce byte offset 24 \\
 \code{PCSrc} & 0 & next PC is \(PC+4\) \\
 \bottomrule
 \end{tabular}
@@ -1254,7 +1263,7 @@ Read \code{x2} and \code{x3}; select the register operand and ALU addition; writ
 
 \begin{frame}{Instruction Decoding and Control Signals}
 \small
-For \code{ldr x7, [x5, \#8]}, the instruction word is \hex{F94004A7}.
+For \code{ldr x7, [x5, \#24]}, the instruction word is \hex{F9400CA7}.
 The decoder recognizes the supported instruction form and generates its control settings.
 \begin{center}
 \begin{tikzpicture}[font=\scriptsize]
@@ -1273,15 +1282,15 @@ The decoder recognizes the supported instruction form and generates its control 
 \begin{itemize}\setlength{\itemsep}{6pt}
 \item These ten bits identify the access size, instruction form, and load operation; they are not a single indivisible opcode field.
 \item The decoder also selects \code{ALUControl=add} and the load/store immediate mode: zero-extend \code{imm12} and multiply by 8.
-\item Register fields select \code{x5} and \code{x7}; \code{imm12=1} produces byte offset 8. These operand fields change the selected registers and offset, while the instruction form determines the control settings.
+\item Register fields select \code{x5} and \code{x7}; \code{imm12=3} produces byte offset 24. The operand fields select registers and offset; the instruction form determines the control settings.
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Control Examples: Load, Store, and Branch}
 \small
 \begin{itemize}\setlength{\itemsep}{10pt}
-\item \key{\texttt{ldr x7, [x5, \#8]}}: \code{ALUSrc=1}, \code{ALUControl=add}, and \code{ImmSrc=load/store}. Select memory for writeback (\code{MemToReg=1}); enable the register write (\code{RegWrite=1}). Keep \code{MemWrite=0}.
-\item \key{\texttt{str x7, [x5, \#8]}}: use the same address calculation. Select \code{Rt=x7} for read port 2 (\code{Read2Src=1}) and send its value to memory. Set \code{MemWrite=1}, \code{RegWrite=0}.
+\item \key{\texttt{ldr x7, [x5, \#24]}}: \code{ALUSrc=1}, \code{ALUControl=add}, and \code{ImmSrc=load/store}. Select memory for writeback (\code{MemToReg=1}); enable the register write (\code{RegWrite=1}). Keep \code{MemWrite=0}.
+\item \key{\texttt{str x7, [x5, \#24]}}: use the same address calculation. Select \code{Rt=x7} for read port 2 (\code{Read2Src=1}) and send its value to memory. Set \code{MemWrite=1}, \code{RegWrite=0}.
 \item \key{\texttt{b label}}: select the signed, scaled branch displacement and \code{PCSrc=1}. The target adder supplies the next PC. Keep both write enables at 0.
 \end{itemize}
 \vspace{.12cm}
@@ -1487,7 +1496,7 @@ The clock period must accommodate the longest state-to-state path. In this datap
   \item A single-cycle datapath computes the next architectural state in one clock period.
   \item The state elements shown store the PC, integer register values, and memory contents.
   \item Instruction fields select register ports, immediate-generation modes, and control settings.
-  \item The \code{ldr x7, [x5, \#8]} path uses instruction fetch, register read, immediate scaling, ALU address calculation, memory read, and register writeback.
+  \item The \code{ldr x7, [x5, \#24]} path uses instruction fetch, register read, immediate scaling, ALU address calculation, memory read, and register writeback.
   \item The same datapath is extended with multiplexers and control signals for stores, ALU instructions, and branches.
   \item \code{b} adds a signed PC-relative byte offset to the address of the branch instruction; \code{imm26} encodes that offset in 4-byte units.
 \end{itemize}
@@ -1497,8 +1506,8 @@ The clock period must accommodate the longest state-to-state path. In this datap
 \begin{enumerate}\setlength{\itemsep}{7pt}
   \item In a single-cycle datapath, when are state elements updated?
   \item Why is the PC modeled separately from the AArch64 general-purpose register file?
-  \item For \code{ldr x7, [x5, \#8]}, which fields select the base and destination registers? Which register-file inputs receive them?
-  \item Why is the encoded \code{imm12} equal to 1 rather than 8 for that instruction?
+  \item For \code{ldr x7, [x5, \#24]}, which fields select the base and destination registers? Which register-file inputs receive them?
+  \item Why is the encoded \code{imm12} equal to 3 rather than 24 for that instruction?
   \item What is the role of the ALU in a load or store instruction?
   \item What does the vertical instruction bar represent? Does it store state?
 \end{enumerate}
@@ -1509,7 +1518,7 @@ The clock period must accommodate the longest state-to-state path. In this datap
 \begin{enumerate}\setlength{\itemsep}{6pt}
   \item Identify the four triangular multiplexers in the complete extended datapath. What two data inputs and one output does each have? Which signal controls the writeback multiplexer?
   \item Why does \code{str} assert \code{MemWrite} but not \code{RegWrite}?
-  \item Trace \code{add x1, x2, x3} and \code{str x7, [x5, \#8]} through the complete diagram. For each, identify the register fields, ALU inputs, selector settings, memory action, register write (if any), and next PC.
+  \item Trace \code{add x1, x2, x3} and \code{str x7, [x5, \#24]} through the complete diagram. For each, identify the register fields, ALU inputs, selector settings, memory action, register write (if any), and next PC.
   \item Why does a single-cycle implementation have a long clock period?
   \item Which datapath outputs contribute to the architectural result of \code{add x1, x2, x3} but not \code{b label}?
   \item A \code{b} at \code{0x2008} targets \code{0x2000}. What are the byte offset, signed \code{imm26}, and next PC? Which address is the base?
