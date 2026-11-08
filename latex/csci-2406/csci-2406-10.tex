@@ -435,8 +435,10 @@ One instruction completes in one clock cycle.
 One instruction completes in one clock cycle. Its required work must settle before the closing clock edge.
 \begin{center}
 \renewcommand{\arraystretch}{1.2}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{lp{10.8cm}}
 \toprule
+\rowcolor{white}
 \textbf{Activity} & \textbf{Meaning} \\
 \midrule
 Fetch & Read the 32-bit instruction at the PC address. \\
@@ -458,8 +460,10 @@ These are activities within one cycle, not separate clocked stages. Not every in
 Architectural state is the information defined by the ISA that determines program execution.
 \begin{center}
 \renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{lp{10.3cm}}
 \toprule
+\rowcolor{white}
 \textbf{State} & \textbf{Purpose} \\
 \midrule
 PC & Current instruction address; separate from the integer registers. \\
@@ -660,8 +664,10 @@ This is combinational logic: it has no clock input and stores no state.
 \begin{center}
 \renewcommand{\arraystretch}{1.15}
 \setlength{\tabcolsep}{5pt}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{>{\raggedright\arraybackslash}p{3.5cm}>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{6.3cm}}
 \toprule
+\rowcolor{white}
 \textbf{Instruction form and example} & \textbf{Encoded immediate} & \textbf{Generated 64-bit value} \\
 \midrule
 Unshifted \code{add/sub} immediate\newline
@@ -696,9 +702,11 @@ Load/store scaling is 8 here because the supported transfers are 64-bit. Branch 
 \end{itemize}
 \begin{center}
 \renewcommand{\arraystretch}{1.15}
+\rowcolors{2}{softgray}{white}
 \begin{tabular}{ll}
 \toprule
-\textbf{ALUControl[1:0]} & \textbf{Operation} \\
+\rowcolor{white}
+\textbf{ALUControl} & \textbf{Operation} \\
 \midrule
 \code{00} & Add: \code{SrcA + SrcB} \\
 \code{01} & Subtract: \code{SrcA - SrcB} \\
@@ -770,20 +778,18 @@ For a 64-bit AArch64 load with unsigned offset, the encoded \code{imm12} is \(24
 \small
 \code{ldr x7, [x5, \#24]} is encoded as \hex{F9400CA7}.
 
+\vspace{.18cm}
 \begin{center}
-\code{1111100101 | 000000000011 | 00101 | 00111}
-\end{center}
-\vspace{-.12cm}
-\begin{center}
-\begin{tikzpicture}[x=0.285cm,y=1cm]
-  \bfld{0}{0}{10}{1111100101}{gold!22}
-  \bfld{10}{0}{12}{000000000011}{lightblue}
-  \bfld{22}{0}{5}{00101}{blue!8}
-  \bfld{27}{0}{5}{00111}{lightblue}
-  \node[font=\ttfamily\tiny] at (5,0.95) {31:22};
-  \node[font=\ttfamily\tiny] at (16,0.95) {21:10};
-  \node[font=\ttfamily\tiny] at (24.5,0.95) {9:5};
-  \node[font=\ttfamily\tiny] at (29.5,0.95) {4:0};
+\begin{tikzpicture}[font=\ttfamily\small]
+\node[font=\scriptsize,anchor=east] at (-.35,0) {Binary};
+\node[font=\scriptsize,anchor=east] at (-.35,-.7) {Hex};
+\foreach \i/\binary/\digit in {0/1111/F,1/1001/9,2/0100/4,3/0000/0,4/0000/0,5/1100/C,6/1010/A,7/0111/7} {
+ \node at (1.35*\i+.5,0) {\binary};
+ \node[text=deepblue,font=\ttfamily\normalsize\bfseries] at (1.35*\i+.5,-.7) {\digit};
+}
+\foreach \i in {1,...,7} {
+ \node at (1.35*\i-.175,0) {|};
+}
 \end{tikzpicture}
 \end{center}
 \vspace{0.1cm}
@@ -1139,7 +1145,7 @@ The assembler calculates the displacement from the label. Each A64 instruction o
   \draw[bus] (3.1,-.68)--node[below,font=\ttfamily\tiny]{Rd/Rt} (rf-A3);
   \draw[bus] (3.1,.125)--node[above,font=\ttfamily\tiny,inner sep=.5pt]{Rm} (readmux-upper);
   \draw[bus] (3.1,-.225)--node[above,font=\ttfamily\tiny,inner sep=.5pt]{Rt} (readmux-lower);
-  \draw[bus] (readmux-out)--node[above,font=\ttfamily\tiny,inner sep=.5pt]{A2} (rf-A2);
+  \draw[bus] (readmux-out)--node[above=2pt,font=\ttfamily\tiny,fill=white,inner sep=.5pt]{A2} (rf-A2);
 
   % ALUSrc: two data inputs enter its base; one output leaves its tip.
   \draw[bus] (rf-RD1)--(alu-A);
@@ -1342,7 +1348,7 @@ For the load and store, \code{PCSrc=0} selects \code{PC+4}. All settings settle 
   \draw[bus] (3.1,-.68)--node[below,font=\ttfamily\tiny]{Rd/Rt} (rf-A3);
   \draw[bus] (3.1,.125)--node[above,font=\ttfamily\tiny,inner sep=.5pt]{Rm} (readmux-upper);
   \draw[bus] (3.1,-.225)--node[above,font=\ttfamily\tiny,inner sep=.5pt]{Rt} (readmux-lower);
-  \draw[bus] (readmux-out)--node[above,font=\ttfamily\tiny,inner sep=.5pt]{A2} (rf-A2);
+  \draw[bus] (readmux-out)--node[above=2pt,font=\ttfamily\tiny,fill=white,inner sep=.5pt]{A2} (rf-A2);
 
   % ALUSrc: two data inputs enter its base; one output leaves its tip.
   \draw[bus] (rf-RD1)--(alu-A);
@@ -1423,7 +1429,7 @@ Dashed bundles: separate control signals. Triangles: muxes. Trace \code{add} and
 \end{frame}
 \begin{frame}{Example Control Settings}
 \scriptsize
-These are controls for this datapath, not ISA-defined control-signal encodings.
+The settings below match our datapath diagram; other processor designs may use different signals or encodings.
 \begin{center}
 \renewcommand{\arraystretch}{1.28}
 \setlength{\tabcolsep}{5pt}
