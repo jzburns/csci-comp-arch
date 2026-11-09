@@ -24,13 +24,23 @@ void yyerror(const char *s);
 %token IMM
 %token COMMENT
 %token MEMORYVAR
+%token DATASECTION TEXTSECTION
 
 /* labels */
 %token LABELCOLON
 
 %%  
 program
-    : stmt_list
+    : text_section
+    | data_section
+    ;
+
+data_section
+    : stmt_list stmt
+    ; 
+    
+text_section
+    : TEXTSECTION stmt_list
     ;
 
 stmt_list

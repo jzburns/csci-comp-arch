@@ -1,3 +1,6 @@
+.data
+
+.text
 // abc
 cmp x0, x1
 sub x0, x1, x5 // subtract this first

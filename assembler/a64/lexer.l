@@ -20,8 +20,12 @@ IMMEDIATE 		(#|#-)[0-9]+
 COLON 				:
 ADDRESSOF			=
 COMMENTSTART	"//"
+DATA_SECTION  .data
+TEXT_SECTION  .text
 
 %%
+{DATA_SECTION}	{ print_instr("Data secion: "); return DATASECTION; }
+{TEXT_SECTION}	{ print_instr("Text secion: "); return TEXTSECTION; }
 {REGISTER}	{ print_instr("Reg: "); return REG; }
 {IMMEDIATE}	{ print_instr("Imm: "); return IMM; }
 {ADDRESSOF}{ID}	{ print_instr("Var: "); return MEMORYVAR; }
