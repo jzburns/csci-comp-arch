@@ -12,7 +12,7 @@ ID 						[a-zA-Z_][a-zA-Z0-9_]*
 FREETEXT			[a-zA-Z_ ][a-zA-Z0-9_ ]*
 
 /* Register Definitions */
-REGISTER			([rR]([0-9]|1[0-5]))|(sp|lr|pc)
+REGISTER			([xX]([0-9]|1[0-9]|2[0-9]))|(sp|lr|pc)
 
 /* Immediate  Definitions */
 IMMEDIATE 		(#|#-)[0-9]+
