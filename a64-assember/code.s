@@ -1,5 +1,3 @@
-.data
-
 .text
 // abc
 cmp x0, x1
@@ -18,3 +16,5 @@ ldr x0, =array // load the address of the first element of var into r0
 here:
 	mov x0, #6 
 	mov x0, x5 // comment 
+
+.data

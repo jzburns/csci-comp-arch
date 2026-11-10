@@ -39,7 +39,7 @@ data_section
     ; 
     
 text_section
-    : TEXTSECTION stmt_list
+    : TEXTSECTION stmt_list DATASECTION
     ;
 
 stmt_list
