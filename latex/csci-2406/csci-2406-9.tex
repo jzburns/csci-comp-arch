@@ -324,35 +324,7 @@ An instruction's 32-bit word encodes the operation and its operands using a defi
 Arm's ISA reference specifies each format's fixed bits: required patterns that help the decoder identify the format. The assembler fills the other fields from the chosen instruction and operands.
 \end{frame}
 
-\begin{frame}{Instruction Decoding}
-\small
-\code{Rd}: destination; \code{Rn}/\code{Rm}: source registers (\code{Rn} is the memory base).\\
-\code{Rt}: transferred register; \code{immN}: an N-bit constant (immediate); \code{cond}: selects a branch condition.
-\begin{center}
-\begin{tikzpicture}[
-  font=\small,
-  stage/.style={draw=navy,line width=0.8pt,rounded corners=2pt,align=center},
-  family/.style={stage,text width=3.65cm,minimum height=1.7cm,inner sep=5pt},
-  flow/.style={-{Stealth[length=2mm]},draw=deepblue,line width=0.9pt}
-]
-\node[stage,fill=softgray,minimum width=8.7cm,minimum height=0.65cm] (word) at (0,0)
-  {\textbf{32-bit instruction word} \quad bits 31\ldots0};
-\node[stage,fill=gold!18,text width=7.8cm,minimum height=0.85cm] (decode) at (0,-1.15)
-  {\textbf{Extract and test fixed encoding bits}\\Use the matching pattern to identify the family and form};
-\draw[flow] (word) -- (decode);
-\node[family,fill=lightblue] (data) at (-4.3,-3.05)
-  {\textbf{Data processing}\\\code{Rd, Rn, Rm}\\or \code{Rd, Rn, imm12}};
-\node[family,fill=green!8] (mem) at (0,-3.05)
-  {\textbf{Load/store}\\Unsigned-offset form:\\ \code{Rt, Rn, imm12}};
-\node[family,fill=gold!12] (branch) at (4.3,-3.05)
-  {\textbf{Immediate branch}\\\code{b/bl}: \code{imm26}\\\code{b.cond}: \code{imm19, cond}};
-\draw[flow] (decode.south) -- ++(0,-0.35) -| (data.north);
-\draw[flow] (decode.south) -- (mem.north);
-\draw[flow] (decode.south) -- ++(0,-0.35) -| (branch.north);
-\end{tikzpicture}
-\end{center}
-The selected form determines each field\textquotesingle s meaning. The following slides define the layouts and values.
-\end{frame}
+
 
 
 % ============================================================
@@ -730,11 +702,10 @@ Instruction kind & Access size & Encoded immediate meaning \\
 
 \key{For 8-byte accesses:}
 \begin{itemize}\setlength{\itemsep}{3pt}
-\item \key{Unsigned, scaled \code{imm12}:} 0 to +32,760 bytes, in steps of 8 --- greater forward reach.
-\item \key{Signed, unscaled \code{imm9}:} $-256$ to $+255$ bytes, in steps of 1 --- short reach in both directions.
+\item \key{Unsigned, scaled \code{imm12}:} 0 to +32,760 bytes, in steps of 8.
 \end{itemize}
 \vspace{0.05cm}
-Scaling trades finer offset steps for greater reach; signed offsets allow access below the base address.
+Scaling increases the addressable range without widening the immediate field.
 
 \end{frame}
 
@@ -1168,6 +1139,34 @@ Write the bit ranges first, then fill in the fields. Do not try to guess the fin
 % ============================================================
 
 \sectiondivider{Section 6}{Instruction Decoding Logic}
+
+\begin{frame}{Instruction Decoding}
+\small
+\begin{center}
+\begin{tikzpicture}[
+  font=\small,
+  stage/.style={draw=navy,line width=0.8pt,rounded corners=2pt,align=center},
+  family/.style={stage,text width=3.65cm,minimum height=1.9cm,inner sep=5pt},
+  flow/.style={-{Stealth[length=2mm]},draw=deepblue,line width=0.9pt}
+]
+\node[stage,fill=softgray,minimum width=8.7cm,minimum height=0.65cm] (word) at (0,0)
+  {\textbf{32-bit instruction word} \quad bits 31\ldots0};
+\node[stage,fill=gold!18,text width=7.8cm,minimum height=0.85cm] (decode) at (0,-1.45)
+  {\textbf{Extract and test fixed encoding bits}\\Match the pattern to identify\\the family and form};
+\draw[flow] (word) -- (decode);
+\node[family,fill=lightblue] (data) at (-4.3,-4.0)
+  {\textbf{Data processing}\\\code{Rd, Rn, Rm}\\or \code{Rd, Rn, imm12}};
+\node[family,fill=green!8] (mem) at (0,-4.0)
+  {\textbf{Load/store}\\Unsigned-offset form:\\ \code{Rt, Rn, imm12}};
+\node[family,fill=gold!12] (branch) at (4.3,-4.0)
+  {\textbf{Immediate branch}\\\code{b/bl}: \code{imm26}\\\code{b.cond}: \code{imm19, cond}};
+\draw[flow] (decode.south) -- ++(0,-0.45) -| (data.north);
+\draw[flow] (decode.south) -- (mem.north);
+\draw[flow] (decode.south) -- ++(0,-0.45) -| (branch.north);
+\end{tikzpicture}
+\end{center}
+Interpret operand fields only after identifying the instruction form.
+\end{frame}
 
 \begin{frame}{Instruction Decoding: A Decision Tree}
 \par
