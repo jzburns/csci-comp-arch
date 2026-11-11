@@ -660,39 +660,8 @@ Immediate rules depend on the instruction form. Constants outside this form may 
 % ============================================================
 
 
-
 % ============================================================
 % ============================================================
-
-
-
-\begin{frame}{Decoding an Instruction Word}
-\small
-\key{Given:} \hex{8B020020}. Use the reference patterns, then interpret the fields for that form.
-\begin{center}
-\begin{tikzpicture}[x=0.43cm,y=1cm]
-\bfld{0}{0}{11}{10001011000}{gold!22}
-\bfld{11}{0}{5}{00010}{lightblue}
-\bfld{16}{0}{6}{000000}{blue!8}
-\bfld{22}{0}{5}{00001}{lightblue}
-\bfld{27}{0}{5}{00000}{lightblue}
-\bitnote{5.5}{0.95}{31:21: prefix}
-\bitnote{13.5}{0.95}{20:16: Rm}
-\bitnote{19}{0.95}{15:10: imm6}
-\bitnote{24.5}{0.95}{9:5: Rn}
-\bitnote{29.5}{0.95}{4:0: Rd}
-\end{tikzpicture}
-\end{center}
-\begin{enumerate}\setlength{\itemsep}{8pt}
-\item \key{Identify the form:} \code{1|0|0|01011|00|0} selects 64-bit \code{add}, without flag updates, using lsl.
-\item \key{Read the operands:} \code{Rm=2}, \code{Rn=1}, \code{Rd=0}; \code{imm6=0} means no shift.
-\item \key{Reconstruct:} \code{add x0, x1, x2}.
-\end{enumerate}
-\vspace{0.18cm}
-\begin{block}{Decoding Rule}
-Identify the form before interpreting the fields. The same bit positions can have different meanings in another form.
-\end{block}
-\end{frame}
 
 \sectiondivider{Section 4}{Memory Instruction Encodings}
 
