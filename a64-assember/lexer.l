@@ -12,7 +12,7 @@ ID 						[a-zA-Z_][a-zA-Z0-9_]*
 FREETEXT			[a-zA-Z_ ][a-zA-Z0-9_ ]*
 
 /* Register Definitions */
-REGISTER			([rR]([0-9]|1[0-5]))|(sp|lr|pc)
+REGISTER			([xX]([0-9]|1[0-9]|2[0-9]))|(sp|lr|pc)
 
 /* Immediate  Definitions */
 IMMEDIATE 		(#|#-)[0-9]+
@@ -20,8 +20,12 @@ IMMEDIATE 		(#|#-)[0-9]+
 COLON 				:
 ADDRESSOF			=
 COMMENTSTART	"//"
+DATA_SECTION  .data
+TEXT_SECTION  .text
 
 %%
+{DATA_SECTION}	{ print_instr("Data secion: "); return DATASECTION; }
+{TEXT_SECTION}	{ print_instr("Text secion: "); return TEXTSECTION; }
 {REGISTER}	{ print_instr("Reg: "); return REG; }
 {IMMEDIATE}	{ print_instr("Imm: "); return IMM; }
 {ADDRESSOF}{ID}	{ print_instr("Var: "); return MEMORYVAR; }

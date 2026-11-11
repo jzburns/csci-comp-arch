@@ -11,7 +11,6 @@ void yyerror(const char *s);
 %define parse.trace
 %debug
 
-/* ARM7DTMI uconditional execution tokens */
 %token REG
 %token CMP 
 %token MOV
@@ -24,13 +23,23 @@ void yyerror(const char *s);
 %token IMM
 %token COMMENT
 %token MEMORYVAR
+%token DATASECTION TEXTSECTION
 
 /* labels */
 %token LABELCOLON
 
 %%  
 program
-    : stmt_list
+    : text_section
+    | data_section
+    ;
+
+data_section
+    : DATASECTION TEXTSECTION stmt_list
+    ; 
+    
+text_section
+    : TEXTSECTION stmt_list DATASECTION
     ;
 
 stmt_list

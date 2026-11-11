@@ -10,4 +10,4 @@ bison -d parser.y
 flex lexer.l
 
 ## compile everything
-clang lex.yy.c parser.tab.c -o arm7assembler -lfl
+clang lex.yy.c parser.tab.c -o a64assembler -lfl
