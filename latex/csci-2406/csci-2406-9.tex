@@ -718,28 +718,29 @@ Sample instruction: \code{ldr x5, [x6, \#16]}
 
 \begin{frame}{Memory Prefix: Width, Addressing Form and Operation}
 \small
-Bits 31:22 combine five fields. \code{opc} means operation code; \code{VR} selects the register class (0: general-purpose; 1: SIMD/floating-point).
+Bits 31:22 describe the transfer and help identify the addressing form.
+Read the fields separately before joining them to form the prefix.
 \par\vspace{7pt}{\centering
-\renewcommand{\arraystretch}{1.22}
-\begin{tabular}{@{}llll@{}}
+\renewcommand{\arraystretch}{1.24}
+\begin{tabular}{@{}llp{0.73\textwidth}@{}}
 \toprule
-\textbf{Bits} & \textbf{Field} & \textbf{Choice for \code{ldr x5}} & \textbf{Meaning} \\
+\textbf{Bits} & \textbf{Field} & \textbf{What it selects} \\
 \midrule
-31:30 & \code{size} & \code{11} & 8-byte access; \code{10} selects 4 bytes \\
-29:27 & Fixed & \code{111} & Identifies the load/store format family \\
-26 & \code{VR} & \code{0} & General-purpose integer registers \\
-25:24 & Form & \code{01} & Scaled offset; base unchanged \\
-23:22 & \code{opc} & \code{01} & Load; \code{00} selects store \\
+31:30 & \code{size} & Bytes transferred: \code{00} = 1, \code{01} = 2, \code{10} = 4, \code{11} = 8. \\
+29:27 & Fixed & Required pattern \code{111} for these load/store forms. \\
+26 & \code{VR} & \code{0}: general-purpose registers; \code{1}: SIMD and floating-point registers. \\
+25 & Fixed & \code{0}, part of the load/store group pattern. \\
+24 & Form & \code{1}: unsigned scaled offset. \code{0}: check additional bits for forms such as pre/post-index. \\
+23:22 & \code{opc} & Operation code: for the integer forms shown, \code{00} = store and \code{01} = load. \\
 \bottomrule
 \end{tabular}\par}\vspace{8pt}
-\vspace{0.12cm}
-\key{64-bit \code{ldr}:} \code{11 | 111 | 0 | 01 | 01}.\\[0.1cm]
-For \code{str}, keep width and addressing form; change \code{opc} from \code{01} to \code{00}.
+\key{Example:} \code{ldr x5, [x6, \#16]} uses \code{11 | 111 | 0 | 0 | 1 | 01}.\\[0.1cm]
+The corresponding \code{str} changes only the last field to \code{00}.
 \end{frame}
 
 \begin{frame}{Common Memory Instruction Patterns}
 \small
-Use the field order \code{size | fixed | VR | form | opc}. All rows use unsigned-offset addressing \code{[Xn|SP, \#offset]}, with no base update.
+Use the field order \code{size | 111 | VR | 0 | form | opc}. All rows use unsigned-offset addressing \code{[Xn|SP, \#offset]}, with no base update.
 \vspace{0.12cm}
 \par\renewcommand{\arraystretch}{1.16}
 \par\vspace{3pt}{\centering
@@ -747,10 +748,10 @@ Use the field order \code{size | fixed | VR | form | opc}. All rows use unsigned
 \toprule
 \textbf{Transfer} & \textbf{Bytes} & \textbf{size} & \textbf{opc} & \textbf{Prefix 31:22} \\
 \midrule
-\code{str Wt}  & 4 & \code{10} & \code{00} & \code{10|111|0|01|00} \\
-\code{ldr Wt}  & 4 & \code{10} & \code{01} & \code{10|111|0|01|01} \\
-\code{str Xt}  & 8 & \code{11} & \code{00} & \code{11|111|0|01|00} \\
-\code{ldr Xt}  & 8 & \code{11} & \code{01} & \code{11|111|0|01|01} \\
+\code{str Wt}  & 4 & \code{10} & \code{00} & \code{10|111|0|0|1|00} \\
+\code{ldr Wt}  & 4 & \code{10} & \code{01} & \code{10|111|0|0|1|01} \\
+\code{str Xt}  & 8 & \code{11} & \code{00} & \code{11|111|0|0|1|00} \\
+\code{ldr Xt}  & 8 & \code{11} & \code{01} & \code{11|111|0|0|1|01} \\
 \bottomrule
 \end{tabular}\par}\vspace{3pt}
 \vspace{0.15cm}
@@ -841,7 +842,8 @@ Reference layout: focus on offset scaling and base updates; exact mode-bit posit
 \bfld{0}{1.9}{2}{size}{lightblue}
 \bfld{2}{1.9}{3}{111}{softgray}
 \bfld{5}{1.9}{1}{\tiny VR}{softgray}
-\bfld{6}{1.9}{2}{01}{gold!25}
+\bfld{6}{1.9}{1}{0}{softgray}
+\bfld{7}{1.9}{1}{1}{gold!25}
 \bfld{8}{1.9}{2}{opc}{lightblue}
 \bfld{10}{1.9}{12}{imm12: offset / access size}{gold!15}
 \bfld{22}{1.9}{5}{Rn}{lightblue}
@@ -850,14 +852,16 @@ Reference layout: focus on offset scaling and base updates; exact mode-bit posit
 \bfld{0}{0.45}{2}{size}{lightblue}
 \bfld{2}{0.45}{3}{111}{softgray}
 \bfld{5}{0.45}{1}{\tiny VR}{softgray}
-\bfld{6}{0.45}{2}{00}{gold!25}
+\bfld{6}{0.45}{1}{0}{softgray}
+\bfld{7}{0.45}{1}{0}{gold!25}
 \bfld{8}{0.45}{2}{opc}{lightblue}
 \bfld{10}{0.45}{1}{0}{softgray}
 \bfld{11}{0.45}{9}{imm9: byte offset}{gold!15}
 \bfld{20}{0.45}{2}{mode}{gold!25}
 \bfld{22}{0.45}{5}{Rn}{lightblue}
 \bfld{27}{0.45}{5}{Rt}{lightblue}
-\bitnote{7}{0.12}{25:24}
+\bitnote{6.5}{0.12}{25}
+\bitnote{7.5}{0.12}{24}
 \bitnote{10.5}{0.12}{21}
 \bitnote{15.5}{0.12}{20:12}
 \bitnote{21}{0.12}{11:10}
@@ -866,10 +870,42 @@ Reference layout: focus on offset scaling and base updates; exact mode-bit posit
 \end{tikzpicture}
 \end{center}
 \begin{itemize}\setlength{\itemsep}{5pt}
-\item \key{Format-identifying bits 25:24:} \code{01} for unsigned offset; \code{00} for the pre/post forms shown. Their bit 21 is also fixed at \code{0}.
+\item \key{Bits 25 and 24:} Bit 25 stays \code{0}. Bit 24 is \code{1} for unsigned offset; the pre/post forms shown use \code{0} in both bit 24 and bit 21.
 \item \key{Mode bits 11:10:} \code{11} selects pre-index; \code{01} selects post-index.
 \item In unsigned-offset form, bits 11:10 are part of \code{imm12}; there is no separate mode field there.
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Pre/Post-Index Changes: A32 and A64}
+\small
+A \key{stride} is the byte distance to the next item. A negative stride steps backward.
+
+\par\vspace{5pt}{\centering
+\renewcommand{\arraystretch}{1.17}
+\begin{tabular}{@{}l >{\raggedright\arraybackslash}p{0.34\textwidth} >{\raggedright\arraybackslash}p{0.37\textwidth}@{}}
+\toprule
+ & \textbf{A32 word \code{ldr}} & \textbf{A64 integer \code{ldr}} \\
+\midrule
+Immediate stride & 12-bit magnitude; \code{U} sets direction.\newline $-4095$ to $+4095$ bytes. & Signed 9-bit byte offset (\code{imm9}).\newline $-256$ to $+255$ bytes. \\
+Register stride & Pre: \code{ldr r0, [r1, r2]!}\newline Post: \code{ldr r0, [r1], r2} & Separate \code{add x1, x1, x2}\newline before (pre) or after (post) the load. \\
+\bottomrule
+\end{tabular}\par}\vspace{5pt}
+
+\key{Post-index example:} Read a 4-byte field from each 512-byte record.
+
+\par\vspace{5pt}
+\begin{columns}[T,onlytextwidth]
+\column{.48\textwidth}
+\key{A32: one instruction}\par
+\code{ldr r0, [r1], \#512}
+\column{.48\textwidth}
+\key{A64: 512 is out of range}\par
+\code{ldr w0, [x1]}\\
+\code{add x1, x1, \#512}
+\end{columns}
+\vspace{5pt}
+
+A64 still supports register offsets: \code{ldr w0, [x1, x2]} reads from \code{x1 + x2} and leaves \code{x1} unchanged.
 \end{frame}
 
 
@@ -1186,8 +1222,8 @@ flow/.style={-{Stealth[length=1.8mm]},draw=deepblue}
 \node[lane,fill=green!8,anchor=north] (lsout) at (0,-4.25)
  {\textbf{Select operation and mode}\\
  Bit 22: 0 $\to$ \code{str}, 1 $\to$ \code{ldr}\\
- \strut [25:24] = \code{01}: unsigned offset\\
- \strut [25:24] = \code{00}, [21] = 0: test [11:10]\\
+ \strut [24] = \code{1}: unsigned offset\\
+ \strut [24] = \code{0}, [21] = 0: test [11:10]\\
  \code{11} pre-index; \code{01} post-index};
 \node[lane,fill=gold!12,anchor=north] (brout) at (4.85,-4.25)
  {\textbf{Select link or condition}\\
@@ -1207,7 +1243,7 @@ flow/.style={-{Stealth[length=1.8mm]},draw=deepblue}
 Start with the raw word \hex{F90008C5}. Each result determines which bits to inspect next.
 \begin{itemize}\setlength{\itemsep}{8pt}
 \item \key{Route to a group.} Bits [28:25] are \code{1100}, which match \code{x1x0}: use the load/store path.
-\item \key{Match the transfer and address form.} Bits [29:26] are \code{1110} and bit 23 is 0. Bits [25:24] are \code{01}, so use the unsigned-offset layout.
+\item \key{Match the transfer and address form.} Bits [29:26] are \code{1110} and bit 23 is 0. Bit 24 is \code{1}, so use the unsigned-offset layout.
 \item \key{Resolve the operation and width.} Bit 22 is 0 (\code{str}); bits [31:30] are \code{11} (8 bytes).
 \item \key{Interpret the operands.} Bits [9:5] give base \code{x6}; bits [4:0] give source \code{x5}. Bits [21:10] give \code{imm12=2}, so the byte offset is $2\times8=16$.
 \end{itemize}
