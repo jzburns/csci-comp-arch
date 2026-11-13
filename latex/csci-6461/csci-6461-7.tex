@@ -929,6 +929,40 @@ A64 still supports register offsets: \code{ldr w0, [x1, x2]} reads from \code{x1
 
 \sectiondivider{Section 5}{Branch Instruction Encodings}
 
+\begin{frame}{Immediate Branch Instruction Layouts}
+\small
+Both layouts encode a signed displacement from the branch instruction's PC, in units of 4 bytes.
+
+\begin{center}
+\begin{tikzpicture}[x=0.42cm,y=1cm]
+  \node[anchor=west,inner sep=0pt,font=\small\bfseries] at (0,4.08)
+    {\code{b}/\code{bl}: \code{b target} or \code{bl function}};
+  \bfld{0}{3.00}{1}{op}{gold!15}
+  \bfld{1}{3.00}{5}{00101}{gold!22}
+  \bfld{6}{3.00}{26}{imm26: signed displacement}{lightblue}
+  \bitnote{0.5}{2.75}{31}
+  \bitnote{3.5}{2.75}{30:26}
+  \bitnote{19}{2.75}{25:0}
+
+  \node[anchor=west,inner sep=0pt,font=\small\bfseries] at (0,2.15)
+    {\code{b.cond}: e.g.\ \code{b.eq target}};
+  \bfld{0}{1.07}{8}{01010100}{gold!22}
+  \bfld{8}{1.07}{19}{imm19: signed displacement}{lightblue}
+  \bfld{27}{1.07}{1}{0}{softgray}
+  \bfld{28}{1.07}{4}{cond}{gold!15}
+  \bitnote{4}{0.82}{31:24}
+  \bitnote{17.5}{0.82}{23:5}
+  \bitnote{27.5}{0.82}{4}
+  \bitnote{30}{0.82}{3:0}
+\end{tikzpicture}
+\end{center}
+
+\begin{itemize}\setlength{\itemsep}{4pt}
+\item \code{b} and \code{bl} share five fixed bits. One \code{op} bit selects whether to save a return address, leaving 26 bits for the displacement.
+\item \code{01010100} identifies the immediate conditional branch format. That tells the decoder to read a 19-bit displacement and a separate four-bit condition. The shorter displacement limits the branch range.
+\end{itemize}
+\end{frame}
+
 \begin{frame}{Common Immediate Branch Patterns}
 \small
 PC is the branch instruction address. The signed displacement is an offset in 4-byte steps: target = PC + displacement $\times 4$.
