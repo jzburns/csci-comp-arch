@@ -1,7 +1,8 @@
+// this is a comment
 .text
-// abc
+// this is a comment
 cmp x0, x1
-sub x0, x1, x5 // subtract this first
+sub x0, x1, x5 
 mov x0, x5 // comment 
 add x0, x1, x5
 ldr x0, [ x1 ] //comment

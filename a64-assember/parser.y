@@ -32,10 +32,11 @@ void yyerror(const char *s);
 program
     : text_section
     | data_section
+    | top_comment
     ;
 
 data_section
-    : DATASECTION TEXTSECTION stmt_list
+    : DATASECTION TEXTSECTION stmt_list 
     ; 
     
 text_section
@@ -46,6 +47,12 @@ stmt_list
     : stmt_list stmt
     | stmt
     | comment
+    ;
+
+// comments outside sections
+top_comment
+    : comment data_section
+    | comment text_section 
     ;
 
 comment
