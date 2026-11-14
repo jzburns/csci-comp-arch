@@ -1,4 +1,5 @@
-.data
+// a test the .data section can be left empty
+// a test the .data section can be left empty
 // a test the .data section can be left empty
 .text
 // leaving the .global qualifier out

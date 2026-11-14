@@ -31,18 +31,10 @@ void yyerror(const char *s);
 %%  
 program
     : text_section
-    | data_section
-    | multi_line_comment
-    | multi_line_comment text_section
     ;
 
-data_section
-    : DATASECTION TEXTSECTION stmt_list 
-    | DATASECTION comment TEXTSECTION stmt_list 
-    ; 
-    
 text_section
-    : TEXTSECTION stmt_list DATASECTION
+    : TEXTSECTION stmt_list 
     ;
 
 stmt_list
@@ -51,14 +43,8 @@ stmt_list
     | comment
     ;
 
-// comments outside sections
-multi_line_comment
-    : multi_line_comment comment 
-    | comment
-    ;
-
 comment
-	  : COMMENT	
+	  : COMMENT 
     ;
     
 stmt
