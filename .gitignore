@@ -87,6 +87,8 @@ Thumbs.db
 *~
 *.swp
 *.swo
+*.iso
+*.qcow2
 
 # Optional: ignore generated PDFs
 # *.pdf
