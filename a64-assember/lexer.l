@@ -9,7 +9,7 @@
 /* Definitions */
 DIGIT 				[0-9]
 ID 						[a-zA-Z_][a-zA-Z0-9_]*
-FREETEXT			[a-zA-Z_ ][a-zA-Z0-9_ ]*
+FREETEXT			[a-zA-Z0-9_ :.]*
 
 /* Register Definitions */
 REGISTER			([xX]([0-9]|1[0-9]|2[0-9]))|(sp|lr|pc)

@@ -1,4 +1,8 @@
 // this is a comment
+// this is a comment
+// this is a comment
+// this is a comment
+// this is a comment
 .text
 // this is a comment
 cmp x0, x1
