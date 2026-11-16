@@ -23,9 +23,12 @@ COMMENTSTART	"//"
 DATA_SECTION  .data
 TEXT_SECTION  .text
 
+GLOBAL  .global
+
 %%
 {DATA_SECTION}	{ print_instr("Data secion: "); return DATASECTION; }
 {TEXT_SECTION}	{ print_instr("Text secion: "); return TEXTSECTION; }
+{GLOBAL}	{ print_instr("Global section: "); return GLOBALSECTION; }
 {REGISTER}	{ print_instr("Reg: "); return REG; }
 {IMMEDIATE}	{ print_instr("Imm: "); return IMM; }
 {ADDRESSOF}{ID}	{ print_instr("Var: "); return MEMORYVAR; }

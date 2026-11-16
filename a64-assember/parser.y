@@ -23,42 +23,34 @@ void yyerror(const char *s);
 %token IMM
 %token COMMENT
 %token MEMORYVAR
-%token DATASECTION TEXTSECTION
+%token DATASECTION TEXTSECTION GLOBALSECTION
 
 /* labels */
 %token LABELCOLON
 
 %%  
 program
-    : text_section
-    ;
-
-text_section
-    : TEXTSECTION stmt_list 
+    : stmt_list
     ;
 
 stmt_list
     : stmt_list stmt
     | stmt
-    | comment
     ;
 
-comment
-	  : COMMENT 
-    ;
-    
-stmt
+    stmt
+    : DATASECTION
+    | TEXTSECTION
+    | GLOBALSECTION
+    | COMMENT
 		// compare
-    : CMP REG ',' REG
-    | CMP REG ',' REG COMMENT
+    | CMP REG ',' REG
 
 		// add
     | ADD REG ',' REG ',' REG
-    | ADD REG ',' REG ',' REG COMMENT
 
 		// subtract
     | SUB REG ',' REG ',' REG
-    | SUB REG ',' REG ',' REG COMMENT
 		
 		// load register instructions: 
 		// initialization 
@@ -68,45 +60,35 @@ stmt
 
 		// addressing register initialization:
     | LDR REG ',' MEMORYVAR
-    | LDR REG ',' MEMORYVAR COMMENT
 
 		// offset addressing:
     | LDR REG ',' '[' REG ']'
-    | LDR REG ',' '[' REG ']' COMMENT
 
 		// offset with immediate
     | LDR REG ',' '[' REG ',' IMM ']'
-    | LDR REG ',' '[' REG ',' IMM ']' COMMENT
 
 		// offset with register
     | LDR REG ',' '[' REG ',' REG ']'
-    | LDR REG ',' '[' REG ',' REG ']' COMMENT
 
 		// post-index addressing:
 
 		// post-index with immediate
     | LDR REG ',' '[' REG ']' ',' IMM
-    | LDR REG ',' '[' REG ']' ',' IMM COMMENT
 
 		// post-index with register
     | LDR REG ',' '[' REG ']' ',' REG
-    | LDR REG ',' '[' REG ']' ',' REG COMMENT
 
 		// pre-index addressing:
 
 		// pre-index with immediate
     | LDR REG ',' '[' REG ',' IMM ']' '!'
-    | LDR REG ',' '[' REG ',' IMM ']' '!' COMMENT
 
 		// pre-index with register
     | LDR REG ',' '[' REG ',' REG ']' '!'
-    | LDR REG ',' '[' REG ',' REG ']' '!' COMMENT
 
 		// move
-    | MOV REG ',' REG 
-    | MOV REG ',' REG COMMENT
+    | MOV REG ',' REG
     | MOV REG ',' IMM 
-    | MOV REG ',' IMM  COMMENT
     | LABELCOLON
     ;
     

@@ -80,7 +80,8 @@ extern int yydebug;
     MEMORYVAR = 281,               /* MEMORYVAR  */
     DATASECTION = 282,             /* DATASECTION  */
     TEXTSECTION = 283,             /* TEXTSECTION  */
-    LABELCOLON = 284               /* LABELCOLON  */
+    GLOBALSECTION = 284,           /* GLOBALSECTION  */
+    LABELCOLON = 285               /* LABELCOLON  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
