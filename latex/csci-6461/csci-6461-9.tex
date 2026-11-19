@@ -100,20 +100,31 @@
 
 \newcommand{\sectiondivider}[2]{%
 \begin{frame}[plain]
+
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
-\fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
-% Explicit page coordinates keep the divider independent of top-aligned frames.
-\node[anchor=west,inner sep=0pt,text width=.93\paperwidth] at
-  ([xshift=.55cm,yshift=.12\paperheight]current page.west) {%
+\fill[gold] (current page.south west)
+  rectangle ([yshift=.15cm]current page.south east);
+\end{tikzpicture}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.94\textwidth}
 \raggedright
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
+
 {\color{gold}\large\bfseries #1\par}
+
 \vspace{0.3cm}
-{\color{white}\fontsize{22}{26}\selectfont\bfseries #2\par}
-};
-\end{tikzpicture}
+
+{\color{white}\fontsize{22}{26}\selectfont\bfseries
+#2\par}
+
+\end{minipage}
+
+\vspace*{\fill}
+
 \end{frame}
 }
 
@@ -321,23 +332,48 @@
 \begin{tikzpicture}[remember picture,overlay]
 \fill[navy] (current page.south west) rectangle (current page.north east);
 \fill[gold] (current page.south west) rectangle ([yshift=.15cm]current page.south east);
-% Cover text and author use fixed page positions, matching the template layout.
-\node[anchor=north west,inner sep=0pt,text width=.94\textwidth] at
-  ([xshift=.65cm,yshift=-.10\paperheight]current page.north west) {%
-\raggedright
-{\color{gold}\normalsize\bfseries CSCI 6461 \;|\; TOPIC 9\par}
-\vspace{0.3cm}
-{\color{white}\fontsize{24}{28}\selectfont\bfseries Pipelining Fundamentals\\[0.12cm]\& the 5-Stage RISC Pipeline\par}
-\vspace{0.35cm}
-{\color{white!80}\large AArch64 instruction flow, pipeline state,\\hazards, and performance\par}
-};
-\node[anchor=north west,inner sep=0pt,text=white!70,font=\small] at
-  ([xshift=.65cm,yshift=-.72\paperheight]current page.north west) {Dr. J. Burns};
 \end{tikzpicture}
+
+\vspace*{\fill}
+
+\begin{minipage}{0.88\textwidth}
+{\color{gold}\normalsize\bfseries
+CSCI 6461 \;|\; Computer Systems Architecture \;|\; TOPIC 9
+\par}
+
+\vspace{0.25cm}
+
+{\color{white}\fontsize{24}{28}\selectfont\bfseries
+Pipelining Fundamentals\\[0.12cm]\& the 5-Stage RISC Pipeline
+\par}
+
+\vspace{0.35cm}
+
+{\color{white!80}\large
+AArch64 instruction flow, pipeline state,\\hazards, and performance
+\par}
+\end{minipage}
+
+\vfill
+
+{\color{white!70}\small
+Dr. J. Burns
+\par}
+
+\vspace*{\fill}
 \end{frame}
 
 \begin{frame}{Topic 9 Outline}
-\setbeamertemplate{enumerate item}{\arabic{enumi}.}
+\setbeamertemplate{enumerate item}{%
+\begin{tikzpicture}[baseline=-0.65ex]
+\fill[black!20] (0.035,-0.035) circle (0.145);
+\fill[blue!35!black] (0,0) circle (0.145);
+\fill[blue!55!black] (-0.012,0.012) circle (0.123);
+\fill[blue!65!white] (-0.027,0.035) circle (0.096);
+\fill[blue!45!black] (0.008,-0.018) circle (0.102);
+\node[text=white,font=\scriptsize\sffamily,inner sep=0pt] at (0,0) {\insertenumlabel};
+\end{tikzpicture}}
+\setbeamercolor{item projected}{fg=white,bg=blue!50!black}
 \begin{enumerate}\setlength{\itemsep}{8pt}
   \item \key{Pipelining Principles and Timing}
   \begin{itemize}
@@ -361,22 +397,45 @@
 \sectiondivider{PART 1}{Pipelining Principles and Timing}
 
 \begin{frame}{Pipeline Assumptions}
-
+\small
+The pipeline overlaps instructions while preserving their A64 register, memory, and control-flow effects.
+\vspace{.08cm}
+\begin{columns}[T,onlytextwidth]
+\column{.56\textwidth}
+\key{Execution Rules}
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \key{ISA behavior:} execute real A64 instructions while preserving their register, memory, and control-flow effects.
-  \item \key{Implementation:} a single-issue, in-order pipeline with stages IF, ID, EX, MEM, and WB.
-  \item \key{Timing assumptions:} one cycle per stage, separate instruction/data access, cache hits, and branch resolution in EX.
+  \item \key{Single-issue:} at most one new instruction enters per cycle.
+  \item \key{In-order:} instructions advance in program order.
+  \item \key{Timing:} one cycle per stage; memory accesses finish in that cycle; branches resolve in EX.
   \item \key{Register timing:} a WB write is visible to an ID read in the same cycle.
-  \item \key{Scope:} simple integer ALU operations, offset \code{ldr}/\code{str}, and \code{b}/\code{cbz}/\code{cbnz}. Use \code{x0}--\code{x30} in the worked examples.
 \end{itemize}
-\vspace{0.05cm}
-\begin{block}{ISA and Microarchitecture}
-The AArch64 ISA does not prescribe five stages. The five stages shown here are a processor design choice.
-\end{block}
-
+\column{.40\textwidth}
+\key{Five Stages}
+\par\vspace{3pt}
+\renewcommand{\arraystretch}{1.16}
+\rowcolors{2}{softgray}{white}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\rowcolor{white}
+\textbf{Stage} & \textbf{Meaning} \\
+\midrule
+IF & Instruction fetch \\
+ID & Decode and register read \\
+EX & Execute \\
+MEM & Data memory access \\
+WB & Register writeback \\
+\bottomrule
+\end{tabular}
+\end{columns}
+\vspace{.10cm}
+\key{Examples:} integer ALU operations, unsigned-offset \code{ldr}/\code{str}, and \code{b}/\code{cbz}/\code{cbnz}; registers \code{x0}--\code{x30}.
+\par\vspace{.12cm}
+The ISA does not prescribe five stages. Separate instruction and data access ports serve the same program address space.
 \end{frame}
 
 \begin{frame}{Overlapping Instructions}
+
+\code{I1}, \code{I2}, \ldots, \code{I5} label successive instructions in program order; \code{I1} is the oldest.
 
 \begin{center}
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
@@ -402,7 +461,7 @@ The AArch64 ISA does not prescribe five stages. The five stages shown here are a
 \begin{frame}{Clock Period and Stage Balance}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.28}
+\renewcommand{\arraystretch}{1.18}
 \setlength{\tabcolsep}{5pt}
 \rowcolors{2}{softgray}{white}
 \begin{tabular}{llllll}
@@ -421,8 +480,9 @@ Single-cycle period: $T_{\mathrm{single}} = \sum t_{\mathrm{stage}}+t_{\mathrm{r
 Pipeline period: $T_{\mathrm{pipe}} = \max(t_{\mathrm{stage}}) + t_{\mathrm{reg}} = 200+20 = 220$ ps.
 \end{block}
 
-\begin{itemize}\setlength{\itemsep}{6pt}
+\begin{itemize}\setlength{\itemsep}{4pt}
   \item The slowest stage limits the clock. Spare time in ID and WB does not shorten a 200 ps stage.
+  \item Once the pipeline is full, it can ideally \key{complete one instruction every 220 ps}, because several instructions are progressing simultaneously.
   \item For a long independent stream, the ideal speedup approaches $820/220 \approx 3.73$.
 \end{itemize}
 
@@ -576,7 +636,7 @@ The example pipeline has a longer per-instruction latency than the 820 ps single
 \end{tabular}
 \end{center}
 \begin{block}{Values Needed in EX}
-The forwarding network can replace an old ID operand with a newer result. Store data and the \code{cbz}/\code{cbnz} test operand also use this network in our model.
+\key{Forwarding} supplies a newer result directly to a dependent instruction instead of using the older value read in ID. It also supplies store data and the \code{cbz}/\code{cbnz} test operand in this model.
 \end{block}
 
 \end{frame}
@@ -689,7 +749,7 @@ Control & The correct next PC is not yet known. & \code{cbz} may redirect instru
 \draw[flow] (f)--(mem);\draw[flow] (m)--(mem);
 \end{tikzpicture}
 \end{center}
-Our model avoids this structural conflict with separate instruction and data access.
+Separate instruction and data access ports avoid this conflict; both access the same program address space.
 
 \end{frame}
 
@@ -740,22 +800,27 @@ sub x8, x7, x9
 
 \code{add x7, x5, x6} \qquad followed by \qquad \code{sub x8, x7, x9}
 \begin{center}
-\begin{tikzpicture}[font=\small]
+\begin{tikzpicture}[font=\small,scale=.94,transform shape]
 \node[state,minimum width=2.5cm] (id) at (0,0) {ID/EX\\saved operands};
-\node[mux] (mux) at (3,0) {operand\\select};
+\draw[draw=navy,line width=.8pt,fill=softorange]
+  (2.7,-.85) -- (2.7,.85) -- (4,0) -- cycle;
+\node[font=\scriptsize] at (3.1,0) {mux};
+\node[font=\scriptsize,anchor=north] at (3.1,-.97) {operand selection};
 \node[logic,minimum width=2.3cm] (alu) at (5.8,0) {EX ALU};
 \node[state,minimum width=2.7cm] (em) at (9.2,0) {EX/MEM\\ALU result};
-\node[state,minimum width=2.7cm] (mw) at (9.2,-1.7) {MEM/WB\\WB value};
-\draw[flow] (id)--(mux);\draw[flow] (mux)--(alu);\draw[flow] (alu)--(em);
-\draw[bypass] (em.north)--++(0,.7)-| (mux.north);
-\node[font=\footnotesize,fill=white] at (5.9,.7) {newest available ALU result};
-\draw[bypass] (mw.west)-| (mux.south);
-\node[font=\footnotesize,fill=white] at (5.8,-1.7) {older result or loaded value};
+\node[state,minimum width=2.7cm] (mw) at (9.2,-1.8) {MEM/WB\\WB value};
+\draw[flow] (id.east) -- (2.7,0);
+\draw[flow] (4,0) -- (alu.west);
+\draw[flow] (alu.east) -- (em.west);
+\draw[bypass] (em.north) -- (9.2,1.12) -- (2.1,1.12) -- (2.1,.55) -- (2.7,.55);
+\node[font=\footnotesize,anchor=south] at (5.9,1.22) {newest available ALU result};
+\draw[bypass] (mw.west) -- (2.1,-1.8) -- (2.1,-.55) -- (2.7,-.55);
+\node[font=\footnotesize,anchor=north] at (5.8,-1.95) {older result or loaded value};
 \end{tikzpicture}
 \end{center}
 
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item \code{add} finishes EX in cycle 3. EX/MEM supplies its result to \code{sub} in EX in cycle 4: no stall.
+  \item \code{add} ends EX in cycle 3. EX/MEM supplies the result to \code{sub} in EX in cycle 4: no stall.
   \item Match valid register writes to source operands. If two results match, select the newest one.
   \item Never forward a load\textquotesingle s address as loaded data.
 \end{itemize}
@@ -841,6 +906,46 @@ add x8, x7, x9
 
 \sectiondivider{PART 4}{Control Flow and Pipeline Performance}
 
+\begin{frame}{AArch64 Branch Operands and Condition Flags}
+
+\begin{columns}[T,onlytextwidth]
+\column{.48\textwidth}
+\begin{block}{Test a general-purpose register}
+\ttfamily\small
+\begin{tabular}{@{}l@{}}
+cbz  x7, .Lzero \\
+cbnz x7, .Lnonzero
+\end{tabular}
+\end{block}
+
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item Test the value of \code{x7} directly.
+  \item Do not read or update NZCV.
+  \item The test operand may need forwarding or a load-use stall.
+\end{itemize}
+
+\column{.48\textwidth}
+\begin{block}{Test condition flags}
+\ttfamily\small
+\begin{tabular}{@{}l@{}}
+cmp  x7, x8 \\
+b.eq .Lequal
+\end{tabular}
+\end{block}
+
+\begin{itemize}\setlength{\itemsep}{6pt}
+  \item \code{cmp} updates NZCV; \code{b.eq} tests Z.
+  \item \code{cmp} is an alias of \code{subs} with a zero-register destination.
+  \item Extending the datapath for this pair requires flag dependence handling.
+\end{itemize}
+
+\end{columns}
+\vspace{.18cm}
+Use the branch instruction\textquotesingle s saved PC for the target. For \code{cbz}/\code{cbnz}, the signed encoded displacement is multiplied by 4.
+\note{Arm A64 ISA Guide: compare-and-branch and condition flags. Arm CMP (immediate) instruction reference: alias of SUBS. Timing diagrams use CBZ/CBNZ; NZCV forwarding is an extension.}
+
+\end{frame}
+
 \begin{frame}{A Taken Branch Flushes Younger Instructions}
 
 \small\key{Assume:} predict sequential fetch; resolve \code{cbz} in EX; the tested value is zero.
@@ -882,50 +987,12 @@ add x8, x7, x9
 \note{Control-hazard model: predict not taken, EX resolution. Penalty depends on the implementation.}
 \end{frame}
 
-\begin{frame}{AArch64 Branch Operands and Condition Flags}
 
-\begin{columns}[T,onlytextwidth]
-\column{.48\textwidth}
-\begin{block}{Test a general-purpose register}
-\ttfamily\small
-\begin{tabular}{@{}l@{}}
-cbz  x7, .Lzero \\
-cbnz x7, .Lnonzero
-\end{tabular}
-\end{block}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item Test the value of \code{x7} directly.
-  \item Do not read or update NZCV.
-  \item The test operand may need forwarding or a load-use stall.
-\end{itemize}
-
-\column{.48\textwidth}
-\begin{block}{Test condition flags}
-\ttfamily\small
-\begin{tabular}{@{}l@{}}
-cmp  x7, x8 \\
-b.eq .Lequal
-\end{tabular}
-\end{block}
-
-\begin{itemize}\setlength{\itemsep}{6pt}
-  \item \code{cmp} updates NZCV; \code{b.eq} tests Z.
-  \item \code{cmp} is an alias of \code{subs} with a zero-register destination.
-  \item Extending the datapath for this pair requires flag dependence handling.
-\end{itemize}
-
-\end{columns}
-\vspace{.18cm}
-Use the branch instruction\textquotesingle s saved PC for the target. For \code{cbz}/\code{cbnz}, the signed encoded displacement is multiplied by 4.
-\note{Arm A64 ISA Guide: compare-and-branch and condition flags. Arm CMP (immediate) instruction reference: alias of SUBS. Timing diagrams use CBZ/CBNZ; NZCV forwarding is an extension.}
-
-\end{frame}
 
 \begin{frame}{Worked Sequence: Load, Add, Store, and Branch}
 
 \small\key{Assume:} the branch is not taken. Forwarding includes store data and the branch test operand.
-\begin{center}\begin{tikzpicture}[x=0.83cm,y=0.70cm]
+\begin{center}\begin{tikzpicture}[x=0.83cm,y=0.65cm]
 \node[anchor=east,font=\small\ttfamily\bfseries] at (0,0) {Cycle};
 \node[font=\small\ttfamily] at (1,0) {1};
 \node[font=\small\ttfamily] at (2,0) {2};
@@ -965,7 +1032,9 @@ Use the branch instruction\textquotesingle s saved PC for the target. For \code{
 
 
 \end{tikzpicture}\end{center}
-\begin{itemize}\setlength{\itemsep}{4pt}
+\scriptsize\code{IF*}: fetch cannot advance while the PC and IF/ID register are held.\normalsize
+
+\begin{itemize}\setlength{\itemsep}{2pt}
   \item \code{ldr} to \code{add}: one stall, then MEM/WB-to-EX forwarding.
   \item \code{add} to \code{str}: forward \code{x4} from EX/MEM into the store-data path in cycle 6.
   \item \code{add} to \code{cbnz}: forward \code{x4} from MEM/WB into the branch test in cycle 7.
@@ -978,12 +1047,13 @@ Use the branch instruction\textquotesingle s saved PC for the target. For \code{
 
 \begin{block}{Finite Run Under the Stated Model}
 $\text{cycles}=N+4+S+2B$\\[.1cm]
+$N$: correct-path instructions (stores and branches included; flushed work excluded).\\[.1cm]
 $S$: load-use stall cycles. \quad $B$: taken branches predicted not taken.\\[.1cm]
 Assume the counted penalties do not overlap and occur before the final drain.
 \end{block}
 \begin{center}
 \small
-\renewcommand{\arraystretch}{1.28}
+\renewcommand{\arraystretch}{1.15}
 \setlength{\tabcolsep}{5pt}
 \rowcolors{2}{softgray}{white}
 \begin{tabular}{>{\raggedright\arraybackslash}p{7.3cm}>{\raggedright\arraybackslash}p{5.6cm}}
